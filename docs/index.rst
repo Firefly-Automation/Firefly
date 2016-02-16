@@ -11,7 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   ecents
+   events
 
 Indices and tables
 ==================
