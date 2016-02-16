@@ -40,7 +40,7 @@ Sample Event:
 
 .. code-block:: python
 
-   for core.utils import send_direct_event
+   from core.utils import send_direct_event
 
    ...
 
