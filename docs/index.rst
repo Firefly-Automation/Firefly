@@ -12,11 +12,4 @@ Contents:
    :maxdepth: 2
 
    events
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   plugins
