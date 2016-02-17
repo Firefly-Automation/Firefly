@@ -24,6 +24,12 @@ App Plugin:
 Device Plugin
 ----------------
 
+There are two parts to the device plugins:
+   1. The device its self
+   2. The device installer script
+
+Device installer scripts can be used to install more than just one device. i.e: SmartThings installer script installs various device types using a common smartthings libary. By doing this the installer script sets up a refresh loop to refresh all devices that it installed.  
+
 
 ----------------
 App Plugin
