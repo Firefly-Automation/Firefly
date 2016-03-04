@@ -13,3 +13,5 @@ Contents:
 
    events
    plugins
+   location
+   scheduler
