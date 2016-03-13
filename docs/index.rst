@@ -15,3 +15,4 @@ Contents:
    plugins
    location
    scheduler
+   config
