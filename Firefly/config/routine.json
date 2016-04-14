@@ -1,0 +1,35 @@
+{
+   "routines" : [
+     {
+      "id": "home",
+      "type": "routine",
+      "mode" : "home",
+      "devices" : {
+        "hue-group-4" : {"switch": "on"},
+        "UUID-2" : {"switch": "off"}
+      },
+      "triggers" : [ 
+        { "Zach Presence" : {"presence":"True"}},
+        { "Ariel Presence" : {"presence":"True"}} 
+        ],
+      "scheduling" : [
+        "55 6 * * MON,TUE,THU,FRI,SAT"
+        ]
+    },
+    {
+      "id": "away",
+      "type": "routine",
+      "mode" : "away",
+      "devices" : {
+        "hue-group-4" : {"switch": "on"},
+        "UUID-2" : {"switch": "off"}
+      },
+      "triggers" : [ 
+        { "Zach Presence" : {"presence":"False"}, "Ariel Presence" : {"presence":"False"} } 
+        ],
+      "scheduling" : [
+        "55 6 * * MON,TUE,THU,FRI,SAT"
+        ]
+    }
+  ]
+}

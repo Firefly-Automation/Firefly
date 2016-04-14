@@ -1,0 +1,56 @@
+{
+  "Zach Presence" : {
+    "id" : "Zach Presence",
+    "package" : "ffPresence",
+    "module" : "ffPresence",
+    "type" : "device", 
+    "subType" : "presence",
+    "name" : "Zach Presence",
+    "args" : {
+      "name" : "Zach Presence",
+      "notify_present" : true,
+      "notify_not_present" : true,
+      "notify_device" : "all"
+    }
+  },
+  "Ariel Presence" : {
+    "id" : "Ariel Presence",
+    "package" : "ffPresence",
+    "module" : "ffPresence",
+    "type" : "device", 
+    "subType" : "presence",
+    "name" : "Ariel Presence",
+    "args" : {
+      "name" : "Ariel Presence",
+      "notify_present" : true,
+      "notify_not_present" : true,
+      "notify_device" : "all"
+    }
+  },
+  "ZachPushover" : {
+    "id" : "ZachPushover",
+    "package" : "ffPushover",
+    "module" : "ffPushover",
+    "type" : "device",
+    "subType" : "notification",
+    "name" : "ZachPushover",
+    "args" : {
+      "name" : "ZachPushover",
+      "api_key" : "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "user_key" : "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    }
+  },
+  "Hue" : {
+    "id" : "hue",
+    "package" : "ffHue",
+    "module" : "ffHue",
+    "type" : "device",
+    "subType" : "light",
+    "args" : {
+      "name" : "Hue",
+      "username" : "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "insatll_lights"  : true,
+      "install_groups" : true
+    }
+  }
+}
