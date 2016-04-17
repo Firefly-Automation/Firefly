@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 16:49:52
-# @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-13 00:54:18
+# @Last Modified by:   zpriddy
+# @Last Modified time: 2016-04-17 02:40:38
+
 from core.models.event import Event as ffEvent
 import logging
 
