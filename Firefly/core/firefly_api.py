@@ -171,7 +171,7 @@ def send_event(event):
       s = pickle.loads(d.get('ffObject'))
       s.sendEvent(event)
       d = pickle.dumps(s)
-      deviceDB.update_one({'id':event.deviceID},{'$set': {'ffObject':d}, '$currentDate': {'lastModified': True}})
+      deviceDB.update_one({'id':event.deviceID},{'$set': {'ffObject':d}}) #, '$currentDate': {'lastModified': True}})
 
   for d in  routineDB.find({'listen':event.deviceID}):
     s = pickle.loads(d.get('ffObject'))
@@ -186,7 +186,7 @@ def send_command(command):
     s = pickle.loads(d.get('ffObject'))
     s.sendCommand(command)
     d = pickle.dumps(s)
-    deviceDB.update_one({'id':command.deviceID},{'$set': {'ffObject':d}, '$currentDate': {'lastModified': True}})
+    deviceDB.update_one({'id':command.deviceID},{'$set': {'ffObject':d}}) #, '$currentDate': {'lastModified': True}})
 
   data_log(command.log)
 
@@ -270,7 +270,7 @@ def event_message(fromDevice, message):
 def update_status(status):
   print "UPDATING STATUS"
   deviceID = status.get('deviceID')
-  deviceDB.update_one({'id':deviceID},{'$set': {'status': status}, "$currentDate": {"lastModified": True}})
+  deviceDB.update_one({'id':deviceID},{'$set': {'status': status}}) #, "$currentDate": {"lastModified": True}})
 
 def auto_start():
   for device in deviceDB.find({}):
