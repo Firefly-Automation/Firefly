@@ -67,9 +67,9 @@ Sample Device
 .. code-block :: python
 
    from core.models.device import Device
-import logging
+  import logging
 
-class Device(Device):
+  class Device(Device):
 
   def __init__(self, deviceID, args={}):
     self.METADATA = {
