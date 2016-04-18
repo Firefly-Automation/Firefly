@@ -66,7 +66,7 @@ Sample Device
 ---------------
 .. code-block :: python
 
-   from core.models.device import Device
+  from core.models.device import Device
   import logging
 
   class Device(Device):
