@@ -4,8 +4,8 @@
       "id": "home",
       "type": "routine",
       "mode" : "home",
-      "devices" : {
-        "hue-group-4" : {"switch": "on"},
+      "actions" : {
+        "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"soft white"}},
         "UUID-2" : {"switch": "off"}
       },
       "triggers" : [ 
@@ -20,8 +20,8 @@
       "id": "away",
       "type": "routine",
       "mode" : "away",
-      "devices" : {
-        "hue-group-4" : {"switch": "on"},
+      "actions" : {
+        "hue-group-4" : {"switch": "off"},
         "UUID-2" : {"switch": "off"}
       },
       "triggers" : [ 

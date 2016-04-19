@@ -36,14 +36,14 @@ class Device(object):
         if item in self._commands:
           simpleCommand = self._commands[item](value)
 
-      self.refreshData()
-
-      ## OPTIONAL - SEND EVENT
-      if command.simple:
-        ffEvent(command.deviceID, simpleCommand)
+      if self.refreshData():
+        logging.info('Chnage In Status - Sending Event')
+        if command.simple:
+          ffEvent(command.deviceID, simpleCommand)
+        else:
+          ffEvent(command.deviceID, command.command)
       else:
-        ffEvent(command.deviceID, command.command)
-      ## OPTIONAL - SEND EVENT
+        logging.info('NO chnage in status')
     
 
   def requestData(self, request):
@@ -67,8 +67,8 @@ class Device(object):
     for item in self._requests:
       returnData[item] = self._requests[item]()
     returnData['deviceID'] = self._id
-    update_status(returnData)
-    return returnData
+    updated = update_status(returnData)
+    return updated
 
   @property
   def metadata(self):

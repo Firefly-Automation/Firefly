@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
-# @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-13 00:49:55
+# @Last Modified by:   zpriddy
+# @Last Modified time: 2016-04-18 17:50:11
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -19,6 +19,7 @@
 
 import json
 import logging
+from core.models.command import Command as ffCommand
 
 class Routine(object):
   def __init__(self, configJson):
@@ -27,7 +28,7 @@ class Routine(object):
     self._name = config.get('id')
     self._mode = config.get('mode')
     self._triggers = config.get('triggers')
-    self._devices = config.get('devices')
+    self._actions = config.get('actions')
     self._scheduling = config.get('scheduling')
 
     self._listen = [x.keys()[0] for x in self._triggers]
@@ -51,8 +52,8 @@ class Routine(object):
       return self._triggers
 
   @property
-  def devices(self):
-      return self._devices
+  def actions(self):
+      return self._actions
 
   @property
   def scheduling(self):
@@ -79,6 +80,13 @@ class Routine(object):
           print '******************* TRIGGER *******************'
           event_message(self._name,"Routine Triggered")
           print str(self._mode)
+          self.executeRoutine()
+
+  def executeRoutine(self):
+    logging.info("Executing Routine")
+    for device, commands in self._actions.iteritems():
+      ffCommand(device,commands)
+
 
   
 

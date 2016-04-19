@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 21:48:42
-# @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-13 00:18:25
+# @Last Modified by:   zpriddy
+# @Last Modified time: 2016-04-18 18:08:40
 from core.models import event
 from core.models.command import Command as ffCommand
 
@@ -81,32 +81,40 @@ class Device(object):
 
     rawLightData = self._hueBridge.get_lights()
     for light, lightData in rawLightData.iteritems():
-      newLight = lightDevice.Device(lightData,'ffHueBridge',light)
+      lightData['bridgeID'] = 'ffHueBridge'
+      lightConfig = {}
+      lightConfig['args'] = lightData
+      lightConfig['args']['lightID'] = light
+      newLight = lightDevice.Device('hue-light-' + str(light), lightConfig)
       lightData['args'] = {}
       lightData['args']['name'] = lightData.get('name')
-      install_child_device('hueLight-' + str(light), newLight, config=lightData)
+      install_child_device('hue-light-' + str(light), newLight, config=lightData)
 
     rawGroupData = self._hueBridge.get_groups()
     for group, groupData in rawGroupData.iteritems():
-      newGroup = groupDevice.Device(groupData,'ffHueBridge',group)
+      groupData['bridgeID'] = 'ffHueBridge'
+      groupConfig = {}
+      groupConfig['args'] = groupData
+      groupConfig['args']['groupID'] = group
+      newGroup = groupDevice.Device('hue-group-' + str(group), groupConfig)
       groupData['args'] = {}
       groupData['args']['name'] = groupData.get('name')
-      install_child_device('hueGroup-' + str(group), newGroup, config=groupData)
+      install_child_device('hue-group-' + str(group), newGroup, config=groupData)
 
     self.refresh_scheduler()
 
   def refresh_scheduler(self, args={}):
     print "Starting Scheduler"
     hueScheduler = Scheduler()
-    hueScheduler.runEveryS(10,self.refresh_hue,replace=True,uuid='HueRefresher')
+    hueScheduler.runEveryS(30,self.refresh_hue,replace=True,uuid='HueRefresher')
 
   def refresh_hue(self):
     rawLightData = self._hueBridge.get_lights()
     for light, lightData in rawLightData.iteritems():
-      deviceID = 'hueLight-' + str(light)
+      deviceID = 'hue-light-' + str(light)
       updateEvent =ffCommand(deviceID,{'update':lightData})
 
     rawGroupData = self._hueBridge.get_groups()
     for group, groupData in rawGroupData.iteritems():
-      deviceID = 'hueGroup-' + str(group)
+      deviceID = 'hue-group-' + str(group)
       updateEvent = ffCommand(deviceID,{'update':groupData})

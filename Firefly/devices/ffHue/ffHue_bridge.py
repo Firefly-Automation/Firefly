@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 23:50:08
-# @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-13 00:29:06
+# @Last Modified by:   zpriddy
+# @Last Modified time: 2016-04-17 20:56:21
 
 import requests #TODO: Replace with core.http_request
 from core.models.event import Event as ffEvent
@@ -96,10 +96,7 @@ class Bridge(object):
 
 
   def sendGroupRequest(self, request):
-    print '***********************************SEND GROUP REQUEST'
-    print request
     if 'groupID' in request.keys():
-      print '***********************************SEND GROUP REQUEST'
       logging.info('Sending Group Request')
       self.send_request('groups/' + str(request.get('groupID')) + '/action', data=request.get('data'), method='PUT')
 

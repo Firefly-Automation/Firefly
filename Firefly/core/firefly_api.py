@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
-# @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-13 01:02:27
+# @Last Modified by:   zpriddy
+# @Last Modified time: 2016-04-18 17:54:19
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -83,11 +83,12 @@ def manual_command(request):
     <input type="submit">
     </form>
     Sample Commands <br>
-    {"device":"hueLight-8", "command":{"switch":"on"}} <br>
-    {"device":"hueLight-8", "command":{"switch":"off"}} <br>
+    {"device":"hue-light-8", "command":{"switch":"on"}} <br>
+    {"device":"hue-light-8", "command":{"switch":"off"}} <br>
     {"device":"ZachPushover", "command":{"notify":{"message":"New Test Message"}}} <br>
     {"device":"Zach Presence", "command":{"presence":true}} <br>
     {"device":"Zach Presence", "command":{"presence":false}} <br>
+    {"device":"hue-group-4", "command":{"setLight":{"preset":"cloudy", "transitiontime":40,"effect":"none","level":100,"alert":"lselect"}}} <br>
     <br>
     Devices:<br>''' + device_list + '''
     </html>
@@ -120,13 +121,13 @@ def ff_read_device_config(request):
 def send_test_event(request):
   #event.Event('Zach Presence', {'presence': not send_request(ffRequest.Request('Zach Presence', 'presence'))})
   #send_notification('all','This is a test message from new Firefly. Zach Presence : ' + str(send_request(ffRequest.Request('Zach Presence', 'presence'))))
-  command = not deviceDB.find_one({'id':'hueLight-8'}).get('status').get('on')
+  command = not deviceDB.find_one({'id':'hue-light-8'}).get('status').get('on')
   print command
   if command:
     command = 'on'
   else:
     command = 'off'
-  myNewEvent = ffEvent('hueLight-8', {'switch': command})
+  myNewEvent = ffEvent('hue-light-8', {'switch': command})
   return str(deviceDB.find_one({'id':'Zach Presence'}).get('status'))
 
 
@@ -268,9 +269,14 @@ def event_message(fromDevice, message):
 
 
 def update_status(status):
-  print "UPDATING STATUS"
   deviceID = status.get('deviceID')
-  deviceDB.update_one({'id':deviceID},{'$set': {'status': status}}) #, "$currentDate": {"lastModified": True}})
+  currentStatus = deviceDB.find_one({'id':deviceID}).get('status')
+  if currentStatus != status:
+    print '-------------------UPDATING STATUS---------------'
+    deviceDB.update_one({'id':deviceID},{'$set': {'status': status}}) #, "$currentDate": {"lastModified": True}})
+    return True
+  else:
+    return False
 
 def auto_start():
   for device in deviceDB.find({}):

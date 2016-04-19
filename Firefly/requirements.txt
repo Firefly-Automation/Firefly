@@ -2,3 +2,6 @@ klein
 treq
 bson
 pymongo
+numpy
+webcolors
+colorpy
