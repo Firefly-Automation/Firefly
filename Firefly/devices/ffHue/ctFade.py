@@ -2,7 +2,7 @@
 # @Author: zpriddy
 # @Date:   2016-04-18 20:56:52
 # @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-18 21:38:39
+# @Last Modified time: 2016-04-18 23:55:37
 
 from core.scheduler import Scheduler
 from core.models.command import Command as ffCommand
@@ -37,7 +37,7 @@ class CTFade(object):
 
   def runFade(self):
     if self._run:
-      lightCommand = ffCommand(self._deviceID, {'setLight':{'ct':str(self._currentK)+'K','transitiontime':self._delay*10}})
+      lightCommand = ffCommand(self._deviceID, {'setLight':{'ct':str(self._currentK)+'K','transitiontime':self._delay*10,'ctfade':True}})
       if self._timeRemaining >= self._delay:
         self._scheduler.runInS(int(self._delay), self.runFade, replace=True, uuid=self._deviceID)
       self._currentK -= self._step

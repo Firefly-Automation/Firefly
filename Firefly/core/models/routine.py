@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-18 17:50:11
+# @Last Modified time: 2016-04-19 00:52:49
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -83,7 +83,7 @@ class Routine(object):
           self.executeRoutine()
 
   def executeRoutine(self):
-    logging.info("Executing Routine")
+    logging.info("Executing Routine" + self._name)
     for device, commands in self._actions.iteritems():
       ffCommand(device,commands)
 

@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-18 17:54:19
+# @Last Modified time: 2016-04-19 01:32:01
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -78,30 +78,47 @@ def manual_command(request):
   form = '''
     <html>
     <h1>Manual Command</h1>
+    <br>
     <form action="manual_command" method="POST" id="command">
-    <textarea form ="command" name="myCommand" id="myCommand" rows="4" cols="35" wrap="soft"></textarea>
+    <textarea form ="command" name="myCommand" id="myCommand" rows="6" cols="70" wrap="soft"></textarea>
     <input type="submit">
     </form>
     Sample Commands <br>
-    {"device":"hue-light-8", "command":{"switch":"on"}} <br>
-    {"device":"hue-light-8", "command":{"switch":"off"}} <br>
-    {"device":"ZachPushover", "command":{"notify":{"message":"New Test Message"}}} <br>
-    {"device":"Zach Presence", "command":{"presence":true}} <br>
-    {"device":"Zach Presence", "command":{"presence":false}} <br>
-    {"device":"hue-group-4", "command":{"setLight":{"preset":"cloudy", "transitiontime":40,"effect":"none","level":100,"alert":"lselect"}}} <br>
+    <a href='?myCommand={"device":"hue-light-8", "command":{"switch":"on"}}'>{"device":"hue-light-8", "command":{"switch":"on"}}</a> <br>
+    <a href='?myCommand={"device":"hue-light-8", "command":{"switch":"off"}}'>{"device":"hue-light-8", "command":{"switch":"off"}}</a> <br>
+    <a href='?myCommand={"device":"ZachPushover", "command":{"notify":{"message":"New Test Message"}}}'>{"device":"ZachPushover", "command":{"notify":{"message":"New Test Message"}}}</a> <br>
+    <a href='?myCommand={"device":"Zach Presence", "command":{"presence":true}}'>{"device":"Zach Presence", "command":{"presence":true}}</a> <br>
+    <a href='?myCommand={"device":"Zach Presence", "command":{"presence":false}}'>{"device":"Zach Presence", "command":{"presence":false}}</a> <br>
+    <a href='?myCommand={"device":"hue-group-4", "command":{"setLight":{"preset":"cloudy", "transitiontime":40,"effect":"none","level":100,"alert":"lselect"}}}'>{"device":"hue-group-4", "command":{"setLight":{"preset":"cloudy", "transitiontime":40,"effect":"none","level":100,"alert":"lselect"}}}</a> <br>
+    <br>
+    <a href='?myCommand={"device":"hue-light-3", "command":{"setLight":{"effect":"colorloop","level":50}}}'>{"device":"hue-light-3", "command":{"setLight":{"effect":"colorloop","level":50}}}</a><br>
+    <a href='?myCommand={"device":"hue-light-3", "command":{"setLight":{"effect":"none","level":50}}}'>{"device":"hue-light-3", "command":{"setLight":{"effect":"none","level":50}}}</a><br>
+    <a href='?myCommand={"device":"hue-light-3", "command":{"switch":"on"}}'>{"device":"hue-light-3", "command":{"switch":"on"}}</a> <br>
+    <a href='?myCommand={"device":"hue-light-3", "command":{"switch":"off"}}'>{"device":"hue-light-3", "command":{"switch":"off"}}</a> <br>
+    <a href='?myCommand={"device":"hue-light-3", "command":{"setLight":{"name":"red","level":100}}}'>{"device":"hue-light-3" "command":{"setLight":{"name":"red","level":100}}}</a><br>
+    <a href='?myCommand={"device":"hue-light-3", "command":{"setLight":{"name":"blue","level":100}}}'>{"device":"hue-light-3" "command":{"setLight":{"name":"blue","level":100}}}</a><br>
+
+    <br>
+    <a href='?myCommand={"device":"night","routine":true}'>{"device":"night","routine":true}</a> <br>
+    <a href='?myCommand={"device":"home","routine":true}'>{"device":"home","routine":true}</a> <br>
+    <br>
+    <a href="http://www.w3schools.com/colors/colors_hex.asp"> Color Names </a><br>
     <br>
     Devices:<br>''' + device_list + '''
     </html>
     '''
-  if request.method == 'POST':
+  if request.method == 'POST' or request.args.get('myCommand'):
     try:
       command = json.loads(request.args.get('myCommand')[0])
-      myCommand = ffCommand(command.get('device'),command.get('command'))
+      if command.get('routine'):
+        myCommand = ffCommand(command.get('device'),command.get('command'), routine=command.get('routine'))
+      else:
+        myCommand = ffCommand(command.get('device'),command.get('command'))
       return form + '<br><br> Last Command: ' + str(request.args.get('myCommand')[0]) 
     except ValueError:
       return form + '<br><br>Last Command Failed - INVALID JSON FORMAT ' + str(request.args.get('myCommand')[0])
   else:
-    return form
+    return form + str(request.args)
 
 @app.route('/readConfig')
 def ff_read_device_config(request):
@@ -182,6 +199,11 @@ def send_event(event):
 
 def send_command(command):
   logging.info('send_command ' + str(command))
+
+  if command.routine:
+    routine = routineDB.find_one({'id':command.deviceID})
+    s = pickle.loads(routine.get('ffObject'))
+    s.executeRoutine()
 
   for d in deviceDB.find({'id':command.deviceID}):
     s = pickle.loads(d.get('ffObject'))

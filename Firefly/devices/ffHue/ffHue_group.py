@@ -2,7 +2,7 @@
 # @Author: zpriddy
 # @Date:   2016-04-17 20:28:40
 # @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-18 21:42:08
+# @Last Modified time: 2016-04-19 01:27:31
 
 from core.models.device import Device
 from core.models.command import Command as ffCommand
@@ -42,7 +42,7 @@ class Device(Device):
     
     self.COMMANDS = {
       'on' : self.setOn,
-      'off' : self.off,
+      'off' : self.setOff,
       'setLight' : self.setGroup,
       'level' : self.setLevel,
       'bri' : self.setBri,
@@ -60,7 +60,7 @@ class Device(Device):
       'xy' : self.getXy,
       'type' : self.getType
     }
-    print args
+
     args = args.get('args')
     name = args.get('name')
     super(Device,self).__init__(deviceID, name)
@@ -78,7 +78,7 @@ class Device(Device):
     self._ct = args.get('action').get('ct')
     self._type = args.get('type')
     self._bridge = args.get('bridgeID')
-    self._level = int(self._bri/255*100)
+    self._level = int(self._bri/255.0*100.0)
 
 
 ####################### START OF DEVICE CODE #############################
@@ -95,191 +95,29 @@ class Device(Device):
   def ct(self):
     return self._ct
 
-  @on.setter
-  def on(self, value):
-    self._on = value
-    self.set_group({'on':value})
-    
-
-  def off(self, args={}):
-    self.set_group({'on':False})
-    self._on = False
-    return {'switch' : 'off'}
-
   @property
   def level(self):
     return self._level
 
   @property
   def tyep(self):
-    return self._tyep
-  
-
-  @level.setter
-  def level(self, pLevel=100):
-    if pLevel == 0:
-      self._level = 0
-      self._bri = 0
-      self._on = False
-    else:
-      on = True
-      self._level = pLevel
-      bri = int(255/100*pLevel)
-    self.set_group({'bri':bri,'on':on})
-
-  def setLevel(self, pLevel):
-    if pLevel <= 0:
-      pLevel = 0
-    if pLevel > 100:
-      pLevel = 100
-    self.level = pLevel
-
-  def setBri(self, pBri):
-    if pBri <= 0:
-      self._bri = 0
-      self._on = False
-    else:
-      if pBri > 255:
-        pBri = 255
-      bri = pBri
-      on = True
-    self.set_group({'bri':bri,'on':on})
-
-  # setGroup(self, value={'hex','level','bri','x','y','hue','on','ct'}) -> Parse from these arguments :) ONE BIG PARSER
-  ## TODO FIX ALL THE self._* to just * = then set the self._* but dont use them 
-  def setGroup(self, value):
-    groupValue = {}
-
-    # XY
-    xy = value.get('xy')
-    if xy:
-      groupValue.update({'xy':xy})
-      print groupValue
-
-    # HUE
-    hue = value.get('hue')
-    if hue:
-      groupValue.update({'hue':hue})
-
-    #TRANS TIME
-    transitiontime = value.get('transitiontime')
-    if transitiontime:
-      groupValue.update({'transitiontime':transitiontime})
-    else:
-      groupValue.update({'transitiontime':40})
-
-
-    #NAME COLOR
-    name = value.get('name')
-    if name:
-      value['hex'] = name_to_hex(name)
-
-
-    #HEX COLOR
-    hexColor = value.get('hex')
-    if hexColor:
-      groupValue.update(self.hexColor(hexColor))
-      self._on = True if not value.get('noOn') else self.on
-      groupValue.update({'on':self.on})
-
-    # PRESET
-    preset = value.get('preset')
-    if preset:
-      if preset in PRESETS_CT:
-        value['ct'] = PRESETS_CT.get(preset)
-
-
-    # SET FOR LEVEL
-    level = value.get('level')
-    if level:
-      if level > 0:
-        level = 100 if level >= 100 else level
-        bri = int(255.0/100.0*level)
-        level = level
-        on = True if not value.get('noOn') else self.on
-        groupValue.update({'bri':bri,'on':on})
-      if level <= 0:
-        self._bri = 0
-        self._level = 0
-        self._on = False
-        groupValue.update({'bri':self.bri,'on':self.on})
-
-    # SET FOR BRI
-    bri = value.get('bri')
-    if bri:
-      if bri > 0:
-        self._level = int(self._bri/255.0*100.0)
-        self._bri = bri
-        sself._on = True if not value.get('noOn') else self.on 
-        groupValue.update({'bri':self.bri,'on':self.on})
-      if bri <= 0:
-        self._level = 0
-        self._bri = 0
-        self._on = False
-        groupValue.update({'bri':self.bri,'on':self.on})
-
-    # SET CT:
-    ct = value.get('ct')
-    if ct:
-      if 'K' in ct.upper():
-        ct = int(ct.upper().replace('K',''))
-        ct = int(1000000/ct)
-
-      if ct > 500:
-        ct = 500
-      if ct < 153:
-        ct = 153
-      self._ct = ct
-      self._on = True if not value.get('noOn') else self.on
-      groupValue.update({'ct':self.ct, 'on':self.on})
-
-
-    # SET FOR ON
-    on = value.get('on')
-    if on is not None:
-      self._on = on
-      groupValue.update({'on':self.on})
-
-    # EFFECT
-    effect = value.get('effect')
-    if effect:
-      self._effect = effect
-      groupValue.update({'effect':self._effect})
-
-    # ALERT
-    alert = value.get('alert')
-    if alert:
-      self._alert = alert
-      groupValue.update({'alert':alert})
-
-    self.set_group(groupValue)
-
-
-  def ctFade(self, args={}):
-    global ctFade
-    #{"device":"hue-group-4", "command":"ctfade":{"startK":6500,"endK":2700,"fadeS":900}}}
-    print '================================================================================'
-    print args
-    ctFade = CTFade(str(self._id),args.get('startK'),args.get('endK'),args.get('fadeS'))
-  
+    return self._type
 
   @property
   def hue(self):
       return self._hue
 
-  def switch(self, value):
-    if value == 'on':
-      self.on = True
-    elif value == 'off':
-      self.on = False
+  def setOff(self, args={}):
+    return self.setGroup({'on':False})
+  
+  def setLevel(self, pLevel):
+    return self.setGroup({'level':pLevel})
 
-  def set_group(self, value):
-    group_id = self._group_id
-    groupEvent = ffCommand(self._bridge,{'sendGroupRequest' : {'groupID':group_id,'data':value}})
+  def setBri(self, pBri):
+    return self.setGroup({'bri':pBri})
 
   def setOn(self, args={}):
-    self.on = True
-    return {'switch' : 'on'}
+    return self.setGroup({'on':True})
 
   def getOn(self):
     return self._on
@@ -302,13 +140,146 @@ class Device(Device):
   def getType(self):
     return self._type
 
+  def setGroup(self, value):
+    groupValue = {}
+
+    # END FADE IF SET COMMAND IS GIVEN
+    if not value.get('ctfade'):
+      global ctFade
+      ctFade.endRun()
+
+    # XY
+    xy = value.get('xy')
+    if xy:
+      groupValue.update({'xy':xy})
+      self._xy = xy
+
+    # HUE
+    hue = value.get('hue')
+    if hue:
+      groupValue.update({'hue':hue})
+      self._hue = hue
+
+    #TRANS TIME
+    transitiontime = value.get('transitiontime')
+    if transitiontime:
+      groupValue.update({'transitiontime':transitiontime})
+    else:
+      groupValue.update({'transitiontime':40})
+
+
+    #NAME COLOR
+    name = value.get('name')
+    if name:
+      value['hex'] = name_to_hex(name)
+
+
+    #HEX COLOR
+    hexColor = value.get('hex')
+    if hexColor:
+      groupValue.update(self.hexColor(hexColor))
+
+
+    # PRESET
+    preset = value.get('preset')
+    if preset:
+      if preset in PRESETS_CT:
+        value['ct'] = PRESETS_CT.get(preset)
+
+
+    # SET FOR LEVEL
+    level = value.get('level')
+    if level:
+      if level > 0:
+        if level > 100:
+          level = 100
+        level = 100 if level >= 100 else level
+        bri = int(255.0/100.0*level)
+        level = level
+        groupValue.update({'bri':bri})
+      if level <= 0:
+        bri = 0
+        level = 0
+        self._on = False
+        groupValue.update({'bri':bri,'on':False})
+      self._bri = bri
+      self._level = level
+
+    # SET FOR BRI
+    bri = value.get('bri')
+    if bri:
+      if bri > 255:
+        bri = 255
+        self._level = int(bri/255.0*100.0)
+      if bri <= 0:
+        bri = 0
+        self._level = 0
+        self._on = False
+        groupValue.update({'on':False})
+      groupValue.update({'bri':bri})
+      self._bri = bri
+
+    # SET CT:
+    ct = value.get('ct')
+    if ct:
+      if 'K' in ct.upper():
+        ct = int(ct.upper().replace('K',''))
+        ct = int(1000000/ct)
+      if ct > 500:
+        ct = 500
+      if ct < 153:
+        ct = 153
+      
+      groupValue.update({'ct':ct})
+      self._ct = ct
+
+    # EFFECT
+    effect = value.get('effect')
+    if effect:
+      groupValue.update({'effect':effect})
+      self._effect = effect
+
+    # ALERT
+    alert = value.get('alert')
+    if alert:
+      groupValue.update({'alert':alert})
+      self._alert = alert
+
+    # SET FOR ON
+    on = value.get('on')
+    if on is not None:
+      groupValue.update({'on':on})
+      self._on = on
+
+    # Turn lights on unless told not to or has already been set
+    if groupValue.get('on') is None and not value.get('onOn'):
+      groupValue.update({'on':True})
+      self._on = True
+
+    self.set_group(groupValue)
+    return value
+
+
+  def ctFade(self, args={}):
+    global ctFade
+    ctFade = CTFade(str(self._id),args.get('startK'),args.get('endK'),args.get('fadeS'))
+
+  def switch(self, value):
+    if value == 'on':
+      self.setGroup({'on':True})
+    elif value == 'off':
+      self.setGroup({'on':False})
+
+  def set_group(self, value):
+    group_id = self._group_id
+    groupCommand = ffCommand(self._bridge,{'sendGroupRequest' : {'groupID':group_id,'data':value}})
+
+
   def hexColor(self, colorHex):
     if '#' in colorHex:
       colorHex = colorHex.replace('#','')
-
     if 'LST' in self._modelid:
       return {'xy':converter.hexToCIE1931(colorHex, lightType='LST')}
-
     return {'xy':converter.hexToCIE1931(colorHex)}
 
 
@@ -324,7 +295,7 @@ class Device(Device):
     self._bri = raw_data.get('action').get('bri')
     self._ct = raw_data.get('action').get('ct')
     self._type = raw_data.get('type')
-    self._level = int(self._bri/255*100)
+    self._level = int(self._bri/255.0*100.0)
     raw_data['action']['level'] = self._level
 
     ffEvent(self._id, raw_data.get('action'))

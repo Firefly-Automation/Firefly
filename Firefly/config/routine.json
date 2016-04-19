@@ -6,7 +6,13 @@
       "mode" : "home",
       "actions" : {
         "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"soft white"}},
-        "UUID-2" : {"switch": "off"}
+        "hue-group-2" : {"setLight": {"on":false, "transitiontime":1}}
+      },
+      "actions_night" : {
+
+      },
+      "actions_day" : {
+
       },
       "triggers" : [ 
         { "Zach Presence" : {"presence":"True"}},
@@ -16,6 +22,7 @@
         "55 6 * * MON,TUE,THU,FRI,SAT"
         ]
     },
+
     {
       "id": "away",
       "type": "routine",
@@ -24,8 +31,36 @@
         "hue-group-4" : {"switch": "off"},
         "UUID-2" : {"switch": "off"}
       },
+      "actions_night" : {
+
+      },
+      "actions_day" : {
+
+      },
       "triggers" : [ 
         { "Zach Presence" : {"presence":"False"}, "Ariel Presence" : {"presence":"False"} } 
+        ],
+      "scheduling" : [
+        "55 6 * * MON,TUE,THU,FRI,SAT"
+        ]
+    },
+
+    {
+      "id": "night",
+      "type": "routine",
+      "mode" : "night",
+      "actions" : {
+        "hue-group-5" : {"setLight": {"on":false, "transitiontime":200}},
+        "hue-light-5" : {"setLight": {"name":"indigo","level":10}}
+      },
+      "actions_night" : {
+        "hue-group-4" : {"setLight": {"on":false}},
+        "hue-light-5" : {"setLight": {"name":"indigo","level":1}}
+      },
+      "actions_day" : {
+        "hue-group-4" : {"setLight": {"on":false}}
+      },
+      "triggers" : [ 
         ],
       "scheduling" : [
         "55 6 * * MON,TUE,THU,FRI,SAT"

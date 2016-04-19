@@ -2,7 +2,7 @@
 # @Author: zpriddy
 # @Date:   2016-04-17 20:28:40
 # @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-18 21:20:21
+# @Last Modified time: 2016-04-19 01:27:44
 
 from core.models.device import Device
 from core.models.command import Command as ffCommand
@@ -10,7 +10,9 @@ from core.models.event import Event as ffEvent
 import logging
 from rgb_cie import Converter
 from webcolors import name_to_hex
+from ctFade import CTFade
 
+ctFade = CTFade(0,0,0,0,run=False)
 
 PRESETS_CT = {
   'cloudy' : '6500K',
@@ -40,11 +42,12 @@ class Device(Device):
     
     self.COMMANDS = {
       'on' : self.setOn,
-      'off' : self.off,
+      'off' : self.setOff,
       'setLight' : self.setLight,
       'level' : self.setLevel,
       'bri' : self.setBri,
       'switch' : self.switch,
+      'ctfade' : self.ctFade,
       'update' : self.update
     }
 
@@ -57,6 +60,7 @@ class Device(Device):
       'xy' : self.getXy,
       'type' : self.getType
     }
+
     print args
     args = args.get('args')
     name = args.get('name')
@@ -80,7 +84,7 @@ class Device(Device):
     self._type = args.get('type')
     self._bridge = args.get('bridgeID')
     self._ct = args.get('state').get('ct')
-    self._level = int(self._bri/255*100)
+    self._level = int(self._bri/255.0*100.0)
 
 ####################### START OF DEVICE CODE #############################
 
@@ -96,185 +100,29 @@ class Device(Device):
   def ct(self):
     return self._ct
 
-  @on.setter
-  def on(self, value):
-    self._on = value
-    self.set_light({'on':value})
-    
-
-  def off(self, args={}):
-    self.set_light({'on':False})
-    self._on = False
-    return {'switch' : 'off'}
-
   @property
   def level(self):
     return self._level
 
   @property
   def tyep(self):
-    return self._tyep
-  
-
-  @level.setter
-  def level(self, pLevel=100):
-    if pLevel == 0:
-      self._level = 0
-      self._bri = 0
-      self._on = False
-    else:
-      self._on = True
-      self._level = pLevel
-      self._bri = int(255/100*pLevel)
-    self.set_light({'bri':self._bri,'on':self.on})
-
-  def setLevel(self, pLevel):
-    if pLevel <= 0:
-      pLevel = 0
-    if pLevel > 100:
-      pLevel = 100
-    self.level = pLevel
-
-  def setBri(self, pBri):
-    if pBri <= 0:
-      self._bri = 0
-      self._on = False
-    else:
-      if pBri > 255:
-        pBri = 255
-      self._bri = pBri
-      self._on = True
-    self.set_light({'bri':self._bri,'on':self.on})
-
-  # setLight(self, value={'hex','level','bri','x','y','hue','on','ct'}) -> Parse from these arguments :) ONE BIG PARSER
-  def setLight(self, value):
-    lightValue = {}
-
-    # XY
-    xy = value.get('xy')
-    if xy:
-      lightValue.update({'xy':xy})
-      print lightValue
-
-    # HUE
-    hue = value.get('hue')
-    if hue:
-      lightValue.update({'hue':hue})
-
-    #TRANS TIME
-    transitiontime = value.get('transitiontime')
-    if transitiontime:
-      lightValue.update({'transitiontime':transitiontime})
-    else:
-      lightValue.update({'transitiontime':40})
-
-
-    #NAME COLOR
-    name = value.get('name')
-    if name:
-      value['hex'] = name_to_hex(name)
-
-
-    #HEX COLOR
-    hexColor = value.get('hex')
-    if hexColor:
-      lightValue.update(self.hexColor(hexColor))
-      self._on = True if not value.get('noOn') else self.on
-      lightValue.update({'on':self.on})
-
-    # PRESET
-    preset = value.get('preset')
-    if preset:
-      if preset in PRESETS_CT:
-        value['ct'] = PRESETS_CT.get(preset)
-
-
-    # SET FOR LEVEL
-    level = value.get('level')
-    if level:
-      if level > 0:
-        level = 100 if level >= 100 else level
-        self._bri = int(255/100*level)
-        self._level = level
-        self._on = True if not value.get('noOn') else self.on
-        lightValue.update({'bri':self.bri,'on':self.on})
-      if level <= 0:
-        self._bri = 0
-        self._level = 0
-        self._on = False
-        lightValue.update({'bri':self.bri,'on':self.on})
-
-    # SET FOR BRI
-    bri = value.get('bri')
-    if bri:
-      if bri > 0:
-        self._level = int(self._bri/255*100)
-        self._bri = bri
-        sself._on = True if not value.get('noOn') else self.on 
-        lightValue.update({'bri':self.bri,'on':self.on})
-      if bri <= 0:
-        self._level = 0
-        self._bri = 0
-        self._on = False
-        lightValue.update({'bri':self.bri,'on':self.on})
-
-    # SET CT:
-    ct = value.get('ct')
-    if ct:
-      if 'K' in ct.upper():
-        ct = int(ct.upper().replace('K',''))
-        ct = int(1000000/ct)
-
-      if ct > 500:
-        ct = 500
-      if ct < 153:
-        ct = 153
-      self._ct = ct
-      self._on = True if not value.get('noOn') else self.on
-      lightValue.update({'ct':self.ct, 'on':self.on})
-
-
-    # SET FOR ON
-    on = value.get('on')
-    if on is not None:
-      self._on = on
-      lightValue.update({'on':self.on})
-
-    # EFFECT
-    effect = value.get('effect')
-    if effect:
-      self._effect = effect
-      lightValue.update({'effect':self._effect})
-
-    # ALERT
-    alert = value.get('alert')
-    if alert:
-      self._alert = alert
-      lightValue.update({'alert':alert})
-
-    self.set_light(lightValue)
-
-
-
-  
+    return self._type
 
   @property
   def hue(self):
       return self._hue
 
-  def switch(self, value):
-    if value == 'on':
-      self.on = True
-    elif value == 'off':
-      self.on = False
+  def setOff(self, args={}):
+    return self.setLight({'on':False})
+  
+  def setLevel(self, pLevel):
+    return self.setLight({'level':pLevel})
 
-  def set_light(self, value):
-    light_id = self._light_id
-    lightEvent = ffCommand(self._bridge,{'sendLightRequest' : {'lightID':light_id,'data':value}})
+  def setBri(self, pBri):
+    return self.setLight({'bri':pBri})
 
   def setOn(self, args={}):
-    self.on = True
-    return {'switch' : 'on'}
+    return self.setLight({'on':True})
 
   def getOn(self):
     return self._on
@@ -297,13 +145,146 @@ class Device(Device):
   def getType(self):
     return self._type
 
+  def setLight(self, value):
+    lightValue = {}
+
+    # END FADE IF SET COMMAND IS GIVEN
+    if not value.get('ctfade'):
+      global ctFade
+      ctFade.endRun()
+
+    # XY
+    xy = value.get('xy')
+    if xy:
+      lightValue.update({'xy':xy})
+      self._xy = xy
+
+    # HUE
+    hue = value.get('hue')
+    if hue:
+      lightValue.update({'hue':hue})
+      self._hue = hue
+
+    #TRANS TIME
+    transitiontime = value.get('transitiontime')
+    if transitiontime:
+      lightValue.update({'transitiontime':transitiontime})
+    else:
+      lightValue.update({'transitiontime':40})
+
+
+    #NAME COLOR
+    name = value.get('name')
+    if name:
+      value['hex'] = name_to_hex(name)
+
+
+    #HEX COLOR
+    hexColor = value.get('hex')
+    if hexColor:
+      lightValue.update(self.hexColor(hexColor))
+
+
+    # PRESET
+    preset = value.get('preset')
+    if preset:
+      if preset in PRESETS_CT:
+        value['ct'] = PRESETS_CT.get(preset)
+
+
+    # SET FOR LEVEL
+    level = value.get('level')
+    if level:
+      if level > 0:
+        if level > 100:
+          level = 100
+        level = 100 if level >= 100 else level
+        bri = int(255.0/100.0*level)
+        level = level
+        lightValue.update({'bri':bri})
+      if level <= 0:
+        bri = 0
+        level = 0
+        self._on = False
+        lightValue.update({'bri':bri,'on':False})
+      self._bri = bri
+      self._level = level
+
+    # SET FOR BRI
+    bri = value.get('bri')
+    if bri:
+      if bri > 255:
+        bri = 255
+        self._level = int(bri/255.0*100.0)
+      if bri <= 0:
+        bri = 0
+        self._level = 0
+        self._on = False
+        lightValue.update({'on':False})
+      lightValue.update({'bri':bri})
+      self._bri = bri
+
+    # SET CT:
+    ct = value.get('ct')
+    if ct:
+      if 'K' in ct.upper():
+        ct = int(ct.upper().replace('K',''))
+        ct = int(1000000/ct)
+      if ct > 500:
+        ct = 500
+      if ct < 153:
+        ct = 153
+      
+      lightValue.update({'ct':ct})
+      self._ct = ct
+
+    # EFFECT
+    effect = value.get('effect')
+    if effect:
+      lightValue.update({'effect':effect})
+      self._effect = effect
+
+    # ALERT
+    alert = value.get('alert')
+    if alert:
+      lightValue.update({'alert':alert})
+      self._alert = alert
+
+    # SET FOR ON
+    on = value.get('on')
+    if on is not None:
+      lightValue.update({'on':on})
+      self._on = on
+
+    # Turn lights on unless told not to or has already been set
+    if lightValue.get('on') is None and not value.get('onOn'):
+      lightValue.update({'on':True})
+      self._on = True
+
+    self.set_light(lightValue)
+    return value
+
+
+  def ctFade(self, args={}):
+    global ctFade
+    ctFade = CTFade(str(self._id),args.get('startK'),args.get('endK'),args.get('fadeS'))
+
+  def switch(self, value):
+    if value == 'on':
+      self.setLight({'on':True})
+    elif value == 'off':
+      self.setLight({'on':False})
+
+  def set_light(self, value):
+    light_id = self._light_id
+    lightCommand = ffCommand(self._bridge,{'sendLightRequest' : {'lightID':light_id,'data':value}})
+
+
   def hexColor(self, colorHex):
     if '#' in colorHex:
       colorHex = colorHex.replace('#','')
-
     if 'LST' in self._modelid:
       return {'xy':converter.hexToCIE1931(colorHex, lightType='LST')}
-
     return {'xy':converter.hexToCIE1931(colorHex)}
 
 
@@ -319,6 +300,6 @@ class Device(Device):
     self._bri = raw_data.get('state').get('bri')
     self._reachable = raw_data.get('state').get('reachable')
     self._ct = raw_data.get('state').get('ct')
-    self._level = int(self._bri/255*100)
+    self._level = int(self._bri/255.0*100.0)
     raw_data['state']['level'] = self._level
     ffEvent(self._id,raw_data.get('state'))
