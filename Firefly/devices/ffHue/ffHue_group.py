@@ -2,7 +2,7 @@
 # @Author: zpriddy
 # @Date:   2016-04-17 20:28:40
 # @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-19 01:27:31
+# @Last Modified time: 2016-04-19 17:23:04
 
 from core.models.device import Device
 from core.models.command import Command as ffCommand
@@ -278,8 +278,6 @@ class Device(Device):
   def hexColor(self, colorHex):
     if '#' in colorHex:
       colorHex = colorHex.replace('#','')
-    if 'LST' in self._modelid:
-      return {'xy':converter.hexToCIE1931(colorHex, lightType='LST')}
     return {'xy':converter.hexToCIE1931(colorHex)}
 
 

@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-19 17:14:14
+# @Last Modified time: 2016-04-19 17:24:44
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -90,15 +90,18 @@ class Routine(object):
     logging.info("Executing Routine" + self._name)
     for device, commands in self._actions.iteritems():
       ffCommand(device,commands)
+      # ADD A SLEEP
 
     if ffLocation:
       if ffLocation.isLight:
         for device, commands in self._actions_day.iteritems():
           ffCommand(device,commands)
+          #ADD A SLEEP
 
       if ffLocation.isDark:
         for device, commands in self._actions_night.iteritems():
           ffCommand(device,commands)
+          #ADD A SLEEP
 
 
   

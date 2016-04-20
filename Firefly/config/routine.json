@@ -8,9 +8,12 @@
         "hue-group-2" : {"setLight": {"on":false, "transitiontime":1}}
       },
       "actions_night" : {
-        "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"soft white"}}
+        "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"soft white", "transitiontime": 1}},
+        "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"soft white"}},
+        "hue-group-2" : {"setLight": {"on":false, "transitiontime":1}}
       },
       "actions_day" : {
+        "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"cloudy", "transitiontime": 1}},
         "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"cloudy"}}
       },
       "triggers" : [ 
