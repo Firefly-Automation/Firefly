@@ -72,6 +72,7 @@
       },
       "actions_night" : {
         "hue-group-5" : {"setLight": {"on":false}},
+        "hue-light-1" : {"setLight": {"on":false}},
         "hue-light-5" : {"setLight": {"name":"indigo","level":10}},
         "hue-light-2" : {"setLight": {"name":"indigo","level":20}}
       },
@@ -104,6 +105,7 @@
 
       },
       "actions_night" : {
+        "hue-light-1" : {"setLight": {"on":false}},
         "hue-group-5" : {"setLight": {"on":false, "transitiontime":200}},
         "hue-light-5" : {"setLight": {"name":"indigo","level":10}}
       },
@@ -165,6 +167,7 @@
 
       },
       "actions_night" : {
+        "hue-light-1" : {"setLight": {"on":false}},
         "hue-group-5" : {"setLight": {"on":false, "transitiontime":200}},
         "hue-light-5" : {"setLight": {"name":"indigo","level":20, "transitiontime":200}},
         "hue-light-6" : {"setLight": {"name":"navy","level":10, "transitiontime":200}},
