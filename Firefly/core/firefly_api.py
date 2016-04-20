@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-19 01:32:01
+# @Last Modified time: 2016-04-19 17:11:17
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -34,12 +34,12 @@ from pymongo import MongoClient
 
 import templates
 
-from core.models import core_settings, routine, event
+from core.models import core_settings, event
 
 from core.models.event import Event as ffEvent
 from core.models.command import Command as ffCommand
 from core.models.request import Request as ffRequest
-
+from core.location import Location
 
 app = Klein()
 core_settings = core_settings.Settings()
@@ -58,6 +58,7 @@ messageDB.ensure_index("timestamp", expireAfterSeconds=(60*60*24*7))
 
 
 testDevices = {}
+ffLocation =  ffLocation = Location('config/location.json') 
 
 ## PATHS ##
 @app.route('/')
@@ -122,6 +123,8 @@ def manual_command(request):
 
 @app.route('/readConfig')
 def ff_read_device_config(request):
+  from core.models import routine
+  
 
   #Remove Existing Routines
   routineDB.remove({})
@@ -134,18 +137,8 @@ def ff_read_device_config(request):
       r['ffObject'] = rObjBin
       routineDB.insert(r)
 
-@app.route('/sendTestEvent')
-def send_test_event(request):
-  #event.Event('Zach Presence', {'presence': not send_request(ffRequest.Request('Zach Presence', 'presence'))})
-  #send_notification('all','This is a test message from new Firefly. Zach Presence : ' + str(send_request(ffRequest.Request('Zach Presence', 'presence'))))
-  command = not deviceDB.find_one({'id':'hue-light-8'}).get('status').get('on')
-  print command
-  if command:
-    command = 'on'
-  else:
-    command = 'off'
-  myNewEvent = ffEvent('hue-light-8', {'switch': command})
-  return str(deviceDB.find_one({'id':'Zach Presence'}).get('status'))
+  print '====================================================='
+  print ffLocation.isLight
 
 
 @app.route('/testRequest')
@@ -156,7 +149,6 @@ def send_test_request(request):
 
 @app.route('/testInstall')
 def test_install(request):
-
   deviceDB.remove({})
   with open('config/devices.json') as devices:
     allDevices = json.load(devices)

@@ -5,14 +5,13 @@
       "type": "routine",
       "mode" : "home",
       "actions" : {
-        "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"soft white"}},
         "hue-group-2" : {"setLight": {"on":false, "transitiontime":1}}
       },
       "actions_night" : {
-
+        "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"soft white"}}
       },
       "actions_day" : {
-
+        "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"cloudy"}}
       },
       "triggers" : [ 
         { "Zach Presence" : {"presence":"True"}},

@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-19 00:52:49
+# @Last Modified time: 2016-04-19 17:14:14
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -29,6 +29,8 @@ class Routine(object):
     self._mode = config.get('mode')
     self._triggers = config.get('triggers')
     self._actions = config.get('actions')
+    self._actions_day = config.get('actions_day')
+    self._actions_night = config.get('actions_night')
     self._scheduling = config.get('scheduling')
 
     self._listen = [x.keys()[0] for x in self._triggers]
@@ -83,9 +85,20 @@ class Routine(object):
           self.executeRoutine()
 
   def executeRoutine(self):
+    from core.firefly_api import ffLocation
+
     logging.info("Executing Routine" + self._name)
     for device, commands in self._actions.iteritems():
       ffCommand(device,commands)
+
+    if ffLocation:
+      if ffLocation.isLight:
+        for device, commands in self._actions_day.iteritems():
+          ffCommand(device,commands)
+
+      if ffLocation.isDark:
+        for device, commands in self._actions_night.iteritems():
+          ffCommand(device,commands)
 
 
   
