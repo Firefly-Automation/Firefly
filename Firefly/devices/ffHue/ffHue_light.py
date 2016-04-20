@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: zpriddy
 # @Date:   2016-04-17 20:28:40
-# @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-19 01:27:44
+# @Last Modified by:   Zachary Priddy
+# @Last Modified time: 2016-04-20 01:03:47
 
 from core.models.device import Device
 from core.models.command import Command as ffCommand
@@ -12,7 +12,7 @@ from rgb_cie import Converter
 from webcolors import name_to_hex
 from ctFade import CTFade
 
-ctFade = CTFade(0,0,0,0,run=False)
+ctFade = CTFade(0,0,0,0,None, None,run=False)
 
 PRESETS_CT = {
   'cloudy' : '6500K',
@@ -61,10 +61,10 @@ class Device(Device):
       'type' : self.getType
     }
 
-    print args
-    args = args.get('args')
-    name = args.get('name')
-    super(Device,self).__init__(deviceID, name)
+    ###########################
+    # SET VARS
+    ###########################
+
     self._light_id = args.get('lightID')
     self._name = args.get('name')
     self._uniqueid = args.get('uniqueid')
@@ -85,6 +85,15 @@ class Device(Device):
     self._bridge = args.get('bridgeID')
     self._ct = args.get('state').get('ct')
     self._level = int(self._bri/255.0*100.0)
+
+    ###########################
+    # DONT CHANGE
+    ###########################
+    args = args.get('args')
+    name = args.get('name')
+    super(Device,self).__init__(deviceID, name)
+    ###########################
+    ###########################
 
 ####################### START OF DEVICE CODE #############################
 
@@ -267,7 +276,7 @@ class Device(Device):
 
   def ctFade(self, args={}):
     global ctFade
-    ctFade = CTFade(str(self._id),args.get('startK'),args.get('endK'),args.get('fadeS'))
+    ctFade = CTFade(str(self._id),args.get('startK'),args.get('endK'),args.get('fadeS'), args.get('startL'), args.get('endL'))
 
   def switch(self, value):
     if value == 'on':

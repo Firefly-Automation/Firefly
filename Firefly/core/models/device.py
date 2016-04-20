@@ -10,6 +10,8 @@ class Device(object):
     self._commands = self.COMMANDS
     self._requests = self.REQUESTS
 
+    self.refreshData()
+
 
   def __str__(self):
     status_string = '<DEVICE:' + self.type.upper() + ' ID:' + self.id.upper() + ' NAME:' + self.name.upper()
@@ -20,6 +22,8 @@ class Device(object):
 
   def sendEvent(self, event):
     logging.debug('Reciving Event in ' + str(self.metadata.get('module')) + ' ' + str(event))
+    if event.event.get('startup'):
+      self.refreshData()
     ''' NEED TO DECIDE WHAT TO DO HERE
     if event.deviceID == self._id:
       for item, value in event.event.iteritems():

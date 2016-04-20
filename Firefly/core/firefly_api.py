@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
-# @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-19 17:11:17
+# @Last Modified by:   Zachary Priddy
+# @Last Modified time: 2016-04-20 00:46:27
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -40,6 +40,7 @@ from core.models.event import Event as ffEvent
 from core.models.command import Command as ffCommand
 from core.models.request import Request as ffRequest
 from core.location import Location
+from core.scheduler import Scheduler
 
 app = Klein()
 core_settings = core_settings.Settings()
@@ -58,7 +59,8 @@ messageDB.ensure_index("timestamp", expireAfterSeconds=(60*60*24*7))
 
 
 testDevices = {}
-ffLocation =  ffLocation = Location('config/location.json') 
+ffLocation = Location('config/location.json')
+ffScheduler = Scheduler()
 
 ## PATHS ##
 @app.route('/')
@@ -96,12 +98,18 @@ def manual_command(request):
     <a href='?myCommand={"device":"hue-light-3", "command":{"setLight":{"effect":"none","level":50}}}'>{"device":"hue-light-3", "command":{"setLight":{"effect":"none","level":50}}}</a><br>
     <a href='?myCommand={"device":"hue-light-3", "command":{"switch":"on"}}'>{"device":"hue-light-3", "command":{"switch":"on"}}</a> <br>
     <a href='?myCommand={"device":"hue-light-3", "command":{"switch":"off"}}'>{"device":"hue-light-3", "command":{"switch":"off"}}</a> <br>
-    <a href='?myCommand={"device":"hue-light-3", "command":{"setLight":{"name":"red","level":100}}}'>{"device":"hue-light-3" "command":{"setLight":{"name":"red","level":100}}}</a><br>
-    <a href='?myCommand={"device":"hue-light-3", "command":{"setLight":{"name":"blue","level":100}}}'>{"device":"hue-light-3" "command":{"setLight":{"name":"blue","level":100}}}</a><br>
+    <a href='?myCommand={"device":"hue-light-3", "command":{"setLight":{"name":"red","level":100}}}'>{"device":"hue-light-3", "command":{"setLight":{"name":"red","level":100}}}</a><br>
+    <a href='?myCommand={"device":"hue-light-3", "command":{"setLight":{"name":"blue","level":100}}}'>{"device":"hue-light-3", "command":{"setLight":{"name":"blue","level":100}}}</a><br>
+    <a href='?myCommand={"device":"hue-group-4", "command":{"ctfade":{"startK":6500, "endK":2700, "fadeS":900}}}'>{"device":"hue-group-4", "command":{"ctfade":{"startK":6500, "endK":2700, "fadeS":900}}}</a>
 
     <br>
-    <a href='?myCommand={"device":"night","routine":true}'>{"device":"night","routine":true}</a> <br>
+    <br>
     <a href='?myCommand={"device":"home","routine":true}'>{"device":"home","routine":true}</a> <br>
+    <a href='?myCommand={"device":"night","routine":true}'>{"device":"night","routine":true}</a> <br>
+    <a href='?myCommand={"device":"away","routine":true}'>{"device":"away","routine":true}</a> <br>
+    <a href='?myCommand={"device":"sexy","routine":true}'>{"device":"sexy","routine":true}</a> <br>
+    <a href='?myCommand={"device":"morning","routine":true}'>{"device":"morning","routine":true}</a> <br>
+    <a href='?myCommand={"device":"sunset","routine":true}'>{"device":"sunset","routine":true}</a> <br>
     <br>
     <a href="http://www.w3schools.com/colors/colors_hex.asp"> Color Names </a><br>
     <br>
@@ -120,6 +128,15 @@ def manual_command(request):
       return form + '<br><br>Last Command Failed - INVALID JSON FORMAT ' + str(request.args.get('myCommand')[0])
   else:
     return form + str(request.args)
+
+@app.route('/API/control', methods=['POST'])
+def api_control(request):
+  request.setHeader('Content-Type', 'application/json')
+  body = json.loads(request.content.read())
+  device =  body.get('device')
+  command = body.get('command')
+  result = ffCommand(device,command)
+  return json.dumps({'action':'recieved'})
 
 @app.route('/readConfig')
 def ff_read_device_config(request):

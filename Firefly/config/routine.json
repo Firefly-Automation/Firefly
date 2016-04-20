@@ -5,7 +5,6 @@
       "type": "routine",
       "mode" : "home",
       "actions" : {
-        "hue-group-2" : {"setLight": {"on":false, "transitiontime":1}}
       },
       "actions_night" : {
         "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"soft white", "transitiontime": 1}},
@@ -17,56 +16,180 @@
         "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"cloudy"}}
       },
       "triggers" : [ 
-        { "Zach Presence" : {"presence":"True"}},
-        { "Ariel Presence" : {"presence":"True"}} 
+        { "Zach Presence" : {"presence":true}},
+        { "Ariel Presence" : {"presence":true}} 
         ],
       "scheduling" : [
-        "55 6 * * MON,TUE,THU,FRI,SAT"
-        ]
-    },
 
+      ],
+      "notification_devices" : [
+        "ZachPushover"
+      ],
+      "notification_message" : "Firefly has changed mode to Home!",
+      "mode_no_run" : [
+        "home", "night"
+      ],
+      "mode_run" :[
+
+      ]
+    },
+    {
+      "id": "sunset",
+      "type": "routine",
+      "mode" : null,
+      "actions" : {
+        "hue-group-3": {"ctfade":{"startK":6000, "endK":2700, "fadeS":1200}}
+      },
+      "actions_night" : {
+
+      },
+      "actions_day" : {
+
+      },
+      "triggers" : [ 
+        {"location":{"time":"dawn"}}
+      ],
+      "scheduling" : [
+
+      ],
+      "notification_devices" : [
+
+      ],
+      "notification_message" : "Firefly is changing to sunset colors",
+      "mode_no_run" : [
+
+      ],
+      "mode_run" :[
+        "home"
+      ]
+    },
     {
       "id": "away",
       "type": "routine",
       "mode" : "away",
       "actions" : {
-        "hue-group-4" : {"switch": "off"},
-        "UUID-2" : {"switch": "off"}
+
       },
       "actions_night" : {
-
+        "hue-group-5" : {"setLight": {"on":false}},
+        "hue-light-5" : {"setLight": {"name":"indigo","level":10}},
+        "hue-light-2" : {"setLight": {"name":"indigo","level":20}}
       },
       "actions_day" : {
-
+        "hue-group-4" : {"switch": "off"}
       },
       "triggers" : [ 
-        { "Zach Presence" : {"presence":"False"}, "Ariel Presence" : {"presence":"False"} } 
-        ],
+        { "Zach Presence" : {"presence":false}, "Ariel Presence" : {"presence":false}},
+        { "Zach Presence" : {"presence":false}, "Ariel Presence" : {"presence":false},  "location":{"time":"sunset"}} 
+      ],
       "scheduling" : [
-        "55 6 * * MON,TUE,THU,FRI,SAT"
-        ]
-    },
 
+      ],
+      "notification_devices" : [
+        "ZachPushover"
+      ],
+      "notification_message" : "Firefly has changed mode to Away!",
+      "mode_no_run" : [
+
+      ],
+      "mode_run" :[
+
+      ]
+    },
     {
       "id": "night",
       "type": "routine",
       "mode" : "night",
       "actions" : {
-        "hue-group-5" : {"setLight": {"on":false, "transitiontime":200}},
-        "hue-light-5" : {"setLight": {"name":"indigo","level":10}}
+
       },
       "actions_night" : {
-        "hue-group-4" : {"setLight": {"on":false}},
-        "hue-light-5" : {"setLight": {"name":"indigo","level":1}}
+        "hue-group-5" : {"setLight": {"on":false, "transitiontime":200}},
+        "hue-light-5" : {"setLight": {"name":"indigo","level":10}}
       },
       "actions_day" : {
         "hue-group-4" : {"setLight": {"on":false}}
       },
       "triggers" : [ 
-        ],
+
+      ],
       "scheduling" : [
-        "55 6 * * MON,TUE,THU,FRI,SAT"
-        ]
+
+      ],
+      "notification_devices" : [
+        "ZachPushover"
+      ],
+      "notification_message" : "Firefly has changed mode to Night!",
+      "mode_no_run" : [
+
+      ],
+      "mode_run" :[
+
+      ]
+    },
+    {
+      "id": "morning",
+      "type": "routine",
+      "mode" : "morning",
+      "actions" : {
+        "hue-group-3": {"ctfade":{"startK":2700, "endK":6500, "fadeS":1200}}
+      },
+      "actions_night" : {
+
+      },
+      "actions_day" : {
+
+      },
+      "triggers" : [ 
+        {"location":{"time":"dawn"}}
+      ],
+      "scheduling" : [
+        "20 6 * * MON-SAT"
+      ],
+      "notification_devices" : [
+        "ZachPushover"
+      ],
+      "notification_message" : "Firefly has changed mode to Morning!",
+      "mode_no_run" : [
+        "home", "morning"
+      ],
+      "mode_run" :[
+        "night"
+      ]
+    },
+    {
+      "id": "sexy",
+      "type": "routine",
+      "mode" : "sexy",
+      "actions" : {
+
+      },
+      "actions_night" : {
+        "hue-group-5" : {"setLight": {"on":false, "transitiontime":200}},
+        "hue-light-5" : {"setLight": {"name":"indigo","level":20, "transitiontime":200}},
+        "hue-light-6" : {"setLight": {"name":"navy","level":10, "transitiontime":200}},
+        "hue-light-9" : {"setLight": {"name":"red","level":10, "transitiontime":200}},
+        "hue-light-10" : {"setLight": {"name":"navy","level":10, "transitiontime":200}}
+      },
+      "actions_day" : {
+        "hue-group-4" : {"setLight": {"on":false}}
+      },
+      "triggers" : [ 
+
+      ],
+      "scheduling" : [
+
+      ],
+      "notification_devices" : [
+        "ZachPushover"
+      ],
+      "notification_message" : "Firefly has changed mode to Sexy!",
+      "mode_no_run" : [
+
+      ],
+      "mode_run" :[
+
+      ]
     }
   ]
 }

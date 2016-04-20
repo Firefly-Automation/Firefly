@@ -4,7 +4,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-02-13 21:34:27
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-03-04 22:48:44
+# @Last Modified time: 2016-04-19 23:31:10
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -22,6 +22,7 @@
 from twisted.internet import reactor, task
 from uuid import uuid1
 from crontab import CronTab
+from datetime import datetime
 
 '''Sample cron_data = {'uuid':'blah','funct':s,'cron':'0 8 * * 1'}  **UUID is optional'''
 '''Or crondata can be  cron_data = {'uuid':'blah','funct':s,'cron':'0 8 * * MON,TUE'}'''
@@ -77,7 +78,7 @@ class Scheduler(object):
     if not cron_data.get('uuid'):
       cron_data['uuid'] = uuid1()
     uuid = cron_data['uuid']
-    delay = CronTab(cron_data['cron']).next()
+    delay = CronTab(cron_data['cron']).next(datetime.now())
     self._cron[uuid] = reactor.callLater(delay, self.runCron, cron_data)
     return uuid
 

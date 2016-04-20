@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: zpriddy
 # @Date:   2016-04-19 15:57:29
-# @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-19 17:15:41
+# @Last Modified by:   Zachary Priddy
+# @Last Modified time: 2016-04-19 23:40:25
 from astral import Astral
 from astral import GoogleGeocoder
 from datetime import datetime, timedelta
@@ -11,6 +11,7 @@ import json
 from core.scheduler import Scheduler as ffScheduler
 from core.models.command import Command as ffCommand
 from core.models.event import Event as ffEvent
+from core.utils.notify import Notification as ffNotify
 
 l_scheduler = ffScheduler()
 
@@ -69,8 +70,8 @@ class Location(object):
     if value in self._modes:
       self._last_mode = self._mode
       self._mode = value
-      #ffNotify('all', 'LOCATION: Mode has changed to: ' + str(value))
       return True
+      ffEvent('location',{'mode':self._mode})
     return False
 
   def read_config_file(self):
@@ -134,8 +135,8 @@ class Location(object):
 
   def dawn_handler(self):
     print 'Dawn Handler'
-    #ffNotify('Zach Pushover', 'LOCATION: It is dawn!')
-
+    ffNotify('ZachPushover', 'LOCATION: It is dawn!')
+    ffEvent('location',{'time':'dawn'})
     now = self.now()
     dawn_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['dawn']
     print "Dawn Time: " + str(dawn_time)
@@ -144,8 +145,8 @@ class Location(object):
 
   def sunrise_handler(self):
     print 'Sunrise Handler'
-    #ffNotify('Zach Pushover', 'LOCATION: It is sunrise!')
-
+    ffNotify('ZachPushover', 'LOCATION: It is sunrise!')
+    ffEvent('location',{'time':'sunrise'})
     now = self.now()
     sunrise_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['sunrise']
     print "Sunrise Time: " + str(sunrise_time)
@@ -154,8 +155,8 @@ class Location(object):
 
   def noon_handler(self):
     print 'Noon Handler'
-    #ffNotify('Zach Pushover', 'LOCATION: It is noon!')
-
+    ffNotify('ZachPushover', 'LOCATION: It is noon!')
+    ffEvent('location',{'time':'noon'})
     now = self.now()
     noon_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['noon']
     print "Noon Time: " + str(noon_time)
@@ -164,8 +165,8 @@ class Location(object):
 
   def sunset_handler(self):
     print 'Sunset Handler'
-    #ffNotify('Zach Pushover', 'LOCATION: It is sunset!')
-
+    ffNotify('ZachPushover', 'LOCATION: It is sunset!')
+    ffEvent('location',{'time':'sunset'})
     now = self.now()
     sunset_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['sunset']
     print "Sunset Time: " + str(sunset_time)
@@ -174,8 +175,8 @@ class Location(object):
 
   def dusk_handler(self):
     print 'Dusk Handler'
-    #ffNotify('Zach Pushover', 'LOCATION: It is dusk!')
-
+    ffNotify('ZachPushover', 'LOCATION: It is dusk!')
+    ffEvent('location',{'time':'dusk'})
     now = self.now()
     dusk_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['dusk']
     print "Dusk Time: " + str(dusk_time)
