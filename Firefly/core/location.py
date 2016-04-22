@@ -7,6 +7,7 @@ from astral import Astral
 from astral import GoogleGeocoder
 from datetime import datetime, timedelta
 import json
+import logging
 
 from core.scheduler import Scheduler as ffScheduler
 from core.models.command import Command as ffCommand
@@ -80,8 +81,8 @@ class Location(object):
       self._zipcode = config.get('zip_code')
       self._modes = config.get('modes')
 
-      print self._modes
-      print self._zipcode
+      logging.info("Modes Installed: " + str(self._modes))
+      logging.info("Zipcode: " + str(self._zipcode))
 
   def setup_local(self):
     self._a = Astral(GoogleGeocoder)
@@ -95,7 +96,7 @@ class Location(object):
     now = self.now()
     if dawn_time < now:
       dawn_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['dawn']
-    print "Dawn Time: " + str(dawn_time)
+    logging.info("Dawn Time: " + str(dawn_time))
     delay_s = (dawn_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.dawn_handler, replace=True, uuid='DawnScheduler')
 
@@ -103,7 +104,7 @@ class Location(object):
     now = self.now()
     if sunrise_time < now:
       sunrise_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['sunrise']
-    print "Sunrise Time: " + str(sunrise_time)
+    logging.info("Sunrise Time: " + str(sunrise_time))
     delay_s = (sunrise_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.sunrise_handler, replace=True, uuid='SunriseScheduler')
 
@@ -111,7 +112,7 @@ class Location(object):
     now = self.now()
     if noon_time < now:
       noon_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['noon']
-    print "Noon Time: " + str(noon_time)
+    logging.info("Noon Time: " + str(noon_time))
     delay_s = (noon_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.noon_handler, replace=True, uuid='NoonScheduler')
 
@@ -119,7 +120,7 @@ class Location(object):
     now = self.now()
     if sunset_time < now:
       sunset_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['sunset']
-    print "Sunset Time: " + str(sunset_time)
+    logging.info("Sunset Time: " + str(sunset_time))
     delay_s = (sunset_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.sunset_handler, replace=True, uuid='SunsetScheduler')
 
@@ -127,61 +128,55 @@ class Location(object):
     now = self.now()
     if dusk_time < now:
       dusk_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['dusk']
-    print "Dusk Time: " + str(dusk_time)
+    logging.info("Dusk Time: " + str(dusk_time))
     delay_s = (dusk_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.dusk_handler, replace=True, uuid='DuskScheduler')
 
 
 
   def dawn_handler(self):
-    print 'Dawn Handler'
     ffNotify('ZachPushover', 'LOCATION: It is dawn!')
     ffEvent('location',{'time':'dawn'})
     now = self.now()
     dawn_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['dawn']
-    print "Dawn Time: " + str(dawn_time)
+    logging.info("Dawn Time: " + str(dawn_time))
     delay_s = (dawn_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.dawn_handler, replace=True, uuid='DawnScheduler')
 
   def sunrise_handler(self):
-    print 'Sunrise Handler'
     ffNotify('ZachPushover', 'LOCATION: It is sunrise!')
     ffEvent('location',{'time':'sunrise'})
     now = self.now()
     sunrise_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['sunrise']
-    print "Sunrise Time: " + str(sunrise_time)
+    logging.info("Sunrise Time: " + str(sunrise_time))
     delay_s = (sunrise_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.sunrise_handler, replace=True, uuid='SunriseScheduler')
 
   def noon_handler(self):
-    print 'Noon Handler'
     ffNotify('ZachPushover', 'LOCATION: It is noon!')
     ffEvent('location',{'time':'noon'})
     now = self.now()
     noon_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['noon']
-    print "Noon Time: " + str(noon_time)
+    logging.info("Noon Time: " + str(noon_time))
     delay_s = (noon_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.noon_handler, replace=True, uuid='NoonScheduler')
 
   def sunset_handler(self):
-    print 'Sunset Handler'
     ffNotify('ZachPushover', 'LOCATION: It is sunset!')
     ffEvent('location',{'time':'sunset'})
     now = self.now()
     sunset_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['sunset']
-    print "Sunset Time: " + str(sunset_time)
+    logging.info("Sunset Time: " + str(sunset_time))
     delay_s = (sunset_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.sunset_handler, replace=True, uuid='SunsetScheduler')
 
   def dusk_handler(self):
-    print 'Dusk Handler'
     ffNotify('ZachPushover', 'LOCATION: It is dusk!')
     ffEvent('location',{'time':'dusk'})
     now = self.now()
     dusk_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['dusk']
-    print "Dusk Time: " + str(dusk_time)
+    logging.info("Dusk Time: " + str(dusk_time))
     delay_s = (dusk_time - now).total_seconds()
-    print 'Scheduling in ' + str(delay_s)
     l_scheduler.runInS(delay_s, self.dusk_handler, replace=True, uuid='DuskScheduler')
 
   def now(self):

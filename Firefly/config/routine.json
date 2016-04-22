@@ -38,7 +38,7 @@
       "type": "routine",
       "mode" : null,
       "actions" : {
-        "hue-group-3": {"ctfade":{"startK":6000, "endK":2700, "fadeS":1200}}
+        "hue-group-4": {"ctfade":{"startK":6000, "endK":2700, "fadeS":1200}}
       },
       "actions_night" : {
 
@@ -47,13 +47,13 @@
 
       },
       "triggers" : [ 
-        {"location":{"time":"dawn"}}
+        {"location":{"time":"sunset"}}
       ],
       "scheduling" : [
 
       ],
       "notification_devices" : [
-
+        "ZachPushover"
       ],
       "notification_message" : "Firefly is changing to sunset colors",
       "mode_no_run" : [
@@ -134,7 +134,8 @@
       "type": "routine",
       "mode" : "morning",
       "actions" : {
-        "hue-group-3": {"ctfade":{"startK":2700, "endK":6500, "fadeS":1200}}
+        "hue-group-4" : {"setLight" : {"preset":"candle", "transitiontime":1, "level":1}},
+        "hue-group-4": {"ctfade":{"startK":2000, "endK":6500, "fadeS":1200, "startL":1, "endL":100}}
       },
       "actions_night" : {
 
@@ -175,7 +176,7 @@
         "hue-light-10" : {"setLight": {"name":"navy","level":10, "transitiontime":200}}
       },
       "actions_day" : {
-        "hue-group-4" : {"setLight": {"on":false}}
+        "hue-group-4" : {"setLight": {"on":true}}
       },
       "triggers" : [ 
 
@@ -192,6 +193,13 @@
       ],
       "mode_run" :[
 
+      ],
+      "run_time_ranges" :[
+        {"start_time":"22:00", "end_time":"02:00"}
+      ],
+      "no_run_time_ranges" :[
+        {"start_time":"5:00", "end_time":"12:00"},
+        {"start_time":"15:00", "end_time":"18:00"}
       ]
     }
   ]

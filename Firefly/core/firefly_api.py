@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-20 00:46:27
+# @Last Modified time: 2016-04-21 00:20:54
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -17,6 +17,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from collections import OrderedDict
 from datetime import datetime
 import json
 import logging
@@ -104,12 +105,12 @@ def manual_command(request):
 
     <br>
     <br>
-    <a href='?myCommand={"device":"home","routine":true}'>{"device":"home","routine":true}</a> <br>
-    <a href='?myCommand={"device":"night","routine":true}'>{"device":"night","routine":true}</a> <br>
-    <a href='?myCommand={"device":"away","routine":true}'>{"device":"away","routine":true}</a> <br>
-    <a href='?myCommand={"device":"sexy","routine":true}'>{"device":"sexy","routine":true}</a> <br>
-    <a href='?myCommand={"device":"morning","routine":true}'>{"device":"morning","routine":true}</a> <br>
-    <a href='?myCommand={"device":"sunset","routine":true}'>{"device":"sunset","routine":true}</a> <br>
+    <a href='?myCommand={"device":"home","routine":true, "force":true}'>{"device":"home","routine":true, "force":true}</a> <br>
+    <a href='?myCommand={"device":"night","routine":true, "force":true}'>{"device":"night","routine":true, "force":true}</a> <br>
+    <a href='?myCommand={"device":"away","routine":true, "force":true}'>{"device":"away","routine":true, "force":true}</a> <br>
+    <a href='?myCommand={"device":"sexy","routine":true, "force":true}'>{"device":"sexy","routine":true, "force":true}</a> <br>
+    <a href='?myCommand={"device":"morning","routine":true, "force":true}'>{"device":"morning","routine":true, "force":true}</a> <br>
+    <a href='?myCommand={"device":"sunset","routine":true, "force":true}'>{"device":"sunset","routine":true, "force":true}</a> <br>
     <br>
     <a href="http://www.w3schools.com/colors/colors_hex.asp"> Color Names </a><br>
     <br>
@@ -120,7 +121,7 @@ def manual_command(request):
     try:
       command = json.loads(request.args.get('myCommand')[0])
       if command.get('routine'):
-        myCommand = ffCommand(command.get('device'),command.get('command'), routine=command.get('routine'))
+        myCommand = ffCommand(command.get('device'),command.get('command'), routine=command.get('routine'), force=command.get('force'))
       else:
         myCommand = ffCommand(command.get('device'),command.get('command'))
       return form + '<br><br> Last Command: ' + str(request.args.get('myCommand')[0]) 
@@ -146,7 +147,7 @@ def ff_read_device_config(request):
   #Remove Existing Routines
   routineDB.remove({})
   with open('config/routine.json') as routines:
-    testRoutines = json.load(routines)
+    testRoutines = json.load(routines, object_pairs_hook=OrderedDict)
     for r in testRoutines.get('routines'):
       rObj = routine.Routine(json.dumps(r))
       rObjBin = pickle.dumps(rObj)
@@ -160,9 +161,8 @@ def ff_read_device_config(request):
 
 @app.route('/testRequest')
 def send_test_request(request):
-  myRequest = ffRequest('Zach Presence', 'all')
-  value = send_request(myRequest)
-  return 'Request Sent - Value: ' + str(value)
+  ffEvent('location',{'time':'sunset'})
+  return 'EVENT SENT'
 
 @app.route('/testInstall')
 def test_install(request):
@@ -212,7 +212,7 @@ def send_command(command):
   if command.routine:
     routine = routineDB.find_one({'id':command.deviceID})
     s = pickle.loads(routine.get('ffObject'))
-    s.executeRoutine()
+    s.executeRoutine(force=command.force)
 
   for d in deviceDB.find({'id':command.deviceID}):
     s = pickle.loads(d.get('ffObject'))

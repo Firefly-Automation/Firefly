@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 18:06:51
-# @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-19 00:39:02
+# @Last Modified by:   Zachary Priddy
+# @Last Modified time: 2016-04-20 08:15:12
 import types
 
 class Command(object):
-  def __init__(self, deviceID, command, routine=False):
+  def __init__(self, deviceID, command, routine=False, force=False):
     from core.firefly_api import send_command
     self._deviceID = deviceID
     self._command = command
     self._routine = routine
-    self._simple = not isinstance(command, types.DictType)
+    self._force = force
+    self._simple = not isinstance(command, types.DictType) if command is not None else False
     if self._simple:
       self._command = {command:''}
 
-    send_command(self)
+    self._result = send_command(self)
 
 
   def __str__(self):
@@ -40,6 +41,14 @@ class Command(object):
   @property
   def routine(self):
       return self._routine
+
+  @property
+  def force(self):
+      return self._force
+  
+  @property
+  def result(self):
+      return self._result
   
   
   

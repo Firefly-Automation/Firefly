@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-20 01:05:03
+# @Last Modified time: 2016-04-21 00:23:39
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -19,12 +19,13 @@
 
 import json
 import logging
+from collections import OrderedDict
 from core.models.command import Command as ffCommand
 from core.firefly_api import ffScheduler
 
 class Routine(object):
   def __init__(self, configJson):
-    config = json.loads(configJson)
+    config = json.loads(configJson, object_pairs_hook=OrderedDict)
 
     self._name = config.get('id')
     self._mode = config.get('mode')
@@ -80,6 +81,7 @@ class Routine(object):
   def event(self, event):
     from core.firefly_api import send_request, event_message
     from core.models.request import Request as FFRequest
+    from core.firefly_api import ffLocation
     logging.debug('ROUTINE: Receving Event In: ' + str(self._name))
 
     for trigger in self._triggers:
@@ -87,32 +89,40 @@ class Routine(object):
         print 'Device in triggers'
         should_trigger = True
         for device, state in trigger.iteritems():
-          status = send_request(FFRequest(device,state.keys()[0]))
-          if str(status) == str(state.values()[0]):
-            pass
-          else:
-            should_trigger = False
+          #TEMP FIX
+          if device != 'location':
+            status = send_request(FFRequest(device,state.keys()[0]))
+            if str(status) == str(state.values()[0]):
+              pass
+            else:
+              should_trigger = False
+          if device == 'location':
+            if event.event == state:
+              pass
+            else:
+              should_trigger = False
 
         if should_trigger:
           event_message(self._name,"Routine Triggered")
           print str(self._mode)
           self.executeRoutine()
 
-  def executeRoutine(self):
+  def executeRoutine(self, force=False):
     from time import sleep
     from core.firefly_api import ffLocation
     from core.utils.notify import Notification as ffNotification
     logging.info("Executing Routine: " + self._name)
 
-    if self._mode_no_run:
-      if ffLocation.mode in self._mode_no_run:
-        logging.info('Returning: Set to not execute in mode: ' + ffLocation.mode)
-        return
+    if not force:
+      if self._mode_no_run:
+        if ffLocation.mode in self._mode_no_run:
+          logging.info('Returning: Set to not execute in mode: ' + ffLocation.mode)
+          return
 
-    if self._mode_run:
-      if ffLocation.mode not in self._mode_run:
-        logging.info('Returning: Set to not execute in mode: ' + ffLocation.mode)
-        return
+      if self._mode_run:
+        if ffLocation.mode not in self._mode_run:
+          logging.info('Returning: Set to not execute in mode: ' + ffLocation.mode)
+          return
 
     for device, commands in self._actions.iteritems():
       ffCommand(device,commands)
@@ -122,12 +132,16 @@ class Routine(object):
       if ffLocation.isLight:
         for device, commands in self._actions_day.iteritems():
           ffCommand(device,commands)
-          sleep(0.05)
+          if 'hue' in device:
+            sleep(0.5)
 
       if ffLocation.isDark:
+        print '********************************************************************'
+        print self._actions_night
         for device, commands in self._actions_night.iteritems():
           ffCommand(device,commands)
-          sleep(0.05)
+          if 'hue' in device:
+            sleep(0.5)
 
     if self._mode:
       ffLocation.mode = self._mode
