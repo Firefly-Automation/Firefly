@@ -1,6 +1,7 @@
 #Mine
 *.pyc
 Firefly/config/devices.json
+design_notes
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

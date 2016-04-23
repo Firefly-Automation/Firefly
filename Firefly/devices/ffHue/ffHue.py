@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 21:48:42
-# @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-18 18:08:40
+# @Last Modified by:   Zachary Priddy
+# @Last Modified time: 2016-04-22 03:06:05
 from core.models import event
 from core.models.command import Command as ffCommand
 
@@ -75,7 +75,7 @@ class Device(object):
 
   def install_hue(self):
     from core.firefly_api import install_child_device
-    logging.info("Installing Hue Bridge")
+    logging.debug("Installing Hue Bridge")
     self._hueBridge = bridge.Bridge(deviceID='ffHueBridge', username=self._username)
     install_child_device('ffHueBridge',self._hueBridge)
 
@@ -104,9 +104,9 @@ class Device(object):
     self.refresh_scheduler()
 
   def refresh_scheduler(self, args={}):
-    print "Starting Scheduler"
+    logging.debug("Starting Hue Scheduler")
     hueScheduler = Scheduler()
-    hueScheduler.runEveryS(30,self.refresh_hue,replace=True,uuid='HueRefresher')
+    hueScheduler.runEveryS(10,self.refresh_hue,replace=True,uuid='HueRefresher')
 
   def refresh_hue(self):
     rawLightData = self._hueBridge.get_lights()

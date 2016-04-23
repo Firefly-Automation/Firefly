@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 23:50:08
-# @Last Modified by:   zpriddy
-# @Last Modified time: 2016-04-17 20:56:21
+# @Last Modified by:   Zachary Priddy
+# @Last Modified time: 2016-04-22 03:20:19
 
 import requests #TODO: Replace with core.http_request
 from core.models.event import Event as ffEvent
 import json
 import logging
+
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 metadata = {
   'module' : 'ffHue_bridge'
@@ -42,7 +45,7 @@ class Bridge(object):
     if not self._username:
       self.register()
 
-    logging.info('Hue Bridge IP: ' + str(self._ip))
+    logging.debug('Hue Bridge IP: ' + str(self._ip))
 
 
 
@@ -65,10 +68,10 @@ class Bridge(object):
           simpleCommand = self._commands[item](value)
     
       ## OPTIONAL - SEND EVENT
-      if command.simple:
-        ffEvent(command.deviceID, simpleCommand)
-      else:
-        ffEvent(command.deviceID, command.command)
+      #if command.simple:
+      #  ffEvent(command.deviceID, simpleCommand)
+      #else:
+      #  ffEvent(command.deviceID, command.command)
       ## OPTIONAL - SEND EVENT
 
   def requestData(self, request):
@@ -91,13 +94,13 @@ class Bridge(object):
 
   def sendLightRequest(self, request):
     if 'lightID' in request.keys():
-      logging.info('Sending Light Request')
+      logging.debug('Sending Light Request')
       self.send_request('lights/' + str(request.get('lightID')) + '/state', data=request.get('data'), method='PUT')
 
 
   def sendGroupRequest(self, request):
     if 'groupID' in request.keys():
-      logging.info('Sending Group Request')
+      logging.debug('Sending Group Request')
       self.send_request('groups/' + str(request.get('groupID')) + '/action', data=request.get('data'), method='PUT')
 
 
@@ -106,7 +109,7 @@ class Bridge(object):
     if data:
       data = json.dumps(data)
 
-      logging.info('Data: ' + data)
+      logging.debug('Data: ' + data)
 
     url = ''
     if (no_username or not self._username):
@@ -114,7 +117,7 @@ class Bridge(object):
     else:
       url = 'http://' + str(self._ip) + '/api/' + self._username + '/' + path
 
-    logging.info('Request URL: ' + url + ' Method: ' + method)
+    logging.debug('Request URL: ' + url + ' Method: ' + method)
 
     if method == 'POST':
       #r = requests.post(url, data=data)
@@ -153,17 +156,17 @@ class Bridge(object):
       logging.error('Problem parsing IP Address of Bridge')
       exit()
 
-    logging.info('IP address: ' + str(self._ip))
+    logging.debug('IP address: ' + str(self._ip))
 
   def register(self):
     request_data = {'devicetype':'zPyHue'}
     response = self.send_request('api', request_data, method='POST', no_username=True)[0]
     
-    logging.info('Response: ' + str(response))
+    logging.debug('Response: ' + str(response))
 
     if 'error' in response:
       if response['error']['type'] == 101:
-        logging.info('Please press the hue button.')
+        logging.debug('Please press the hue button.')
         sleep(3)
         if (self._rCount < 30): 
           self.register()
@@ -172,7 +175,7 @@ class Bridge(object):
 
     if 'success' in response:
       self._username = response['success']['username']
-      logging.info('Success! username: ' + str(self._username))
+      logging.debug('Success! username: ' + str(self._username))
 
   def get_all(self):
     '''Returns all from /api/username'''

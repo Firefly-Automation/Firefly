@@ -6,6 +6,7 @@ class Device(object):
     self._id = deviceID
     self._name = deviceName
     self._type = self.METADATA.get('type')
+    self._lastStatus = {}
     self._metadata = self.METADATA
     self._commands = self.COMMANDS
     self._requests = self.REQUESTS
@@ -40,14 +41,11 @@ class Device(object):
         if item in self._commands:
           simpleCommand = self._commands[item](value)
 
-      if self.refreshData():
-        logging.info('Chnage In Status - Sending Event')
-        if command.simple:
-          ffEvent(command.deviceID, simpleCommand)
-        else:
-          ffEvent(command.deviceID, command.command)
+      updated_status = self.refreshData()
+      if updated_status:
+        ffEvent(self.id, updated_status)
       else:
-        logging.info('NO chnage in status')
+        logging.debug('NO chnage in status')
     
 
   def requestData(self, request):
@@ -68,11 +66,19 @@ class Device(object):
   def refreshData(self):
     from core.firefly_api import update_status
     returnData = {}
+    newChanges = {}
     for item in self._requests:
       returnData[item] = self._requests[item]()
+      #This builds a list of only the things that have changed - This way an event can be sent with only those items
+      if returnData[item] != self._lastStatus.get(item):
+        newChanges[item] = returnData[item]
+    self._lastStatus = returnData
     returnData['deviceID'] = self._id
     updated = update_status(returnData)
-    return updated
+    if updated and newChanges != {}:
+      return newChanges
+
+    return False
 
   @property
   def metadata(self):

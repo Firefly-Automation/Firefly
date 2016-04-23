@@ -2,7 +2,7 @@
 # @Author: zpriddy
 # @Date:   2016-04-17 20:28:40
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-20 01:03:47
+# @Last Modified time: 2016-04-22 12:55:47
 
 from core.models.device import Device
 from core.models.command import Command as ffCommand
@@ -11,6 +11,7 @@ import logging
 from rgb_cie import Converter
 from webcolors import name_to_hex
 from ctFade import CTFade
+from math import ceil
 
 ctFade = CTFade(0,0,0,0,None, None,run=False)
 
@@ -58,13 +59,15 @@ class Device(Device):
       'sat' : self.getSat,
       'ct' : self.getCt,
       'xy' : self.getXy,
-      'type' : self.getType
+      'type' : self.getType,
+      'level' : self.getLevel,
+      'colormode' : self.getColorMode
     }
 
     ###########################
     # SET VARS
     ###########################
-
+    args = args.get('args')
     self._light_id = args.get('lightID')
     self._name = args.get('name')
     self._uniqueid = args.get('uniqueid')
@@ -89,7 +92,6 @@ class Device(Device):
     ###########################
     # DONT CHANGE
     ###########################
-    args = args.get('args')
     name = args.get('name')
     super(Device,self).__init__(deviceID, name)
     ###########################
@@ -154,6 +156,14 @@ class Device(Device):
   def getType(self):
     return self._type
 
+  def getLevel(self):
+    self._level = int(ceil(self._bri/255.0*100.0))
+    return self._level
+
+  def getColorMode(self):
+    return self._colormode
+
+
   def setLight(self, value):
     lightValue = {}
 
@@ -178,9 +188,6 @@ class Device(Device):
     transitiontime = value.get('transitiontime')
     if transitiontime:
       lightValue.update({'transitiontime':transitiontime})
-    else:
-      lightValue.update({'transitiontime':40})
-
 
     #NAME COLOR
     name = value.get('name')
@@ -262,7 +269,10 @@ class Device(Device):
     # SET FOR ON
     on = value.get('on')
     if on is not None:
-      lightValue.update({'on':on})
+      if on:
+        lightValue.update({'on':on})
+      else:
+        lightValue.update({'on':on, 'bri':255})
       self._on = on
 
     # Turn lights on unless told not to or has already been set
@@ -307,8 +317,7 @@ class Device(Device):
     self._colormode = raw_data.get('state').get('colormode')
     self._alert = raw_data.get('state').get('alert')
     self._bri = raw_data.get('state').get('bri')
-    self._reachable = raw_data.get('state').get('reachable')
     self._ct = raw_data.get('state').get('ct')
-    self._level = int(self._bri/255.0*100.0)
-    raw_data['state']['level'] = self._level
-    ffEvent(self._id,raw_data.get('state'))
+    self._level = int(ceil(self._bri/255.0*100.0))
+    if not self._reachable:
+      self._on = False

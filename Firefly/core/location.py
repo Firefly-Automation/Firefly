@@ -2,7 +2,7 @@
 # @Author: zpriddy
 # @Date:   2016-04-19 15:57:29
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-19 23:40:25
+# @Last Modified time: 2016-04-22 03:22:00
 from astral import Astral
 from astral import GoogleGeocoder
 from datetime import datetime, timedelta
@@ -71,8 +71,8 @@ class Location(object):
     if value in self._modes:
       self._last_mode = self._mode
       self._mode = value
-      return True
       ffEvent('location',{'mode':self._mode})
+      return True
     return False
 
   def read_config_file(self):
@@ -81,8 +81,8 @@ class Location(object):
       self._zipcode = config.get('zip_code')
       self._modes = config.get('modes')
 
-      logging.info("Modes Installed: " + str(self._modes))
-      logging.info("Zipcode: " + str(self._zipcode))
+      logging.debug("Modes Installed: " + str(self._modes))
+      logging.debug("Zipcode: " + str(self._zipcode))
 
   def setup_local(self):
     self._a = Astral(GoogleGeocoder)
@@ -96,7 +96,7 @@ class Location(object):
     now = self.now()
     if dawn_time < now:
       dawn_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['dawn']
-    logging.info("Dawn Time: " + str(dawn_time))
+    logging.debug("Dawn Time: " + str(dawn_time))
     delay_s = (dawn_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.dawn_handler, replace=True, uuid='DawnScheduler')
 
@@ -104,7 +104,7 @@ class Location(object):
     now = self.now()
     if sunrise_time < now:
       sunrise_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['sunrise']
-    logging.info("Sunrise Time: " + str(sunrise_time))
+    logging.debug("Sunrise Time: " + str(sunrise_time))
     delay_s = (sunrise_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.sunrise_handler, replace=True, uuid='SunriseScheduler')
 
@@ -112,7 +112,7 @@ class Location(object):
     now = self.now()
     if noon_time < now:
       noon_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['noon']
-    logging.info("Noon Time: " + str(noon_time))
+    logging.debug("Noon Time: " + str(noon_time))
     delay_s = (noon_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.noon_handler, replace=True, uuid='NoonScheduler')
 
@@ -120,7 +120,7 @@ class Location(object):
     now = self.now()
     if sunset_time < now:
       sunset_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['sunset']
-    logging.info("Sunset Time: " + str(sunset_time))
+    logging.debug("Sunset Time: " + str(sunset_time))
     delay_s = (sunset_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.sunset_handler, replace=True, uuid='SunsetScheduler')
 
@@ -128,7 +128,7 @@ class Location(object):
     now = self.now()
     if dusk_time < now:
       dusk_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['dusk']
-    logging.info("Dusk Time: " + str(dusk_time))
+    logging.debug("Dusk Time: " + str(dusk_time))
     delay_s = (dusk_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.dusk_handler, replace=True, uuid='DuskScheduler')
 
@@ -139,7 +139,7 @@ class Location(object):
     ffEvent('location',{'time':'dawn'})
     now = self.now()
     dawn_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['dawn']
-    logging.info("Dawn Time: " + str(dawn_time))
+    logging.debug("Dawn Time: " + str(dawn_time))
     delay_s = (dawn_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.dawn_handler, replace=True, uuid='DawnScheduler')
 
@@ -148,7 +148,7 @@ class Location(object):
     ffEvent('location',{'time':'sunrise'})
     now = self.now()
     sunrise_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['sunrise']
-    logging.info("Sunrise Time: " + str(sunrise_time))
+    logging.debug("Sunrise Time: " + str(sunrise_time))
     delay_s = (sunrise_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.sunrise_handler, replace=True, uuid='SunriseScheduler')
 
@@ -157,7 +157,7 @@ class Location(object):
     ffEvent('location',{'time':'noon'})
     now = self.now()
     noon_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['noon']
-    logging.info("Noon Time: " + str(noon_time))
+    logging.debug("Noon Time: " + str(noon_time))
     delay_s = (noon_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.noon_handler, replace=True, uuid='NoonScheduler')
 
@@ -166,7 +166,7 @@ class Location(object):
     ffEvent('location',{'time':'sunset'})
     now = self.now()
     sunset_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['sunset']
-    logging.info("Sunset Time: " + str(sunset_time))
+    logging.debug("Sunset Time: " + str(sunset_time))
     delay_s = (sunset_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.sunset_handler, replace=True, uuid='SunsetScheduler')
 
@@ -175,7 +175,7 @@ class Location(object):
     ffEvent('location',{'time':'dusk'})
     now = self.now()
     dusk_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['dusk']
-    logging.info("Dusk Time: " + str(dusk_time))
+    logging.debug("Dusk Time: " + str(dusk_time))
     delay_s = (dusk_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.dusk_handler, replace=True, uuid='DuskScheduler')
 

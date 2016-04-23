@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 21:48:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-19 22:48:56
+# @Last Modified time: 2016-04-22 03:06:09
 
 
 from core.models.device import Device
@@ -29,13 +29,13 @@ class Device(Device):
     ###########################
     # SET VARS
     ###########################
+    args = args.get('args')
     self._api_key = args.get('api_key')
     self._user_key = args.get('user_key')
 
     ###########################
     # DONT CHANGE
     ###########################
-    args = args.get('args')
     name = args.get('name')
     super(Device,self).__init__(deviceID, name)
     ###########################
@@ -78,4 +78,4 @@ class Device(Device):
 
 
   def print_response_code(self, response):
-    logging.info('Pushover Response: ' + str(response))
+    logging.debug('Pushover Response: ' + str(response))

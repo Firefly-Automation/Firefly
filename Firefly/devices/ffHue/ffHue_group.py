@@ -2,7 +2,7 @@
 # @Author: zpriddy
 # @Date:   2016-04-17 20:28:40
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-20 01:03:58
+# @Last Modified time: 2016-04-22 02:46:52
 
 from core.models.device import Device
 from core.models.command import Command as ffCommand
@@ -11,6 +11,7 @@ import logging
 from rgb_cie import Converter
 from webcolors import name_to_hex
 from ctFade import CTFade
+from math import ceil
 
 ctFade = CTFade(0,0,0,0,None, None,run=False)
 
@@ -58,13 +59,14 @@ class Device(Device):
       'sat' : self.getSat,
       'ct' : self.getCt,
       'xy' : self.getXy,
-      'type' : self.getType
+      'type' : self.getType,
+      'level' : self.getLevel
     }
 
     ###########################
     # SET VARS
     ###########################
-
+    args = args.get('args')
     self._group_id = args.get('groupID')
     self._name = args.get('name')
     self._lights = args.get('lights')
@@ -84,7 +86,6 @@ class Device(Device):
     ###########################
     # DONT CHANGE
     ###########################
-    args = args.get('args')
     name = args.get('name')
     super(Device,self).__init__(deviceID, name)
     ###########################
@@ -149,6 +150,10 @@ class Device(Device):
   def getType(self):
     return self._type
 
+  def getLevel(self):
+    self._level = int(ceil(self._bri/255.0*100.0))
+    return self._level
+
   def setGroup(self, value):
     groupValue = {}
 
@@ -173,8 +178,7 @@ class Device(Device):
     transitiontime = value.get('transitiontime')
     if transitiontime:
       groupValue.update({'transitiontime':transitiontime})
-    else:
-      groupValue.update({'transitiontime':40})
+
 
 
     #NAME COLOR
@@ -302,7 +306,6 @@ class Device(Device):
     self._bri = raw_data.get('action').get('bri')
     self._ct = raw_data.get('action').get('ct')
     self._type = raw_data.get('type')
-    self._level = int(self._bri/255.0*100.0)
-    raw_data['action']['level'] = self._level
+    self._level = int(ceil(self._bri/255.0*100.0))
 
-    ffEvent(self._id, raw_data.get('action'))
+    #ffEvent(self._id, raw_data.get('action'))

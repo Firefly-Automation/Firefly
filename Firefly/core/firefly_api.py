@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-21 00:20:54
+# @Last Modified time: 2016-04-22 03:06:59
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -121,10 +121,10 @@ def manual_command(request):
     try:
       command = json.loads(request.args.get('myCommand')[0])
       if command.get('routine'):
-        myCommand = ffCommand(command.get('device'),command.get('command'), routine=command.get('routine'), force=command.get('force'))
+        myCommand = ffCommand(command.get('device'),command.get('command'), routine=command.get('routine'), force=command.get('force'), source='Web: Manual Command').result
       else:
-        myCommand = ffCommand(command.get('device'),command.get('command'))
-      return form + '<br><br> Last Command: ' + str(request.args.get('myCommand')[0]) 
+        myCommand = ffCommand(command.get('device'),command.get('command'), source='Web: Manual Command').result
+      return form + '<br><br> Last Command: ' + str(request.args.get('myCommand')[0])  + 'Sucessfully sent to device: ' + str(myCommand)
     except ValueError:
       return form + '<br><br>Last Command Failed - INVALID JSON FORMAT ' + str(request.args.get('myCommand')[0])
   else:
@@ -155,9 +155,6 @@ def ff_read_device_config(request):
       r['ffObject'] = rObjBin
       routineDB.insert(r)
 
-  print '====================================================='
-  print ffLocation.isLight
-
 
 @app.route('/testRequest')
 def send_test_request(request):
@@ -181,7 +178,7 @@ def test_install(request):
       deviceDB.insert(d)
 
 def install_child_device(deviceID, ffObject, config={}, status={}):
-  logging.info("Installing Child Device")
+  logging.debug("Installing Child Device")
   d = {}
   d['id'] = deviceID
   d['ffObject'] = pickle.dumps(ffObject)
@@ -198,34 +195,43 @@ def send_event(event):
       s = pickle.loads(d.get('ffObject'))
       s.sendEvent(event)
       d = pickle.dumps(s)
-      deviceDB.update_one({'id':event.deviceID},{'$set': {'ffObject':d}}) #, '$currentDate': {'lastModified': True}})
+      deviceDB.update_one({'id':event.deviceID},{'$set': {'ffObject':d}, '$currentDate': {'lastModified': True}})
 
   for d in  routineDB.find({'listen':event.deviceID}):
     s = pickle.loads(d.get('ffObject'))
     s.event(event)
   
-  data_log(event.log)
+  data_log(event.log, logType='event')
 
 def send_command(command):
-  logging.info('send_command ' + str(command))
+  logging.debug('send_command ' + str(command))
+
+  sucess = False
+  message = None
 
   if command.routine:
     routine = routineDB.find_one({'id':command.deviceID})
-    s = pickle.loads(routine.get('ffObject'))
-    s.executeRoutine(force=command.force)
+    if routine:
+      s = pickle.loads(routine.get('ffObject'))
+      s.executeRoutine(force=command.force)
+      sucess = True
 
   for d in deviceDB.find({'id':command.deviceID}):
     s = pickle.loads(d.get('ffObject'))
     s.sendCommand(command)
     d = pickle.dumps(s)
-    deviceDB.update_one({'id':command.deviceID},{'$set': {'ffObject':d}}) #, '$currentDate': {'lastModified': True}})
+    deviceDB.update_one({'id':command.deviceID},{'$set': {'ffObject':d}, '$currentDate': {'lastModified': True}})
+    sucess = True
 
-  data_log(command.log)
+  if not sucess:
+    message = 'Device not found'
+  data_log(command.log, message=message, logType='command')
+  return sucess
 
   # MAYBE ALSO SEND TO APPS 
 
 def send_request(request):
-  logging.info('send_request' + str(request))
+  logging.debug('send_request' + str(request))
   d = deviceDB.find_one({'id':request.deviceID})
   if d:
     if not request.forceRefresh:
@@ -275,11 +281,11 @@ def send_notification(deviceID, message, priority=0):
 def read_settings():
   global core_settings
   with open('config/settings.json') as settings:
-    logging.info('Reading Settings')
+    logging.debug('Reading Settings')
     newSettings = json.load(settings)
     core_settings.port = newSettings.get('port')
     core_settings.ip_address = str(newSettings.get('ip_address'))
-    logging.info(core_settings)
+    logging.debug(core_settings)
 
 ## THIS WILL REPLACE THE TEST ONE ABOVE
 def insatll_devices():
@@ -290,9 +296,9 @@ def insatll_devices():
   package.Device(device.get('deviceID'), device)
 
 
-def data_log(event, message=None):
+def data_log(event, message=None, logType='unknown'):
   timestamp = datetime.now()
-  datalogDB.insert({"timestamp":timestamp, "event":str(event), "message":str(message)})
+  datalogDB.insert({"timestamp":timestamp, "type":str(logType), "data":str(event), "message":str(message)})
 
 def event_message(fromDevice, message):
   timestamp = datetime.now()
@@ -301,13 +307,16 @@ def event_message(fromDevice, message):
 
 def update_status(status):
   deviceID = status.get('deviceID')
-  currentStatus = deviceDB.find_one({'id':deviceID}).get('status')
-  if currentStatus != status:
-    print '-------------------UPDATING STATUS---------------'
-    deviceDB.update_one({'id':deviceID},{'$set': {'status': status}}) #, "$currentDate": {"lastModified": True}})
-    return True
+  device = deviceDB.find_one({'id':deviceID})
+  if device:
+    currentStatus = device.get('status')
+    if currentStatus != status:
+      deviceDB.update_one({'id':deviceID},{'$set': {'status': status}}) #, "$currentDate": {"lastModified": True}})
+      return True
+    else:
+      return False
   else:
-    return False
+    return True
 
 def auto_start():
   for device in deviceDB.find({}):
@@ -318,7 +327,7 @@ def run():
   global core_settings
   read_settings()
   auto_start()
-  app.run(core_settings.ip_address, core_settings.port)
+  app.run(core_settings.ip_address, core_settings.port, logFile=open('logs/app.log','w'))
 
 if __name__ == "__main__":
   run()

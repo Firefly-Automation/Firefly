@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-21 00:23:39
+# @Last Modified time: 2016-04-22 03:06:21
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -111,17 +111,17 @@ class Routine(object):
     from time import sleep
     from core.firefly_api import ffLocation
     from core.utils.notify import Notification as ffNotification
-    logging.info("Executing Routine: " + self._name)
+    logging.debug("Executing Routine: " + self._name)
 
     if not force:
       if self._mode_no_run:
         if ffLocation.mode in self._mode_no_run:
-          logging.info('Returning: Set to not execute in mode: ' + ffLocation.mode)
+          logging.debug('Returning: Set to not execute in mode: ' + ffLocation.mode)
           return
 
       if self._mode_run:
         if ffLocation.mode not in self._mode_run:
-          logging.info('Returning: Set to not execute in mode: ' + ffLocation.mode)
+          logging.debug('Returning: Set to not execute in mode: ' + ffLocation.mode)
           return
 
     for device, commands in self._actions.iteritems():

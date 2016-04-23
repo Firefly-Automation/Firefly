@@ -2,7 +2,7 @@
 # @Author: zpriddy
 # @Date:   2016-04-18 20:56:52
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-20 01:03:19
+# @Last Modified time: 2016-04-22 12:53:27
 
 from core.scheduler import Scheduler
 from core.models.command import Command as ffCommand
@@ -52,7 +52,7 @@ class CTFade(object):
         self._currnetL += self._lStep
       else:
         lightCommand = ffCommand(self._deviceID, {'setLight':{'ct':str(self._currentK)+'K','transitiontime':self._delay*10, 'ctfade':True}})
-      if self._timeRemaining >= self._delay:
+      if self._timeRemaining > 0:
         self._scheduler.runInS(int(self._delay), self.runFade, replace=True, uuid=self._deviceID)
       self._currentK -= self._step
       self._timeRemaining -= self._delay

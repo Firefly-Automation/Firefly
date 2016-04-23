@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 21:48:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-19 22:29:03
+# @Last Modified time: 2016-04-22 03:06:00
 from core.models.event import Event as ffEvent
 import logging
 
@@ -123,4 +123,4 @@ class Device(object):
 
 
   def print_response_code(self, response):
-    logging.info('Pushover Response: ' + str(response))
+    logging.debug('Pushover Response: ' + str(response))

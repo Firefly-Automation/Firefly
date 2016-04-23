@@ -3,7 +3,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:00:14
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-11 09:09:54
+# @Last Modified time: 2016-04-22 03:17:33
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -18,10 +18,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from core import firefly_api
-import logging
 
-logging.basicConfig(level=logging.DEBUG)
+import logging
+logging.basicConfig(level=logging.INFO)
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+
+
+from core import firefly_api
 
 if __name__ == "__main__":
   firefly_api.run()
