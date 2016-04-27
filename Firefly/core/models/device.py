@@ -16,6 +16,7 @@ class Device(object):
 
   def __str__(self):
     status_string = '<DEVICE:' + self.type.upper() + ' ID:' + self.id.upper() + ' NAME:' + self.name.upper()
+
     for item in self.requests.keys():
       status_string += ' ' + item.upper() + ': ' + str(self.requests[item]()) 
     status_string += ' /DEVICE>'
@@ -42,10 +43,13 @@ class Device(object):
           simpleCommand = self._commands[item](value)
 
       updated_status = self.refreshData()
-      if updated_status:
-        ffEvent(self.id, updated_status)
+      if command.send_event:
+        if updated_status:
+          ffEvent(self.id, updated_status)
+        else:
+          logging.debug('NO chnage in status')
       else:
-        logging.debug('NO chnage in status')
+        logging.debug('Set to not send event')
     
 
   def requestData(self, request):
@@ -64,6 +68,7 @@ class Device(object):
       return returnData
 
   def refreshData(self):
+    logging.debug('Refresh Data in ' + self._name)
     from core.firefly_api import update_status
     returnData = {}
     newChanges = {}
@@ -95,6 +100,11 @@ class Device(object):
   @property
   def id(self):
       return self._id
+
+  @property
+  def requests(self):
+      return self._requests
+  
   
   
   

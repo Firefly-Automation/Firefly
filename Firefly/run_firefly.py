@@ -3,7 +3,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:00:14
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-22 03:17:33
+# @Last Modified time: 2016-04-26 21:30:04
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -20,7 +20,8 @@
 
 
 import logging
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
+logging.basicConfig(format='%(asctime)s %(levelname)s {%(module)s} [%(funcName)s] %(message)s', datefmt='%Y-%m-%d,%H:%M:%S', level=logging.INFO)
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 

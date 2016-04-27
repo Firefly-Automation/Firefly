@@ -3,8 +3,9 @@
 from core.models.command import Command
 
 import mock 
-from mock import patch
 import unittest
+
+from mock import patch
 
 class send_command:
   def __init__(self, command):

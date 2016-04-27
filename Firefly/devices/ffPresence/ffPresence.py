@@ -2,7 +2,7 @@
 # @Author: zpriddy
 # @Date:   2016-04-17 01:25:27
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-22 01:29:46
+# @Last Modified time: 2016-04-26 10:06:40
 
 from core.models.device import Device
 import logging
@@ -18,7 +18,8 @@ class Device(Device):
     }
     
     self.COMMANDS = {
-      'presence' : self.setPresence
+      'presence' : self.setPresence,
+      'startup' : self.refreshData
     }
 
     self.REQUESTS = {

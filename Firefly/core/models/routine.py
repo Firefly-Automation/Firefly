@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-22 03:06:21
+# @Last Modified time: 2016-04-25 23:50:45
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -38,8 +38,10 @@ class Routine(object):
     self._mode_run = config.get('mode_run')
     self._notification_devices = config.get('notification_devices')
     self._notification_message = config.get('notification_message')
+    self._run_time_ranges = config.get('run_time_ranges')
+    self._no_run_time_ranges = config.get('no_run_time_ranges')
 
-    self._listen = [x.keys()[0] for x in self._triggers]
+    self._listen = list(set().union(*(d.keys() for d in self._triggers)))
 
 
     if self._scheduling:
@@ -109,6 +111,7 @@ class Routine(object):
 
   def executeRoutine(self, force=False):
     from time import sleep
+    from datetime import datetime, time
     from core.firefly_api import ffLocation
     from core.utils.notify import Notification as ffNotification
     logging.debug("Executing Routine: " + self._name)
@@ -124,9 +127,49 @@ class Routine(object):
           logging.debug('Returning: Set to not execute in mode: ' + ffLocation.mode)
           return
 
+      if self._run_time_ranges or self._no_run_time_ranges:
+        now = datetime.now().time()
+        if self._run_time_ranges:
+          for timeRange in self._run_time_ranges:
+            startH, startM = timeRange.get('start_time').split(':')
+            startH = int(startH)
+            startM = int(startM)
+            endH, endM = timeRange.get('end_time').split(':')
+            endH = int(endH)
+            endM = int(endM)
+            if startH <= endH:
+              if not (now >= time(startH,startM) and now <= time(endH,endM)):
+                logging.critical("Not in time range to run routine")
+                return
+            else:
+              if not (now >= time(startH,startM) or now <= time(endH,endM)):
+                logging.critical("Not in time range to run routine")
+                return
+
+        if self._no_run_time_ranges:
+          for timeRange in self._no_run_time_ranges:
+            startH, startM = timeRange.get('start_time').split(':')
+            startH = int(startH)
+            startM = int(startM)
+            endH, endM = timeRange.get('end_time').split(':')
+            endH = int(endH)
+            endM = int(endM)
+            logging.critical(str(startH) + ' ' + str(endH))
+            if startH <= endH:
+              if now >= time(startH,startM) and now <= time(endH,endM):
+                logging.critical("In time range to not run routine")
+                return
+            else:
+              if now >= time(startH,startM) or now <= time(endH,endM):
+                logging.critical("In time range to not run routine")
+                return
+
+
+
     for device, commands in self._actions.iteritems():
       ffCommand(device,commands)
-      sleep(0.05)
+      if 'hue' in device:
+        sleep(0.5)
 
     if ffLocation:
       if ffLocation.isLight:
@@ -136,8 +179,6 @@ class Routine(object):
             sleep(0.5)
 
       if ffLocation.isDark:
-        print '********************************************************************'
-        print self._actions_night
         for device, commands in self._actions_night.iteritems():
           ffCommand(device,commands)
           if 'hue' in device:

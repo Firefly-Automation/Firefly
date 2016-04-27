@@ -52,5 +52,16 @@
       "insatll_lights"  : true,
       "install_groups" : true
     }
+  },
+  "zwave" : {
+    "id" : "zwave",
+    "package" : "ffZwave",
+    "module" : "ffZwave",
+    "type" : "device",
+    "subType" : "hub",
+    "args" : {
+      "configFile" : "/home/zpriddy/Github/python-openzwave/python-openzwave/openzwave/config",
+      "port" : "/dev/ttyUSB0"
+    }
   }
 }

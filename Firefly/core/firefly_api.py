@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-22 03:06:59
+# @Last Modified time: 2016-04-26 22:31:26
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -32,6 +32,7 @@ from bson.binary import Binary
 import pickle
 import pymongo
 from pymongo import MongoClient
+from sys import modules
 
 import templates
 
@@ -53,6 +54,7 @@ routineDB = ffDB.routines
 deviceDB = ffDB.devices
 datalogDB = ffDB.datalog
 messageDB = ffDB.message
+appsDB = ffDB.apps
 
 datalogDB.ensure_index("timestamp", expireAfterSeconds=(60*60*72))
 messageDB.ensure_index("timestamp", expireAfterSeconds=(60*60*24*7))
@@ -62,6 +64,7 @@ messageDB.ensure_index("timestamp", expireAfterSeconds=(60*60*24*7))
 testDevices = {}
 ffLocation = Location('config/location.json')
 ffScheduler = Scheduler()
+ffZwave = None
 
 ## PATHS ##
 @app.route('/')
@@ -155,6 +158,27 @@ def ff_read_device_config(request):
       r['ffObject'] = rObjBin
       routineDB.insert(r)
 
+@app.route('/installApps')
+def ff_instal_apps(request):
+  appsDB.remove({})
+  with open('config/apps.json') as coreAppConfig:
+    appList = json.load(coreAppConfig)
+    for name, app in appList.iteritems():
+      package_full_path = 'apps.' + app.get('package') +'.' + app.get('module')
+      app_config = 'config/app_config/' + str(name) + '.json'
+      with open(str(app_config)) as app_config_file:
+        app_config_data = json.load(app_config_file)
+        package = __import__(package_full_path, globals={}, locals={}, fromlist=[app.get('package')], level=-1)
+        reload(modules[package_full_path])
+        aObj = package.App(app_config_data)
+        aObjBin = pickle.dumps(aObj)
+        a = {}
+        a['id'] = aObj.id
+        a['ffObject'] = aObjBin
+        a['name'] = name
+        a['listen'] = aObj.listen
+        appsDB.insert(a)
+
 
 @app.route('/testRequest')
 def send_test_request(request):
@@ -163,19 +187,23 @@ def send_test_request(request):
 
 @app.route('/testInstall')
 def test_install(request):
+  global ffZwave
   deviceDB.remove({})
   with open('config/devices.json') as devices:
     allDevices = json.load(devices)
     for name, device in allDevices.iteritems():
-      package_full_path = device.get('type') + 's.' + device.get('package') + '.' + device.get('module')
-      package = __import__(package_full_path, globals={}, locals={}, fromlist=[device.get('package')], level=-1)
-      dObj = package.Device(device.get('id'), device)
-      d = {}
-      d['id'] = device.get('id')
-      d['ffObject'] = pickle.dumps(dObj)
-      d['config'] = device
-      d['status'] = {}
-      deviceDB.insert(d)
+      if device.get('module') != "ffZwave":
+        package_full_path = device.get('type') + 's.' + device.get('package') + '.' + device.get('module')
+        package = __import__(package_full_path, globals={}, locals={}, fromlist=[device.get('package')], level=-1)
+        reload(modules[package_full_path])
+        dObj = package.Device(device.get('id'), device)
+        d = {}
+        d['id'] = device.get('id')
+        d['ffObject'] = pickle.dumps(dObj)
+        d['config'] = device
+        d['status'] = {}
+        deviceDB.insert(d)
+
 
 def install_child_device(deviceID, ffObject, config={}, status={}):
   logging.debug("Installing Child Device")
@@ -197,6 +225,12 @@ def send_event(event):
       d = pickle.dumps(s)
       deviceDB.update_one({'id':event.deviceID},{'$set': {'ffObject':d}, '$currentDate': {'lastModified': True}})
 
+  for a in appsDB.find({'listen':event.deviceID}):
+    app = pickle.loads(a.get('ffObject'))
+    app.sendEvent(event)
+    appObj = pickle.dumps(app)
+    appsDB.update_one({'id':app.id},{'$set': {'ffObject':appObj}, '$currentDate': {'lastModified': True}})
+
   for d in  routineDB.find({'listen':event.deviceID}):
     s = pickle.loads(d.get('ffObject'))
     s.event(event)
@@ -204,6 +238,7 @@ def send_event(event):
   data_log(event.log, logType='event')
 
 def send_command(command):
+  global ffZwave
   logging.debug('send_command ' + str(command))
 
   sucess = False
@@ -216,11 +251,21 @@ def send_command(command):
       s.executeRoutine(force=command.force)
       sucess = True
 
+  if command.deviceID == ffZwave.name:
+    ffZwave.sendCommand(command)
+
   for d in deviceDB.find({'id':command.deviceID}):
     s = pickle.loads(d.get('ffObject'))
     s.sendCommand(command)
     d = pickle.dumps(s)
     deviceDB.update_one({'id':command.deviceID},{'$set': {'ffObject':d}, '$currentDate': {'lastModified': True}})
+    sucess = True
+
+  for a in appsDB.find({'id':command.deviceID}):
+    app = pickle.loads(a.get('ffObject'))
+    app.sendCommand(command)
+    appObj = pickle.dumps(app)
+    appsDB.update_one({'id':app.id},{'$set': {'ffObject':appObj}, '$currentDate': {'lastModified': True}})
     sucess = True
 
   if not sucess:
@@ -293,6 +338,7 @@ def insatll_devices():
   print device
   package_full_path = device.get('type') + 's.' + device.get('package') + '.' + device.get('package')
   package = __import__(package_full_path, globals={}, locals={}, fromlist=[device.get('package')], level=-1)
+  reload(package)
   package.Device(device.get('deviceID'), device)
 
 
@@ -319,9 +365,20 @@ def update_status(status):
     return True
 
 def auto_start():
+  global ffZwave
+  with open('config/devices.json') as devices:
+    allDevices = json.load(devices)
+    for name, device in allDevices.iteritems():
+      if device.get('module') == "ffZwave":
+        package_full_path = device.get('type') + 's.' + device.get('package') + '.' + device.get('module')
+        package = __import__(package_full_path, globals={}, locals={}, fromlist=[device.get('package')], level=-1)
+        ffZwave = package.Device(device.get('id'), device)
+        #ffZwave.refresh_scheduler()
+
   for device in deviceDB.find({}):
     deviceID = device.get('id')
     ffEvent(deviceID, {'startup': True})
+
 
 def run():
   global core_settings

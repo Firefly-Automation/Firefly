@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 21:48:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-22 03:06:05
+# @Last Modified time: 2016-04-25 18:20:53
 from core.models import event
 from core.models.command import Command as ffCommand
 
@@ -40,7 +40,7 @@ class Device(object):
 
 
   def sendEvent(self, event):
-    logging.debug('Reciving Event in ffPushover ' + str(event) )
+    logging.debug('Reciving Event in ffHue ' + str(event) )
     if event.deviceID == self._id:
       for item, value in event.event.iteritems():
         if item in self._commands: 
@@ -48,7 +48,7 @@ class Device(object):
     self.refreshData()
 
   def requestData(self, request):
-    logging.debug('Request made to ffPushover ' + str(request))
+    logging.debug('Request made to ffHue ' + str(request))
     if request.multi:
       returnData = {}
       for item in request.request:
@@ -106,7 +106,7 @@ class Device(object):
   def refresh_scheduler(self, args={}):
     logging.debug("Starting Hue Scheduler")
     hueScheduler = Scheduler()
-    hueScheduler.runEveryS(10,self.refresh_hue,replace=True,uuid='HueRefresher')
+    hueScheduler.runEveryS(30,self.refresh_hue,replace=True,uuid='HueRefresher')
 
   def refresh_hue(self):
     rawLightData = self._hueBridge.get_lights()

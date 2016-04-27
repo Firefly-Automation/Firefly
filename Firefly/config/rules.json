@@ -1,0 +1,40 @@
+{
+  "rules" : [
+    {
+      "id" : 1,
+      "name" : "turn on entry light when door is opened",
+      "triggers" : [
+        {"zwave-node-14" : {"state" : true}}
+      ],
+      "actions" : [
+
+      ],
+      "actions_day" : [
+
+      ],
+      "actions_night" : [
+
+      ],
+      "scheduling" : [
+
+      ],
+      "mode_run" : [
+        "home"
+      ],
+      "mode_no_run" : [
+
+      ],
+      "run_time_ranges" :[
+        
+      ],
+      "no_run_time_ranges" :[
+        
+      ],
+      "options" : {
+        "switch_back_when_triggers_change" : true,
+        /*This will use if trigger.state != event.state and instead of returning it will switch back anything that was set to true or false. ie. Door Opens -> light is set to True -> Door closes -> light is set to false. 
+        "switch_back_delay" : 5
+      }
+    }
+  ]
+}

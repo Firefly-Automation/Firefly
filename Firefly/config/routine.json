@@ -68,7 +68,7 @@
       "type": "routine",
       "mode" : "away",
       "actions" : {
-
+        "lgtv" : {"cmd":"POWER"}
       },
       "actions_night" : {
         "hue-group-5" : {"setLight": {"on":false}},
@@ -102,7 +102,7 @@
       "type": "routine",
       "mode" : "night",
       "actions" : {
-
+        "lgtv" : {"cmd":"POWER"}
       },
       "actions_night" : {
         "hue-light-1" : {"setLight": {"on":false}},
@@ -195,11 +195,10 @@
 
       ],
       "run_time_ranges" :[
-        {"start_time":"22:00", "end_time":"02:00"}
+        
       ],
       "no_run_time_ranges" :[
-        {"start_time":"5:00", "end_time":"12:00"},
-        {"start_time":"15:00", "end_time":"18:00"}
+        
       ]
     }
   ]
