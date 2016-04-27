@@ -1,0 +1,23 @@
+{ 
+  "motion" : 
+  {
+    "package" : "ffAdvancedLighting",
+    "module" : "motion",
+    "installs" :
+    [ 
+      {
+        "id":"kitchenLights",
+        "name" : "Turn Kitchen Lights on with motion",
+        "motion_sensors" : ["zwave-node-4"],
+        "lights" : [],
+        "actions_on_motion_active" : {
+          "zwave-node-11" : "on"
+        },
+        "actions_on_motion_inactive" : {
+          "zwave-node-11" : "off"
+        },
+        "delay_time" : 15
+      }
+    ]
+  }
+}

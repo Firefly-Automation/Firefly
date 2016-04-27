@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-24 17:40:36
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-26 22:56:16
+# @Last Modified time: 2016-04-27 13:05:13
 from time import sleep, time
 from sys import stdout
 from core.models.device import Device

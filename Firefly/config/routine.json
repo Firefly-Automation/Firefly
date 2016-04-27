@@ -102,15 +102,17 @@
       "type": "routine",
       "mode" : "night",
       "actions" : {
-        "lgtv" : {"cmd":"POWER"}
+        "zwave-node-11" : "off"
       },
       "actions_night" : {
         "hue-light-1" : {"setLight": {"on":false}},
         "hue-group-5" : {"setLight": {"on":false, "level":1, "transitiontime":200}},
-        "hue-light-5" : {"setLight": {"name":"indigo","level":10}}
+        "hue-light-5" : {"setLight": {"name":"indigo","level":10}},
+        "lgtv" : {"cmd":"POWER"}
       },
       "actions_day" : {
-        "hue-group-4" : {"setLight": {"on":false}}
+        "hue-group-4" : {"setLight": {"on":false}},
+        "lgtv" : {"cmd":"POWER"}
       },
       "triggers" : [ 
 

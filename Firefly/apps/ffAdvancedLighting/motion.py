@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 23:06:59
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-26 23:17:33
+# @Last Modified time: 2016-04-27 08:11:18
 
 
 from core.models.app import App
@@ -17,7 +17,9 @@ class App(App):
       'module' : 'motion',
       'inputs' : {
         'motion_sensors' : {'type':'device', 'capability':'motion', 'multi':True, 'help':'Motion sensors to trigger lights', 'required':True},
-        'lights' : {'capability':'switch', 'capability':'switch', 'multi':True, 'help':'Lights and Switches to be triggered by motion sensors', 'required':True}
+        'lights' : {'type':'device', 'capability':'switch', 'multi':True, 'help':'Lights and Switches to be triggered by motion sensors', 'required':True},
+        'actions_on_motion_active' : {'type':'action', 'multi':True, 'help':'Non generic actions when motion is triggered'},
+        'actions_on_motion_inactive' : {'type':'action', 'multi':True, 'help':'Non generic actions when motion is is not longer triggered'}
       },
       'options' : {
         'delay_time' : {'type':'number', 'help':'Delay time in minutes from last activity before turnning off light', 'required':True},
@@ -30,12 +32,15 @@ class App(App):
         'allow_chain' : {'type':'boolean', 'default':False, 'help':'Allow the actions of this event to trigger other events listening to switched devices. This is not recommened because it can cause looping.'}
       }
   }
+
   def __init__(self, config, args={}):
     #METADAT is set above so that we can pull it during install
     #self.METADATA = METADATA
     self.INPUTS = {
       'motion_sensors' : config.get('motion_sensors'),
-      'lights' : config.get('lights')
+      'lights' : config.get('lights'),
+      'actions_on_motion_active' : config.get('actions_on_motion_active'),
+      'actions_on_motion_inactive' : config.get('actions_on_motion_inactive')
     }
     self.OPTIONS = {
       'delay_time' : config.get('delay_time'),
@@ -59,6 +64,7 @@ class App(App):
     super(App, self).__init__(config, args)
 
     self._disabled = False
+    self._send_event = True if config.get('allow_chain') is True else False
 
 
   #########################################
@@ -108,11 +114,16 @@ class App(App):
 
     if event.event.get('motion'):
       for light in self.lights:
-        ffCommand(light,"on")
-        ffScheduler.cancel(self._id)
+        ffCommand(light,"on", send_event=self._send_event)
+      for device, action in self.actions_on_motion_active.iteritems():
+        ffCommand(device, action, send_event=self._send_event)
+      ffScheduler.cancel(self._id)
 
     if not event.event.get('motion'):
-      ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, uuid=self._id)
+      if self.delay_time is None:
+        self.TurnLightsOff()
+      else:
+        ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, uuid=self._id)
 
   def TurnLightsOff(self):
     if self._disabled:
@@ -120,7 +131,10 @@ class App(App):
       return -2
 
     for light in self.lights:
-      ffCommand(light, "off")
+      ffCommand(light, "off", send_event=self._send_event)
+
+    for device, action in self.actions_on_motion_inactive.iteritems():
+      ffCommand(device, action, send_event=self._send_event)
 
 
 

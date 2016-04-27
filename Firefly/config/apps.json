@@ -1,7 +1,5 @@
 {
-
-  "kitchenLightTestApp": {
-    "package":"ffAdvancedLighting",
-    "module":"ffAdvancedLighting"
-  }
+  "ffAdvancedLighting" : [
+    "motion"
+  ]
 }

@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-26 22:31:26
+# @Last Modified time: 2016-04-27 13:03:47
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -163,21 +163,25 @@ def ff_instal_apps(request):
   appsDB.remove({})
   with open('config/apps.json') as coreAppConfig:
     appList = json.load(coreAppConfig)
-    for name, app in appList.iteritems():
-      package_full_path = 'apps.' + app.get('package') +'.' + app.get('module')
-      app_config = 'config/app_config/' + str(name) + '.json'
-      with open(str(app_config)) as app_config_file:
-        app_config_data = json.load(app_config_file)
-        package = __import__(package_full_path, globals={}, locals={}, fromlist=[app.get('package')], level=-1)
-        reload(modules[package_full_path])
-        aObj = package.App(app_config_data)
-        aObjBin = pickle.dumps(aObj)
-        a = {}
-        a['id'] = aObj.id
-        a['ffObject'] = aObjBin
-        a['name'] = name
-        a['listen'] = aObj.listen
-        appsDB.insert(a)
+    for packageName, module in appList.iteritems():
+      for moduleName in module:
+        package_full_path = 'apps.' + str(packageName) + '.' + str(moduleName)
+        app_package_config = 'config/app_config/' + str(packageName) + '/config.json'
+        logging.critical(app_package_config)
+        with open(str(app_package_config)) as app_package_config_file:
+          app_package_config_data = json.load(app_package_config_file).get(moduleName)
+          logging.critical(app_package_config_data)
+          package = __import__(package_full_path, globals={}, locals={}, fromlist=[str(packageName)], level=-1)
+          reload(modules[package_full_path])
+          for install in app_package_config_data.get('installs'):
+            aObj = package.App(install)
+            aObjBin = pickle.dumps(aObj)
+            a = {}
+            a['id'] = aObj.id
+            a['ffObject'] = aObjBin
+            a['name'] = install.get('name')
+            a['listen'] = aObj.listen
+            appsDB.insert(a)
 
 
 @app.route('/testRequest')
