@@ -1,4 +1,9 @@
 #Mine
+*.sqlite
+OZW_Log.txt
+sumblime_Firefly*
+.c9/*
+.c9.log
 *.pyc
 Firefly/config/devices.json
 design_notes
