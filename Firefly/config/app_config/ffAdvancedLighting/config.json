@@ -8,7 +8,7 @@
       {
         "id":"kitchenLights",
         "name" : "Turn Kitchen Lights on with motion",
-        "motion_sensors" : ["zwave-node-4"],
+        "motion_sensors" : ["zwave-node-16"],
         "lights" : [],
         "actions_on_motion_active" : {
           "zwave-node-11" : "on"
@@ -17,6 +17,21 @@
           "zwave-node-11" : "off"
         },
         "delay_time" : 15
+      }
+    ]
+  },
+  "contact" :
+  {
+    "package" : "ffAdvancedLighting",
+    "module" : "contact",
+    "installs" :
+    [ 
+      {
+        "id":"testSwitch",
+        "name" : "Turn Kitchen Lights on when door opens",
+        "contact_sensors" : ["zwave-node-13", "zwave-node-2"],
+        "lights" : ["hue-light-2"],
+        "delay_time" : 1
       }
     ]
   }

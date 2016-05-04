@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-27 13:03:47
+# @Last Modified time: 2016-05-03 23:59:49
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -109,6 +109,7 @@ def manual_command(request):
     <br>
     <br>
     <a href='?myCommand={"device":"home","routine":true, "force":true}'>{"device":"home","routine":true, "force":true}</a> <br>
+    <a href='?myCommand={"device":"home-daylight","routine":true, "force":true}'>{"device":"home-daylight","routine":true, "force":true}</a> <br>
     <a href='?myCommand={"device":"night","routine":true, "force":true}'>{"device":"night","routine":true, "force":true}</a> <br>
     <a href='?myCommand={"device":"away","routine":true, "force":true}'>{"device":"away","routine":true, "force":true}</a> <br>
     <a href='?myCommand={"device":"sexy","routine":true, "force":true}'>{"device":"sexy","routine":true, "force":true}</a> <br>

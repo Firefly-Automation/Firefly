@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-24 17:40:36
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-27 13:05:13
+# @Last Modified time: 2016-05-03 23:41:00
 from time import sleep, time
 from sys import stdout
 from core.models.device import Device
@@ -98,7 +98,7 @@ class Device(Device):
     network.start()
 
     stdout.write("Waking up Zwave (This can take up to 5 minutes)")
-    for i in xrange(300):
+    for i in xrange(3):
       if network.state >= network.STATE_AWAKED:
         logging.info('Zwave Network Awake')
         break
@@ -107,7 +107,7 @@ class Device(Device):
         stdout.flush()
         sleep(1)
 
-    for x in xrange(300):
+    for x in xrange(3):
       if network.state >= network.STATE_READY:
         ffEvent(self._id,{'zwave':'network_ready'})
       else:
@@ -120,7 +120,7 @@ class Device(Device):
   def get_all_node_data(self, args={}):
     if self._network is None:
       ffEvent(self._id,{'zwave':'network_not_ready'})
-      logging.critical('Zwave not ready')
+      #logging.critical('Zwave not ready')
       return 1
 
     returnData = {}
@@ -162,7 +162,7 @@ class Device(Device):
   def get_node_data(self, node):
     if self._network is None:
       ffEvent(self._id,{'zwave':'network_not_ready'})
-      logging.critical('Zwave not ready')
+      #logging.critical('Zwave not ready')
       return 1
 
     returnData = {}
@@ -211,7 +211,7 @@ class Device(Device):
     nodeID = args.get('node')
     switchID = args.get('switchID')
     state = args.get('on')
-    logging.critical('Switching Node ' + str(nodeID))
+    #logging.critical('Switching Node ' + str(nodeID))
 
     if nodeID is None or state is None:
       return -1

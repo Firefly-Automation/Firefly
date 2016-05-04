@@ -7,17 +7,18 @@
       "actions" : {
       },
       "actions_night" : {
+        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:2700", "level":1}}},
         "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"soft white", "transitiontime": 1}},
         "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"soft white"}},
         "hue-group-2" : {"setLight": {"on":false, "transitiontime":1}}
       },
       "actions_day" : {
-        "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"cloudy", "transitiontime": 1}},
-        "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"cloudy"}}
+        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:5200", "level":1}}},
+        "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"noon", "transitiontime": 1}},
+        "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"noon"}}
       },
       "triggers" : [ 
-        { "Zach Presence" : {"presence":true}},
-        { "Ariel Presence" : {"presence":true}} 
+        { "zwave-node-13" : {"open":true}}
         ],
       "scheduling" : [
 
@@ -27,10 +28,72 @@
       ],
       "notification_message" : "Firefly has changed mode to Home!",
       "mode_no_run" : [
-        "home", "night"
+        "home", "night", "away"
       ],
       "mode_run" :[
 
+      ]
+    },
+    {
+      "id": "home-daylight",
+      "type": "routine",
+      "mode" : "home-daylight",
+      "actions" : {
+      },
+      "actions_night" : {
+        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:5200", "level":1}}},
+        "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"noon", "transitiontime": 1}},
+        "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"noon"}}
+      },
+      "actions_day" : {
+        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:5200", "level":1}}},
+        "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"noon", "transitiontime": 1}},
+        "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"noon"}}
+      },
+      "triggers" : [ 
+        ],
+      "scheduling" : [
+
+      ],
+      "notification_devices" : [
+
+      ],
+      "notification_message" : "Firefly has changed mode to Home!",
+      "mode_no_run" : [
+
+      ],
+      "mode_run" :[
+
+      ]
+    },
+    {
+      "id": "arriving",
+      "type": "routine",
+      "mode" : "arriving",
+      "actions" : {
+      },
+      "actions_night" : {
+
+      },
+      "actions_day" : {
+
+      },
+      "triggers" : [ 
+        { "Zach Presence" : {"presence":true}},
+        { "Ariel Presence" : {"presence":true}}
+        ],
+      "scheduling" : [
+
+      ],
+      "notification_devices" : [
+        "ZachPushover"
+      ],
+      "notification_message" : "Firefly has changed mode to Arriving!",
+      "mode_no_run" : [
+        "home", "arriving", "night"
+      ],
+      "mode_run" :[
+        "away"
       ]
     },
     {
@@ -38,6 +101,7 @@
       "type": "routine",
       "mode" : null,
       "actions" : {
+        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:2700", "level":1, "duration":1200}}},
         "hue-group-4": {"ctfade":{"startK":6000, "endK":2700, "fadeS":1200}}
       },
       "actions_night" : {
@@ -71,6 +135,7 @@
         "lgtv" : {"cmd":"POWER"}
       },
       "actions_night" : {
+        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off"}}},
         "hue-group-5" : {"setLight": {"on":false}},
         "hue-light-1" : {"setLight": {"on":false}},
         "hue-light-5" : {"setLight": {"name":"indigo","level":10}},
@@ -102,13 +167,14 @@
       "type": "routine",
       "mode" : "night",
       "actions" : {
-        "zwave-node-11" : "off"
+        "zwave-node-11" : "off",
+        "lgtv" : {"cmd":"POWER"}
       },
       "actions_night" : {
+        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off"}}},
         "hue-light-1" : {"setLight": {"on":false}},
         "hue-group-5" : {"setLight": {"on":false, "level":1, "transitiontime":200}},
-        "hue-light-5" : {"setLight": {"name":"indigo","level":10}},
-        "lgtv" : {"cmd":"POWER"}
+        "hue-light-5" : {"setLight": {"name":"indigo","level":10}}        
       },
       "actions_day" : {
         "hue-group-4" : {"setLight": {"on":false}},
@@ -136,8 +202,9 @@
       "type": "routine",
       "mode" : "morning",
       "actions" : {
+        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:5200", "level":1, "duration":1200}}},
         "hue-group-4" : {"setLight" : {"preset":"candle", "transitiontime":1, "level":1}},
-        "hue-group-4": {"ctfade":{"startK":2000, "endK":6500, "fadeS":1200, "startL":1, "endL":100}}
+        "hue-group-4": {"ctfade":{"startK":2000, "endK":5200, "fadeS":1200, "startL":1, "endL":100}}
       },
       "actions_night" : {
 
@@ -170,6 +237,7 @@
 
       },
       "actions_night" : {
+        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off", "duration":20}}},
         "hue-light-1" : {"setLight": {"on":false}},
         "hue-group-5" : {"setLight": {"on":false, "transitiontime":200}},
         "hue-light-5" : {"setLight": {"name":"indigo","level":20, "transitiontime":200}},
@@ -178,6 +246,7 @@
         "hue-light-10" : {"setLight": {"name":"navy","level":10, "transitiontime":200}}
       },
       "actions_day" : {
+        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off", "duration":20}}},
         "hue-group-4" : {"setLight": {"on":true}}
       },
       "triggers" : [ 

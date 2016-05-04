@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-26 21:10:05
+# @Last Modified time: 2016-04-28 10:40:17
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -35,7 +35,7 @@ class App(object):
     self._options = self.OPTIONS
     self._inputs = self.INPUTS
     self._events = self.EVENTS
-    self._listen = list(set().union(*(d for d in self._inputs.values())))
+    self._listen = list(set().union(*(d for d in self._inputs.values() if d is not None)))
 
     for name, value in self._inputs.iteritems():
       setattr(self, name, value)

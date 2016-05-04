@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-25 22:13:31
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-26 06:55:44
+# @Last Modified time: 2016-05-01 12:14:30
 
 from core.models.device import Device
 import xml.etree.ElementTree as etree
@@ -160,7 +160,7 @@ class Device(Device):
 
     logging.critical(url)
     logging.critical(cmdText)
-    r = requests.post(url, data=cmdText, headers=headers)
+    r = requests.post(url, data=cmdText, headers=headers, timeout=1)
     
     logging.critical(r.status_code)
     if r.status_code != 200:

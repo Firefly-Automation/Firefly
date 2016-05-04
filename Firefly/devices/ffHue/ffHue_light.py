@@ -2,16 +2,17 @@
 # @Author: zpriddy
 # @Date:   2016-04-17 20:28:40
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-22 12:55:47
+# @Last Modified time: 2016-05-03 21:49:33
 
-from core.models.device import Device
-from core.models.command import Command as ffCommand
-from core.models.event import Event as ffEvent
 import logging
-from rgb_cie import Converter
-from webcolors import name_to_hex
+
+from core.models.command import Command as ffCommand
+from core.models.device import Device
+from core.models.event import Event as ffEvent
 from ctFade import CTFade
 from math import ceil
+from rgb_cie import Converter
+from webcolors import name_to_hex
 
 ctFade = CTFade(0,0,0,0,None, None,run=False)
 
@@ -116,7 +117,7 @@ class Device(Device):
     return self._level
 
   @property
-  def tyep(self):
+  def type(self):
     return self._type
 
   @property
