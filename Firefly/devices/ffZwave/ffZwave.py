@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-24 17:40:36
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-05-03 23:41:00
+# @Last Modified time: 2016-05-04 00:03:13
 from time import sleep, time
 from sys import stdout
 from core.models.device import Device
@@ -98,7 +98,7 @@ class Device(Device):
     network.start()
 
     stdout.write("Waking up Zwave (This can take up to 5 minutes)")
-    for i in xrange(3):
+    for i in xrange(300):
       if network.state >= network.STATE_AWAKED:
         logging.info('Zwave Network Awake')
         break
@@ -107,7 +107,7 @@ class Device(Device):
         stdout.flush()
         sleep(1)
 
-    for x in xrange(3):
+    for x in xrange(300):
       if network.state >= network.STATE_READY:
         ffEvent(self._id,{'zwave':'network_ready'})
       else:
