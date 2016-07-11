@@ -1,0 +1,50 @@
+{% extends "ui.html" %}
+{% block title %}Users{% endblock %}
+
+{% block main %}
+    <div class="container">
+      <table class="striped highlight centered">
+        <thead>
+          <tr>
+              <th data-field="id">User Name</th>
+          </tr>
+        </thead>
+
+        <tbody>
+        {% for user in users %}
+          <tr>
+            <td>{{user}}</td>
+            <td style="width:10%; font-size: 10px">{% if user != 'admin' %}<a href='/remove_user?username={{user}}'>remove</a>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+</div>
+
+<br>
+<br>
+<br>
+<div class="container center grey lighten-3">
+<h5>Add User:</h5>
+<form action="/add_user">
+<div class="row margin">
+  <div class="input-field col s12"> 
+    <i class="mdi-social-person-outline prefix"></i>
+    <input name="username" id="username" type="text" autocorrect="off" autocapitalize="none">
+    <label for="username" class="center-align">Username</label>
+  </div>
+</div>
+<div class="row margin">
+  <div class="input-field col s12">
+    <i class="mdi-action-lock-outline prefix"></i>
+    <input name="password" id="password" type="password">
+    <label for="password">Password</label>
+  </div>
+            </div>
+  <button class="btn btn-lg " type="submit">Add User</button>
+</form>
+<div class="container">
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

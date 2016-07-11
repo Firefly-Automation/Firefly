@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-05-03 23:59:49
+# @Last Modified time: 2016-06-27 16:15:54
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -17,31 +17,33 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from collections import OrderedDict
-from datetime import datetime
+import difflib
 import json
 import logging
-from klein import Klein
+import pickle
+import pymongo
 import treq
-from twisted.web.server import Site
-from twisted.web.resource import Resource
+
+from bson.binary import Binary
+from collections import OrderedDict
+from datetime import datetime
+from klein import Klein
+from pymongo import MongoClient
+from sys import modules
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue
 from twisted.python import log
-from bson.binary import Binary
-import pickle
-import pymongo
-from pymongo import MongoClient
-from sys import modules
+from twisted.web.resource import Resource
+from twisted.web.server import Site
 
 import templates
 
 from core.models import core_settings, event
 
-from core.models.event import Event as ffEvent
-from core.models.command import Command as ffCommand
-from core.models.request import Request as ffRequest
 from core.location import Location
+from core.models.command import Command as ffCommand
+from core.models.event import Event as ffEvent
+from core.models.request import Request as ffRequest
 from core.scheduler import Scheduler
 
 app = Klein()
@@ -65,6 +67,9 @@ testDevices = {}
 ffLocation = Location('config/location.json')
 ffScheduler = Scheduler()
 ffZwave = None
+
+routine_list = []
+device_list = {}
 
 ## PATHS ##
 @app.route('/')
@@ -94,8 +99,8 @@ def manual_command(request):
     <a href='?myCommand={"device":"hue-light-8", "command":{"switch":"on"}}'>{"device":"hue-light-8", "command":{"switch":"on"}}</a> <br>
     <a href='?myCommand={"device":"hue-light-8", "command":{"switch":"off"}}'>{"device":"hue-light-8", "command":{"switch":"off"}}</a> <br>
     <a href='?myCommand={"device":"ZachPushover", "command":{"notify":{"message":"New Test Message"}}}'>{"device":"ZachPushover", "command":{"notify":{"message":"New Test Message"}}}</a> <br>
-    <a href='?myCommand={"device":"Zach Presence", "command":{"presence":true}}'>{"device":"Zach Presence", "command":{"presence":true}}</a> <br>
-    <a href='?myCommand={"device":"Zach Presence", "command":{"presence":false}}'>{"device":"Zach Presence", "command":{"presence":false}}</a> <br>
+    <a href='?myCommand={"device":"ZachPresence", "command":{"presence":true}}'>{"device":"ZachPresence", "command":{"presence":true}}</a> <br>
+    <a href='?myCommand={"device":"ZachPresence", "command":{"presence":false}}'>{"device":"ZachPresence", "command":{"presence":false}}</a> <br>
     <a href='?myCommand={"device":"hue-group-4", "command":{"setLight":{"preset":"cloudy", "transitiontime":40,"effect":"none","level":100,"alert":"lselect"}}}'>{"device":"hue-group-4", "command":{"setLight":{"preset":"cloudy", "transitiontime":40,"effect":"none","level":100,"alert":"lselect"}}}</a> <br>
     <br>
     <a href='?myCommand={"device":"hue-light-3", "command":{"setLight":{"effect":"colorloop","level":50}}}'>{"device":"hue-light-3", "command":{"setLight":{"effect":"colorloop","level":50}}}</a><br>
@@ -383,6 +388,189 @@ def auto_start():
   for device in deviceDB.find({}):
     deviceID = device.get('id')
     ffEvent(deviceID, {'startup': True})
+
+
+################################################################################
+################################ API FUNCTIONS #################################
+################################################################################
+
+@app.route('/API/views/routine')
+def APIViewsRoutine(request):
+  returnData = {}
+  for r in routineDB.find({}).sort("id"):
+    if r.get('icon') is None:
+      continue
+    rID = r .get('id')
+    returnData[rID] = {}
+    returnData[rID]['id'] = rID
+    returnData[rID]['icon'] = r.get('icon')
+
+  logging.critical(str(returnData))
+  return json.dumps(returnData, sort_keys=True)
+
+
+@app.route('/API/views/devices')
+def APIViewsDevices(request):
+  returnData = {}
+  for d in deviceDB.find({},{'status.views':1, 'id':1}):
+    dID = d.get('id')
+    if (d.get('status').get('views')):
+      returnData[dID] = d.get('status').get('views')
+
+  return json.dumps(returnData, sort_keys=True)
+
+
+@app.route('/API/status/devices/all')
+def APIDevicesStatusAll(request):
+  returnData = {}
+  for d in deviceDB.find({},{'status':1, 'id':1}):
+    dID = d.get('id')
+    if (d.get('status')):
+      returnData[dID] = d.get('status')
+
+  return json.dumps(returnData, sort_keys=True)
+
+
+@app.route('/API/mode')
+def APIMode(request):
+  return ffLocation.mode
+
+#####################################################
+#         ECHO API
+#####################################################
+
+@app.route('/api/echo', methods=['GET', 'POST'])
+def echo_api(request):
+  echo_app_version = "1.0"
+  request.setHeader('Content-Type', 'application/json')
+  r_data = json.loads(request.content.read())
+  logging.error(str(r_data))
+  
+  response = echo_handler(r_data)
+  logging.error(str(response))
+  return json.dumps({"version":echo_app_version,"response":response},indent=2,sort_keys=True)
+
+def echo_handler(p_request):
+  p_request = json.loads(p_request)
+  request = p_request.get('request')
+  r_type = None
+  if request is not None:
+    r_type = request.get('type')
+  
+  if r_type == "LaunchRequest":
+    return launch_request(request)
+  elif r_type == "IntentRequest":
+    return intent_request(request)
+  else:
+    return launch_request(request)
+  
+def launch_request(request):
+  output_speech = "Welcome to Firefly Smart Home. Please say a command"
+  output_type = "PlainText"
+  
+  card_type = "Simple"
+  card_title = "Firefly Smart Home"
+  card_content = "Welcome to Firefly Smart Home. You can say commands such as: Alexa, tell firefly to say good night. Alexa, tell firefly to set home to away"
+  
+  response = {"outputSpeech": {"type":output_type,"text":output_speech},"card":{"type":card_type,"title":card_title,"content":card_content},'shouldEndSession':False}
+  
+  return response
+  
+  
+def intent_request(request):
+  intent = request.get('intent')
+  if intent is not None:
+    intent_name = intent.get('name')
+    logging.critical(intent_name)
+    if intent_name == 'ChangeMode':
+      return echo_change_mode(intent)
+    if intent_name == 'Switch':
+      return echo_switch(intent)
+    if intent_name == 'Dimmer':
+      return echo_dimmer(intent)
+
+  return launch_request(request)
+
+def echo_change_mode(intent):
+  global routine_list
+  mode = intent.get('slots').get('mode').get('value').lower()
+  close_matches = difflib.get_close_matches(mode, routine_list)
+  if len(close_matches) < 1:
+    get_routines_list()
+    close_matches = difflib.get_close_matches(mode, routine_list)
+  if len(close_matches) > 0:
+    routine = close_matches[0]
+    myCommand = ffCommand(routine, None, routine=True, source="Echo command", force=True)
+    if myCommand.result:
+      return make_response("Changed mode to " + str(routine), "Changed mode to " + str(routine))
+  
+  return make_response("Error changing mode to " + str(mode), "Error changing mode to " + str(mode), card_title="Firefly Smart Home Error")
+
+def echo_switch(intent):
+  global device_list
+  device = intent.get('slots').get('device').get('value').lower()
+  state = intent.get('slots').get('state').get('value')
+  close_matches = difflib.get_close_matches(device, device_list.keys())
+  logging.critical(device_list)
+  logging.critical(close_matches)
+  if len(close_matches) < 1:
+    get_device_list()
+    close_matches = difflib.get_close_matches(device, device_list.keys())
+  if len(close_matches) > 0:
+    device = close_matches[0]
+    myCommand = ffCommand(device_list.get(device), {'switch':state})
+    if myCommand.result:
+      return make_response("Turned " + str(device) + " " + str(state), "Turned " + str(device) + " " +  str(state))
+
+  return make_response("Error finding device " + str(device), "Error finding device " + str(device), card_title="Firefly Smart Home Error")
+
+def echo_dimmer(intent):
+  global device_list
+  device = intent.get('slots').get('device').get('value').lower()
+  level = int(intent.get('slots').get('level').get('value'))
+  close_matches = difflib.get_close_matches(device, device_list.keys())
+  if len(close_matches) < 1:
+    get_device_list()
+    close_matches = difflib.get_close_matches(device, device_list.keys())
+  if len(close_matches) > 0:
+    device = close_matches[0]
+    myCommand = ffCommand(device_list.get(device), {'setLight' : {'level':level}})
+    if myCommand.result:
+      return make_response("Set " + str(device) + " to " + str(level) + " percent.", "Set " + str(device) + " to " + str(level) + "percent.")
+
+  return make_response("Error finding device " + str(device), "Error finding device " + str(device), card_title="Firefly Smart Home Error")
+  
+  
+
+def get_routines_list():
+  global routine_list
+  routine_list = []
+  for r in routineDB.find():
+    routine_list.append(r.get('id'))
+
+def get_device_list(lower=True):
+  logging.critical("GET DEVICE LIST")
+  global device_list
+  device_list = {}
+  for d in deviceDB.find({},{"config.name":1,"id":1}):
+    if d.get('config').get('name') is not None:
+      if lower:
+        device_list[d.get('config').get('name').lower()] = d.get('id')
+      else:
+        device_list[d.get('config').get('name')] = d.get('id')
+
+def make_response(output_speech, card_content, output_type="PlainText", card_title="Firefly Smart Home", card_type="Simple", end_session=True):
+  response = {"outputSpeech": {"type":output_type,"text":output_speech},"card":{"type":card_type,"title":card_title,"content":card_content},'shouldEndSession':end_session}
+  return response
+
+#####################################################
+#         END ECHO API
+#####################################################
+
+
+
+
+
 
 
 def run():

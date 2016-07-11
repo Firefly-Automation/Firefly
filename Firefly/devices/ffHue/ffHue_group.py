@@ -2,7 +2,7 @@
 # @Author: zpriddy
 # @Date:   2016-04-17 20:28:40
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-22 02:46:52
+# @Last Modified time: 2016-05-29 15:13:15
 
 from core.models.device import Device
 from core.models.command import Command as ffCommand
@@ -61,6 +61,32 @@ class Device(Device):
       'xy' : self.getXy,
       'type' : self.getType,
       'level' : self.getLevel
+    }
+
+    self.VIEWS = {
+      'display' : True,
+      'name' : args.get('args').get('name'),
+      'id' : deviceID,
+      'type' : 'hue',
+      'dash_view' : {
+        'request' : 'on',
+        'type' : 'button', 
+        'button' : {
+          "true" : {
+            'click' : 'true',
+            'color' : 'grey',
+            'command' : {'switch':'on'},
+            'text' : 'Off'
+          },
+          "false" : {
+            'click' : 'false',
+            'color' : 'green lighten-1',
+            'command' : {'switch':'off'},
+            'default' : True,
+            'text' : 'On'
+          }
+        }
+      }
     }
 
     ###########################
@@ -158,7 +184,7 @@ class Device(Device):
     groupValue = {}
 
     # END FADE IF SET COMMAND IS GIVEN
-    if not value.get('ctfade'):
+    if value.get('ctfade') is None:
       global ctFade
       ctFade.endRun()
 

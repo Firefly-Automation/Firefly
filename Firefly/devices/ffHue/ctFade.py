@@ -2,10 +2,11 @@
 # @Author: zpriddy
 # @Date:   2016-04-18 20:56:52
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-22 12:53:27
+# @Last Modified time: 2016-05-09 16:38:42
 
 from core.scheduler import Scheduler
 from core.models.command import Command as ffCommand
+import logging
 
 class CTFade(object):
   def __init__(self, deviceID, startK, endK, fadeTimeS, startLevel, endLevel, run=True):
@@ -58,6 +59,7 @@ class CTFade(object):
       self._timeRemaining -= self._delay
 
   def endRun(self):
+    logging.critical("Ending Fade")
     self._run = False
 
 

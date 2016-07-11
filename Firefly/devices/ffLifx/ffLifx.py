@@ -2,9 +2,9 @@
 # @Author: Zachary Priddy
 # @Date:   2016-05-03 08:06:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-05-03 23:48:42
-import logging
+# @Last Modified time: 2016-06-26 22:59:44
 import ffLifx_light as lightDevice
+import logging
 
 from core.models.command import Command as ffCommand
 from core.models.device import Device
@@ -48,6 +48,8 @@ class Device(Device):
 
     }
 
+    self.VIEWS = {}
+
     args = args.get('args')
     self._api_key = args.get('api_key')
     self._api_url = 'https://api.lifx.com/v1/lights/'
@@ -76,13 +78,18 @@ class Device(Device):
     data = args.get('lightCommand')
 
     url = self._api_url + 'all/state'
-    r = requests.put(url, headers=self.header, data=data)
-    if r.status_code == 200:
-      return True
-    return False
+    treq.put(url, headers=self.header, data=data)
+    #if r.status_code == 200:
+    return True
+    #return False
 
   def sendLightCommand(self, args={}):
-    pass
+    logging.critical(args)
+    data = args.get('lightCommand')
+    url = self._api_url + 'id:' + str(args.get('lightID')) + '/state'
+    treq.put(url, headers=self.header, data=data)
+    return True
+
 
   def sendMulti(self, args={}):
     pass

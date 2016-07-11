@@ -1,0 +1,4 @@
+feedparser
+flask-socketio
+flask-login
+Flask-SSLify

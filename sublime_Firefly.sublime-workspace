@@ -1,0 +1,2820 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"hue-g",
+				"hue-group-8"
+			],
+			[
+				"ins",
+				"install_child_device"
+			],
+			[
+				"ligh",
+				"lightData"
+			],
+			[
+				"in",
+				"install_groups"
+			],
+			[
+				"ap",
+				"_api_url〔variable〕"
+			],
+			[
+				"mod",
+				"modules〔module〕"
+			],
+			[
+				"app",
+				"app_package_config_data"
+			],
+			[
+				"pack",
+				"packageName"
+			],
+			[
+				"pa",
+				"packageName"
+			],
+			[
+				"run",
+				"run_conditions"
+			],
+			[
+				"con",
+				"configOptions〔variable〕"
+			],
+			[
+				"device",
+				"deviceID"
+			],
+			[
+				"dev",
+				"device"
+			],
+			[
+				"aO",
+				"aObjBin"
+			],
+			[
+				"apps",
+				"appsDB〔variable〕"
+			],
+			[
+				"app_co",
+				"app_config_file"
+			],
+			[
+				"from",
+				"fromlist"
+			],
+			[
+				"ff",
+				"ffLocation"
+			],
+			[
+				"ru",
+				"run_modes"
+			],
+			[
+				"mo",
+				"models"
+			],
+			[
+				"event",
+				"eventType〔variable〕"
+			],
+			[
+				"ite",
+				"iteritems"
+			],
+			[
+				"no",
+				"no_run_modes"
+			],
+			[
+				"getL",
+				"getLuminanceUnits〔function〕"
+			],
+			[
+				"getH",
+				"getHumidityUnits"
+			],
+			[
+				"getT",
+				"getTemperatureUnits〔function〕"
+			],
+			[
+				"_te",
+				"_temperature_units〔variable〕"
+			],
+			[
+				"_hu",
+				"_humidity_units〔variable〕"
+			],
+			[
+				"en",
+				"endH"
+			],
+			[
+				"time",
+				"timeRange〔variable〕"
+			],
+			[
+				"tim",
+				"timeRange〔variable〕"
+			],
+			[
+				"_no",
+				"_no_run_time_ranges〔variable〕"
+			],
+			[
+				"_",
+				"_run_time_ranges〔variable〕"
+			],
+			[
+				"cm",
+				"cmdText〔variable〕"
+			],
+			[
+				"devi",
+				"deviceID"
+			],
+			[
+				"swi",
+				"switchID"
+			],
+			[
+				"c",
+				"critical〔function〕"
+			],
+			[
+				"va",
+				"valueId〔variable〕"
+			],
+			[
+				"get",
+				"getattr〔function〕"
+			],
+			[
+				"set",
+				"setattr〔function〕"
+			],
+			[
+				"zw",
+				"zwaveSetup〔variable〕"
+			],
+			[
+				"sta",
+				"startup_zwave〔function〕"
+			],
+			[
+				"z",
+				"zwave"
+			],
+			[
+				"star",
+				"startup_zwave"
+			],
+			[
+				"n",
+				"network"
+			],
+			[
+				"ZWa",
+				"ZWaveNetwork"
+			],
+			[
+				"bri",
+				"_bri〔variable〕"
+			],
+			[
+				"upda",
+				"updated_status"
+			],
+			[
+				"up",
+				"updated_status"
+			],
+			[
+				"he",
+				"hue-group-4"
+			],
+			[
+				"_ac",
+				"_actions_night〔variable〕"
+			],
+			[
+				"_cu",
+				"_currnetL〔variable〕"
+			],
+			[
+				"_en",
+				"_endLevel〔variable〕"
+			],
+			[
+				"_st",
+				"_startLevel〔variable〕"
+			],
+			[
+				"st",
+				"startLevel"
+			],
+			[
+				"_mod",
+				"_mode_no_run〔variable〕"
+			],
+			[
+				"mode",
+				"mode_run"
+			],
+			[
+				"Za",
+				"ZachPushover"
+			],
+			[
+				"cr",
+				"cron_data〔variable〕"
+			],
+			[
+				"e",
+				"executeRoutine〔function〕"
+			],
+			[
+				"S",
+				"Scheduler"
+			],
+			[
+				"_mo",
+				"_mode_not〔variable〕"
+			],
+			[
+				"_not",
+				"_notification_message〔variable〕"
+			],
+			[
+				"_n",
+				"_notification_devices〔variable〕"
+			],
+			[
+				"not",
+				"notification_message"
+			],
+			[
+				"pri",
+				"priority〔argument〕"
+			],
+			[
+				"hr",
+				"href='?myCommand={\"device\":\"hue"
+			],
+			[
+				"even",
+				"event_message〔module〕"
+			],
+			[
+				"ev",
+				"event"
+			],
+			[
+				"fr",
+				"fromDevice〔argument〕"
+			],
+			[
+				"mess",
+				"messageDB〔variable〕"
+			],
+			[
+				"mes",
+				"messageDB"
+			],
+			[
+				"ra",
+				"raw_data〔argument〕"
+			],
+			[
+				"http",
+				"http_request〔module〕"
+			],
+			[
+				"si",
+				"simpleCommand〔variable〕"
+			],
+			[
+				"de",
+				"deviceID"
+			],
+			[
+				"d",
+				"DictType〔class〕"
+			],
+			[
+				"me",
+				"metadata〔variable〕"
+			],
+			[
+				"re",
+				"send_request〔function〕"
+			],
+			[
+				"za",
+				"ZachPushover"
+			],
+			[
+				"tem",
+				"templates〔module〕"
+			],
+			[
+				"hu",
+				"hueScheduler"
+			],
+			[
+				"retu",
+				"returnData〔variable〕"
+			],
+			[
+				"lig",
+				"lightData〔variable〕"
+			],
+			[
+				"li",
+				"lightID"
+			],
+			[
+				"light",
+				"lightData〔variable〕"
+			],
+			[
+				"l",
+				"lightData"
+			],
+			[
+				"tool",
+				"tooltipped"
+			],
+			[
+				"padd",
+				"padding-bottom"
+			],
+			[
+				"margin-t",
+				"margin-bottom"
+			],
+			[
+				"font",
+				"font-size"
+			],
+			[
+				"date",
+				"datetime〔class〕"
+			],
+			[
+				"pad",
+				"padding-left"
+			],
+			[
+				"a",
+				"alerts"
+			],
+			[
+				"sy",
+				"style=〔attribute〕"
+			],
+			[
+				"for",
+				"forecast"
+			],
+			[
+				"dat",
+				"datetime〔class〕"
+			],
+			[
+				"ge",
+				"getWeather〔function〕"
+			],
+			[
+				"fon",
+				"font-size"
+			],
+			[
+				"all",
+				"allViews"
+			],
+			[
+				"da",
+				"dayData〔variable〕"
+			],
+			[
+				"loca",
+				"location〔module〕"
+			],
+			[
+				"is",
+				"isinstance"
+			],
+			[
+				"cur",
+				"current_user"
+			],
+			[
+				"flask",
+				"flask_login〔module〕"
+			],
+			[
+				"cont",
+				"container"
+			],
+			[
+				"sor",
+				"sorted_switches"
+			],
+			[
+				"sw",
+				"switches"
+			],
+			[
+				"gen",
+				"generateGroupView〔function〕"
+			],
+			[
+				"gr",
+				"groupName〔argument〕"
+			],
+			[
+				"das",
+				"dashboard_groups"
+			],
+			[
+				"config",
+				"config_file〔variable〕"
+			],
+			[
+				"type",
+				"type=\"checkbox"
+			],
+			[
+				"u",
+				"update_lights"
+			],
+			[
+				"fil",
+				"filtered_devices〔variable〕"
+			],
+			[
+				"it",
+				"iteritems"
+			],
+			[
+				"deb",
+				"debugView〔function〕"
+			],
+			[
+				"form",
+				"formNavbar〔function〕"
+			],
+			[
+				"nav",
+				"navbar"
+			],
+			[
+				"NA",
+				"NAVLINKS"
+			],
+			[
+				"ca",
+				"capabilities〔variable〕"
+			],
+			[
+				"devic",
+				"device_status"
+			],
+			[
+				"PA",
+				"PAGE_TEMPLATE〔variable〕"
+			],
+			[
+				"DEV",
+				"DEVICE_TEMPLATE〔variable〕"
+			],
+			[
+				"lo",
+				"loads〔function〕"
+			],
+			[
+				"json",
+				"jsonify〔module〕"
+			],
+			[
+				"jso",
+				"jsonify"
+			],
+			[
+				"dum",
+				"dumps〔function〕"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "Firefly/devices/ffLifx/ffLifx.py",
+			"settings":
+			{
+				"buffer_size": 2808,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/core/models/device.py",
+			"settings":
+			{
+				"buffer_size": 3117,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/devices/ffLifx/ffLifx_light.py",
+			"settings":
+			{
+				"buffer_size": 5056,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/config/app_config/ffAdvancedLighting/motion.json",
+			"settings":
+			{
+				"buffer_size": 187,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/devices/ffLgControl/ffLgControl.py",
+			"settings":
+			{
+				"buffer_size": 4678,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/config/app_config/ffAdvancedLighting/config.json",
+			"settings":
+			{
+				"buffer_size": 1470,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/core/models/app.py",
+			"settings":
+			{
+				"buffer_size": 2562,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/apps/ffAdvancedLighting/contact.py",
+			"settings":
+			{
+				"buffer_size": 5117,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/config/apps.json",
+			"settings":
+			{
+				"buffer_size": 76,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/config/app_config/kitchenLightTestApp.json",
+			"settings":
+			{
+				"buffer_size": 199,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/devices/ffHue/ffHue_light.py",
+			"settings":
+			{
+				"buffer_size": 7885,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/devices/ffHue/ctFade.py",
+			"settings":
+			{
+				"buffer_size": 2213,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/config/routine.json",
+			"settings":
+			{
+				"buffer_size": 7646,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Package Control Messages\n========================\n\nMaterial Theme\n--------------\n\n  Material Theme for Sublime Text 3\n  https://github.com/equinusocio/material-theme\n  \n  👉 Version 2.1.5 👈\n  ********************************************************************************\n  \n  🏮 UI THEME\n  \n    ➼ Fix a lot of UI color glitches\n    ➼ Fix all accents colors mistakes (I hope)\n    ➼ Fix \"Unable to decode overlay_bar_horizontal.png\" console error (removed asset declaration)\n  \n  \n  🏮 COLOR SCHEMES\n  \n    ➼ Add color to html attributes in jsx scope\n    ➼ Edit color for `this` variable in jsx and js files.\n\n  Material Theme for Sublime Text 3\n  https://github.com/equinusocio/material-theme\n  \n  👉 Version 2.1.3 👈\n  ********************************************************************************\n  \n  🏮 UI THEME\n  \n    ➼ New .pug file icon (Jade will be renamed Pug, more info here https://github.com/pugjs/pug/issues/2184)\n    ➼ Fix some filetype icons.\n  \n  \n  🏮 COLOR SCHEMES\n  \n    ➼ Fix italic comments for the dark scheme\n    ➼ Fix/add italic html tag attributes\n    ➼ Remove italic style from css classnames\n",
+			"settings":
+			{
+				"buffer_size": 1116,
+				"line_ending": "Unix",
+				"name": "Package Control Messages",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"file": "Firefly/config/location.json",
+			"settings":
+			{
+				"buffer_size": 87,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/apps/ffAdvancedLighting/motion.py",
+			"settings":
+			{
+				"buffer_size": 5126,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/apps/ffAdvancedLighting/switch.py",
+			"settings":
+			{
+				"buffer_size": 5029,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/core/firefly_api.py",
+			"settings":
+			{
+				"buffer_size": 15786,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/devices/ffZwave/ffZwave.py",
+			"settings":
+			{
+				"buffer_size": 7410,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/devices/ffHue/ffHue.py",
+			"settings":
+			{
+				"buffer_size": 3941,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/devices/ffHue/ffHue_group.py",
+			"settings":
+			{
+				"buffer_size": 7390,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Firefly/config/devices.json",
+			"settings":
+			{
+				"buffer_size": 4683,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 354.0,
+		"last_filter": "import",
+		"selected_items":
+		[
+			[
+				"import",
+				"Python Fix Imports"
+			],
+			[
+				"mark",
+				"Markdown Preview: Export HTML in Sublime Text"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			],
+			[
+				"pa",
+				"Package Control: Install Package"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"rem",
+				"Package Control: Remove Package"
+			],
+			[
+				"pack",
+				"Package Control: Remove Package"
+			],
+			[
+				"test",
+				"PythonTest: Run project tests"
+			],
+			[
+				"htm",
+				"HTMLBeautify"
+			],
+			[
+				"git com",
+				"Git: Commit"
+			],
+			[
+				"add",
+				"Git: Add All"
+			],
+			[
+				"com",
+				"Git: Commit"
+			],
+			[
+				"comm",
+				"Git: Commit"
+			],
+			[
+				"push",
+				"Git: Push"
+			],
+			[
+				"git add",
+				"Git: Add All"
+			],
+			[
+				"git pus",
+				"Git: Push"
+			],
+			[
+				"git co",
+				"Git: Commit"
+			],
+			[
+				"git",
+				"Git: Add All"
+			],
+			[
+				"go",
+				"Google Spell Check"
+			],
+			[
+				"goo",
+				"Google Spell Check"
+			],
+			[
+				"goog",
+				"Google Spell Check"
+			],
+			[
+				"PACK",
+				"Package Control: Install Package"
+			],
+			[
+				"git push",
+				"Git: Push"
+			],
+			[
+				"git a",
+				"Git: Add All"
+			],
+			[
+				"SNIPPE",
+				"Snippet: Lorem ipsum"
+			],
+			[
+				"templ",
+				"Create file from Template"
+			]
+		],
+		"width": 575.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/zpriddy/Github/Firefly/README.md",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffLifx/__init__.py",
+		"/home/zpriddy/Github/Firefly/Firefly/core/models/routine.py",
+		"/home/zpriddy/Github/Firefly/Firefly/config/apps.json",
+		"/home/zpriddy/Github/Firefly/Firefly/config/app_config/ffAdvancedLighting/motion.json",
+		"/home/zpriddy/Github/Firefly/Firefly/config/app_config/kitchenLightTestApp.json",
+		"/home/zpriddy/Github/Firefly/Firefly/apps/ffAdvancedLighting/motion.py",
+		"/home/zpriddy/Github/Firefly/Firefly/apps/ffAdvancedLighting/ffAdvancedLighting.py",
+		"/home/zpriddy/Github/Firefly/Firefly/core/models/app.py",
+		"/home/zpriddy/Github/Firefly/Firefly/firefly_tests.py",
+		"/home/zpriddy/Github/Firefly/Firefly/config/rules.json",
+		"/home/zpriddy/Github/Firefly/Firefly/config/routine_template.json",
+		"/home/zpriddy/Github/Firefly/Firefly/core/models/command.py",
+		"/home/zpriddy/Github/Firefly/Firefly/core/models/device.py",
+		"/home/zpriddy/Github/Firefly/Firefly/config/routine.json",
+		"/home/zpriddy/Github/Firefly/Firefly/logs/app.log",
+		"/home/zpriddy/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/zpriddy/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/zpriddy/Github/Firefly/Firefly/config/app_config/ffAdvancedLighting/__init__.py",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffZwave/ffZwave.py",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffZwave/ffZwave_switch.py",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffZwave/ffZwave_door_window_sensor.py",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffZwave/ffZwave_multi_sensor.py",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffHue/ffHue.py",
+		"/home/zpriddy/Github/Firefly/Firefly/config/devices.json",
+		"/home/zpriddy/Github/Firefly/Firefly/run_firefly.py",
+		"/home/zpriddy/Github/Firefly/Firefly/core/firefly_api.py",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffPresence/ffPresence.py",
+		"/home/zpriddy/Github/Firefly/Firefly/config/app_config/__init__.py",
+		"/home/zpriddy/Github/Firefly/Firefly/tests/test_core_models_command.py",
+		"/home/zpriddy/Github/Firefly/Firefly/apps/ffAdvancedLighting/__init__.py",
+		"/home/zpriddy/Github/Firefly/Firefly/apps/__init__.py",
+		"/home/zpriddy/Github/Firefly/Firefly/apps",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffLgControl/ffLgControl.py",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffHue/ctFade.py",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffHue/ffHue_light.py",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffLgControl/__init__.py",
+		"/home/zpriddy/Github/python-lg/lg.py",
+		"/home/zpriddy/Github/Firefly/Firefly/config/devices_sample.json",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffZwave/__init__.py",
+		"/home/zpriddy/Github/Firefly/Firefly/core/location.py",
+		"/home/zpriddy/Github/Firefly/Firefly/config/location.json",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffHue/ffHue_bridge.py",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffPushover/ffPushover_old.py",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffHue/ffHue_group.py",
+		"/home/zpriddy/Github/Firefly/Firefly/core/models/request.py",
+		"/home/zpriddy/Github/Firefly/Firefly/core/utils/notify.py",
+		"/home/zpriddy/Github/Firefly/Firefly/core/scheduler.py",
+		"/home/zpriddy/Github/Firefly/Firefly/core/models/event.py",
+		"/home/zpriddy/Github/Firefly/Firefly/devices/ffPushover/ffPushover.py",
+		"/home/zpriddy/Github/Firefly/Firefly/core/utils/__init__.py",
+		"/home/zpriddy/Github/Firefly/Firefly/templates/manual_command.html",
+		"/home/zpriddy/Github/Firefly/Firefly/templates/__init__.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/static/js/__init__.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/templates/dashboard.html",
+		"/home/zpriddy/Github/zPyFirefly/firefly/plugins/forecastio/forecastio.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/static/__init__.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/static/css/__init__.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/plugins/zPyForcastio/zPyForcastio.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/plugins/zPyForcastio/__init.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/old_design.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/templates/devices_beta.html",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/templates/login.html",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/TEST/index.html",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/templates/__init__.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/template/devices_beta.html",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/web_ui.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/styles.css",
+		"/home/zpriddy/Github/zPyFirefly/firefly/plugins/zPySmartThings/zPySmartThings_contact_device.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/plugins/zPySmartThings/zPySmartThings_dimmer_device.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/plugins/zPySmartThings/zPySmartThings_motion_device.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/plugins/firefly/firefly_presence_device.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/static/css/bootstrap.css",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/static/css/bootstrap.min.css",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_ui/__init__.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/plugins/pushover/pushover.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/config/pushover.json",
+		"/home/zpriddy/Github/zPyFirefly/firefly/config/firefly_settings.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/core/location.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/plugins/firefly_virtual_devices/firefly_virtual_switch_device.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/plugins/firefly_virtual_devices/firefly_presence_device.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/plugins/firefly_virtual_devices/firefly_installer.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/plugins/firefly_virtual_devices/__init__.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/s.py",
+		"/home/zpriddy/.config/sublime-text-3/Packages/User/FileHeader.sublime-settings",
+		"/home/zpriddy/.config/sublime-text-3/Packages/User/python.sublime-snippet",
+		"/home/zpriddy/Github/zPyFirefly/firefly/config/__init__.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/web_api/__init__.py",
+		"/home/zpriddy/Github/zPyFirefly/firefly/__init__.py",
+		"/home/zpriddy/.config/sublime-text-3/Cache/Python/Python.sublime-syntax.cache",
+		"/home/zpriddy/.config/sublime-text-3/Packages/SublimeLinter/SublimeLinter.sublime-settings",
+		"/home/zpriddy/.config/sublime-text-3/Packages/SublimeLinter/sublimelinter.py",
+		"/home/zpriddy/.config/sublime-text-3/Packages/SublimeLinter/lint/python_linter.py",
+		"/home/zpriddy/.config/sublime-text-3/Packages/Pylinter/Pylinter.sublime-settings",
+		"/home/zpriddy/.config/sublime-text-3/Packages/User/Plain text.sublime-settings",
+		"/home/zpriddy/.cache/kioexec/krun/12478_0_messages.json"
+	],
+	"find":
+	{
+		"height": 24.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"/home/zpriddy/Github/Firefly/Firefly",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"lifx",
+			"configOptions",
+			"_liminance",
+			"criti",
+			"’",
+			"refresh_scheduler",
+			"zn.",
+			"event",
+			"logging.info",
+			"print",
+			"message",
+			"\"hue-light-1\" : {\"setLight\": {\"on\":false}},",
+			"ffEvent('location':{'mode':self._mode})",
+			"Zach Pus",
+			"#ffN",
+			"start",
+			"subType",
+			"ffEvent",
+			"update",
+			"datetime",
+			"data_log",
+			"print",
+			"hour",
+			"300",
+			"l12",
+			"refreshFunction",
+			"')}}\"></",
+			"text",
+			"templa",
+			"                            ",
+			"refreshFunction",
+			">\n",
+			"            \n",
+			"main",
+			"value",
+			"icons",
+			"getAllDevices()",
+			"localhos",
+			"get_lights",
+			"row-",
+			"wrap",
+			".row",
+			"row ",
+			"types",
+			"Command Not Found",
+			"Command Not Fount",
+			"col",
+			": ",
+			"reactor",
+			"run",
+			"send_command",
+			"log",
+			"print",
+			"()\n",
+			"std",
+			"sys",
+			"4"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"config",
+			"_luminance",
+			"\\'",
+			"'",
+			"self._network.",
+			"self._network",
+			"logging.debug",
+			"ffEvent('location',{'mode':self._mode})",
+			"ZachPus",
+			"ffN",
+			"getAllDevices().get('all_devices')",
+			""
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "Firefly/devices/ffLifx/ffLifx.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2808,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1996,
+								1996
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								5,
+								3,
+								8,
+								6,
+								32,
+								1,
+								46,
+								131,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 840.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "Firefly/core/models/device.py",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 3117,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								26,
+								22,
+								50,
+								48,
+								7,
+								191,
+								216,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 16,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Firefly/devices/ffLifx/ffLifx_light.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5056,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								419,
+								419
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								5,
+								3,
+								9,
+								18,
+								26,
+								13,
+								154,
+								58,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 15,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "Firefly/config/app_config/ffAdvancedLighting/motion.json",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 187,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								121,
+								121
+							]
+						],
+						"settings":
+						{
+							"auto_complete": true,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								26,
+								23,
+								14,
+								8,
+								1,
+								62,
+								164,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 19,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "Firefly/devices/ffLgControl/ffLgControl.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4678,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4342,
+								4342
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								26,
+								6,
+								55,
+								44,
+								0,
+								94,
+								149,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1722.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 18,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "Firefly/config/app_config/ffAdvancedLighting/config.json",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1470,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								539,
+								539
+							]
+						],
+						"settings":
+						{
+							"auto_complete": true,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								27,
+								0,
+								38,
+								8,
+								4,
+								184,
+								169,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 232.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "Firefly/core/models/app.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2562,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1460,
+								1460
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								26,
+								21,
+								10,
+								5,
+								10,
+								47,
+								216,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 210.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 21,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "Firefly/apps/ffAdvancedLighting/contact.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5117,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4311,
+								4311
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								28,
+								10,
+								35,
+								44,
+								14,
+								5,
+								194,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1288.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "Firefly/config/apps.json",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 76,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								69,
+								69
+							]
+						],
+						"settings":
+						{
+							"auto_complete": true,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								26,
+								17,
+								49,
+								18,
+								9,
+								235,
+								216,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "Firefly/config/app_config/kitchenLightTestApp.json",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 199,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								199,
+								199
+							]
+						],
+						"settings":
+						{
+							"auto_complete": true,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								26,
+								21,
+								11,
+								54,
+								10,
+								46,
+								182,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 10,
+					"file": "Firefly/devices/ffHue/ffHue_light.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7885,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								494,
+								494
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								22,
+								12,
+								55,
+								47,
+								3,
+								199,
+								235,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "Firefly/devices/ffHue/ctFade.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2213,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								261,
+								261
+							]
+						],
+						"settings":
+						{
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								22,
+								12,
+								53,
+								28,
+								4,
+								210,
+								45,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "Firefly/config/routine.json",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7646,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								862,
+								862
+							]
+						],
+						"settings":
+						{
+							"auto_complete": true,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								26,
+								22,
+								45,
+								5,
+								0,
+								64,
+								19,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1116,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1116,
+								1116
+							]
+						],
+						"settings":
+						{
+							"auto_indent": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_width": 2,
+							"word_wrap": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "Firefly/config/location.json",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 87,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								83,
+								83
+							]
+						],
+						"settings":
+						{
+							"auto_complete": true,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								20,
+								0,
+								38,
+								27,
+								4,
+								150,
+								234,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 20,
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "Firefly/apps/ffAdvancedLighting/motion.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5126,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5126,
+								5126
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								26,
+								23,
+								17,
+								33,
+								6,
+								125,
+								22,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1302.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 17,
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"file": "Firefly/apps/ffAdvancedLighting/switch.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5029,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4402,
+								4402
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								28,
+								10,
+								5,
+								25,
+								14,
+								196,
+								214,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1050.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 17,
+					"file": "Firefly/core/firefly_api.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15786,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5255,
+								5255
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								26,
+								22,
+								32,
+								6,
+								6,
+								48,
+								35,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1008.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 14,
+					"type": "text"
+				},
+				{
+					"buffer": 18,
+					"file": "Firefly/devices/ffZwave/ffZwave.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7410,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2701,
+								2701
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								26,
+								22,
+								56,
+								15,
+								15,
+								63,
+								167,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1134.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 19,
+					"file": "Firefly/devices/ffHue/ffHue.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3941,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3452,
+								3452
+							]
+						],
+						"settings":
+						{
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								25,
+								18,
+								20,
+								53,
+								10,
+								86,
+								58,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 20,
+					"file": "Firefly/devices/ffHue/ffHue_group.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7390,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3700,
+								3700
+							]
+						],
+						"settings":
+						{
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								22,
+								2,
+								46,
+								52,
+								0,
+								120,
+								44,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1806.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 21,
+					"file": "Firefly/config/devices.json",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4683,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3712,
+								3712
+							]
+						],
+						"settings":
+						{
+							"auto_complete": true,
+							"c_time":
+							[
+								128,
+								3,
+								99,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								100,
+								97,
+								116,
+								101,
+								116,
+								105,
+								109,
+								101,
+								10,
+								113,
+								0,
+								67,
+								10,
+								7,
+								224,
+								4,
+								26,
+								10,
+								20,
+								36,
+								9,
+								75,
+								59,
+								113,
+								1,
+								133,
+								113,
+								2,
+								82,
+								113,
+								3,
+								46
+							],
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1764.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 24.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.359202562703,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 98.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.git":
+	{
+		"height": 100.0
+	},
+	"pinned_build_system": "",
+	"project": "sublime_Firefly.sublime-project",
+	"replace":
+	{
+		"height": 44.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 1,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 293.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

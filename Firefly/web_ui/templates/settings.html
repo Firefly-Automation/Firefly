@@ -1,0 +1,31 @@
+{% extends "ui.html" %}
+{% block title %}Devices{% endblock %}
+
+{% block main %}
+<div class="container">
+  <div class="row">
+
+    <div class="col s6 m3">
+      <a href="/tokens">
+        <div class="card-panel grey lighten-2 center" style="width: 150px; height: 150px">
+        <i class="medium material-icons">vpn_key</i>
+        <h5>Tokens</h5>
+        </div>
+      </a>
+    </div>
+
+    <div class="col s6 m3">
+      <a href="/users">
+        <div class="card-panel grey lighten-2 center" style="width: 150px; height: 150px">
+        <i class="medium material-icons">people</i>
+        <h5>Users</h5>
+        </div>
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

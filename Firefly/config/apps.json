@@ -1,6 +1,8 @@
 {
   "ffAdvancedLighting" : [
     "motion",
-    "contact"
+    "contact",
+    "switch",
+    "lux"
   ]
 }

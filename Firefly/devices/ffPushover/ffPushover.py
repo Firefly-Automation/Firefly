@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 21:48:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-22 03:06:09
+# @Last Modified time: 2016-05-22 14:16:36
 
 
 from core.models.device import Device
@@ -25,6 +25,8 @@ class Device(Device):
 
     self.REQUESTS = {
     }
+
+    self.VIEWS = {}
 
     ###########################
     # SET VARS

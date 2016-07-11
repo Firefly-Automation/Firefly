@@ -2,18 +2,19 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-25 00:40:41
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-25 18:00:21
-from core.models.device import Device
-from core.models.command import Command as ffCommand
-from core.models.event import Event as ffEvent
+# @Last Modified time: 2016-06-27 17:32:10
 import logging
+
+from core.models.command import Command as ffCommand
+from core.models.device import Device
+from core.models.event import Event as ffEvent
 
 class Device(Device):
 
   def __init__(self, deviceID, args={}):
     self.METADATA = {
       'title' : 'Firefly Zwave Switch',
-      'type' : 'sensor',
+      'type' : 'switch',
       'package' : 'ffZwave',
       'module' : 'ffZwave_switch'
     }
@@ -31,6 +32,31 @@ class Device(Device):
       'off' : self.getOff,
       'valueId' : self.getValueId,
       'label' : self.getLabel
+    }
+    self.VIEWS = {
+      'display' : True,
+      'name' : args.get('name'),
+      'id' : deviceID,
+      'type' : 'switch',
+      'dash_view' : {
+        'request' : 'state',
+        'type' : 'button', 
+        'button' : {
+          "false" : {
+            'click' : 'true',
+            'color' : 'grey',
+            'command' : {'switch':'on'},
+            'text' : 'Off'
+          },
+          "true" : {
+            'click' : 'false',
+            'color' : 'green lighten-1',
+            'command' : {'switch':'off'},
+            'default' : True,
+            'text' : 'On'
+          }
+        }
+      }
     }
 
     ###########################

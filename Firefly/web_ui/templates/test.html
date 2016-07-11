@@ -1,0 +1,60 @@
+{% extends "ui.html" %}
+{% block title %}Test{% endblock %}
+{% block main %}
+
+  <script type="text/javascript" charset="utf-8" src="/static/js/farbtastic.js"></script>
+  <script type="text/javascript" charset="utf-8">
+$('#colorpicker1').farbtastic(function() {
+    $("#color2").val($.farbtastic('#colorpicker1').hsl);
+  });
+   $(function () {
+     //$('#colorpicker1').farbtastic('#color1');
+     $('#colorpicker1').farbtastic(/*{ callback: */function(color){
+      var mylist = this.hsl;
+      console.log(mylist.length);
+      var x = 0;
+      var len = mylist.length
+      while(x < len){ 
+          //mylist[x] = parseFloat(mylist[x]).toFixed(5); 
+          x++
+      }
+      $('#color1').val(this.hsl);
+     }/*, width:150 }*/);
+     $('#colorpicker2').farbtastic({ callback: '#color2', width: 150 });
+   });
+  </script>
+  <style type="text/css" media="screen">
+   .colorpicker {
+     float: left;
+     margin: 1em;
+   }
+   form {
+     margin: 2em 1em 0 1;
+     text-align: center;
+   }
+   body {
+     font-family: "Lucida Grande", "Lucida Unicode", "Lucida Sans", sans-serif;
+   }
+   p {
+     clear: both;
+   }
+  </style>
+
+<div class="colorpicker">
+  <div id="colorpicker1"></div>
+  <form><input type="text" id="color1" /></form>
+</div>
+
+<div class="colorpicker">
+  <div id="colorpicker2"></div>
+  <form><input type="text" id="color2" /></form>
+</div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+function refreshFunction() {}
+
+{% endblock %}

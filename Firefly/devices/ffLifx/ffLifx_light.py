@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-05-03 09:18:26
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-05-03 23:27:58
+# @Last Modified time: 2016-06-27 17:21:40
 import logging
 
 from core.models.command import Command as ffCommand
@@ -47,6 +47,32 @@ class Device(Device):
       'sat' : self.getSat,
       'ct' : self.getCt,
       'level' : self.getLevel,
+    }
+
+    self.VIEWS = {
+      'display' : True,
+      'name' : args.get('args').get('name'),
+      'id' : deviceID,
+      'type' : 'lights',
+      'dash_view' : {
+        'request' : 'on',
+        'type' : 'button', 
+        'button' : {
+          "false" : {
+            'click' : 'true',
+            'color' : 'grey',
+            'command' : {'switch':'on'},
+            'text' : 'Off'
+          },
+          "true" : {
+            'click' : 'false',
+            'color' : 'green lighten-1',
+            'command' : {'switch':'off'},
+            'default' : True,
+            'text' : 'On'
+          }
+        }
+      }
     }
 
     args = args.get('args')
@@ -121,7 +147,8 @@ class Device(Device):
     return self._level
 
   def setLight(self, value):
-
+    lightValue = {}
+    
     # HUE
     hue = value.get('hue')
     if hue:
@@ -202,7 +229,8 @@ class Device(Device):
       self.setLight({'on':False})
 
   def set_light(self, value):
-    pass
+    logging.critical("SET_LIGHT")
+    ffCommand(self._bridge, {'sendLightCommand':{'lightCommand':value,'lightID': self._light_id}})
 
   def update(self, args={}):
     self._connected = args.get('connected')

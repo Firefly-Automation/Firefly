@@ -1,0 +1,153 @@
+{% extends "ui.html" %}
+{% block title %}Shortcuts{% endblock %}
+{% block main %}
+  <container>
+  <div class="row">
+    <div class="col s12">
+      <ul class="collapsible popout" data-collapsible="accordion">
+        {% for name, group in shortcuts.iteritems() %}
+          <li>
+            <div class="collapsible-header hoverable"><i class="material-icons">{{group.get('icon')}}</i>{{name.replace(name[0],name[0].upper())}}</div>
+            <div class="collapsible-body">
+              <div class="row" style="padding-top: 10px">
+                {% for device in group.get('devices') %}
+                  {% if allDevices.get(device) %}
+                    <div class="col s12 l6">
+                      <div class="card-panel right-align"> <a class='left dropdown-button grey-text' href='#' data-activates='{{device.replace(' ','')}}-dropmenu' data-beloworigin="true" style="vertical-align: middle"><i class="material-icons">more_vert</i></a>
+                      {% if 'switch' in allDevices.get(device).get('capabilities') %}
+                        <div class="switch">
+                          <label>
+                            <div class="left-align" style="padding-top: -100px; padding-left: 50px;padding-bottom:0px; height: 0px; top:100px; vertical-align: middle">
+                              <div class="grey-text" style="font-size: 125%; position:relative; top:-10px; width:25%">{{allDevices.get(device).get('title')}}</div>
+                            </div> Off
+                            <input id='{{device.replace(' ','')}}' type="checkbox" onClick='{{device.replace(' ','').replace('-','')}}OnClick()'> <span class="lever"></span> On </label>
+                          </div>
+                        {% endif %}
+                        {% if 'presence' in allDevices.get(device).get('capabilities') %}
+                          <label> {{allDevices.get(device).get('title')}} - <span name="{{device.replace(' ','').replace('-','')}}state">{{allDevices.get(device).get('value').replace(allDevices.get(device).get('value')[0],allDevices.get(device).get('value')[0].upper())}}</span></label>
+                        {% endif %}
+                        {% if 'motion' in allDevices.get(device).get('capabilities') %}
+                          <label> {{allDevices.get(device).get('title')}} - <span name="{{device.replace(' ','').replace('-','')}}state">{{allDevices.get(device).get('value').replace(allDevices.get(device).get('value')[0],allDevices.get(device).get('value')[0].upper())}}</span></label>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <ul id='{{device.replace(' ','')}}-dropmenu' class='dropdown-content'>
+                      <li><button class="btn {{device.replace(' ','')}}-modal" data-target="{{device.replace(' ','')}}-modal">View Device </li>
+                      <li><a href="#!">two</a> </li>
+                      <li class="divider"></li>
+                      <li><a href="#!">three</a> </li>
+                    </ul>
+                    <!-- Modal Structure -->
+                    <div id="{{device.replace(' ','')}}-modal" class="modal modal-fixed-footer">
+                      <div class="modal-content">
+                        <h4>{{allDevices.get(device).get('title').replace(allDevices.get(device).get('title')[0],allDevices.get(device).get('title')[0].upper())}} : <span name="{{device.replace(' ','').replace('-','')}}state">{{allDevices.get(device).get('value').replace(allDevices.get(device).get('value')[0],allDevices.get(device).get('value')[0].upper())}}</span></h4>
+                        <container>
+                        <div class="row">
+                          <div class="col s12">
+                            <ul class="{{device.replace(' ','').replace('-','')}}tab">
+                              <li class="tab col s6 center"><a href="#{{device.replace(' ','').replace('-','')}}control">Control</a></li>
+                              <li class="tab col s6 center"><a href="#{{device.replace(' ','').replace('-','')}}info">Info</a></li>
+                            </ul>
+                          </div>
+                          <div id="{{device.replace(' ','').replace('-','')}}control" class="col s12">
+                            <p>This is where full device view is going to go</p>
+                            <div class="row">
+                              {% if allDevices.get(device).get('config') %}
+                                {% for item, value in allDevices.get(device).get('config').iteritems() %}
+                                  <div class="col s12 l6">
+                                    <a class="btn" onClick="httpRequest('{{device}}', '{{value.get('command')}}', '{{value.get('value')}}')" style='width:100%;margin: 5px;'>{{item}}</a>
+                                  </div>
+                                {% endfor %}
+                              {% endif %}
+                            </div>
+                          </div>
+                          <div id="{{device.replace(' ','').replace('-','')}}info" class="col s12">
+                            <p> Name: {{ device }} </p>
+                            <p> Title: {{ allDevices.get(device).get('title') }} </p>
+                          </div>
+                        </div>
+                        
+                        </container>
+                      </div>
+                      <div class="modal-footer">
+                        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
+                      </div>
+                    </div>
+                    <script>
+                    $(document).ready(function(){
+                    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+                    $('.{{device.replace(' ','')}}-modal').leanModal();
+                    $('ul.{{device.replace(' ','').replace('-','')}}tab').tabs();
+                    });
+                    </script>
+                    
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  </container>
+{% endblock %}
+{% block scripts %}
+  function refreshFunction() {
+  console.log("ALL DEVICE REFRESH")
+  var data = $.ajax({
+  type: "GET",
+  url: "/API/allDevices",
+  async: false
+  })
+  .responseText;
+  var jsondata = eval('(' + data + ')');
+  var allDevices = jsondata.all_devices
+  {% for dtype in deviceTypeList %}
+    {% if  devices.get(dtype) %}
+      {% for name, options  in allDevices.iteritems() %}
+        var {{ name.replace('-','').replace(' ','') + 'State'}} = jsondata['all_devices']['{{ name }}']['value'] == "off" ? false : true;
+        $('#{{name}}')
+        .prop({
+        checked: {{ name.replace('-','').replace(' ','')  + 'State'}}
+        })
+        var span = document.getElementsByName('{{name.replace(' ','').replace('-','')}}state');
+        if (span)
+        {
+        for (i=0;i<span.length;i++)
+          {
+          span[i].innerText = span.textContent = jsondata['all_devices']['{{ name }}']['value'];
+          }
+          
+          }
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+    };
+    window.setInterval(function () {
+    refreshFunction()
+    }, 5000);
+    {% for dtype in deviceTypeList %}
+      {% if  devices.get(dtype) %}
+        {% for name, options  in devices.get(dtype).iteritems() %}
+          function {{ name.replace('-','') + 'OnClick()'}} {
+          console.log('{{ options.get('title') + 'OnClick'}}')
+          var checked = document.getElementById('{{ name }}').checked
+          if (checked) {
+          httpRequest('{{ name }}', 'switch', 'on')
+          }
+          else {
+          httpRequest('{{ name }}', 'switch', 'off')
+          }
+          }
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+    function httpRequest(device, command, value) {
+    var form = "device=" + device + "&command=" + command + "&value=" + value;
+    console.log(form)
+    var url = "/API/translator"
+    console.log(url)
+    $.post(url, form);
+    }
+  {% endblock %}

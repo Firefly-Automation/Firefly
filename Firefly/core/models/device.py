@@ -1,4 +1,5 @@
 import logging
+
 from core.models.event import Event as ffEvent
 
 class Device(object):
@@ -10,6 +11,7 @@ class Device(object):
     self._metadata = self.METADATA
     self._commands = self.COMMANDS
     self._requests = self.REQUESTS
+    self._views = self.VIEWS
 
     self.refreshData()
 
@@ -70,7 +72,7 @@ class Device(object):
   def refreshData(self):
     logging.debug('Refresh Data in ' + self._name)
     from core.firefly_api import update_status
-    returnData = {}
+    returnData = self.__dict__
     newChanges = {}
     for item in self._requests:
       returnData[item] = self._requests[item]()
@@ -79,6 +81,7 @@ class Device(object):
         newChanges[item] = returnData[item]
     self._lastStatus = returnData
     returnData['deviceID'] = self._id
+    returnData['views'] = self._views
     updated = update_status(returnData)
     if updated and newChanges != {}:
       return newChanges
@@ -104,6 +107,11 @@ class Device(object):
   @property
   def requests(self):
       return self._requests
+
+  @property
+  def views(self):
+    return self._views
+  
   
   
   

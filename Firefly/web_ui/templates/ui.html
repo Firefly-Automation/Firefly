@@ -1,0 +1,123 @@
+<html>
+  <head>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+    <link rel="stylesheet" href="/static/css/weather-icons.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified JavaScript -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+    <script src="/static/js/newsTicker.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style> 
+    body {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1 0 auto;
+    }
+       
+
+    header,
+    main,
+    footer {
+        padding-left: 240px;
+      }
+      logo {
+        padding-left: 20px;
+      }
+      @media only screen and (max-width: 992px) {
+      header,
+      main,
+      footer,
+      logo {
+        padding-left: 0;
+      }
+    }
+    </style>
+    <title>Firefly - {% block title %}{% endblock %}</title>
+  </head>
+  <body>
+    <header>
+      <nav class="top-nav">
+        <div class="nav-wrapper grey darken-3"> <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+        <logo><a href="#!" class="brand-logo">Firefly</a> </logo> <a href="#" data-activates="mobile-demo" class="right button-collapse2"><i class="material-icons">more_vert</i></a>
+        <ul class="side-nav" id="mobile-demo">
+          <li><a href="https://github.com/zpriddy">Github</a> </li>
+          <li><a href="http://firefly-home-automation.readthedocs.org">Docs</a> </li>
+          <li><a href="#" onclick="toggleFullScreen()">Fullscreen</a> </li>
+          <li><a href="/logout">Logout</a> </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container" style="clear:both;">
+      <ul id="nav-mobile" class="side-nav fixed" style="clear:both;">
+        <div style="clear:both;position:relative;height:60%;">
+          <li class="bold"><a href="/dashboard" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">dashboard</i>Dashboard</a> </li>
+          <li class="bold"><a href="/routines" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">track_changes</i>Routines</a> </li>
+          <li class="bold"><a href="/shortcuts" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">forward</i>Shortcuts</a> </li>
+          <li class="bold"><a href="/devices" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">device_hub</i>Devices</a> </li>
+        </div>
+        <div style="clear:both;position:relative;bottom:0;height:30%;padding-top:50%;padding-bottom:194px">
+          <li class="bold"><a href="#" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">speaker_notes</i>Events</a> </li>
+          <li class="bold"><a href="#" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">subject</i>Logs</a> </li>
+          <li class="bold"><a href="/settings" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">settings</i>Settings</a> </li>
+        </ul>
+      </div>
+    </header>
+    <main>
+    {% block main %}
+    {% endblock %}
+    </main>
+    {% block footer%}
+    {% endblock %}
+  </body>
+  <script>
+  {% block scripts %}
+  {% endblock %}
+  </script>
+  <script>
+  $(document)
+  .ready(function () {
+  
+  $('.collapsible').collapsible({
+  accordion : true // A setting that changes the collapsible behavior to expandable instead of the default accordion style
+  });
+  $(".button-collapse2")
+  .sideNav({
+  edge: 'right',
+  closeOnClick: true
+  })
+  $(".button-collapse")
+  .sideNav()
+  $('.dropdown-button')
+  .dropdown({
+  inDuration: 300,
+  outDuration: 225,
+  constrain_width: false, // Does not change width of dropdown to that of the activator
+  hover: true, // Activate on hover
+  gutter: 0, // Spacing from edge
+  belowOrigin: false, // Displays dropdown below the button
+  alignment: 'left' // Displays dropdown with edge aligned to the left of button
+  });
+  refreshFunction();
+  });
+  function toggleFullScreen() {
+  var doc = window.document;
+  var docEl = doc.documentElement;
+  var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+  var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+  if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+  requestFullScreen.call(docEl);
+  }
+  else {
+  cancelFullScreen.call(doc);
+  }
+  }
+  </script>
+</html>

@@ -2,10 +2,11 @@
 # @Author: zpriddy
 # @Date:   2016-04-17 01:25:27
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-26 10:06:40
+# @Last Modified time: 2016-06-27 17:22:19
+
+import logging
 
 from core.models.device import Device
-import logging
 
 class Device(Device):
 
@@ -24,6 +25,32 @@ class Device(Device):
 
     self.REQUESTS = {
       'presence' : self.getPresence
+    }
+
+    self.VIEWS = {
+      'display' : True,
+      'name' : args.get('args').get('name'),
+      'id' : deviceID,
+      'type' : 'presence',
+      'dash_view' : {
+        'request' : 'presence',
+        'type' : 'button', 
+        'button' : {
+          "false" : {
+            'click' : 'true',
+            'color' : 'grey',
+            'command' : {'presence':True},
+            'text' : 'Away'
+          },
+          "true" : {
+            'click' : 'false',
+            'color' : 'green lighten-1',
+            'command' : {'presence':False},
+            'default' : True,
+            'text' : 'Present'
+          }
+        }
+      }
     }
 
     ###########################

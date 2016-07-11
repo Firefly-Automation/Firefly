@@ -2,11 +2,12 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-25 00:40:41
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-26 10:21:05
-from core.models.device import Device
-from core.models.command import Command as ffCommand
-from core.models.event import Event as ffEvent
+# @Last Modified time: 2016-06-27 17:36:59
 import logging
+
+from core.models.command import Command as ffCommand
+from core.models.device import Device
+from core.models.event import Event as ffEvent
 
 class Device(Device):
 
@@ -30,6 +31,32 @@ class Device(Device):
       'battery' : self.getBattery,
       'valueId' : self.getValueId,
       'label' : self.getLabel
+    }
+
+    self.VIEWS = {
+      'display' : True,
+      'name' : args.get('name'),
+      'id' : deviceID,
+      'type' : 'sensor',
+      'dash_view' : {
+        'request' : 'state',
+        'type' : 'button', 
+        'button' : {
+          "false" : {
+            'click' : 'true',
+            'color' : 'grey',
+            'command' : 'none',
+            'default' : True,
+            'text' : 'closed'
+          },
+          "true" : {
+            'click' : 'false',
+            'color' : 'blue lighten-1',
+            'command' : 'none',
+            'text' : 'open'
+          }
+        }
+      }
     }
 
     ###########################

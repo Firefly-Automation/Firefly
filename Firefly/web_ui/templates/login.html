@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified JavaScript -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  </head>
+  <body>
+    <div class="container">
+      <div id="login-page" class="row center" style="padding-top:10%">
+        <div class="col m6 offset-m3 s12 z-depth-6 card-panel center">
+          <form class="login-form" action='loginPage' method='POST'>
+            <div class="row">
+              <div class="input-field col s12 center">
+                <img src="https://s-media-cache-ak0.pinimg.com/736x/55/7b/9d/557b9df0efe38c40ae55cebb2d64cdd4.jpg" alt="" class="responsive-img valign profile-image-login" style="height:15%">
+                <p class="center login-form-text">Firefly Login</p>
+              </div>
+            </div>
+            <div class="row margin">
+              <div class="input-field col s12">
+                <i class="mdi-social-person-outline prefix"></i>
+                <input class="validate" name="email" id="email" type="text" autocorrect="off" autocapitalize="none">
+                <label for="email" class="center-align">Username</label>
+              </div>
+            </div>
+            <div class="row margin">
+              <div class="input-field col s12">
+                <i class="mdi-action-lock-outline prefix"></i>
+                <input name="pw" id="pw" type="password">
+                <label for="pw">Password</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12 m12 l12  login-text ">
+                <input type="checkbox" id="remember" />
+                <label for="remember">Remember me</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <button class="btn btn-lg " type="submit">Sign in</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

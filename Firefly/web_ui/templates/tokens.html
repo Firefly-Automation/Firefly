@@ -1,0 +1,44 @@
+{% extends "ui.html" %}
+{% block title %}Devices{% endblock %}
+
+{% block main %}
+    <div class="container">
+      <table class="striped highlight centered">
+        <thead>
+          <tr>
+              <th data-field="id">App Name</th>
+              <th data-field="name">Token</th>
+          </tr>
+        </thead>
+
+        <tbody>
+        {% for app, token in tokens.iteritems() %}
+          <tr>
+            <td>{{app}}</td>
+            <td>{{token}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+</div>
+
+<br>
+<br>
+<br>
+<div class="container center grey lighten-3">
+<h5>Add Token:</h5>
+<form action="/api/get_token">
+<div class="row margin">
+  <div class="input-field col s12">
+    <i class="mdi-social-person-outline prefix"></i>
+    <input name="app_name" id="text" type="text" autocorrect="off" autocapitalize="none">
+    <label for="app_name" class="center-align">App Name</label>
+  </div>
+</div>
+  <button class="btn btn-lg " type="submit">Create Token</button>
+</form>
+<div class="container">
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

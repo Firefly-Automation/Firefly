@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 23:06:59
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-28 10:35:36
+# @Last Modified time: 2016-05-08 19:29:22
 
 
 from core.models.app import App
@@ -110,10 +110,12 @@ class App(App):
         return -2 
 
     if event.event.get('on'):
-      for light in self.lights:
-        ffCommand(light,"on", send_event=self._send_event)
-      for device, action in self.actions_switch_on.iteritems():
-        ffCommand(device, action, send_event=self._send_event)
+      if self.lights:
+        for light in self.lights:
+          ffCommand(light,"on", send_event=self._send_event)
+      if self.actions_switch_on:
+        for device, action in self.actions_switch_on.iteritems():
+          ffCommand(device, action, send_event=self._send_event)
       ffScheduler.cancel(self._id)
 
     if not event.event.get('on'):
@@ -127,11 +129,13 @@ class App(App):
       logging.critical('Switch Events Disabled')
       return -2
 
-    for light in self.lights:
-      ffCommand(light, "off", send_event=self._send_event)
+    if self.lights:
+      for light in self.lights:
+        ffCommand(light, "off", send_event=self._send_event)
 
-    for device, action in self.actions_switch_off.iteritems():
-      ffCommand(device, action, send_event=self._send_event)
+    if self.actions_switch_off:
+      for device, action in self.actions_switch_off.iteritems():
+        ffCommand(device, action, send_event=self._send_event)
 
 
 

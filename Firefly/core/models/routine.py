@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-25 23:50:45
+# @Last Modified time: 2016-05-16 16:13:15
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -40,6 +40,7 @@ class Routine(object):
     self._notification_message = config.get('notification_message')
     self._run_time_ranges = config.get('run_time_ranges')
     self._no_run_time_ranges = config.get('no_run_time_ranges')
+    self._icon = config.get('icon')
 
     self._listen = list(set().union(*(d.keys() for d in self._triggers)))
 

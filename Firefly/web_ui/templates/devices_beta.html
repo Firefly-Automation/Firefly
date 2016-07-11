@@ -1,0 +1,196 @@
+<html>
+
+<head>
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Compiled and minified JavaScript -->
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    header,
+    main,
+    footer {
+      padding-left: 240px;
+    }
+    logo {
+      padding-left: 20px;
+    }
+    @media only screen and (max-width: 992px) {
+      header,
+      main,
+      footer,
+      logo {
+        padding-left: 0;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav class="top-nav">
+      <div class="nav-wrapper grey darken-3"> <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+        <logo><a href="#!" class="brand-logo">Firefly</a> </logo> <a href="#" data-activates="mobile-demo" class="right button-collapse2"><i class="material-icons">more_vert</i></a>
+        <ul class="side-nav" id="mobile-demo">
+          <li><a href="https://github.com/zpriddy">Github</a> </li>
+          <li><a href="http://firefly-home-automation.readthedocs.org">Docs</a> </li>
+          <li><a href="/logout">Logout</a> </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container" style="clear:both;">
+      <ul id="nav-mobile" class="side-nav fixed" style="clear:both;">
+        <div style="clear:both;position:relative;height:60%;">
+          <li class="bold"><a href="#" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">dashboard</i>Dashboard</a> </li>
+          <li class="bold"><a href="#" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">track_changes</i>Routines</a> </li>
+          <li class="bold"><a href="#" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">forward</i>Shortcuts</a> </li>
+          <li class="bold"><a href="#" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">device_hub</i>Devices</a> </li>
+        </div>
+        <div style="clear:both;position:relative;bottom:0;height:30%;padding-top:50%;padding-bottom:194px">
+          <li class="bold"><a href="#" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">speaker_notes</i>Events</a> </li>
+          <li class="bold"><a href="#" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">subject</i>Logs</a> </li>
+          <li class="bold"><a href="#" class="waves-effect waves-teal"><i class="material-icons" style="vertical-align: middle; position: relative; top:-2px; padding-right: 10px;">settings</i>Settings</a> </li>
+          <div>
+      </ul>
+      </div>
+  </header>
+  <main>
+    <div class="row">
+      <div class="col s12">
+        <ul class="tabs">
+          {% for dtype in deviceTypeList %}
+            <li class="tab col s3"><a href="#{{dtype}}">{{ dtype }}</a> </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <!--
+      <div id="test2" class="col s12">
+        <container>
+          <div class="row">
+            <div class="col s12 m6 l4">
+              <div class="card-panel">
+                <div class="range-field"> Kitchen Lights
+                  <input type="range" id="test5" min="0" max="100" step="5" style="width:75%; padding-left: 25%"></input>
+                </div>
+              </div>
+            </div>
+          </div>
+        </container>
+      </div>
+      -->
+      {% for dtype in deviceTypeList %}
+      <div id="{{ dtype }}" class="col s12">
+        <container>
+        <div class="row">
+        {% if  devices.get(dtype) %}
+        {% for name, options  in devices.get(dtype).iteritems() %}
+          
+            <div class="col s12 m6 l4">
+              <div class="card-panel right-align"> <a class='left dropdown-button grey-text' href='#' data-activates='{{ name + '-dropmenu' }}' data-beloworigin="true" style="vertical-align: middle"><i class="material-icons">more_vert</i></a>
+                <div class="switch">
+                  <label>
+                    <div class="left-align" style="padding-top: -100px; padding-left: 50px;padding-bottom:0px; height: 0px; top:100px; vertical-align: middle">
+                      <div class="grey-text" style="font-size: 125%; position:relative; top:-10px; width:25%">{{ options.get('title') }}</div>
+                    </div> Off
+                    <input id='{{ name }}' type="checkbox" onClick='{{ name.replace('-','') + 'OnClick()'}}'> <span class="lever"></span> On </label>
+                </div>
+              </div>
+            </div>
+            <ul id='{{ name + '-dropmenu' }}' class='dropdown-content'>
+              <li><a href="#!">{{name}}</a> </li>
+              <li><a href="#!">two</a> </li>
+              <li class="divider"></li>
+              <li><a href="#!">three</a> </li>
+            </ul>
+
+        {% endfor %}
+        {% endif %}
+
+        </container>
+        {% endfor %}
+      </div>
+      <div id="test4" class="col s12">Test 4</div>
+    </div>
+  </main>
+</body>
+<script>
+  $(document)
+    .ready(function () {
+      $(".button-collapse2")
+        .sideNav({
+          edge: 'right',
+          closeOnClick: true
+        })
+      $(".button-collapse")
+        .sideNav()
+      $('.dropdown-button')
+        .dropdown({
+          inDuration: 300,
+          outDuration: 225,
+          constrain_width: false, // Does not change width of dropdown to that of the activator
+          hover: true, // Activate on hover
+          gutter: 0, // Spacing from edge
+          belowOrigin: false, // Displays dropdown below the button
+          alignment: 'left' // Displays dropdown with edge aligned to the left of button
+        });
+      refreshFunction();
+    });
+
+  function refreshFunction() {
+    var data = $.ajax({
+        type: "GET",
+        url: "/API/allDevices",
+        async: false
+      })
+      .responseText;
+    var jsondata = eval('(' + data + ')');
+    var allDevices = jsondata.all_devices
+    {% for dtype in deviceTypeList %}
+    {% if  devices.get(dtype) %}
+    {% for name, options  in devices.get(dtype).iteritems() %}
+    var {{ name.replace('-','') + 'State'}} = jsondata['all_devices']['{{ name }}']['value'] == "off" ? false : true;
+    $('#{{name}}')
+      .prop({
+        checked: {{ name.replace('-','') + 'State'}}
+      })
+    {% endfor %}
+    {% endif %}
+    {% endfor %}
+  };
+  window.setInterval(function () {
+    refreshFunction()
+  }, 5000);
+
+  {% for dtype in deviceTypeList %}
+  {% if  devices.get(dtype) %}
+  {% for name, options  in devices.get(dtype).iteritems() %}
+  function {{ name.replace('-','') + 'OnClick()'}} {
+    console.log('{{ options.get('title') + 'OnClick'}}')
+    var checked = document.getElementById('{{ name }}').checked
+    if (checked) {
+      httpRequest('{{ name }}', 'switch', 'on')
+    }
+    else {
+      httpRequest('{{ name }}', 'switch', 'off')
+    }
+
+  }
+  {% endfor %}
+  {% endif %}
+  {% endfor %}
+
+
+  function httpRequest(device, command, value) {
+    var form = "device=" + device + "&command=" + command + "&value=" + value;
+    console.log(form)
+    var url = "/API/translator"
+    console.log(url)
+    $.post(url, form);
+  }
+
+</script>
+
+</html>

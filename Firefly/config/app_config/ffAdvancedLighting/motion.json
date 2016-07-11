@@ -2,7 +2,7 @@
   {
     "id":"kitchenLights",
     "name" : "Turn Kitchen Lights on with motion",
-    "motion_sensors" : ["zwave-node-15"],
+    "motion_sensors" : ["zwave-node-4"],
     "lights" : ["zwave-node-11"],
     "delay_time" : 15
   }

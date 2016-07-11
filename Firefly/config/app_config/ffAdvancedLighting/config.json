@@ -8,7 +8,7 @@
       {
         "id":"kitchenLights",
         "name" : "Turn Kitchen Lights on with motion",
-        "motion_sensors" : ["zwave-node-16"],
+        "motion_sensors" : ["zwave-node-4"],
         "lights" : [],
         "actions_on_motion_active" : {
           "zwave-node-11" : "on"
@@ -16,7 +16,22 @@
         "actions_on_motion_inactive" : {
           "zwave-node-11" : "off"
         },
-        "delay_time" : 15
+        "delay_time" : 15,
+        "run_modes" : ["home"]
+      },
+      {
+        "id":"kitchenLightsLowPower",
+        "name" : "Turn Kitchen Lights on with motion",
+        "motion_sensors" : ["zwave-node-4"],
+        "lights" : [],
+        "actions_on_motion_active" : {
+          "zwave-node-11" : "on"
+        },
+        "actions_on_motion_inactive" : {
+          "zwave-node-11" : "off"
+        },
+        "delay_time" : 2,
+        "run_modes" : ["lowpower"]
       }
     ]
   },
@@ -32,6 +47,32 @@
         "contact_sensors" : ["zwave-node-13", "zwave-node-2"],
         "lights" : ["hue-light-2"],
         "delay_time" : 1
+      }
+    ]
+  },
+  "switch" :
+  {
+    "package" : "ffAdvancedLighting",
+    "module" : "switch",
+    "installs" :
+    [ 
+      {
+        "id":"FanSwitch",
+        "name" : "Turn Bedroom Fan On With Switch",
+        "switches" : ["hue-group-8"],
+        "lights" : ["zwave-node-9"]
+      },
+      {
+        "id":"UpstarisLights",
+        "name" : "Turn On Upstairs Lights With Switch",
+        "switches" : ["zwave-node-14"],
+        "lights" : ["hue-group-10"]
+      },
+      {
+        "id":"UpstarisLights2",
+        "name" : "Turn On Upstairs Lights With Switch",
+        "switches" : ["hue-group-10"],
+        "lights" : ["zwave-node-14"]
       }
     ]
   }

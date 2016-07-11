@@ -1,0 +1,44 @@
+{% extends "ui.html" %}
+{% block title %}Routines{% endblock %}
+{% block main %}
+<div class="container">
+  <div class="row">
+    {% for name, r in routines.iteritems() %}
+      <div class="col s6 l3 m4" style="padding: 20px">
+        <a class="waves-effect waves-light btn-large" style="height: 150px; width: 150px; padding: 10px;" onClick='{{ name.replace('-','') + 'OnClick()'}}'><i class="large material-icons center" style="font-size: 50px; padding: 10px">{{r.get('icon')}}</i><br>{{name}}</a>
+      </div>
+    {% endfor %}
+  </div>
+  </div>
+{% endblock %}
+{% block footer %}
+  <footer class="page-footer grey darken-3">
+    <div class="container left" style="color: white; padding-bottom: 10px; padding-left: 50px">
+      Current Mode: <span id="mode"> {{mode}} </span>
+    </div>
+  </footer>
+{% endblock %}
+{% block scripts %}
+  function refreshFunction() {
+    var data = $.ajax({
+    type: "GET",
+    url: "/API/mode",
+    async: false
+  })
+.responseText;
+console.log(data)
+document.getElementById("mode").textContent=data;
+}
+window.setInterval(function () {
+refreshFunction()
+}, 15000);
+  {% for r in routines %}
+    function {{ r.replace('-','').replace(' ', '') + 'OnClick()'}} {
+      console.log('{{ r + 'OnClick'}}')
+      var form = "command=" + "{\"device\":\"{{r}}\",\"routine\":true, \"force\":true}" ;
+      var url = "/API/translator2"
+      console.log(url)
+      $.post(url, form);
+    }
+  {% endfor %}
+{% endblock %}

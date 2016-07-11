@@ -2,12 +2,13 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-25 22:13:31
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-05-01 12:14:30
+# @Last Modified time: 2016-06-26 18:07:48
+
+import logging
+import requests
+import xml.etree.ElementTree as etree
 
 from core.models.device import Device
-import xml.etree.ElementTree as etree
-import requests
-import logging
 
 COMMANDS = {
   'POWER' : 1,
@@ -91,10 +92,38 @@ class Device(Device):
     self.COMMANDS = {
       'pin' : self.showPin,
       'off' : self.setOff,
-      'command' : self.sendCommand
+      'command' : self.sendCommand,
+      'switch' : self.setOff
     }
 
     self.REQUESTS = {
+      'status' : self.get_status
+    }
+
+    self.VIEWS = {
+      'display' : True,
+      'name' : args.get('args').get('name'),
+      'id' : deviceID,
+      'type' : 'Entertainment',
+      'dash_view' : {
+        'request' : 'status',
+        'type' : 'button', 
+        'button' : {
+          "true" : {
+            'click' : 'false',
+            'color' : 'orange lighten-1',
+            'command' : {'cmd':'POWER'},
+            'text' : 'Off'
+          },
+          "false" : {
+            'click' : 'false',
+            'color' : 'orange lighten-1',
+            'command' : {'cmd':'POWER'},
+            'default' : True,
+            'text' : 'Off'
+          }
+        }
+      }
     }
 
     ###########################
@@ -116,7 +145,7 @@ class Device(Device):
 #############################################################
 
   def setOff(self, args={}):
-    self.sendCommand({'cmd':'POWER'})
+    self.sendCommand(args={'command':{'cmd':'POWER'}})
 
   def showPin(self, args={}):
     pass
@@ -124,10 +153,14 @@ class Device(Device):
   def sendCommand(self, args={}):
     try:
       args=args.command
+      logging.critical(args)
       if args.get('code'):
         command = args.get('code')
       else:
         command = COMMANDS.get(args.get('cmd'))
+        #TODO fix temp fix of default to power
+        if command is None:
+            command = 1
         logging.critical('Command: ' + str(command))
       if command is None:
         return -1
@@ -160,7 +193,7 @@ class Device(Device):
 
     logging.critical(url)
     logging.critical(cmdText)
-    r = requests.post(url, data=cmdText, headers=headers, timeout=1)
+    r = requests.post(url, data=cmdText, headers=headers)
     
     logging.critical(r.status_code)
     if r.status_code != 200:
@@ -173,3 +206,6 @@ class Device(Device):
       logging.critical('CANT GET LG SESSION')
       return False
     return session
+
+  def get_status(self, args={}):
+    pass

@@ -1,0 +1,304 @@
+{% extends "ui.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block main %}
+<div class="container" style="width:95%">
+
+      
+      <div class="row center ">
+        <div class="col s12 cards-container">
+          <div class="card light-green darken-1 hoverable white-text">
+            <div class="card-content ">
+              <span class="card-title"><div id="date"></div></span>
+            </div>
+          </div>
+        
+
+        
+          <div class="card blue-grey darken-1 hoverable" id="weather" style="padding-top: 10px">
+            <div class="card-content">
+            <div class="row">
+            <div class="row">
+              <div class="col s3 center">
+              <div class="row">
+              <span class="card-title" style="font-size: 200%"><i class="wi {{weather.get('value')[0].get('icon')}}"></i></span>
+              </div>
+              <div class="row">
+              {{(weather.get('value')[0].get('temperatureMax'))|int}}<i class="wi wi-fahrenheit"></i> / {{(weather.get('value')[0].get('temperatureMin'))|int}}<i class="wi wi-fahrenheit"></i>
+              </div>
+              </div>
+              <div class="col s9">
+                <span class="card-title" style="font-size: 400%"><i class="wi {{current.get('icon')}}"></i></span>
+                <span style="position:relative;font-size: 300%;bottom:-30px">{{current.get('temperature')|int}}<i class="wi wi-fahrenheit"></i></span>
+              </div>
+            </div>
+            </div>
+            
+            <div class="row" style="position:relative;top:-10px;height: 1px">
+            {{weather.get('value')[0].get('summary')}}
+            {% for alert in alerts %}
+              <span class="red-text"> {{alert.get('title')}} : {{alert.get('description')}} </span>
+            {% endfor %}
+            </div>
+            </div>
+            <div class="card-action  white-text center">
+              <div class="row" style="height:5%">
+              {% for i in [1,2,3] %}
+                <div class="col s3 m4 l3 center">
+                <div class="row">
+                <a class="tooltipped" data-position="top" data-delay="50" data-tooltip="{{weather.get('value')[i].get('summary')}}">
+                <i class="wi {{weather.get('value')[i].get('icon')}}"></i>
+                </div>
+                <div class="row">
+                {{(weather.get('value')[i].get('temperatureMax'))|int}}<i class="wi wi-fahrenheit hide-on-small-only"></i> / {{(weather.get('value')[i].get('temperatureMin'))|int}}<i class="wi wi-fahrenheit hide-on-small-only"></i></a>
+                </div>
+                </div>
+              {% endfor %}
+                <div class="col m3 l3 center hide-on-med-only center">
+                <div class="row">
+                <a class="tooltipped" data-position="top" data-delay="50" data-tooltip="{{weather.get('value')[4].get('summary')}}">
+                <i class="wi {{weather.get('value')[4].get('icon')}}"></i>
+                </div>
+                <div class="row">
+                {{(weather.get('value')[4].get('temperatureMax'))|int}}<i class="wi wi-fahrenheit hide-on-small-only"></i> / {{(weather.get('value')[4].get('temperatureMin'))|int}}<i class="wi wi-fahrenheit hide-on-small-only"></i></a>
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+      
+
+        
+          <div class="card blue-grey darken-1 hoverable">
+            <div class="card-content white-text">
+              <span class="card-title">Current Mode: Home </span>
+              <p>Welcome Home! Isn't it nice to be greeted by your smart home? </p><p>-Firefly</p>
+            </div>
+          </div>
+
+
+          <div class="card blue-grey darken-1 hoverable">
+            <div class="card-content white-text">
+              <span class="card-title">Current Traffic To Work</span>
+              </div>
+              <div class="card-content">
+              <iframe src="https://www.google.com/maps/embed?pb=!1m28!1m12!1m3!1d50729.5027658817!2d-122.03478031334384!3d37.375784337396915!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m13!3e6!4m5!1s0x808fcca8870b2af3%3A0x87c1157b04c18a7f!2s250+Josefa+St%2C+San+Jose%2C+CA+95110!3m2!1d37.3265063!2d-121.89886059999999!4m5!1s0x808fb9e4d48c9bf1%3A0x46b82989ad4df250!2sGoogle+Bldg+CL2%2C+1200+Crittenden+Ln%2C+Mountain+View%2C+CA+94043%2C+USA!3m2!1d37.4258509!2d-122.07230059999999!5e0!3m2!1sen!2sus!4v1458659220255&z=10"  frameborder="0" style="border:0;width:100%" allowfullscreen></iframe>
+            </div>
+          </div>
+
+          <div class="card blue-grey darken-1 hoverable">
+            <div class="card-content white-text">
+              <span class="card-title">News</span>
+              </div>
+              <div class="card-content" style="height:400px">
+              <ul id="nt-example2" class="nt-example2">
+                {% for item in feed %}
+                <li data-infos="{{ item.get('summary') }}">
+                          <i class="fa fa-fw fa-play state"></i>
+                          <span class="hour tooltipped" data="{{ item.get('link') }}" data-tooltip="{{ item.get('title') }}">{{ item.get('time') }}</span> <span class="tooltipped" data-tooltip="{{ item.get('title') }}"> {{ item.get('title') }} <span>
+                          <div class="link">{{ item.get('link') }}</div>
+                        </li>
+                {% endfor %}
+
+              </ul>
+              <div id="nt-example2-infos-container">
+                      <div id="nt-example2-infos-triangle"></div>
+                      <div id="nt-example2-infos" class="row">
+                        <div class="col-xs-4 centered">
+                          <i class="fa fa-arrow-left" id="nt-example2-prev"></i>
+                          <i class="fa fa-arrow-right" id="nt-example2-next"></i>
+                        </div>
+                        <div class="col-xs-8">
+                        <div class="infos-title"></div>
+                          <div class="infos-text">{{ feed[0].get('summary') }}</div><a id="infos-link" class="infos-link right" href="#" onclick="feedlink()" style="visited{color:orange;}">Read More</a>
+                        </div>
+                      </div>
+                    </div>
+                </div>    
+            </div>
+          </div>
+
+
+
+          
+        </div>
+      </div>
+
+            
+</div>
+{% endblock %}
+
+{% block scripts %}
+function feedlink() {
+  document.getElementById("infos-link").href=$('#nt-example2 li:first div').text(); 
+    return false;
+}
+$(document)
+  .ready(function () {
+var nt_example2 = $('#nt-example2').newsTicker({
+  row_height: 60,
+  max_rows: 1,
+  speed: 300,
+  duration: 6000,
+  prevButton: $('#nt-example2-prev'),
+  nextButton: $('#nt-example2-next'),
+  hasMoved: function() {
+      $('#nt-example2-infos-container').fadeOut(200, function(){
+          $('#nt-example2-infos .infos-hour').text($('#nt-example2 li:first span').text());
+          $('#nt-example2-infos .infos-text').text($('#nt-example2 li:first').data('infos'));
+          $(this).fadeIn(400);
+        });
+    },
+    pause: function() {
+      $('#nt-example2 li i').removeClass('fa-play').addClass('fa-pause');
+    },
+    unpause: function() {
+      $('#nt-example2 li i').removeClass('fa-pause').addClass('fa-play');
+    }
+});
+$('#nt-example2-infos').hover(function() {
+    nt_example2.newsTicker('pause');
+}, function() {
+    nt_example2.newsTicker('unpause');
+});
+    });
+
+function refreshFunction() {
+  document.getElementById("date").innerHTML = formatAMPM();
+};
+window.setInterval(function () {
+  refreshFunction()
+  }, 5000);
+
+
+function formatAMPM() {
+var d = new Date(),
+    ampm = d.getHours() >= 12 ? 'pm' : 'am'
+
+var WEATHER = document.getElementById("weather");
+
+var color = "blue-grey darken-1"
+if (d.getHours() == 0)
+{
+  color = "grey darken-3 white-text"
+}
+if (d.getHours() == 1)
+{
+  color = "grey darken-4 white-text"
+}
+if (d.getHours() == 2)
+{
+  color = "grey darken-4 white-text"
+}
+if (d.getHours() == 3)
+{
+  color = "grey darken-4 white-text"
+}
+if (d.getHours() == 4)
+{
+  color = "blue-grey darken-4"
+}
+if (d.getHours() == 5)
+{
+  color = "blue-grey darken-3"
+}
+if (d.getHours() == 6)
+{
+  color = "green accent-2 grey-text"
+}
+if (d.getHours() == 7)
+{
+  color = "green accent-1 grey-text"
+}
+if (d.getHours() == 8)
+{
+  color = "green accent-1 grey-text"
+}
+if (d.getHours() == 9)
+{
+  color = "lime accent-2 grey-text"
+}
+if (d.getHours() == 10)
+{
+  color = "lime accent-2 grey-text"
+}
+if (d.getHours() == 11)
+{
+  color = "lime accent-2 grey-text"
+}
+if (d.getHours() == 12)
+{
+  color = "lime accent-2 grey-text"
+}
+if (d.getHours() == 13)
+{
+  color = "lime grey-text"
+}
+if (d.getHours() == 14)
+{
+  color = "light-blue darken-2 white-text"
+}
+if (d.getHours() == 15)
+{
+  color = "light-blue darken-3 white-text"
+}
+if (d.getHours() == 16)
+{
+  color = "light-blue darken-4 white-text"
+}
+if (d.getHours() == 17)
+{
+  color = "yellow darken-4 white-text"
+}
+if (d.getHours() == 18)
+{
+  color = "deep-orange darken-3 white-text"
+}
+if (d.getHours() == 19)
+{
+  color = "deep-orange accent-4 white-text"
+}
+if (d.getHours() == 20)
+{
+  color = "blue-grey darken-2 white-text"
+}
+if (d.getHours() == 21)
+{
+  color = "blue-grey darken-3 white-text"
+}
+if (d.getHours() == 22)
+{
+  color = "blue-grey darken-4 white-text"
+}
+if (d.getHours() == 23)
+{
+  color = "grey darken-3 white-text white-hover"
+}
+
+  var cardClass = "card hoverable " + color
+
+  console.log(cardClass)
+  WEATHER.className = cardClass
+
+
+
+
+
+    
+d.setHours(d.getHours() > 12 ? (d.getHours()-12) : d.getHours() )
+d.setHours(d.getHours() == 0 ? 12 :  d.getHours() )
+var minutes = d.getMinutes().toString().length == 1 ? '0'+d.getMinutes() : d.getMinutes(),
+    hours = d.getHours().toString().length == 1 ? '0'+d.getHours() : d.getHours(),
+    months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+return hours+':'+minutes+ampm+'<br>'+days[d.getDay()]+' '+months[d.getMonth()]+' '+d.getDate()+' '+d.getFullYear();
+}
+
+setTimeout(function(){
+   window.location.reload(1);
+}, 5*60*1000);
+
+
+
+{% endblock %}

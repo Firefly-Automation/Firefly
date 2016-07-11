@@ -1,0 +1,50 @@
+{% extends "ui.html" %}
+{% block title %}Devices{% endblock %}
+{% block main %}
+
+  <div class="row">
+    <div class="col s12">
+      <ul class="tabs">
+        <li class="tab col s2"><a class="active" href="#allDevices">All Devices</a></li>
+        {% for t in device_types %}
+        <li class="tab col s2"><a href="#{{t}}">{{t}}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div id="allDevices" class="col s12">
+      <div class="row" >
+        {% for d, b in devices.iteritems() %}
+          {{b|safe}}
+        {% endfor %}
+      </div>
+    </div>
+    {% for t in device_types %}
+    <div id="{{t}}" class="col s12">
+      {% for d, c in device_list.iteritems() %}
+        {% if c.get('type') == t %}
+          {% for d2, b in devices.iteritems() %}
+            {% if d2 == c.get('name') %}
+              {{b|safe}}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+
+
+
+
+
+{% endblock %}
+{% block scripts %}
+  $(document).ready(function(){
+  // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+  $('.modal-trigger').leanModal();
+  });
+  {{js|safe}}
+  window.setInterval(function () {
+    refreshFunction()
+  }, 5000);
+{% endblock %}

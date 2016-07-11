@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 21:48:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-25 18:20:53
+# @Last Modified time: 2016-05-22 14:17:24
 from core.models import event
 from core.models.command import Command as ffCommand
 
@@ -35,6 +35,8 @@ class Device(object):
 
     self._requests = {
     }
+
+    self.VIEWS = {}
 
     self.install_hue()
 
@@ -106,7 +108,7 @@ class Device(object):
   def refresh_scheduler(self, args={}):
     logging.debug("Starting Hue Scheduler")
     hueScheduler = Scheduler()
-    hueScheduler.runEveryS(30,self.refresh_hue,replace=True,uuid='HueRefresher')
+    hueScheduler.runEveryS(10,self.refresh_hue,replace=True,uuid='HueRefresher')
 
   def refresh_hue(self):
     rawLightData = self._hueBridge.get_lights()
