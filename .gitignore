@@ -8,6 +8,7 @@ sumblime_Firefly*
 Firefly/config/devices.json
 design_notes
 Firefly/web_ui/certs/*
+*.sublime-*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
