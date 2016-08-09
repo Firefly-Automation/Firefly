@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 23:06:59
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-01 19:59:14
+# @Last Modified time: 2016-08-09 16:29:48
 
 
 import logging
@@ -127,6 +127,9 @@ class App(App):
         ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, uuid=self._id)
 
   def TurnLightsOff(self):
+    from core.firefly_api import ffScheduler
+    from core.firefly_api import ffLocation
+    
     if self._disabled:
       logging.critical('Motion Events Disabled')
       return -2

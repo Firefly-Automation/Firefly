@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 23:06:59
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-01 19:58:59
+# @Last Modified time: 2016-08-09 16:30:22
 
 
 import logging
@@ -127,19 +127,22 @@ class App(App):
         ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, uuid=self._id)
 
   def TurnLightsOff(self):
+    from core.firefly_api import ffScheduler
+    from core.firefly_api import ffLocation
+
     if self._disabled:
       logging.critical('Contact Events Disabled')
       return -2
 
-#    if self.run_modes:
-#      if ffLocation.mode not in self.run_modes:
-#        logging.critical("Not in mode to run")
-#        return -2
+    if self.run_modes:
+      if ffLocation.mode not in self.run_modes:
+        logging.critical("Not in mode to run")
+        return -2
 
-#    if self.no_run_modes:
-#      if ffLocation.mode in self.no_run_modes:
-#        logging.critical("In no run mode")
-#        return -2
+    if self.no_run_modes:
+      if ffLocation.mode in self.no_run_modes:
+        logging.critical("In no run mode")
+        return -2
 
     if self.lights:
       for light in self.lights:
