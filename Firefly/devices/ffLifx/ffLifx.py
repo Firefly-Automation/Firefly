@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-05-03 08:06:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-06-26 22:59:44
+# @Last Modified time: 2016-06-26 22:20:40
 import ffLifx_light as lightDevice
 import logging
 

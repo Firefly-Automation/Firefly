@@ -2,12 +2,14 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 23:06:59
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-28 10:44:56
+# @Last Modified time: 2016-08-01 19:58:59
 
+
+import logging
 
 from core.models.app import App
 from core.models.command import Command as ffCommand
-import logging
+from time import sleep
 
 class App(App):
   METADATA = {
@@ -100,12 +102,12 @@ class App(App):
         return -2
 
     if self.run_dark is not None:
-      if not ffLocation.is_dark:
+      if not ffLocation.isDark:
         logging.critical("Not running because is dark")
-        retunr -2
+        return -2
 
     if self.run_light is not None:
-      if not ffLocation.is_light:
+      if not ffLocation.isLight:
         logging.critical("Not running because is light")
         return -2 
 
@@ -129,6 +131,16 @@ class App(App):
       logging.critical('Contact Events Disabled')
       return -2
 
+#    if self.run_modes:
+#      if ffLocation.mode not in self.run_modes:
+#        logging.critical("Not in mode to run")
+#        return -2
+
+#    if self.no_run_modes:
+#      if ffLocation.mode in self.no_run_modes:
+#        logging.critical("In no run mode")
+#        return -2
+
     if self.lights:
       for light in self.lights:
         ffCommand(light, "off", send_event=self._send_event)
@@ -136,6 +148,8 @@ class App(App):
     if self.actions_contact_closed:
       for device, action in self.actions_contact_closed.iteritems():
         ffCommand(device, action, send_event=self._send_event)
+        if 'hue' in device:
+          sleep(0.5)
 
 
 

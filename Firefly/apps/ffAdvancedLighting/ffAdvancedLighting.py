@@ -2,11 +2,12 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 16:09:01
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-26 23:12:06
+# @Last Modified time: 2016-07-27 22:45:35
+
+import logging
 
 from core.models.app import App
 from core.models.command import Command as ffCommand
-import logging
 
 class App(App):
   METADATA = {
@@ -93,12 +94,12 @@ class App(App):
         return -2
 
     if self.run_dark is not None:
-      if not ffLocation.is_dark:
+      if not ffLocation.isDark:
         logging.critical("Not running because is dark")
         retunr -2
 
     if self.run_light is not None:
-      if not ffLocation.is_light:
+      if not ffLocation.isLight:
         logging.critical("Not running because is light")
         return -2 
 

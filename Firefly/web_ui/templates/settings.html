@@ -23,9 +23,37 @@
       </a>
     </div>
 
+    <div class="col s6 m3">
+      <a href="#" onclick=sendRequest('installApps')>
+        <div class="card-panel grey lighten-2 center" style="width: 150px; height: 150px">
+        <i class="medium material-icons">apps</i>
+        <h5>Install Apps</h5>
+        </div>
+      </a>
+    </div>
+
+    <div class="col s6 m3">
+      <a href="#" onclick=sendRequest('readConfig')>
+        <div class="card-panel grey lighten-2 center" style="width: 150px; height: 150px">
+        <i class="medium material-icons">polymer</i>
+        <h5>Install Routines</h5>
+        </div>
+      </a>
+    </div>
+
   </div>
 </div>
+
+
+<script>
+function sendRequest(request){
+  console.log('Sending Request')
+  var url = "/API/" + request
+  $.get(url);
+}
+</script>
 {% endblock %}
 
 {% block scripts %}
+
 {% endblock %}

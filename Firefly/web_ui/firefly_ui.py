@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-05-22 12:47:41
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-06-27 19:48:02
+# @Last Modified time: 2016-07-31 21:00:35
 
 import collections
 import requests
@@ -175,10 +175,15 @@ def devices():
 @app.route('/devices/views/<path:path>')
 @login_required
 def device_view(path):
-  allDevices = requests.get(API_PATHS['all_device_status']).json()
-  device = allDevices.get(path)
-  device = json.dumps(device, sort_keys=True, indent=4, separators=(',', ': ')).replace('\n','</br>').replace('  ','&nbsp;')
-  return "Still in development <code>" + device + "</code>"
+  try:
+    allDevices = requests.get(API_PATHS['all_device_status']).json()
+    device = allDevices.get(path)
+    device = json.dumps(device, sort_keys=True, indent=4, separators=(',', ': ')).replace('\n','</br>').replace('  ','&nbsp;')
+    #return "Still in development <code>" + device + "</code>"
+    return render_template('device_single_view.html', device=device)
+  except:
+    return "UNKNOWN ERROR"
+
 
 @app.route('/dashboard')
 @login_required
@@ -272,15 +277,18 @@ def settingsPage():
 @app.route('/API/translator2', methods=['GET','POST'])
 @login_required
 def translator2():
-  command = request.form.get('command')
-  json_command = json.loads(command)
-  new_command = {'myCommand':command}
-  #json_command = json.dumps({'device':device, 'command': {command:value}})
-  print json_command
-  print new_command
-  url = "http://localhost:6001/manual_command?myCommand=" + command
-  requests.get(url)
-  return redirect(request.referrer)
+  try:
+    command = request.form.get('command')
+    json_command = json.loads(command)
+    new_command = {'myCommand':command}
+    #json_command = json.dumps({'device':device, 'command': {command:value}})
+    print json_command
+    print new_command
+    url = "http://localhost:6001/manual_command?myCommand=" + command
+    requests.get(url)
+    return "COMMAND SENT"
+  except:
+    return "UNKNOWN ERROR"
 
 @app.route('/API/mode')
 @login_required
@@ -313,14 +321,17 @@ def get_token():
 @app.route('/api/command', methods=['POST', 'GET'])
 @auth_token_required
 def api_test():
-  print request.get_json().get('command')
-  command = request.get_json().get('command')
-  url = "http://localhost:6001/manual_command?myCommand=" + json.dumps(command)
-  print url
-  requests.get(url)
-  # This is where I would forward the command to the innder API
-  return "Okay"
-  
+  try:
+    print request.get_json().get('command')
+    command = request.get_json().get('command')
+    url = "http://localhost:6001/manual_command?myCommand=" + json.dumps(command)
+    print url
+    requests.get(url)
+    # This is where I would forward the command to the innder API
+    return "Okay"
+  except:
+    return ''
+
 
 #####################################################
 #         QUICK PRESENCE
@@ -329,12 +340,15 @@ def api_test():
 @auth_token_required
 @app.route('/api/presence')
 def quick_presence():
-  device = str(request.args.get('d'))
-  presence = bool2str(request.args.get('p'))
-  command = {'device':device,'command':{'presence':presence}}
-  url = "http://localhost:6001/manual_command?myCommand=" + json.dumps(command)
-  requests.get(url)
-  return "Okay"
+  try:
+    device = str(request.args.get('d'))
+    presence = bool2str(request.args.get('p'))
+    command = {'device':device,'command':{'presence':presence}}
+    url = "http://localhost:6001/manual_command?myCommand=" + json.dumps(command)
+    requests.get(url)
+    return "Okay"
+  except:
+    return ''
 
 def bool2str(s):
     if str(s).lower() in ['t', '1', 'true', 'present', 'entered', 'home', 'y', 'yes']:
@@ -352,17 +366,61 @@ def bool2str(s):
 @app.route('/api/echo', methods=['GET','POST'])
 @auth_token_required
 def echo_api():
-  command = json.dumps(request.get_json())
-  print command
-  url = "http://localhost:6001/api/echo"
-  r = requests.post(url, json=command)
-  # This is where I would forward the command to the innder API
-  print str(r.text)
-  return r.text + "\n"
-
+  try:
+    command = json.dumps(request.get_json())
+    print command
+    url = "http://localhost:6001/api/echo"
+    r = requests.post(url, json=command)
+    # This is where I would forward the command to the innder API
+    print str(r.text)
+    return r.text + "\n"
+  except:
+    return ''
 
 #####################################################
 #          END ECHO API
+#####################################################
+
+#####################################################
+#         IFTTT API
+#####################################################
+
+@app.route('/api/ifttt', methods=['GET','POST'])
+@auth_token_required
+def ifttt_api():
+  try:
+    command = json.dumps(request.get_json())
+    print command
+    url = "http://localhost:6001/api/ifttt"
+    r = requests.post(url, json=command)
+    # This is where I would forward the command to the innder API
+    print str(r.text)
+    return r.text + "\n"
+  except:
+    return ''
+
+#####################################################
+#          END IFTTT API
+#####################################################
+
+#####################################################
+#          SETTINGS LINKS
+#####################################################
+
+@app.route('/API/installApps')
+@login_required
+def installApps():
+  requests.get('http://localhost:6001/installApps')
+  return "okay"
+
+@app.route('/API/readConfig')
+@login_required
+def readConfig():
+  requests.get('http://localhost:6001/readConfig')
+  return "okay"
+
+#####################################################
+#          END SETTINGS LINKS
 #####################################################
 
 
@@ -378,6 +436,7 @@ def acme_challenge(path):
 @login_required
 def addUser():
   username = request.args.get('username')
+  password = request.args.get('password')
 
   if username is not None and password is not None:
     user_datastore.create_user(email=username, password=password)

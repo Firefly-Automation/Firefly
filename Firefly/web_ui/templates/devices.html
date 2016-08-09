@@ -1,30 +1,83 @@
 {% extends "ui.html" %}
 {% block title %}Devices{% endblock %}
 {% block main %}
+<style>
+
+.cards-container {
+  column-break-inside: avoid;
+}
+.cards-container .collection {
+  display: inline-block;
+  overflow: visible;
+}
+
+.collection {
+  width: 100%;
+}
+
+.collection.secondary-content {
+  height: 100px;
+}
+
+@media only screen and (max-width: 600px) {
+  .cards-container {
+    -webkit-column-count: 1;
+    -moz-column-count: 1;
+    column-count: 1;
+  }
+}
+@media only screen and (min-width: 600px) {
+  .cards-container {
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;
+  }
+}
+@media only screen and (min-width: 1250px) {
+  .cards-container {
+    -webkit-column-count: 3;
+    -moz-column-count: 3;
+    column-count: 3;
+  }
+}
+.text-center {
+  text-align: center;
+}
+
+.scroll-wrapper {
+  -webkit-overflow-scrolling: touch !important;;
+    overflow-y: scroll !important;;
+
+  /* important:  dimensions or positioning here! */
+}
+</style>
 
   <div class="row">
     <div class="col s12">
       <ul class="tabs">
         <li class="tab col s2"><a class="active" href="#allDevices">All Devices</a></li>
-        {% for t in device_types %}
+        {% for t in device_types|sort %}
         <li class="tab col s2"><a href="#{{t}}">{{t}}</a></li>
         {% endfor %}
       </ul>
     </div>
     <div id="allDevices" class="col s12">
       <div class="row" >
+        <div class="col s12 cards-container">
         {% for d, b in devices.iteritems() %}
           {{b|safe}}
         {% endfor %}
+        </div>
       </div>
     </div>
+
     {% for t in device_types %}
     <div id="{{t}}" class="col s12">
       {% for d, c in device_list.iteritems() %}
-        {% if c.get('type') == t %}
+        {% if c.get('type') == t  and c is not none%}
           {% for d2, b in devices.iteritems() %}
-            {% if d2 == c.get('name') %}
-              {{b|safe}}
+            {% if d2 == c.get('name') and b is not none %}
+              {{b.replace('-modal','-modal-t')|safe}}
             {% endif %}
           {% endfor %}
         {% endif %}
@@ -34,10 +87,139 @@
   </div>
 
 
+<script>
+'use strict';
+String.prototype.replaceAll = function(target, replacement) {
+  return this.split(target).join(replacement);
+};
+
+function refreshFunction(){
+  console.log("REFRESH")
+
+  //var data = $.ajax({
+  //    type: "GET",
+  //    url: "/API/allDevices",
+  //    async: false
+  //  })
+  var data 
+  $.get( "/API/allDevices", function( data ) {
+
+
+  
+  console.log(data)
+  var allDevices = eval('(' + data + ')');
+  for (var device in allDevices){
+      if (allDevices[device]['views']){ 
+      if (allDevices[device]['views']['dash_view']){
+        var request = allDevices[device]['views']['dash_view']['request']
+        var status = allDevices[device][request]
+        var deviceID = 'D_' + device.replaceAll('-','__')
+        if (allDevices[device]['views']['dash_view']['type'] === "switch") {
+          deviceID = deviceID + '_switch'
+          console.log(deviceID + ' ' + status)
+          Array.from(document.getElementsByName(deviceID)).forEach(function (element) {element.checked=status})
+        }
+        if (allDevices[device]['views']['dash_view']['type'] === "text") {
+          deviceID = deviceID + '_text'
+          console.log('TEXT - ' + deviceID + ' ' + status)
+          var c = document.getElementsByName(deviceID)[0].getAttribute('commands')
+          c = jQuery.parseJSON(c)
+          console.log(c[status])
+          //This is where my issue is
+         Array.from( document.getElementsByName(deviceID)).forEach(function (element) {
+            element.innerHTML=c[status]['text']
+            element.className = c[status]['color'] + '-text'
+            element.setAttribute('value', status)
+          })
+        }
+        //console.log(deviceID)
+        //console.log(status)
+
+        //window[ deviceID ](status, false)
+
+      }
+    }
+  }
+  });
+}
+
+
+
+function myFunct(value, name, ctype, raw, commands, send) {
+  
+  console.log(value)
+  console.log(name)
+  console.log(raw)
+  commands=jQuery.parseJSON(commands)
+  console.log(commands)
+  
+  if (ctype == "checkbox"){  
+    Array.from(document.getElementsByName(name)).forEach(function (element) {element.checked=value})
+    sendCommand(commands[value], raw)
+  }
+
+  else if (ctype == "slider"){
+    document.getElementById(name).innerHTML = value
+    var sliderID = name + "_slider"
+    document.getElementById(sliderID).value = value
+  }
+
+  else if (ctype == "text"){
+    var c = document.getElementsByName(name)[0].getAttribute('commands')
+    var current = document.getElementsByName(name)[0].getAttribute('value')
+    c = jQuery.parseJSON(c)
+    var command = c[current]['command']
+    if (command != 'none'){
+      setTimeout(function() { refreshFunction(); }, 500);
+      sendCommand(command, raw)
+    }
+  }
+
+  else if (ctype == "button"){
+    sendCommand(commands, raw)
+
+    
+  }
+}
+
+function flatten(obj) {
+    var result = Object.create(obj);
+    for(var key in result) {
+        result[key] = result[key];
+    }
+    return result;
+}
+
+String.prototype.escapeSpecialChars = function() {
+    return this.replace(/\\n/g, "\\n")
+               .replace(/\\'/g, "\\'")
+               .replace(/\\"/g, '\\"')
+               .replace(/\\&/g, "\\&")
+               .replace(/\\r/g, "\\r")
+               .replace(/\\t/g, "\\t")
+               .replace(/\\b/g, "\\b")
+               .replace(/\\f/g, "\\f");
+};
+
+function sendCommand(pCommand, pDevice){
+  console.log('Sending Command')
+  var command = {'device':pDevice, 'command':pCommand}
+  command = JSON.stringify(flatten(command))
+  var form = "command=" + command.escapeSpecialChars()
+  var url = "/API/translator2"
+  console.log(form)
+  $.post(url, form);
+}
+
+
+</script>
+
 
 
 
 {% endblock %}
+
+
 {% block scripts %}
   $(document).ready(function(){
   // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
@@ -47,4 +229,5 @@
   window.setInterval(function () {
     refreshFunction()
   }, 5000);
+
 {% endblock %}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta name="apple-mobile-web-app-capable" content="yes">
+      <meta name="mobile-web-app-capable" content="yes">
+      <!-- Compiled and minified CSS -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+      <link rel="stylesheet" href="/static/css/weather-icons.css">
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!-- Compiled and minified JavaScript -->
+      <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+      <script src="/static/js/newsTicker.js"></script>
+      <meta name="viewport" content="width=device-width, initial-scale=0.5" />
+    </head>
+
+    <body>
+      <div class="row" style="font-size:10px">
+        <div class="col s12">
+          <ul class="tabs">
+            <li class="tab col s3"><a href="#control">Controls</a></li>
+            <li class="tab col s3"><a href="#info">Info</a></li>
+          </ul>
+        </div>
+        <div id="control" class="col s12">More Controls</div>
+        <div id="info" class="col s12">
+          <code>
+          {{device|safe}}
+          </code>
+        </div>
+      </div>
+
+
+      <script>
+        $(document).ready(function(){
+          $('ul.tabs').tabs();
+        });
+      </script>
+    </body>
+</html>

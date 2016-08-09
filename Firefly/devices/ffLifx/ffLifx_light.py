@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-05-03 09:18:26
-# @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-06-27 17:21:40
+# @Last Modified by:   zpriddy
+# @Last Modified time: 2016-07-05 08:42:46
 import logging
 
 from core.models.command import Command as ffCommand
@@ -56,8 +56,8 @@ class Device(Device):
       'type' : 'lights',
       'dash_view' : {
         'request' : 'on',
-        'type' : 'button', 
-        'button' : {
+        'type' : 'switch', 
+        'switch' : {
           "false" : {
             'click' : 'true',
             'color' : 'grey',

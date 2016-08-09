@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-25 00:40:41
-# @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-06-27 17:36:59
+# @Last Modified by:   zpriddy
+# @Last Modified time: 2016-07-05 08:54:48
 import logging
 
 from core.models.command import Command as ffCommand
@@ -40,20 +40,18 @@ class Device(Device):
       'type' : 'sensor',
       'dash_view' : {
         'request' : 'state',
-        'type' : 'button', 
-        'button' : {
+        'type' : 'text', 
+        'text' : {
           "false" : {
-            'click' : 'true',
-            'color' : 'grey',
+            'color' : 'blue',
             'command' : 'none',
-            'default' : True,
-            'text' : 'closed'
+            'text' : 'Closed'
           },
           "true" : {
-            'click' : 'false',
-            'color' : 'blue lighten-1',
+            'click' : 'true',
+            'color' : 'red',
             'command' : 'none',
-            'text' : 'open'
+            'text' : 'Open'
           }
         }
       }

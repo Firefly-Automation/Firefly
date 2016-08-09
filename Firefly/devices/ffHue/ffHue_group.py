@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 # @Author: zpriddy
 # @Date:   2016-04-17 20:28:40
-# @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-05-29 15:13:15
+# @Last Modified by:   zpriddy
+# @Last Modified time: 2016-07-04 23:37:12
 
-from core.models.device import Device
-from core.models.command import Command as ffCommand
-from core.models.event import Event as ffEvent
 import logging
-from rgb_cie import Converter
-from webcolors import name_to_hex
+
+from core.models.command import Command as ffCommand
+from core.models.device import Device
+from core.models.event import Event as ffEvent
 from ctFade import CTFade
 from math import ceil
+from rgb_cie import Converter
+from webcolors import name_to_hex
 
 ctFade = CTFade(0,0,0,0,None, None,run=False)
 
@@ -67,21 +68,17 @@ class Device(Device):
       'display' : True,
       'name' : args.get('args').get('name'),
       'id' : deviceID,
-      'type' : 'hue',
+      'type' : 'lights',
       'dash_view' : {
         'request' : 'on',
-        'type' : 'button', 
-        'button' : {
-          "true" : {
-            'click' : 'true',
-            'color' : 'grey',
-            'command' : {'switch':'on'},
+        'type' : 'switch', 
+        'switch' : {
+          "false" : {
+            'command' : {'switch':'off'},
             'text' : 'Off'
           },
-          "false" : {
-            'click' : 'false',
-            'color' : 'green lighten-1',
-            'command' : {'switch':'off'},
+          "true" : {
+            'command' : {'switch':'on'},
             'default' : True,
             'text' : 'On'
           }

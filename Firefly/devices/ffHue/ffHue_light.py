@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: zpriddy
 # @Date:   2016-04-17 20:28:40
-# @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-06-27 17:22:02
+# @Last Modified by:   zpriddy
+# @Last Modified time: 2016-07-04 23:37:06
 
 import logging
 
@@ -36,16 +36,16 @@ class Device(Device):
 
   def __init__(self, deviceID, args={}):
     self.METADATA = {
-      'title' : 'Firefly Hue Group Device',
-      'type' : 'group',
+      'title' : 'Firefly Hue Light Device',
+      'type' : 'light',
       'package' : 'ffHue',
-      'module' : 'ffHue_group'
+      'module' : 'ffHue_light'
     }
     
     self.COMMANDS = {
       'on' : self.setOn,
       'off' : self.setOff,
-      'setLight' : self.setGroup,
+      'setLight' : self.setLight,
       'level' : self.setLevel,
       'bri' : self.setBri,
       'switch' : self.switch,
@@ -61,7 +61,8 @@ class Device(Device):
       'ct' : self.getCt,
       'xy' : self.getXy,
       'type' : self.getType,
-      'level' : self.getLevel
+      'level' : self.getLevel,
+      'colormode' : self.getColorMode
     }
 
     self.VIEWS = {
@@ -71,18 +72,14 @@ class Device(Device):
       'type' : 'lights',
       'dash_view' : {
         'request' : 'on',
-        'type' : 'button', 
-        'button' : {
+        'type' : 'switch', 
+        'switch' : {
           "false" : {
-            'click' : 'true',
-            'color' : 'grey',
-            'command' : {'switch':'on'},
+            'command' : {'switch':'off'},
             'text' : 'Off'
           },
           "true" : {
-            'click' : 'false',
-            'color' : 'green lighten-1',
-            'command' : {'switch':'off'},
+            'command' : {'switch':'on'},
             'default' : True,
             'text' : 'On'
           }
@@ -94,20 +91,25 @@ class Device(Device):
     # SET VARS
     ###########################
     args = args.get('args')
-    self._group_id = args.get('groupID')
+    self._light_id = args.get('lightID')
     self._name = args.get('name')
-    self._lights = args.get('lights')
-    self._on = args.get('action').get('on')
-    self._hue = args.get('action').get('hue')
-    self._sat = args.get('action').get('sat')
-    self._effect = args.get('action').get('effect')
-    self._xy = args.get('action').get('xy')
-    self._colormode = args.get('action').get('colormode')
-    self._alert = args.get('action').get('alert')
-    self._bri = args.get('action').get('bri')
-    self._ct = args.get('action').get('ct')
+    self._uniqueid = args.get('uniqueid')
+    self._manufacturername = args.get('manufacturername')
+    self._swversion = args.get('swversion')
+    self._modelid = args.get('modelid')
+    self._reachable = args.get('state').get('reachable')
+    self._on = args.get('state').get('on')
+    self._hue = args.get('state').get('hue')
+    self._sat = args.get('state').get('sat')
+    self._effect = args.get('state').get('effect')
+    self._xy = args.get('state').get('xy')
+    self._colormode = args.get('state').get('colormode')
+    self._alert = args.get('state').get('alert')
+    self._bri = args.get('state').get('bri')
+    self._reachable = args.get('state').get('reachable')
     self._type = args.get('type')
     self._bridge = args.get('bridgeID')
+    self._ct = args.get('state').get('ct')
     self._level = int(self._bri/255.0*100.0)
 
     ###########################
@@ -137,7 +139,7 @@ class Device(Device):
     return self._level
 
   @property
-  def tyep(self):
+  def type(self):
     return self._type
 
   @property
@@ -145,16 +147,16 @@ class Device(Device):
       return self._hue
 
   def setOff(self, args={}):
-    return self.setGroup({'on':False})
+    return self.setLight({'on':False})
   
   def setLevel(self, pLevel):
-    return self.setGroup({'level':pLevel})
+    return self.setLight({'level':pLevel})
 
   def setBri(self, pBri):
-    return self.setGroup({'bri':pBri})
+    return self.setLight({'bri':pBri})
 
   def setOn(self, args={}):
-    return self.setGroup({'on':True})
+    return self.setLight({'on':True})
 
   def getOn(self):
     return self._on
@@ -181,8 +183,12 @@ class Device(Device):
     self._level = int(ceil(self._bri/255.0*100.0))
     return self._level
 
-  def setGroup(self, value):
-    groupValue = {}
+  def getColorMode(self):
+    return self._colormode
+
+
+  def setLight(self, value):
+    lightValue = {}
 
     # END FADE IF SET COMMAND IS GIVEN
     if value.get('ctfade') is None:
@@ -192,21 +198,19 @@ class Device(Device):
     # XY
     xy = value.get('xy')
     if xy:
-      groupValue.update({'xy':xy})
+      lightValue.update({'xy':xy})
       self._xy = xy
 
     # HUE
     hue = value.get('hue')
     if hue:
-      groupValue.update({'hue':hue})
+      lightValue.update({'hue':hue})
       self._hue = hue
 
     #TRANS TIME
     transitiontime = value.get('transitiontime')
     if transitiontime:
-      groupValue.update({'transitiontime':transitiontime})
-
-
+      lightValue.update({'transitiontime':transitiontime})
 
     #NAME COLOR
     name = value.get('name')
@@ -217,7 +221,7 @@ class Device(Device):
     #HEX COLOR
     hexColor = value.get('hex')
     if hexColor:
-      groupValue.update(self.hexColor(hexColor))
+      lightValue.update(self.hexColor(hexColor))
 
 
     # PRESET
@@ -236,12 +240,12 @@ class Device(Device):
         level = 100 if level >= 100 else level
         bri = int(255.0/100.0*level)
         level = level
-        groupValue.update({'bri':bri})
+        lightValue.update({'bri':bri})
       if level <= 0:
         bri = 0
         level = 0
         self._on = False
-        groupValue.update({'bri':bri,'on':False})
+        lightValue.update({'bri':bri,'on':False})
       self._bri = bri
       self._level = level
 
@@ -255,8 +259,8 @@ class Device(Device):
         bri = 0
         self._level = 0
         self._on = False
-        groupValue.update({'on':False})
-      groupValue.update({'bri':bri})
+        lightValue.update({'on':False})
+      lightValue.update({'bri':bri})
       self._bri = bri
 
     # SET CT:
@@ -270,33 +274,36 @@ class Device(Device):
       if ct < 153:
         ct = 153
       
-      groupValue.update({'ct':ct})
+      lightValue.update({'ct':ct})
       self._ct = ct
 
     # EFFECT
     effect = value.get('effect')
     if effect:
-      groupValue.update({'effect':effect})
+      lightValue.update({'effect':effect})
       self._effect = effect
 
     # ALERT
     alert = value.get('alert')
     if alert:
-      groupValue.update({'alert':alert})
+      lightValue.update({'alert':alert})
       self._alert = alert
 
     # SET FOR ON
     on = value.get('on')
     if on is not None:
-      groupValue.update({'on':on})
+      if on:
+        lightValue.update({'on':on})
+      else:
+        lightValue.update({'on':on, 'bri':255})
       self._on = on
 
     # Turn lights on unless told not to or has already been set
-    if groupValue.get('on') is None and not value.get('onOn'):
-      groupValue.update({'on':True})
+    if lightValue.get('on') is None and not value.get('onOn'):
+      lightValue.update({'on':True})
       self._on = True
 
-    self.set_group(groupValue)
+    self.set_light(lightValue)
     return value
 
 
@@ -306,33 +313,34 @@ class Device(Device):
 
   def switch(self, value):
     if value == 'on':
-      self.setGroup({'on':True})
+      self.setLight({'on':True})
     elif value == 'off':
-      self.setGroup({'on':False})
+      self.setLight({'on':False})
 
-  def set_group(self, value):
-    group_id = self._group_id
-    groupCommand = ffCommand(self._bridge,{'sendGroupRequest' : {'groupID':group_id,'data':value}})
+  def set_light(self, value):
+    light_id = self._light_id
+    lightCommand = ffCommand(self._bridge,{'sendLightRequest' : {'lightID':light_id,'data':value}})
 
 
   def hexColor(self, colorHex):
     if '#' in colorHex:
       colorHex = colorHex.replace('#','')
+    if 'LST' in self._modelid:
+      return {'xy':converter.hexToCIE1931(colorHex, lightType='LST')}
     return {'xy':converter.hexToCIE1931(colorHex)}
 
 
   def update(self, raw_data):
-    self._lights = raw_data.get('lights')
-    self._on = raw_data.get('action').get('on')
-    self._hue = raw_data.get('action').get('hue')
-    self._sat = raw_data.get('action').get('sat')
-    self._effect = raw_data.get('action').get('effect')
-    self._xy = raw_data.get('action').get('xy')
-    self._colormode = raw_data.get('action').get('colormode')
-    self._alert = raw_data.get('action').get('alert')
-    self._bri = raw_data.get('action').get('bri')
-    self._ct = raw_data.get('action').get('ct')
-    self._type = raw_data.get('type')
+    self._reachable = raw_data.get('state').get('reachable')
+    self._on = raw_data.get('state').get('on')
+    self._hue = raw_data.get('state').get('hue')
+    self._sat = raw_data.get('state').get('sat')
+    self._effect = raw_data.get('state').get('effect')
+    self._xy = raw_data.get('state').get('xy')
+    self._colormode = raw_data.get('state').get('colormode')
+    self._alert = raw_data.get('state').get('alert')
+    self._bri = raw_data.get('state').get('bri')
+    self._ct = raw_data.get('state').get('ct')
     self._level = int(ceil(self._bri/255.0*100.0))
-
-    #ffEvent(self._id, raw_data.get('action'))
+    if not self._reachable:
+      self._on = False

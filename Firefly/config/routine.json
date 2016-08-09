@@ -29,7 +29,7 @@
       ],
       "notification_message" : "Firefly has changed mode to Home!",
       "mode_no_run" : [
-        "home", "night", "away"
+        "home", "night", "away", "vacation"
       ],
       "mode_run" :[
 
@@ -146,7 +146,9 @@
         "hue-group-3" : {"setLight": {"on":false}},
         "hue-light-1" : {"setLight": {"on":false}},
         "hue-light-5" : {"setLight": {"name":"indigo","level":10}},
-        "hue-light-2" : {"setLight": {"name":"indigo","level":20}}
+        "hue-light-2" : {"setLight": {"name":"indigo","level":20}},
+        "lgtv" : {"cmd":"POWER"},
+        "ecobee" : "setAway"
       },
       "actions_day" : {
         "hue-group-4" : {"switch": "off"}
@@ -163,6 +165,7 @@
       ],
       "notification_message" : "Firefly has changed mode to Away!",
       "mode_no_run" : [
+        "vacation"
 
       ],
       "mode_run" :[
@@ -182,7 +185,8 @@
         "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off", "duration":2}}},
         "hue-light-1" : {"setLight": {"on":false}},
         "hue-group-4" : {"setLight": {"on":false, "level":1, "transitiontime":200}},
-        "hue-light-5" : {"setLight": {"on":true, "name":"indigo","level":20, "transitiontime":200}}        
+        "hue-light-5" : {"setLight": {"on":true, "name":"indigo","level":20, "transitiontime":200}},
+        "ecobee" : {"setMode" : {"mode":"sleep"}}
       },
       "actions_day" : {
         "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off","duration":2}}},
@@ -282,7 +286,6 @@
       },
       "actions_night" : {
         "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off", "duration":20}}},
-        "hue-light-1" : {"setLight": {"on":false}},
         "hue-group-3" : {"setLight": {"on":false, "transitiontime":200}},
         "hue-light-5" : {"setLight": {"name":"indigo","level":20, "transitiontime":200}},
         "hue-light-6" : {"setLight": {"name":"navy","level":10, "transitiontime":200}},
@@ -353,6 +356,49 @@
       ],
       "no_run_time_ranges" :[
         
+      ]
+    },
+    {
+      "id": "vacation",
+      "type": "routine",
+      "mode" : "vacation",
+      "icon" : "local_airport",
+      "actions" : {
+      },
+      "actions_night" : {
+        "hue-group-3" : {"setLight": {"on":false}},
+        "hue-light-1" : {"setLight": {"on":false}},
+        "hue-light-5" : {"setLight": {"name":"indigo","level":30}},
+        "hue-light-2" : {"setLight": {"name":"indigo","level":30}},
+        "zwave-node-11" : "off"
+      },
+      "actions_day" : {
+        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off", "duration":1}}},
+        "hue-group-3" : {"setLight": {"on":false}},
+        "zwave-node-11" : "off"
+      },
+      "triggers" : [ 
+        {"location":{"time":"sunset"}},
+	{"location":{"time":"sunrise"}}
+      ],
+      "scheduling" : [
+        
+      ],
+      "notification_devices" : [
+        "ZachPushover"
+      ],
+      "notification_message" : "Vacation Mode has been activated.",
+      "mode_no_run" : [
+
+      ],
+      "mode_run" :[
+        "vacation"
+      ],
+      "run_time_ranges" :[
+
+      ],
+      "no_run_time_ranges" :[
+
       ]
     }
   ]

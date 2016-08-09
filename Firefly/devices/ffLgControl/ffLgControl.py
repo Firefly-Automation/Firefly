@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-25 22:13:31
-# @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-06-26 18:07:48
+# @Last Modified by:   zpriddy
+# @Last Modified time: 2016-07-05 08:37:49
 
 import logging
 import requests
@@ -97,7 +97,7 @@ class Device(Device):
     }
 
     self.REQUESTS = {
-      'status' : self.get_status
+      'status' : self.get_session
     }
 
     self.VIEWS = {
@@ -109,19 +109,9 @@ class Device(Device):
         'request' : 'status',
         'type' : 'button', 
         'button' : {
-          "true" : {
-            'click' : 'false',
-            'color' : 'orange lighten-1',
-            'command' : {'cmd':'POWER'},
-            'text' : 'Off'
-          },
-          "false" : {
-            'click' : 'false',
-            'color' : 'orange lighten-1',
-            'command' : {'cmd':'POWER'},
-            'default' : True,
-            'text' : 'Off'
-          }
+          'color' : 'orange',
+          'command' : {'cmd':'POWER'},
+          'text' : 'Off'
         }
       }
     }
@@ -193,7 +183,10 @@ class Device(Device):
 
     logging.critical(url)
     logging.critical(cmdText)
-    r = requests.post(url, data=cmdText, headers=headers)
+    try:
+        r = requests.post(url, data=cmdText, headers=headers, timeout=2)
+    except:
+        return False
     
     logging.critical(r.status_code)
     if r.status_code != 200:
@@ -206,6 +199,3 @@ class Device(Device):
       logging.critical('CANT GET LG SESSION')
       return False
     return session
-
-  def get_status(self, args={}):
-    pass

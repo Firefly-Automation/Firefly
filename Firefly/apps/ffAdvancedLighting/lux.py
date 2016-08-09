@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 23:06:59
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-01 19:59:17
+# @Last Modified time: 2016-07-27 23:47:54
 
 
 import logging
@@ -12,15 +12,16 @@ from core.models.command import Command as ffCommand
 
 class App(App):
   METADATA = {
-      'title' : 'Firefly Advanced Lighting - Motion',
+      'title' : 'Firefly Advanced Lighting - LUX',
       'type' : 'app',
       'package' : 'ffAdvancedLighting',
-      'module' : 'switch',
+      'module' : 'lux',
       'inputs' : {
-        'switches' : {'type':'device', 'capability':'switch', 'multi':True, 'help':'Switches to trigger lights', 'required':True},
-        'lights' : {'type':'device', 'capability':'switch', 'multi':True, 'help':'Lights and Switches to be triggered by switches', 'required':True},
-        'actions_switch_on' : {'type':'action', 'multi':True, 'help':'Non generic actions when switch turns on'},
-        'actions_switch_off' : {'type':'action', 'multi':True, 'help':'Non generic actions when switch turns off'}
+        'sensors' : {'type':'device', 'capability':'sensor', 'multi':True, 'help':'Sensors to trigger lights', 'required':True},
+        'lights' : {'type':'device', 'capability':'switch', 'multi':True, 'help':'Lights and Switches to be triggered by LUX changes', 'required':True},
+        'lux_level':  {'type':'number', 'help':'The level that is trigger for level low/high', 'required':True},
+        'actions_lux_high' : {'type':'action', 'multi':True, 'help':'Non generic actions when lux goes high.'},
+        'actions_lux_low' : {'type':'action', 'multi':True, 'help':'Non generic actions when lux goes low.'}
       },
       'options' : {
         'delay_time' : {'type':'number', 'help':'Delay time in minutes from last activity before off actions applied', 'required':True},
@@ -38,12 +39,13 @@ class App(App):
     #METADAT is set above so that we can pull it during install
     #self.METADATA = METADATA
     self.INPUTS = {
-      'switches' : config.get('switches'),
+      'sensors' : config.get('sensors'),
       'lights' : config.get('lights'),
-      'actions_switch_on' : config.get('actions_switch_on'),
-      'actions_switch_off' : config.get('actions_switch_off')
+      'actions_lux_high' : config.get('actions_lux_high'),
+      'actions_lux_low' : config.get('actions_lux_low')
     }
     self.OPTIONS = {
+      'lux_level' : config.get('lux_level'),
       'delay_time' : config.get('delay_time'),
       'run_modes' : config.get('run_modes'),
       'no_run_modes' : config.get('no_run_modes'),
@@ -53,7 +55,7 @@ class App(App):
       'no_run_conditions' : config.get('no_run_modes')
     }
     self.EVENTS = {
-      'switches' : self.switchHandler
+      'sensors' : self.sensorHandler
     }
     self.COMMANDS = {
       'disable' : self.setDisable
@@ -82,12 +84,21 @@ class App(App):
   def getDisable(self, args={}):
     return self._disabled
 
-  def switchHandler(self, event={}):
+  def sensorHandler(self, event={}):
     from core.firefly_api import ffScheduler
     from core.firefly_api import ffLocation
 
+    logging.critical("ENTERNING LUX HANDELER")
+
+    lux = int(event.event.get('luminance')) if event.event.get('luminance') is not None else None
+    if lux is None or lux == '':
+      return -2
+    logging.critical('LUX: ' + str(lux))
+    change_value = self.lux_level
+
+
     if self._disabled:
-      logging.critical('Switch Events Disabled')
+      logging.critical('Lux Events Disabled')
       return -2
 
     if self.run_modes:
@@ -103,23 +114,23 @@ class App(App):
     if self.run_dark is not None:
       if not ffLocation.isDark:
         logging.critical("Not running because is dark")
-        return -2
+        retunr -2
 
     if self.run_light is not None:
       if not ffLocation.isLight:
         logging.critical("Not running because is light")
         return -2 
 
-    if event.event.get('on'):
+    if lux <= change_value:
       if self.lights:
         for light in self.lights:
           ffCommand(light,"on", send_event=self._send_event)
-      if self.actions_switch_on:
-        for device, action in self.actions_switch_on.iteritems():
+      if self.actions_lux_low:
+        for device, action in self.actions_lux_low.iteritems():
           ffCommand(device, action, send_event=self._send_event)
       ffScheduler.cancel(self._id)
 
-    if not event.event.get('on'):
+    if lux > change_value:
       if self.delay_time is None:
         self.TurnLightsOff()
       else:
@@ -127,7 +138,7 @@ class App(App):
 
   def TurnLightsOff(self):
     if self._disabled:
-      logging.critical('Switch Events Disabled')
+      logging.critical('LUX Events Disabled')
       return -2
 
     if self.run_modes:
@@ -144,10 +155,11 @@ class App(App):
       for light in self.lights:
         ffCommand(light, "off", send_event=self._send_event)
 
-    if self.actions_switch_off:
-      for device, action in self.actions_switch_off.iteritems():
+    if self.actions_lux_high:
+      for device, action in self.actions_lux_high.iteritems():
         ffCommand(device, action, send_event=self._send_event)
         if 'hue' in device:
           sleep(0.5)
+
 
 

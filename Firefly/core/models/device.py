@@ -72,7 +72,20 @@ class Device(object):
   def refreshData(self):
     logging.debug('Refresh Data in ' + self._name)
     from core.firefly_api import update_status
-    returnData = self.__dict__
+    returnData = {}
+    '''
+    allData = dict(self.__dict__)
+    if allData.get('COMMANDS'):
+      allData.pop('COMMANDS', None)
+    if allData.get('REQUESTS'):
+      allData.pop('REQUESTS',None)
+    if allData.get('_commands'):
+      allData.pop('_commands', None)
+    if allData.get('_requests'):
+      allData.pop('_requests', None)
+    logging.critical(allData)
+    returnData = allData
+    '''
     newChanges = {}
     for item in self._requests:
       returnData[item] = self._requests[item]()

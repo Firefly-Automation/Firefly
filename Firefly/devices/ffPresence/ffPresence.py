@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: zpriddy
 # @Date:   2016-04-17 01:25:27
-# @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-06-27 17:22:19
+# @Last Modified by:   zpriddy
+# @Last Modified time: 2016-07-05 00:19:34
 
 import logging
 
@@ -34,8 +34,8 @@ class Device(Device):
       'type' : 'presence',
       'dash_view' : {
         'request' : 'presence',
-        'type' : 'button', 
-        'button' : {
+        'type' : 'text', 
+        'text' : {
           "false" : {
             'click' : 'true',
             'color' : 'grey',
@@ -44,7 +44,7 @@ class Device(Device):
           },
           "true" : {
             'click' : 'false',
-            'color' : 'green lighten-1',
+            'color' : 'green',
             'command' : {'presence':False},
             'default' : True,
             'text' : 'Present'

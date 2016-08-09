@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-25 00:40:41
-# @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-06-27 17:32:10
+# @Last Modified by:   zpriddy
+# @Last Modified time: 2016-07-05 08:47:25
 import logging
 
 from core.models.command import Command as ffCommand
@@ -35,23 +35,19 @@ class Device(Device):
     }
     self.VIEWS = {
       'display' : True,
-      'name' : args.get('name'),
+      'name' : args.get('args').get('name'),
       'id' : deviceID,
-      'type' : 'switch',
+      'type' : 'lights',
       'dash_view' : {
-        'request' : 'state',
-        'type' : 'button', 
-        'button' : {
+        'request' : 'on',
+        'type' : 'switch', 
+        'switch' : {
           "false" : {
-            'click' : 'true',
-            'color' : 'grey',
-            'command' : {'switch':'on'},
+            'command' : {'switch':'off'},
             'text' : 'Off'
           },
           "true" : {
-            'click' : 'false',
-            'color' : 'green lighten-1',
-            'command' : {'switch':'off'},
+            'command' : {'switch':'on'},
             'default' : True,
             'text' : 'On'
           }

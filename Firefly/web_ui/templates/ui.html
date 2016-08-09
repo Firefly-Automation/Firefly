@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
     <script src="/static/js/newsTicker.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <access origin="https://firefly.tardis-core.com"/>
     <style> 
     body {
       display: flex;
@@ -74,9 +75,10 @@
     {% block main %}
     {% endblock %}
     </main>
+</body>
     {% block footer%}
     {% endblock %}
-  </body>
+ 
   <script>
   {% block scripts %}
   {% endblock %}

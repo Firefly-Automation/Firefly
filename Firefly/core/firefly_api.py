@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-06-27 16:15:54
+# @Last Modified time: 2016-07-28 22:28:42
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -175,7 +175,7 @@ def ff_instal_apps(request):
         app_package_config = 'config/app_config/' + str(packageName) + '/config.json'
         logging.critical(app_package_config)
         with open(str(app_package_config)) as app_package_config_file:
-          app_package_config_data = json.load(app_package_config_file).get(moduleName)
+          app_package_config_data = json.load(app_package_config_file, object_pairs_hook=OrderedDict).get(moduleName) #json.load(app_package_config_file).get(moduleName)
           logging.critical(app_package_config_data)
           package = __import__(package_full_path, globals={}, locals={}, fromlist=[str(packageName)], level=-1)
           reload(modules[package_full_path])
@@ -436,6 +436,70 @@ def APIMode(request):
   return ffLocation.mode
 
 #####################################################
+#         IFTTT API
+#####################################################
+@app.route('/api/ifttt', methods=['GET', 'POST'])
+def ifttt_api(request):
+  r_data = json.loads(request.content.read())
+  logging.error(str(r_data))
+
+  response = ifttt_handler(r_data)
+  logging.error(str(response))
+  return response
+
+def ifttt_handler(p_request):
+  p_request = json.loads(p_request)
+  action = p_request.get('action')
+  
+  if action == "mode":
+    return ifttt_change_mode(p_request)
+  if action == "switch":
+    logging.error("IFTTT SWITCH")
+    return ifttt_switch(p_request)
+
+  return False
+
+def ifttt_change_mode(request):
+  global routine_list
+  mode = request.get('mode').lower()
+  if mode is None:
+    return False
+  close_matches = difflib.get_close_matches(mode, routine_list)
+  if len(close_matches) < 1:
+    get_routines_list()
+    close_matches = difflib.get_close_matches(mode, routine_list)
+  if len(close_matches) > 0:
+    routine = close_matches[0]
+    myCommand = ffCommand(routine, None, routine=True, source="Echo command", force=True)
+    if myCommand.result:
+      return True
+  return False
+
+
+def ifttt_switch(request):
+  global device_list
+  device = request.get('device').lower()
+  if device is None:
+    return False
+  state = request.get('state')
+  close_matches = difflib.get_close_matches(device, device_list.keys())
+  logging.critical(device_list)
+  logging.critical(close_matches)
+  if len(close_matches) < 1:
+    get_device_list()
+    close_matches = difflib.get_close_matches(device, device_list.keys())
+  if len(close_matches) > 0:
+    device = close_matches[0]
+    myCommand = ffCommand(device_list.get(device), {'switch':state})
+    if myCommand.result:
+      return True
+  return False
+
+#####################################################
+#         END IFTTT API
+#####################################################
+
+#####################################################
 #         ECHO API
 #####################################################
 
@@ -540,7 +604,13 @@ def echo_dimmer(intent):
 
   return make_response("Error finding device " + str(device), "Error finding device " + str(device), card_title="Firefly Smart Home Error")
   
-  
+def make_response(output_speech, card_content, output_type="PlainText", card_title="Firefly Smart Home", card_type="Simple", end_session=True):
+  response = {"outputSpeech": {"type":output_type,"text":output_speech},"card":{"type":card_type,"title":card_title,"content":card_content},'shouldEndSession':end_session}
+  return response
+
+#####################################################
+#         END ECHO API
+#####################################################
 
 def get_routines_list():
   global routine_list
@@ -558,16 +628,6 @@ def get_device_list(lower=True):
         device_list[d.get('config').get('name').lower()] = d.get('id')
       else:
         device_list[d.get('config').get('name')] = d.get('id')
-
-def make_response(output_speech, card_content, output_type="PlainText", card_title="Firefly Smart Home", card_type="Simple", end_session=True):
-  response = {"outputSpeech": {"type":output_type,"text":output_speech},"card":{"type":card_type,"title":card_title,"content":card_content},'shouldEndSession':end_session}
-  return response
-
-#####################################################
-#         END ECHO API
-#####################################################
-
-
 
 
 

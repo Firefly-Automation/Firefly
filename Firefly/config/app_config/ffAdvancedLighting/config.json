@@ -17,7 +17,7 @@
           "zwave-node-11" : "off"
         },
         "delay_time" : 15,
-        "run_modes" : ["home"]
+        "run_modes" : ["home", "vacation"]
       },
       {
         "id":"kitchenLightsLowPower",
@@ -42,11 +42,105 @@
     "installs" :
     [ 
       {
-        "id":"testSwitch",
-        "name" : "Turn Kitchen Lights on when door opens",
-        "contact_sensors" : ["zwave-node-13", "zwave-node-2"],
+        "id":"frontDoor",
+        "name" : "Turn entry lights on when door opens",
+        "contact_sensors" : ["zwave-node-13", "zwave-node-5"],
         "lights" : ["hue-light-2"],
-        "delay_time" : 1
+        "delay_time" : 3
+      },
+      {
+        "id":"frontDoorAlarm",
+        "name" : "Send Notification If Front Door Is Opened",
+        "contact_sensors" : ["zwave-node-13"],
+        "run_modes" : ["away"],
+        "lights" : ["hue-light-2"],
+        "delay_time" : 3,
+        "actions_contact_open" : {
+          "ZachPushover": {"notify":{"message":"ALERT! FRONT DOOR OPENED WHILE IN AWAY MODE", "priority":"emergency"}}
+        }
+      },
+      {
+        "id":"frontDoorAlarmNight",
+        "name" : "Send Notification If Front Door Is Opened",
+        "contact_sensors" : ["zwave-node-13"],
+        "run_modes" : ["night"],
+        "lights" : ["hue-light-2"],
+        "delay_time" : 3,
+        "actions_contact_open" : {
+          "ZachPushover": {"notify":{"message":"ALERT! FRONT DOOR OPENED WHILE IN NIGHT MODE", "priority":"emergency"}}
+        }
+      },
+      {
+        "id":"vactionDay",
+        "name" : "Turn on inside lights when door opens during day.",
+        "contact_sensors" : ["zwave-node-13", "zwave-node-5"],
+        "delay_time" : 30,
+        "run_light" : true,
+        "run_modes" : ["vacation"],
+        "actions_contact_open" : {
+          "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:5200", "brightness":1, "duration":2}}},
+          "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"noon", "transitiontime": 1}},
+          "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"noon"}},
+          "zwave-node-11" : "on",
+          "ZachPushover": {"notify":{"message":"VACATION MODE: Door opened.", "priority":"high"}}
+        },
+        "actions_contact_closed" : {
+          "vacation" : {"routine":true, "force":true},
+          "zwave-node-11" : "off",
+          "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off", "duration":2}}},
+          "zwave-node-11" : "off",
+          "ZachPushover": {"notify":{"message":"VACATION MODE: Door Closed action taken."}}
+        }
+      },
+      {
+        "id":"vactionNight",
+        "name" : "Turn on inside lights when door opens during Night.",
+        "contact_sensors" : ["zwave-node-13", "zwave-node-5"],
+        "delay_time" : 30,
+        "run_dark" : true,
+        "run_modes" : ["vacation"],
+        "actions_contact_open" : {
+          "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:2700", "brightness":1, "duration":2}}},
+          "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"soft white", "transitiontime": 1}},
+          "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"soft white"}},
+          "zwave-node-11" : "on",
+          "ZachPushover": {"notify":{"message":"VACATION MODE: Door opened.", "priority":"high"}}
+        },
+        "actions_contact_closed" : {
+          "vacation" : {"routine":true, "force":true},
+          "hue-group-3" : {"setLight": {"on":false}},
+          "hue-light-1" : {"setLight": {"on":false}},
+          "hue-light-5" : {"setLight": {"name":"indigo","level":30}},
+          "hue-light-2" : {"setLight": {"name":"indigo","level":30}},
+          "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off", "duration":2}}},
+          "zwave-node-11" : "off",
+          "ZachPushover": {"notify":{"message":"VACATION MODE: Door Closed action taken."}}
+        }
+      },
+      {
+        "id":"windowAlarm",
+        "name" : "Send Notification If Lower Window is opened",
+        "contact_sensors" : ["zwave-node-2"],
+        "actions_contact_open" : {
+          "ZachPushover": {"notify":{"message":"ALERT! LOWER WINDOW IS OPEN!", "priority":"emergency"}}
+        }
+      }
+    ]
+  },
+  "lux" :
+  {
+    "package" : "ffAdvancedLighting",
+    "module" : "lux",
+    "installs" :
+    [ 
+      {
+        "id":"InsideLightsAutoBright",
+        "name" : "Turn off inside lights when bright",
+        "sensors" : ["zwave-node-16"],
+        "lights" : ["hue-group-3","02a0d3f1-6dd1-4e71-8106-455ecc0ba3b3","02c67179-c79c-4164-b86d-5c213c501a3b"],
+        "lux_level" : 60,
+        "run_modes" : ["home"]
+
       }
     ]
   },
@@ -66,13 +160,15 @@
         "id":"UpstarisLights",
         "name" : "Turn On Upstairs Lights With Switch",
         "switches" : ["zwave-node-14"],
-        "lights" : ["hue-group-10"]
+        "lights" : ["hue-group-10"],
+        "allow_chain" : false
       },
       {
         "id":"UpstarisLights2",
         "name" : "Turn On Upstairs Lights With Switch",
         "switches" : ["hue-group-10"],
-        "lights" : ["zwave-node-14"]
+        "lights" : ["zwave-node-14"],
+        "allow_chain" : false
       }
     ]
   }
