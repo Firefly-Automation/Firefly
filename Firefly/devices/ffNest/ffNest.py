@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 23:56:57
+# @Last Modified time: 2016-08-15 23:57:59
 
 import logging
 
@@ -27,7 +27,7 @@ class Device(Device):
     self.COMMANDS = {
       'update' : self.update,
       'setPresence' : self.setPresence,
-      'startup' : self.refresh_scheduler,
+      'startup' : self.updateu,
     }
 
     self.REQUESTS = {
