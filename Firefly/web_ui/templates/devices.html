@@ -127,14 +127,14 @@ function refreshFunction(){
           //c = jQuery.parseJSON(c)
           console.log('-----------------------')
           console.log(c)
-          console.log(c[status])
+          console.log(c[status.toString()])
           //This is where my issue is
          Array.from( document.getElementsByName(deviceID)).forEach(function (element) {
-            element.innerHTML=c[status]['text']
-            element.className = c[status]['color'] + '-text'
-            element.setAttribute('value', status)
+            element.innerHTML=c[status.toString()]['text']
+            element.className = c[status.toString()]['color'] + '-text'
+            element.setAttribute('value', status.toString())
             console.log(deviceID)
-            console.log(c[status]['text'])
+            console.log(c[status.toString()]['text'])
             console.log(status)
           })
         }
