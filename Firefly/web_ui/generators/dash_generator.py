@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-05-22 14:40:40
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 13:50:29
+# @Last Modified time: 2016-08-16 13:51:18
 
 import collections
 import json
@@ -234,7 +234,7 @@ def generate_stateValue(config):
   name = config.get('name')
   deviceIDRaw = config.get('id')
   deviceID = config.get('id').replace('-',"__")
-  stateValue = config.get('dash_view').get('stateValue')
+  stateValue = config.get('dash_view').get('state')
   settings = {}
   for c, s in stateValue.iteritems():
     settings[c] = {"command":s.get('command'), "value":s.get('value'), "color":s.get('color')}
