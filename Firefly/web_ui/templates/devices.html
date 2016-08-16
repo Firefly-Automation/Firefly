@@ -123,7 +123,7 @@ function refreshFunction(){
           deviceID = deviceID + '_text'
           console.log('TEXT - ' + deviceID + ' ' + status)
           //var c = document.getElementsByName(deviceID)[0].getAttribute('commands')
-          var c = data[device]['views']['dash_view']['commands']
+          var c = allDevices[device]['views']['dash_view']['commands']
           c = jQuery.parseJSON(c)
           console.log('-----------------------')
           console.log(c)
