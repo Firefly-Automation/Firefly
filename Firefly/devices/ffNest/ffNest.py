@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 14:41:34
+# @Last Modified time: 2016-08-16 14:45:30
 
 import logging
 
@@ -253,10 +253,11 @@ class Device(Device):
 
   @property
   def shared(self):
-    try:
+    logging.critical('GETTING SHARED ---------------- NEST')
+    if self._raw_status is not None:
       return self._raw_status.get(self._serial).get('shared')
-    except:
-      return None
+    logging.critical('RAW STATUS IS NONE!')
+    return None
 
   @property
   def structure(self):
