@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 14:45:30
+# @Last Modified time: 2016-08-16 14:47:59
 
 import logging
 
@@ -136,9 +136,11 @@ class Device(Device):
     self.update_shared()
 
   def update_shared(self, args={}):
-    try:
-      shared = self.shared
+    logging.critical('UPDATING SHARED')
+    
+    shared = self.shared
 
+    if shared is not None:
       self._hvac_ac_state = shared.get('hvac_ac_state')
       self._hvac_heater_state = shared.get('hvac_heater_state')
       self._hvac_fan_state = shared.get('hvac_fan_state')
@@ -147,8 +149,7 @@ class Device(Device):
       self._target_temperature_high = shared.get('target_temperature_high')
       self._target_temperature_low = shared.get('target_temperature_low')
       self._nest_auto_away = shared.get('auto_away')
-    except:
-      pass
+
 
 
 
