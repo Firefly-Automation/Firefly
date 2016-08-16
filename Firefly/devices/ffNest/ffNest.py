@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 15:13:31
+# @Last Modified time: 2016-08-16 15:16:29
 
 import logging
 
@@ -295,4 +295,4 @@ class Device(Device):
   
 
 def c2f(celsius):
-  return float("{0:.1f".format((celsius * 1.8) + 32))
+  return float("{0:.1f}".format((celsius * 1.8) + 32))
