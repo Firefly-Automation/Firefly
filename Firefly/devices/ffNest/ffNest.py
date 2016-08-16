@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 00:25:22
+# @Last Modified time: 2016-08-16 00:27:02
 
 import logging
 
@@ -156,8 +156,8 @@ class Device(Device):
 
     self.VIEWS = {
       'display' : True,
-      'name' : args.get('args').get('name'),
-      'id' : deviceID,
+      'name' : self.name,
+      'id' : self.id,
       'type' : 'thermostat',
       'dash_view' : {
         'request' : 'state',
