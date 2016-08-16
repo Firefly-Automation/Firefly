@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 23:07:29
+# @Last Modified time: 2016-08-15 23:15:29
 
 import logging
 
@@ -91,11 +91,11 @@ class Device(Device):
 
   def refresh_scheduler(self):
     logging.critical('------NEST STARTUP-----')
-    Scheduler.runInS(5,self.refresh,replace=True,uuid='NEST-UPDATER')
+    #Scheduler.runEveryM(5,self.refresh,replace=True,uuid='NEST-UPDATER')
 
   def refresh(self):
     logging.critical('****************NEST REFRESH*************')
-    refresh_command = ffCommand(self.id, 'update', source='NEST-UPDATER')
+    #refresh_command = ffCommand(self.id, 'update', source='NEST-UPDATER')
     #def __init__(self, deviceID, command, routine=False, force=False, source=None, send_event=True):
     return 0
 

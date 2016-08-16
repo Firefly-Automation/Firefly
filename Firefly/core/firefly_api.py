@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-07-28 22:28:42
+# @Last Modified time: 2016-08-15 23:15:11
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -388,6 +388,12 @@ def auto_start():
   for device in deviceDB.find({}):
     deviceID = device.get('id')
     ffEvent(deviceID, {'startup': True})
+
+  ffScheduler.runEveryM(5, auto_refresh, replace=True, uuid='auto-refresh')
+
+
+def auto_refresh():
+  refresh_command = ffCommand('nest', 'update', source='NEST-UPDATER')
 
 
 ################################################################################
