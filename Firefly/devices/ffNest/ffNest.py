@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 14:59:37
+# @Last Modified time: 2016-08-16 15:02:25
 
 import logging
 
@@ -35,7 +35,8 @@ class Device(Device):
       'state' : self.getState,
       'temp' : self.getTemp,
       'target' : self.getTargetTemp,
-      'fan' : self.getFan
+      'fan' : self.getFan,
+      'targetType' : self.getTargetType
     }
 
 
@@ -136,8 +137,7 @@ class Device(Device):
     self.update_shared()
 
   def update_shared(self, args={}):
-    logging.critical('UPDATING SHARED')
-    
+
     shared = self.shared
 
     if shared is not None:
@@ -156,11 +156,13 @@ class Device(Device):
   def setPresence(self, value):
     return 0
 
+  def getTargetType(self, args={}):
+    return self._target_temperature_type
+
 
   def getPresence(self, args={}):
     try:
       presence = not self.structure.get('away')
-      logging.critical('Nest Presence : (away)' + str(presence))
       return presence
     except:
       return 0
@@ -174,13 +176,11 @@ class Device(Device):
       else:
         self._thermostatOperatingState = "idle"
 
-      logging.critical('Nest State: ' + str(self._thermostatOperatingState))
       return self._thermostatOperatingState
     except:
       return 0
 
   def getTemp(self, args={}):
-    logging.critical('Getting TEMP')
     try:
       temp = self.shared.get('current_temperature')
       if self._f:
