@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 00:09:31
+# @Last Modified time: 2016-08-16 00:13:40
 
 import logging
 
@@ -36,6 +36,8 @@ class Device(Device):
       'temp' : self.getTemp
     }
 
+    self.__temp = self.getTemp()
+
     self.VIEWS = {
       'display' : True,
       'name' : args.get('args').get('name'),
@@ -49,14 +51,14 @@ class Device(Device):
             'click' : 'true',
             'color' : 'grey',
             'command' : 'update',
-            'text' : self.getTemp()
+            'text' : self.__temp
           },
           "true" : {
             'click' : 'false',
             'color' : 'green',
             'command' : 'update',
             'default' : True,
-            'text' : self.getTemp()
+            'text' : self.__temp
           }
         }
       }
@@ -136,6 +138,7 @@ class Device(Device):
       return 0
 
   def getTemp(self, args={}):
+    logging.critical('Getting TEMP')
     try:
       temp = self._raw_status.get('shared').get(self._serial).get('current_temperature')
       if self._f:
