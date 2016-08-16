@@ -2,12 +2,13 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 22:38:28
+# @Last Modified time: 2016-08-15 22:48:45
 
 import logging
 
 import requests
 
+from core.firefly.models.command import Command as ffCommand
 from core.firefly_api import ffScheduler as Scheduler
 from core.models.device import Device
 
@@ -92,7 +93,12 @@ class Device(Device):
 
   def refresh_scheduler(self):
     logging.critical('------NEST STARTUP-----')
-    Scheduler.runEveryM(5,self.update,replace=True,uuid='NEST-UPDATER')
+    Scheduler.runEveryM(5,self.refresh,replace=True,uuid='NEST-UPDATER')
+
+  def refresh(self):
+    refresh_command = ffCommand(self._id, 'update', source='NEST-UPDATER')
+    #def __init__(self, deviceID, command, routine=False, force=False, source=None, send_event=True):
+    return 0
 
 
   def login(self):
