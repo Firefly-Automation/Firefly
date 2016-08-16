@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 21:49:10
+# @Last Modified time: 2016-08-15 21:56:11
 
 import logging
 
@@ -27,6 +27,7 @@ class Device(Device):
     self.COMMANDS = {
       'update' : self.update,
       'setPresence' : self.setPresence,
+      'startup' : self.refresh_scheduler,
     }
 
     self.REQUESTS = {
@@ -75,7 +76,7 @@ class Device(Device):
     self._thermostatOperatingState = None
     self._temp = None
 
-    Scheduler.runEveryM(5,self.update,replace=True,uuid='NEST-UPDATER')
+    self.refresh_scheduler()
 
     ###########################
     # DONT CHANGE
@@ -85,6 +86,10 @@ class Device(Device):
     ###########################
     ###########################
 
+
+  def refresh_scheduler(self):
+    logging.critical('------NEST STARTUP-----')
+    Scheduler.runEveryM(5,self.update,replace=True,uuid='NEST-UPDATER')
 
 
   def login(self):
