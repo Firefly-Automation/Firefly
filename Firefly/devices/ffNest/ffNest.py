@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 22:23:17
+# @Last Modified time: 2016-08-15 22:25:35
 
 import logging
 
@@ -123,21 +123,30 @@ class Device(Device):
 
 
   def getPresence(self):
-    presence = self._structure.get('away')
-    logging.critical('Nest Presence : (away)' + str(presence))
-    return presence
+    try:
+      presence = self._structure.get('away')
+      logging.critical('Nest Presence : (away)' + str(presence))
+      return presence
+    except:
+      return 0
 
   def getState(self):
-    self._thermostatOperatingState = self._raw_status.get('shared').get(self._serial).get('hvac_ac_state')
-    logging.critical('Nest State: ' + str(self._thermostatOperatingState))
-    return self._thermostatOperatingState
+    try:
+      self._thermostatOperatingState = self._raw_status.get('shared').get(self._serial).get('hvac_ac_state')
+      logging.critical('Nest State: ' + str(self._thermostatOperatingState))
+      return self._thermostatOperatingState
+    except:
+      return 0
 
   def getTemp(self):
-    temp = self._raw_status.get('shared').get(self._serial).get('current_temperature')
-    if self._f:
-      temp = c2f(temp)
-    logging.critical('Nest TEMP: ' + str(temp))
-    return temp
+    try:
+      temp = self._raw_status.get('shared').get(self._serial).get('current_temperature')
+      if self._f:
+        temp = c2f(temp)
+      logging.critical('Nest TEMP: ' + str(temp))
+      return temp
+    except:
+      return 0
 
   def update(self):
     logging.critical('---------UPDATING NEST----------')
