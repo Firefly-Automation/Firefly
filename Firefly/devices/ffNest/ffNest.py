@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 23:19:33
+# @Last Modified time: 2016-08-15 23:21:21
 
 import logging
 
@@ -148,14 +148,14 @@ class Device(Device):
 
   def getTemp(self):
     logging.critical('-----------GET TEMP----------')
-    try:
-      temp = self._raw_status.get('shared').get(self._serial).get('current_temperature')
-      if self._f:
-        temp = c2f(temp)
-      logging.critical('Nest TEMP: ' + str(temp))
-      return int(temp)
-    except:
-      return 0
+    #try:
+    temp = self._raw_status.get('shared').get(self._serial).get('current_temperature')
+    if self._f:
+      temp = self.c2f(temp)
+    logging.critical('Nest TEMP: ' + str(temp))
+    return float(temp)
+    #except:
+    #  return 0
 
   def update(self):
     logging.critical('---------UPDATING NEST----------')
@@ -164,5 +164,5 @@ class Device(Device):
     #self.refreshData()
     return 0
 
-def c2f(celsius):
-  return (celsius * 1.8) + 32
+  def c2f(self, celsius):
+    return float((celsius * 1.8) + 32)
