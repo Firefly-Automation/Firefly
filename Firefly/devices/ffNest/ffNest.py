@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 16:50:37
+# @Last Modified time: 2016-08-16 16:53:18
 
 import logging
 
@@ -165,14 +165,12 @@ class Device(Device):
   def setPresence(self, value=True):
     logging.critical('SET NEST TO ' + str(value))
     
-    presence = value
+    presence = not value
 
     self.login()
 
     url_base = self._auth_data.get('urls').get('transport_url')
     url = url_base + '/v2/put/structure.' + self._structure_id
-
-    logging.critical(url)
 
     headers = {
       "user-agent":"Nest/1.1.0.10 CFNetwork/548.0.4",
@@ -187,9 +185,6 @@ class Device(Device):
 
     r = requests.post(url, headers=headers, json=data)
 
-    logging.critical(str(r.__dict__))
-    logging.critical(str(r.raw))
-    
     return True
 
 
