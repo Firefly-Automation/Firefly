@@ -123,7 +123,6 @@ class Device(object):
 
   @property
   def views(self):
-    logging.critical("GETTING DEVICE VIEW")
     self._views = self.VIEWS
     return self._views
   

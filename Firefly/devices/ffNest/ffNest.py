@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 00:13:40
+# @Last Modified time: 2016-08-16 00:20:25
 
 import logging
 
@@ -51,14 +51,14 @@ class Device(Device):
             'click' : 'true',
             'color' : 'grey',
             'command' : 'update',
-            'text' : self.__temp
+            'text' : self.getTemp()
           },
           "true" : {
             'click' : 'false',
             'color' : 'green',
             'command' : 'update',
             'default' : True,
-            'text' : self.__temp
+            'text' : self.getTemp()
           }
         }
       }
