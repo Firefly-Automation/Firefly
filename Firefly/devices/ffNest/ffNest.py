@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 14:38:25
+# @Last Modified time: 2016-08-16 14:39:06
 
 import logging
 
@@ -254,7 +254,7 @@ class Device(Device):
 
   @property
   def structure(self):
-    retrun self._raw_status.get('structure').get(self._structure_id)
+    return self._raw_status.get('structure').get(self._structure_id)
   
 
 def c2f(celsius):
