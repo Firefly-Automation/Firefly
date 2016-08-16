@@ -2,14 +2,14 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 21:39:10
+# @Last Modified time: 2016-08-15 21:46:20
 
 import logging
 
 import requests
 
+from core.firefly_api import ffScheduler as Scheduler
 from core.models.device import Device
-from core.scheduler import Scheduler
 
 
 URL = 'https://home.nest.com/user/login'
