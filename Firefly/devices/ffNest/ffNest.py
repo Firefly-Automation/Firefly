@@ -2,14 +2,14 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 22:48:45
+# @Last Modified time: 2016-08-15 22:50:18
 
 import logging
 
 import requests
 
-from core.firefly.models.command import Command as ffCommand
 from core.firefly_api import ffScheduler as Scheduler
+from core.models.command import Command as ffCommand
 from core.models.device import Device
 
 
