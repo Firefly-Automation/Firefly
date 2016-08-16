@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 23:15:29
+# @Last Modified time: 2016-08-15 23:19:33
 
 import logging
 
@@ -91,6 +91,7 @@ class Device(Device):
 
   def refresh_scheduler(self):
     logging.critical('------NEST STARTUP-----')
+    return 0
     #Scheduler.runEveryM(5,self.refresh,replace=True,uuid='NEST-UPDATER')
 
   def refresh(self):
@@ -146,12 +147,13 @@ class Device(Device):
       return 0
 
   def getTemp(self):
+    logging.critical('-----------GET TEMP----------')
     try:
       temp = self._raw_status.get('shared').get(self._serial).get('current_temperature')
       if self._f:
         temp = c2f(temp)
       logging.critical('Nest TEMP: ' + str(temp))
-      return temp
+      return int(temp)
     except:
       return 0
 
