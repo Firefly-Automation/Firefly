@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 22:32:10
+# @Last Modified time: 2016-08-15 22:35:12
 
 import logging
 
@@ -42,21 +42,21 @@ class Device(Device):
       'id' : deviceID,
       'type' : 'thermostat',
       'dash_view' : {
-        'request' : 'temp',
+        'request' : 'state',
         'type' : 'text', 
         'text' : {
           "false" : {
             'click' : 'true',
             'color' : 'grey',
-            'command' : {'presence':True},
-            'text' : 'Away'
+            'command' : {},
+            'text' : str(self._temp)
           },
           "true" : {
             'click' : 'false',
-            'color' : 'green',
-            'command' : {'presence':False},
+            'color' : 'blue',
+            'command' : {},
             'default' : True,
-            'text' : 'Present'
+            'text' : str(self._temp)
           }
         }
       }
