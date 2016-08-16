@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 21:47:32
+# @Last Modified time: 2016-08-15 21:49:10
 
 import logging
 
@@ -75,7 +75,7 @@ class Device(Device):
     self._thermostatOperatingState = None
     self._temp = None
 
-    Scheduler.runEveryS(5,self.update,replace=True,uuid='NEST-UPDATER')
+    Scheduler.runEveryM(5,self.update,replace=True,uuid='NEST-UPDATER')
 
     ###########################
     # DONT CHANGE
@@ -126,4 +126,6 @@ class Device(Device):
 
   def update(self):
     logging.critical('---------UPDATING NEST----------')
+    self.login()
+    self.status()
     return 0
