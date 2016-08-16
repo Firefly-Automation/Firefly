@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 16:53:18
+# @Last Modified time: 2016-08-16 16:55:25
 
 import logging
 
@@ -165,27 +165,31 @@ class Device(Device):
   def setPresence(self, value=True):
     logging.critical('SET NEST TO ' + str(value))
     
-    presence = not value
+    try:
+      presence = not value
 
-    self.login()
+      self.login()
 
-    url_base = self._auth_data.get('urls').get('transport_url')
-    url = url_base + '/v2/put/structure.' + self._structure_id
+      url_base = self._auth_data.get('urls').get('transport_url')
+      url = url_base + '/v2/put/structure.' + self._structure_id
 
-    headers = {
-      "user-agent":"Nest/1.1.0.10 CFNetwork/548.0.4",
-      'X-nl-protocol-version': '1',
-      'X-nl-user-id': self._auth_data.get('userid'),
-      'Authorization': "Basic " + self._auth_data.get('access_token')
-    }
+      headers = {
+        "user-agent":"Nest/1.1.0.10 CFNetwork/548.0.4",
+        'X-nl-protocol-version': '1',
+        'X-nl-user-id': self._auth_data.get('userid'),
+        'Authorization': "Basic " + self._auth_data.get('access_token')
+      }
 
-    data = {
-      'away' : presence
-    }
+      data = {
+        'away' : presence
+      }
 
-    r = requests.post(url, headers=headers, json=data)
+      r = requests.post(url, headers=headers, json=data)
 
-    return True
+      return True
+      
+    except:
+      return False
 
 
 
