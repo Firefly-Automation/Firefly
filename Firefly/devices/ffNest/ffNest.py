@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 00:20:25
+# @Last Modified time: 2016-08-16 00:25:22
 
 import logging
 
@@ -144,6 +144,7 @@ class Device(Device):
       if self._f:
         temp = c2f(temp)
       logging.critical('Nest TEMP: ' + str(temp))
+      self._temp = temp
       return temp
     except:
       return 0
@@ -152,6 +153,33 @@ class Device(Device):
     logging.critical('---------UPDATING NEST----------')
     self.login()
     self.status()
+
+    self.VIEWS = {
+      'display' : True,
+      'name' : args.get('args').get('name'),
+      'id' : deviceID,
+      'type' : 'thermostat',
+      'dash_view' : {
+        'request' : 'state',
+        'type' : 'text', 
+        'text' : {
+          "false" : {
+            'click' : 'true',
+            'color' : 'grey',
+            'command' : 'update',
+            'text' : self._temp
+          },
+          "true" : {
+            'click' : 'false',
+            'color' : 'green',
+            'command' : 'update',
+            'default' : True,
+            'text' : self._temp
+          }
+        }
+      }
+    }
+
     self.refreshData()
     return 0
 
