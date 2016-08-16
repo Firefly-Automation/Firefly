@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 15:50:56
+# @Last Modified time: 2016-08-16 15:57:37
 
 import logging
 
@@ -155,6 +155,7 @@ class Device(Device):
 
   def setPresence(self, value):
     logging.critical('SET NEST TO ' + value)
+    '''
     presence = 'away'
     if value is True:
       presence = 'home'
@@ -177,6 +178,7 @@ class Device(Device):
     r = requests.put(url, headers=headers, data=data)
 
     logging.critical(str(r.__dict__))
+    '''
 
 
 
