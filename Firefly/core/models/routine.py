@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-05-16 16:13:15
+# @Last Modified time: 2016-08-16 16:18:03
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -19,9 +19,10 @@
 
 import json
 import logging
+
 from collections import OrderedDict
-from core.models.command import Command as ffCommand
 from core.firefly_api import ffScheduler
+from core.models.command import Command as ffCommand
 
 class Routine(object):
   def __init__(self, configJson):
@@ -168,6 +169,9 @@ class Routine(object):
 
 
     for device, commands in self._actions.iteritems():
+      logging.critical(device)
+      logging.critical(commands)
+      
       ffCommand(device,commands)
       if 'hue' in device:
         sleep(0.5)
