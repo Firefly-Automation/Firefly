@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 16:31:15
+# @Last Modified time: 2016-08-16 16:33:27
 
 import logging
 
@@ -182,7 +182,7 @@ class Device(Device):
       'away' : presence
     }
 
-    r = requests.post(url, headers=headers, data=data)
+    r = requests.post(url, headers=headers, json=data)
 
     logging.critical(str(r.__dict__))
     
