@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 16:01:54
+# @Last Modified time: 2016-08-16 16:05:09
 
 import logging
 
@@ -114,7 +114,7 @@ class Device(Device):
 
 
   def login(self, args={}):
-    logging.debug("Logging into Nest.")
+    logging.critical("Logging into Nest.")
     data = {
       'username' : self._username,
       'password' : self._password
@@ -164,6 +164,7 @@ class Device(Device):
   def setPresence(self, value):
     logging.critical('SET NEST TO ' + value)
     
+    '''
     presence = value
 
     self.login()
@@ -184,7 +185,7 @@ class Device(Device):
     r = requests.put(url, headers=headers, data=data)
 
     logging.critical(str(r.__dict__))
-    
+    '''
 
 
 
