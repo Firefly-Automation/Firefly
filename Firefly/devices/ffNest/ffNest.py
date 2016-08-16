@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 23:28:27
+# @Last Modified time: 2016-08-15 23:32:04
 
 import logging
 
@@ -157,7 +157,8 @@ class Device(Device):
     if self._f:
       temp = self.c2f(temp)
     logging.critical('Nest TEMP: ' + str(temp))
-    return float(temp)
+    #return float(temp)
+    return 0
     #except:
     #  return 0
 
