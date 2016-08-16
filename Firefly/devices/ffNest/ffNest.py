@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 15:16:29
+# @Last Modified time: 2016-08-16 15:50:56
 
 import logging
 
@@ -154,7 +154,31 @@ class Device(Device):
 
 
   def setPresence(self, value):
-    return 0
+    logging.critical('SET NEST TO ' + value)
+    presence = 'away'
+    if value is True:
+      presence = 'home'
+
+    self.login()
+
+    url_base = self._auth_data.get('urls').get('transport_url')
+    url = url_base + '/v2/put/structure.' + self._structure_id
+
+    headers = {
+      'X-nl-protocol-version': '1',
+      'X-nl-user-id': self._auth_data.get('userid'),
+      'Authorization': "Basic " + self._auth_data.get('access_token')
+    }
+
+    data = {
+      'away' : presence
+    }
+
+    r = requests.put(url, headers=headers, data=data)
+
+    logging.critical(str(r.__dict__))
+
+
 
   def getTargetType(self, args={}):
     return self._target_temperature_type
