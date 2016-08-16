@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 23:32:04
+# @Last Modified time: 2016-08-15 23:48:28
 
 import logging
 
@@ -105,7 +105,7 @@ class Device(Device):
     return 0
 
 
-  def login(self):
+  def login(self, args={}):
     logging.debug("Logging into Nest.")
     data = {
       'username' : self._username,
@@ -113,7 +113,7 @@ class Device(Device):
     }
     self._auth_data = requests.post(URL, data=data).json()
 
-  def status(self):
+  def status(self, args={}):
     logging.debug("Getting nest status.")
     url_base = self._auth_data.get('urls').get('transport_url')
     url = url_base + '/v2/mobile/user.' + self._auth_data.get('userid')
@@ -134,7 +134,7 @@ class Device(Device):
     return 0
 
 
-  def getPresence(self):
+  def getPresence(self, args={}):
     try:
       presence = self._structure.get('away')
       logging.critical('Nest Presence : (away)' + str(presence))
@@ -142,7 +142,7 @@ class Device(Device):
     except:
       return 0
 
-  def getState(self):
+  def getState(self, args={}):
     try:
       self._thermostatOperatingState = self._raw_status.get('shared').get(self._serial).get('hvac_ac_state')
       logging.critical('Nest State: ' + str(self._thermostatOperatingState))
@@ -150,7 +150,7 @@ class Device(Device):
     except:
       return 0
 
-  def getTemp(self):
+  def getTemp(self, args={}):
     logging.critical('-----------GET TEMP----------')
     #try:
     temp = self._raw_status.get('shared').get(self._serial).get('current_temperature')
@@ -162,7 +162,7 @@ class Device(Device):
     #except:
     #  return 0
 
-  def update(self):
+  def update(self, args={}):
     logging.critical('---------UPDATING NEST----------')
     self.login()
     self.status()
