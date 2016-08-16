@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 22:55:32
+# @Last Modified time: 2016-08-15 22:57:42
 
 import logging
 
@@ -98,7 +98,7 @@ class Device(Device):
 
   def refresh(self):
     logging.critical('****************NEST REFRESH*************')
-    refresh_command = ffCommand(self._id, 'update', source='NEST-UPDATER')
+    refresh_command = ffCommand(self.id, 'update', source='NEST-UPDATER')
     #def __init__(self, deviceID, command, routine=False, force=False, source=None, send_event=True):
     return 0
 
