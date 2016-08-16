@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 23:24:36
+# @Last Modified time: 2016-08-15 23:26:34
 
 import logging
 
@@ -37,6 +37,28 @@ class Device(Device):
       'temp' : self.getTemp
     }
 
+
+
+    ###########################
+    # SET VARS
+    ###########################
+    args = args.get('args')
+    self._username = args.get('username')
+    self._password = args.get('password')
+    self._serial = args.get('serial')
+    self._f = args.get('f')
+
+    self._auth_data = None
+    self._raw_status = None
+    self._thermostatOperatingState = None
+    self._temp = None
+    self._structure = None,
+    self._structure_id = None
+
+    self.update()
+
+
+
     self.VIEWS = {
       'display' : True,
       'name' : args.get('args').get('name'),
@@ -62,26 +84,6 @@ class Device(Device):
         }
       }
     }
-
-    ###########################
-    # SET VARS
-    ###########################
-    args = args.get('args')
-    self._username = args.get('username')
-    self._password = args.get('password')
-    self._serial = args.get('serial')
-    self._f = args.get('f')
-
-    self._auth_data = None
-    self._raw_status = None
-    self._thermostatOperatingState = None
-    self._temp = None
-    self._structure = None,
-    self._structure_id = None
-
-    self.update()
-
-
     ###########################
     # DONT CHANGE
     ###########################
