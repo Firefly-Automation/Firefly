@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 22:59:12
+# @Last Modified time: 2016-08-15 23:00:46
 
 import logging
 
@@ -49,13 +49,13 @@ class Device(Device):
           "false" : {
             'click' : 'true',
             'color' : 'grey',
-            'command' : {},
+            'command' : 'update'},
             'text' : str(self.getTemp())
           },
           "true" : {
             'click' : 'false',
             'color' : 'blue',
-            'command' : {},
+            'command' : {'update'},
             'default' : True,
             'text' : str(self.getTemp())
           }
