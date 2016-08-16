@@ -123,6 +123,7 @@ class Device(object):
 
   @property
   def views(self):
+    self._views = self.VIEWS
     return self._views
   
   
