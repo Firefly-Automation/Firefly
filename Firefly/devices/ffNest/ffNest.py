@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 14:59:01
+# @Last Modified time: 2016-08-16 14:59:37
 
 import logging
 
@@ -159,7 +159,7 @@ class Device(Device):
 
   def getPresence(self, args={}):
     try:
-      presence = !self.structure.get('away')
+      presence = not self.structure.get('away')
       logging.critical('Nest Presence : (away)' + str(presence))
       return presence
     except:
