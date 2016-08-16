@@ -140,7 +140,7 @@ function refreshFunction(){
 
           Array.from( document.getElementsByName(deviceID)).forEach(function (element) {
              console.log(allDevices[device]['views']['dash_view']['state'][status])
-             element.innerHTML=allDevices[device]['views']['dash_view']['state'][status]['value'].toFixed(1)
+             element.innerHTML=allDevices[device]['views']['dash_view']['state'][status]['value']
              element.className = allDevices[device]['views']['dash_view']['state'][status]['color'] + '-text'
              element.setAttribute('value', status)
            })

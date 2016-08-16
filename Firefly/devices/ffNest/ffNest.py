@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 15:02:25
+# @Last Modified time: 2016-08-16 15:13:31
 
 import logging
 
@@ -169,12 +169,20 @@ class Device(Device):
 
   def getState(self, args={}):
     try:
-      if self._hvac_ac_state is True:
-        self._thermostatOperatingState = "cool"
-      elif self._hvac_heater_state is True:
-        self._thermostatOperatingState = "heat"
+      if self.getPresence() is False:
+        if self._hvac_ac_state is True:
+          self._thermostatOperatingState = "awaycool"
+        elif self._hvac_heater_state is True:
+          self._thermostatOperatingState = "awayheat"
+        else:
+          self._thermostatOperatingState = "awayidle"
       else:
-        self._thermostatOperatingState = "idle"
+        if self._hvac_ac_state is True:
+          self._thermostatOperatingState = "cool"
+        elif self._hvac_heater_state is True:
+          self._thermostatOperatingState = "heat"
+        else:
+          self._thermostatOperatingState = "idle"
 
       return self._thermostatOperatingState
     except:
@@ -243,7 +251,27 @@ class Device(Device):
             'color' : 'red',
             'command' : 'update',
             'default' : True,
-            'value' : self._temp
+            'value' : str(self._temp) + ' (away)'
+          },
+          "awayidle" : {
+            'click' : 'true',
+            'color' : 'grey',
+            'command' : 'update',
+            'value' : str(self._temp) + ' (away)'
+          },
+          "awaycool" : {
+            'click' : 'false',
+            'color' : 'blue',
+            'command' : 'update',
+            'default' : True,
+            'value' : str(self._temp) + ' (away)'
+          },
+          "awayheat" : {
+            'click' : 'false',
+            'color' : 'red',
+            'command' : 'update',
+            'default' : True,
+            'value' : str(self._temp) + ' (away)'
           }
         }
       }
@@ -267,4 +295,4 @@ class Device(Device):
   
 
 def c2f(celsius):
-  return (celsius * 1.8) + 32
+  return float("{0:.1f".format((celsius * 1.8) + 32))
