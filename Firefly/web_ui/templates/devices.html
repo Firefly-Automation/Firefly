@@ -122,7 +122,8 @@ function refreshFunction(){
         if (allDevices[device]['views']['dash_view']['type'] === "text") {
           deviceID = deviceID + '_text'
           console.log('TEXT - ' + deviceID + ' ' + status)
-          var c = document.getElementsByName(deviceID)[0].getAttribute('commands')
+          //var c = document.getElementsByName(deviceID)[0].getAttribute('commands')
+          var c = data[device]['views']['dash_view']['commands']
           c = jQuery.parseJSON(c)
           console.log('-----------------------')
           console.log(c)
