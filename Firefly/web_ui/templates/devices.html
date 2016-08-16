@@ -116,7 +116,7 @@ function refreshFunction(){
         var deviceID = 'D_' + device.replaceAll('-','__')
         if (allDevices[device]['views']['dash_view']['type'] === "switch") {
           deviceID = deviceID + '_switch'
-          console.log(deviceID + ' ' + status)
+          console.log('AT POINT 1 ' + deviceID + ' ' + status)
           Array.from(document.getElementsByName(deviceID)).forEach(function (element) {element.checked=status})
         }
         if (allDevices[device]['views']['dash_view']['type'] === "text") {
