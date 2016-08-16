@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 16:09:45
+# @Last Modified time: 2016-08-16 16:21:39
 
 import logging
 
@@ -156,12 +156,13 @@ class Device(Device):
 
 
   def setHome(self, args={}):
-    return self.setPresence(True)
+    logging.critical('SET HOME')
+    return self.setPresence(value=True)
 
   def setAway(self, args={}):
-    return self.setPresence(False)
+    return self.setPresence(value=False)
 
-  def setPresence(self, value):
+  def setPresence(self, value=False):
     logging.critical('SET NEST TO ' + value)
     
     '''
