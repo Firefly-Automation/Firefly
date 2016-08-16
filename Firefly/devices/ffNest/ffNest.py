@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 14:33:24
+# @Last Modified time: 2016-08-16 14:37:09
 
 import logging
 
@@ -38,7 +38,6 @@ class Device(Device):
       'fan' : self.getFan
     }
 
-    self.__temp = self.getTemp()
 
     self.VIEWS = {
       'display' : True,
@@ -53,21 +52,21 @@ class Device(Device):
             'click' : 'true',
             'color' : 'grey',
             'command' : 'update',
-            'value' : self.getTemp()
+            'value' : ""
           },
           "cool" : {
             'click' : 'false',
             'color' : 'blue',
             'command' : 'update',
             'default' : True,
-            'value' : self.getTemp()
+            'value' : ""
           },
           "heat" : {
             'click' : 'false',
             'color' : 'red',
             'command' : 'update',
             'default' : True,
-            'value' : self.getTemp()
+            'value' : ""
           }
       }
     }
