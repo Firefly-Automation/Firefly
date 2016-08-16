@@ -139,8 +139,8 @@ function refreshFunction(){
           deviceID = deviceID + '_stateValue'
 
           Array.from( document.getElementsByName(deviceID)).forEach(function (element) {
-             console.log(allDevices[device]['views']['dash_view']['state'][state])
-             element.innerHTML=allDevices[device]['views']['dash_view']['state'][state]['value']
+             console.log(allDevices[device]['views']['dash_view']['state'][status])
+             element.innerHTML=allDevices[device]['views']['dash_view']['state'][status]['value']
              element.className = c[status]['color'] + '-text'
              element.setAttribute('value', status)
            })
