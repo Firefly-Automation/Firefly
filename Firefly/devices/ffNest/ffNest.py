@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 23:26:34
+# @Last Modified time: 2016-08-15 23:28:27
 
 import logging
 
@@ -38,7 +38,6 @@ class Device(Device):
     }
 
 
-
     ###########################
     # SET VARS
     ###########################
@@ -61,7 +60,7 @@ class Device(Device):
 
     self.VIEWS = {
       'display' : True,
-      'name' : args.get('args').get('name'),
+      'name' : args.get('name'),
       'id' : deviceID,
       'type' : 'thermostat',
       'dash_view' : {
