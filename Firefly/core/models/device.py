@@ -94,7 +94,7 @@ class Device(object):
         newChanges[item] = returnData[item]
     self._lastStatus = returnData
     returnData['deviceID'] = self._id
-    returnData['views'] = self._views
+    returnData['views'] = self.views
     updated = update_status(returnData)
     if updated and newChanges != {}:
       return newChanges
