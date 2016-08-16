@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 23:21:21
+# @Last Modified time: 2016-08-15 23:22:21
 
 import logging
 
@@ -91,6 +91,7 @@ class Device(Device):
 
   def refresh_scheduler(self):
     logging.critical('------NEST STARTUP-----')
+    self.update()
     return 0
     #Scheduler.runEveryM(5,self.refresh,replace=True,uuid='NEST-UPDATER')
 
