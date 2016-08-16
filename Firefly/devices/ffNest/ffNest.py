@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 14:39:06
+# @Last Modified time: 2016-08-16 14:41:34
 
 import logging
 
@@ -136,16 +136,19 @@ class Device(Device):
     self.update_shared()
 
   def update_shared(self, args={}):
-    shared = self.shared
+    try:
+      shared = self.shared
 
-    self._hvac_ac_state = shared.get('hvac_ac_state')
-    self._hvac_heater_state = shared.get('hvac_heater_state')
-    self._hvac_fan_state = shared.get('hvac_fan_state')
-    self._target_temperature_type = shared.get('target_temperature_type')
-    self._target_temperature = shared.get('target_temperature')
-    self._target_temperature_high = shared.get('target_temperature_high')
-    self._target_temperature_low = shared.get('target_temperature_low')
-    self._nest_auto_away = shared.get('auto_away')
+      self._hvac_ac_state = shared.get('hvac_ac_state')
+      self._hvac_heater_state = shared.get('hvac_heater_state')
+      self._hvac_fan_state = shared.get('hvac_fan_state')
+      self._target_temperature_type = shared.get('target_temperature_type')
+      self._target_temperature = shared.get('target_temperature')
+      self._target_temperature_high = shared.get('target_temperature_high')
+      self._target_temperature_low = shared.get('target_temperature_low')
+      self._nest_auto_away = shared.get('auto_away')
+    except:
+      pass
 
 
 
@@ -250,11 +253,17 @@ class Device(Device):
 
   @property
   def shared(self):
-    return self._raw_status.get(self._serial).get('shared')
+    try:
+      return self._raw_status.get(self._serial).get('shared')
+    except:
+      return None
 
   @property
   def structure(self):
-    return self._raw_status.get('structure').get(self._structure_id)
+    try:
+      return self._raw_status.get('structure').get(self._structure_id)
+    except:
+      return None
   
 
 def c2f(celsius):
