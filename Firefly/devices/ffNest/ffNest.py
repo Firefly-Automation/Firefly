@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 16:05:09
+# @Last Modified time: 2016-08-16 16:09:45
 
 import logging
 
@@ -186,6 +186,7 @@ class Device(Device):
 
     logging.critical(str(r.__dict__))
     '''
+    return True
 
 
 
