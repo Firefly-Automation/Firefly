@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 13:47:01
+# @Last Modified time: 2016-08-16 14:33:24
 
 import logging
 
@@ -33,7 +33,9 @@ class Device(Device):
     self.REQUESTS = {
       'presence' : self.getPresence,
       'state' : self.getState,
-      'temp' : self.getTemp
+      'temp' : self.getTemp,
+      'target' : self.getTargetTemp,
+      'fan' : self.getFan
     }
 
     self.__temp = self.getTemp()
@@ -47,20 +49,26 @@ class Device(Device):
         'request' : 'state',
         'type' : 'stateValue', 
         'state' : {
-          "false" : {
+          "idle" : {
             'click' : 'true',
             'color' : 'grey',
             'command' : 'update',
             'value' : self.getTemp()
           },
-          "true" : {
+          "cool" : {
             'click' : 'false',
-            'color' : 'green',
+            'color' : 'blue',
+            'command' : 'update',
+            'default' : True,
+            'value' : self.getTemp()
+          },
+          "heat" : {
+            'click' : 'false',
+            'color' : 'red',
             'command' : 'update',
             'default' : True,
             'value' : self.getTemp()
           }
-        }
       }
     }
 
@@ -77,8 +85,18 @@ class Device(Device):
     self._raw_status = None
     self._thermostatOperatingState = None
     self._temp = None
-    self._structure = None,
     self._structure_id = None
+
+    self._hvac_ac_state = None
+    self._hvac_heater_state = None
+    self._hvac_fan_state = None
+    self._target_temperature_type = None
+    self._target_temperature = None
+    self._target_temperature_high = None
+    self._target_temperature_low = None
+    self._auto_away = None
+
+
 
 
     ###########################
@@ -114,7 +132,21 @@ class Device(Device):
     self._raw_status = requests.get(url, headers=headers).json()
 
     self._structure_id = self._raw_status.get('structure').keys()[0]
-    self._structure = self._raw_status.get('structure').get(self._structure_id)
+
+    self.update_shared()
+
+  def update_shared(self, args={}):
+    shared = self.shared
+
+    self._hvac_ac_state = shared.get('hvac_ac_state')
+    self._hvac_heater_state = shared.get('hvac_heater_state')
+    self._hvac_fan_state = shared.get('hvac_fan_state')
+    self._target_temperature_type = shared.get('target_temperature_type')
+    self._target_temperature = shared.get('target_temperature')
+    self._target_temperature_high = shared.get('target_temperature_high')
+    self._target_temperature_low = shared.get('target_temperature_low')
+    self._nest_auto_away = shared.get('auto_away')
+
 
 
   def setPresence(self, value):
@@ -123,7 +155,7 @@ class Device(Device):
 
   def getPresence(self, args={}):
     try:
-      presence = self._structure.get('away')
+      presence = self.structure.get('away')
       logging.critical('Nest Presence : (away)' + str(presence))
       return presence
     except:
@@ -131,7 +163,13 @@ class Device(Device):
 
   def getState(self, args={}):
     try:
-      self._thermostatOperatingState = self._raw_status.get('shared').get(self._serial).get('hvac_ac_state')
+      if self._hvac_ac_state is True:
+        self._thermostatOperatingState = "cool"
+      elif self._hvac_heater_state is True:
+        self._thermostatOperatingState = "heat"
+      else:
+        self._thermostatOperatingState = "idle"
+
       logging.critical('Nest State: ' + str(self._thermostatOperatingState))
       return self._thermostatOperatingState
     except:
@@ -140,12 +178,32 @@ class Device(Device):
   def getTemp(self, args={}):
     logging.critical('Getting TEMP')
     try:
-      temp = self._raw_status.get('shared').get(self._serial).get('current_temperature')
+      temp = self.shared.get('current_temperature')
       if self._f:
         temp = c2f(temp)
       logging.critical('Nest TEMP: ' + str(temp))
       self._temp = temp
       return temp
+    except:
+      return 0
+
+  def getFan(self, args={}):
+    return self._hvac_fan_state
+
+  def getTargetTemp(self, args={}):
+    try:
+      if self._f:
+        return {
+          'target' : c2f(self._target_temperature),
+          'high' : c2f(self._target_temperature_high),
+          'low' : c2f(self._target_temperature_low)
+          }
+      else:
+        return {
+          'target' : self._target_temperature,
+          'high' : self._target_temperature_high,
+          'low' : self._target_temperature_low
+          }
     except:
       return 0
 
@@ -163,15 +221,22 @@ class Device(Device):
         'request' : 'state',
         'type' : 'stateValue', 
         'state' : {
-          "false" : {
+          "idle" : {
             'click' : 'true',
             'color' : 'grey',
             'command' : 'update',
             'value' : self._temp
           },
-          "true" : {
+          "cool" : {
             'click' : 'false',
-            'color' : 'green',
+            'color' : 'blue',
+            'command' : 'update',
+            'default' : True,
+            'value' : self._temp
+          },
+          "heat" : {
+            'click' : 'false',
+            'color' : 'red',
             'command' : 'update',
             'default' : True,
             'value' : self._temp
@@ -182,6 +247,15 @@ class Device(Device):
 
     self.refreshData()
     return 0
+
+  @property
+  def shared(self):
+    return self._raw_status.get(self._serial).get('shared')
+
+  @property
+  def structure(self):
+    retrun self._raw_status.get('structure').get(self._structure_id)
+  
 
 def c2f(celsius):
   return (celsius * 1.8) + 32
