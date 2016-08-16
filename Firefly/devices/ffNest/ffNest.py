@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 22:25:35
+# @Last Modified time: 2016-08-15 22:32:10
 
 import logging
 
@@ -75,7 +75,8 @@ class Device(Device):
     self._raw_status = None
     self._thermostatOperatingState = None
     self._temp = None
-    self._structure = None
+    self._structure = None,
+    self._structure_id = None
 
     self.refresh_scheduler()
 
@@ -105,7 +106,7 @@ class Device(Device):
   def status(self):
     logging.debug("Getting nest status.")
     url_base = self._auth_data.get('urls').get('transport_url')
-    url = url_base + '/v2/mobile/' + self._auth_data.get('userid')
+    url = url_base + '/v2/mobile/user.' + self._auth_data.get('userid')
 
     headers = {
       'X-nl-protocol-version': '1',
@@ -115,7 +116,8 @@ class Device(Device):
 
     self._raw_status = requests.get(url, headers=headers).json()
 
-    self._structure = self._raw_status.get('structure').keys()[0]
+    self._structure_id = self._raw_status.get('structure').keys()[0]
+    self._structure = self._raw_status.get('structure').get(self._structure_id)
 
 
   def setPresence(self, value):
