@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 14:50:53
+# @Last Modified time: 2016-08-16 14:52:34
 
 import logging
 
@@ -257,7 +257,7 @@ class Device(Device):
     logging.critical('GETTING SHARED ---------------- NEST')
     if self._raw_status is not None:
       logging.critical(self._raw_status)
-      return self._raw_status.get(self._serial).get('shared')
+      return self._raw_status.get('shared').get(self._serial)
     logging.critical('RAW STATUS IS NONE!')
     return None
 
