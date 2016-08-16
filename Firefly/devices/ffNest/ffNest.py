@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 14:37:09
+# @Last Modified time: 2016-08-16 14:38:25
 
 import logging
 
@@ -52,22 +52,23 @@ class Device(Device):
             'click' : 'true',
             'color' : 'grey',
             'command' : 'update',
-            'value' : ""
+            'value' : self.getTemp()
           },
           "cool" : {
             'click' : 'false',
             'color' : 'blue',
             'command' : 'update',
             'default' : True,
-            'value' : ""
+            'value' : self.getTemp()
           },
           "heat" : {
             'click' : 'false',
             'color' : 'red',
             'command' : 'update',
             'default' : True,
-            'value' : ""
+            'value' : self.getTemp()
           }
+        }
       }
     }
 
