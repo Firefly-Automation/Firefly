@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 15:57:37
+# @Last Modified time: 2016-08-16 16:01:54
 
 import logging
 
@@ -28,6 +28,8 @@ class Device(Device):
       'update' : self.update,
       'setPresence' : self.setPresence,
       'startup' : self.update,
+      'home' : self.setHome,
+      'away' : self.setAway
     }
 
     self.REQUESTS = {
@@ -153,12 +155,16 @@ class Device(Device):
 
 
 
+  def setHome(self, args={}):
+    return self.setPresence(True)
+
+  def setAway(self, args={}):
+    return self.setPresence(False)
+
   def setPresence(self, value):
     logging.critical('SET NEST TO ' + value)
-    '''
-    presence = 'away'
-    if value is True:
-      presence = 'home'
+    
+    presence = value
 
     self.login()
 
@@ -178,7 +184,7 @@ class Device(Device):
     r = requests.put(url, headers=headers, data=data)
 
     logging.critical(str(r.__dict__))
-    '''
+    
 
 
 
