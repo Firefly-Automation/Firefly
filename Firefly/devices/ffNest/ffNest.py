@@ -2,14 +2,13 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 23:54:05
+# @Last Modified time: 2016-08-15 23:56:57
 
 import logging
 
 import requests
 
 from core.firefly_api import ffScheduler as Scheduler
-from core.models.command import Command as ffCommand
 from core.models.device import Device
 
 
@@ -37,6 +36,31 @@ class Device(Device):
       'temp' : self.getTemp
     }
 
+    self.VIEWS = {
+      'display' : True,
+      'name' : args.get('args').get('name'),
+      'id' : deviceID,
+      'type' : 'thermostat',
+      'dash_view' : {
+        'request' : 'state',
+        'type' : 'text', 
+        'text' : {
+          "false" : {
+            'click' : 'true',
+            'color' : 'grey',
+            'command' : {},
+            'text' : '??'
+          },
+          "true" : {
+            'click' : 'false',
+            'color' : 'green',
+            'command' : {},
+            'default' : True,
+            'text' : '??'
+          }
+        }
+      }
+    }
 
     ###########################
     # SET VARS
@@ -57,32 +81,6 @@ class Device(Device):
     self.update()
 
 
-
-    self.VIEWS = {
-      'display' : True,
-      'name' : args.get('name'),
-      'id' : deviceID,
-      'type' : 'thermostat',
-      'dash_view' : {
-        'request' : 'state',
-        'type' : 'text', 
-        'text' : {
-          "false" : {
-            'click' : 'true',
-            'color' : 'grey',
-            'command' : {'update'},
-            'text' : "0"
-          },
-          "true" : {
-            'click' : 'false',
-            'color' : 'blue',
-            'command' : {'update'},
-            'default' : True,
-            'text' : "0"
-          }
-        }
-      }
-    }
     ###########################
     # DONT CHANGE
     ###########################
@@ -92,20 +90,7 @@ class Device(Device):
     ###########################
 
 
-  def refresh_scheduler(self):
-    logging.critical('------NEST STARTUP-----')
-    self.update()
-    return 0
-    #Scheduler.runEveryM(5,self.refresh,replace=True,uuid='NEST-UPDATER')
-
-  def refresh(self):
-    logging.critical('****************NEST REFRESH*************')
-    #refresh_command = ffCommand(self.id, 'update', source='NEST-UPDATER')
-    #def __init__(self, deviceID, command, routine=False, force=False, source=None, send_event=True):
-    return 0
-
-
-  def login(self, args={}):
+  def login(self):
     logging.debug("Logging into Nest.")
     data = {
       'username' : self._username,
@@ -113,7 +98,7 @@ class Device(Device):
     }
     self._auth_data = requests.post(URL, data=data).json()
 
-  def status(self, args={}):
+  def status(self):
     logging.debug("Getting nest status.")
     url_base = self._auth_data.get('urls').get('transport_url')
     url = url_base + '/v2/mobile/user.' + self._auth_data.get('userid')
@@ -134,7 +119,7 @@ class Device(Device):
     return 0
 
 
-  def getPresence(self, args={}):
+  def getPresence(self):
     try:
       presence = self._structure.get('away')
       logging.critical('Nest Presence : (away)' + str(presence))
@@ -142,7 +127,7 @@ class Device(Device):
     except:
       return 0
 
-  def getState(self, args={}):
+  def getState(self):
     try:
       self._thermostatOperatingState = self._raw_status.get('shared').get(self._serial).get('hvac_ac_state')
       logging.critical('Nest State: ' + str(self._thermostatOperatingState))
@@ -150,24 +135,22 @@ class Device(Device):
     except:
       return 0
 
-  def getTemp(self, args={}):
-    logging.critical('-----------GET TEMP----------')
-    #try:
-    temp = self._raw_status.get('shared').get(self._serial).get('current_temperature')
-    if self._f:
-      temp = self.c2f(temp)
-    logging.critical('Nest TEMP: ' + str(temp))
-    #return float(temp)
-    return 0
-    #except:
-    #  return 0
+  def getTemp(self):
+    try:
+      temp = self._raw_status.get('shared').get(self._serial).get('current_temperature')
+      if self._f:
+        temp = c2f(temp)
+      logging.critical('Nest TEMP: ' + str(temp))
+      return temp
+    except:
+      return 0
 
-  def update(self, args={}):
+  def update(self):
     logging.critical('---------UPDATING NEST----------')
     self.login()
     self.status()
-    #self.refreshData()
+    self.refreshData()
     return 0
 
-  def c2f(self, celsius):
-    return float((celsius * 1.8) + 32)
+def c2f(celsius):
+  return (celsius * 1.8) + 32
