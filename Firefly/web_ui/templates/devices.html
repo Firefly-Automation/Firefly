@@ -178,7 +178,7 @@ function myFunct(value, name, ctype, raw, commands, send) {
     document.getElementById(sliderID).value = value
   }
 
-  else if (ctype == "text"){
+  else if (ctype == "text" || ctype == "stateValue"){
     var c = document.getElementsByName(name)[0].getAttribute('commands')
     var current = document.getElementsByName(name)[0].getAttribute('value')
     c = jQuery.parseJSON(c)
