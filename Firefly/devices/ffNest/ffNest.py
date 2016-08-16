@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 00:27:02
+# @Last Modified time: 2016-08-16 13:46:29
 
 import logging
 
@@ -161,20 +161,20 @@ class Device(Device):
       'type' : 'thermostat',
       'dash_view' : {
         'request' : 'state',
-        'type' : 'text', 
-        'text' : {
+        'type' : 'stateValue', 
+        'state' : {
           "false" : {
             'click' : 'true',
             'color' : 'grey',
             'command' : 'update',
-            'text' : self._temp
+            'value' : self._temp
           },
           "true" : {
             'click' : 'false',
             'color' : 'green',
             'command' : 'update',
             'default' : True,
-            'text' : self._temp
+            'value' : self._temp
           }
         }
       }
