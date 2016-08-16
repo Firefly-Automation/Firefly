@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 23:15:11
+# @Last Modified time: 2016-08-15 23:43:36
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -362,17 +362,21 @@ def event_message(fromDevice, message):
 
 
 def update_status(status):
-  deviceID = status.get('deviceID')
-  device = deviceDB.find_one({'id':deviceID})
-  if device:
-    currentStatus = device.get('status')
-    if currentStatus != status:
-      deviceDB.update_one({'id':deviceID},{'$set': {'status': status}}) #, "$currentDate": {"lastModified": True}})
-      return True
+  try:
+    deviceID = status.get('deviceID')
+    device = deviceDB.find_one({'id':deviceID})
+    if device:
+      currentStatus = device.get('status')
+      if currentStatus != status:
+        logging.critical(str(status))
+        deviceDB.update_one({'id':deviceID},{'$set': {'status': status}}) #, "$currentDate": {"lastModified": True}})
+        return True
+      else:
+        return False
     else:
-      return False
-  else:
-    return True
+      return True
+  except:
+    logging.critical('ERROR UPDATING STATUS')
 
 def auto_start():
   global ffZwave
