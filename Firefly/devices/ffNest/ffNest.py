@@ -2,7 +2,11 @@
 # @Author: Zachary Priddy
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-05 22:25:18
+<<<<<<< HEAD
+# @Last Modified time: 2016-10-05 22:27:05
+=======
+# @Last Modified time: 2016-10-05 22:24:04
+>>>>>>> 9cee45b95ad549125c988c6c4124363684ff9f35
 
 import logging
 
