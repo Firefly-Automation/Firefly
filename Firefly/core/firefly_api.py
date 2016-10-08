@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-07 22:00:13
+# @Last Modified time: 2016-10-07 22:01:35
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -445,8 +445,8 @@ def APIDevicesStatusAll(request):
   deviceTypeList = []
 
   for name, d in deviceViews.iteritems():
-    if d.type not in deviceTypeList:
-      deviceTypeList.append(d.type)
+    if d['type'] not in deviceTypeList:
+      deviceTypeList.append(d['type'])
 
   deviceTypes = [
     {
