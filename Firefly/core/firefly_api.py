@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-07 21:52:43
+# @Last Modified time: 2016-10-07 21:56:40
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -421,22 +421,24 @@ def APIViewsRoutine(request):
 
 @app.route('/API/views/devices')
 def APIViewsDevices(request):
-  returnData = {}
+  devices = {}
   for d in deviceDB.find({},{'status.views':1, 'id':1}):
     dID = d.get('id')
     if (d.get('status').get('views')):
-      returnData[dID] = d.get('status').get('views')
+      devices[dID] = d.get('status').get('views')
+
+  returnData = {'devices': devices}
 
   return json.dumps(returnData, sort_keys=True)
 
 
 @app.route('/API/status/devices/all')
 def APIDevicesStatusAll(request):
-  devices = {}
+  deviceViews = {}
   for d in deviceDB.find({},{'status':1, 'id':1}):
     dID = d.get('id')
     if (d.get('status')):
-      devices[dID] = d.get('status')
+      deviceViews[dID] = d.get('status')
 
   returnData = {'devices': deviceViews}
 
