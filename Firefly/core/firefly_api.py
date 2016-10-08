@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-07 23:53:34
+# @Last Modified time: 2016-10-07 23:55:43
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -451,6 +451,7 @@ def APIViewsDevices(request):
         'type': str(d),
         'title': str(d)
       })
+    deviceIndex += 1
 
   returnData['types'] = deviceTypes
 
