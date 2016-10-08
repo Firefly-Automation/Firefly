@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-07 23:21:52
+# @Last Modified time: 2016-10-07 23:46:39
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -421,11 +421,11 @@ def APIViewsRoutine(request):
 
 @app.route('/API/views/devices')
 def APIViewsDevices(request):
-  devices = {}
+  devices = []
   for d in deviceDB.find({},{'status.views':1, 'id':1}):
     dID = d.get('id')
     if (d.get('status').get('views')):
-      devices[dID] = d.get('status').get('views')
+      devices.append(d.get('status').get('views'))
 
   returnData = {'devices': devices}
 
