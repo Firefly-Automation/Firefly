@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-07 22:21:25
+# @Last Modified time: 2016-10-07 23:19:20
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -429,6 +429,31 @@ def APIViewsDevices(request):
 
   returnData = {'devices': devices}
 
+  deviceTypeList = []
+
+  for name, d in devices.iteritems():
+    dType = d.get('views').get('type')
+    if dType and dType not in deviceTypeList:
+      deviceTypeList.append(str(dType))
+
+  deviceTypes = [
+    {
+      'index': 0,
+      "type": 'all',
+      'title': 'all devices'
+    }
+  ]
+
+  deviceIndex = 1
+  for d in deviceTypeList:
+    deviceTypes.append({
+        'index': deviceIndex,
+        'type': str(d),
+        'title': str(d)
+      })
+
+  returnData['types'] = deviceTypes
+
   return json.dumps(returnData, sort_keys=True)
 
 
@@ -464,7 +489,7 @@ def APIDevicesStatusAll(request):
     deviceTypes.append({
         'index': deviceIndex,
         'type': str(d),
-        'title': str(d) + 's'
+        'title': str(d)
       })
 
   returnData['types'] = deviceTypes
