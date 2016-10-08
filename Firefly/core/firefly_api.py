@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-07 23:19:20
+# @Last Modified time: 2016-10-07 23:21:52
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -432,7 +432,7 @@ def APIViewsDevices(request):
   deviceTypeList = []
 
   for name, d in devices.iteritems():
-    dType = d.get('views').get('type')
+    dType = d.get('type')
     if dType and dType not in deviceTypeList:
       deviceTypeList.append(str(dType))
 
