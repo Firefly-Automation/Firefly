@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-15 23:43:36
+# @Last Modified time: 2016-10-07 21:50:27
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -415,7 +415,7 @@ def APIViewsRoutine(request):
     returnData[rID]['id'] = rID
     returnData[rID]['icon'] = r.get('icon')
 
-  logging.critical(str(returnData))
+  #logging.critical(str(returnData))
   return json.dumps(returnData, sort_keys=True)
 
 
@@ -432,11 +432,37 @@ def APIViewsDevices(request):
 
 @app.route('/API/status/devices/all')
 def APIDevicesStatusAll(request):
-  returnData = {}
+  devices = {}
   for d in deviceDB.find({},{'status':1, 'id':1}):
     dID = d.get('id')
     if (d.get('status')):
-      returnData[dID] = d.get('status')
+      devices[dID] = d.get('status')
+
+  returnData = {'devices': deviceViews}
+
+  deviceTypeList = []
+
+  for d in deviceViews:
+    if d.type not in deviceTypeList:
+      deviceTypeList.append(d.type)
+
+  deviceTypes = [
+    {
+      'index': 0,
+      "type": 'all'
+      'title': 'all devices'
+    }
+  ]
+
+  deviceIndex = 1
+  for d in deviceTypeList:
+    deviceTypes.append({
+        'index': deviceIndex,
+        'type': str(d),
+        'title': str(d) + 's'
+      })
+
+  returnData['types'] = deviceTypes
 
   return json.dumps(returnData, sort_keys=True)
 

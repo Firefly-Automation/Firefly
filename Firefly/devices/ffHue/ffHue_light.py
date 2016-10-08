@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: zpriddy
 # @Date:   2016-04-17 20:28:40
-# @Last Modified by:   zpriddy
-# @Last Modified time: 2016-07-04 23:37:06
+# @Last Modified by:   Zachary Priddy
+# @Last Modified time: 2016-10-07 21:38:22
 
 import logging
 
@@ -84,7 +84,8 @@ class Device(Device):
             'text' : 'On'
           }
         }
-      }
+      },
+      'card' : "<md-card layout='row' layout-align='center center' layout-wrap><device-card layout='row' flex layout-wrap layout-align='center center'><span  style='cursor: pointer;' ng-click='selectDeviceIndex($index)' layout-align='start center' flex=''> {{::item.name}} </span><md-switch layout-align='end center' ng-model=deviceStates[item.id].on ng-click='switch(!deviceStates[item.id].on)'></md-switch></device-card></div><md-card-content ng-if='$index ==selectedDeviceIndex' flex=100 layout-wrap><md-divider></md-divider><div layout='row' layout-align='center center'><md-button flex=50>On</md-button><md-button flex=50>Off</md-button></div><md-divider></md-divider><md-subhead> Turn off in: </md-subhead> <div layout='row' layout-align='center center'><md-button flex=25>30m</md-button><md-button flex=25>1h</md-button><md-button flex=25>2h</md-button><md-button flex=25>4h</md-button></div><br><md-card-actions layout='row' layout-align='start center' flex='100'><md-button flex=50>More Info</md-button></md-card-actions></md-card-content></md-card>"
     }
 
     ###########################
