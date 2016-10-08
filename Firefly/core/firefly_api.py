@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-07 21:50:27
+# @Last Modified time: 2016-10-07 21:52:43
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -449,7 +449,7 @@ def APIDevicesStatusAll(request):
   deviceTypes = [
     {
       'index': 0,
-      "type": 'all'
+      "type": 'all',
       'title': 'all devices'
     }
   ]
