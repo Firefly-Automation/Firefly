@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: zpriddy
 # @Date:   2016-04-17 01:25:27
-# @Last Modified by:   zpriddy
-# @Last Modified time: 2016-07-05 00:19:34
+# @Last Modified by:   Zachary Priddy
+# @Last Modified time: 2016-10-07 22:10:00
 
 import logging
 
@@ -24,7 +24,7 @@ class Device(Device):
     }
 
     self.REQUESTS = {
-      'presence' : self.getPresence
+      'presence': self.getPresence
     }
 
     self.VIEWS = {
@@ -32,10 +32,10 @@ class Device(Device):
       'name' : args.get('args').get('name'),
       'id' : deviceID,
       'type' : 'presence',
-      'dash_view' : {
-        'request' : 'presence',
-        'type' : 'text', 
-        'text' : {
+      'dash_view': {
+        'request': 'presence',
+        'type': 'text', 
+        'text': {
           "false" : {
             'click' : 'true',
             'color' : 'grey',
