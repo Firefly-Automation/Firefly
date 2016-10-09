@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-25 00:40:41
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-08 19:06:52
+# @Last Modified time: 2016-10-08 19:51:46
 import logging
 
 from core.models.command import Command as ffCommand
@@ -55,7 +55,7 @@ class Device(Device):
           }
         }
       },
-      'card': "<md-card layout='row' layout-align='center center' layout-wrap><device-card layout='row' flex layout-wrap layout-align='center center'><span  style='cursor: pointer;' ng-click='selectDeviceIndex($index)' layout-align='start center' flex=''> {{::item.name}} </span><div layout-align='end center' ng-show='deviceStates[item.id].state'>Open</div><div layout-align='end center' ng-show='!deviceStates[item.id].state'>Closed</div></device-card></div><md-card-content ng-show='$index ==selectedDeviceIndex' flex=100 layout-wrap><md-card-actions layout='row' layout-align='start center' flex='100'><md-button flex=50>More Info</md-button></md-card-actions></md-card-content></md-card>"
+      'card': "<md-card layout='row' layout-align='center center' layout-wrap><device-card layout='row' flex layout-wrap layout-align='center center'><span  style='cursor: pointer;' ng-click='selectDeviceIndex($index)' layout-align='start center' flex=''> {{::item.name}} </span><div layout-align='end center' ng-show='deviceStates[item.id].state'>Open</div><div layout-align='end center' ng-show='!deviceStates[item.id].state'>Closed</div></device-card></div><md-card-content ng-show='$index ==selectedDeviceIndex' flex=100 layout-wrap><md-card-actions layout='row' layout-align='start center' flex='100'><md-divider></md-divider><md-button flex=50>More Info</md-button></md-card-actions></md-card-content></md-card>"
     }
 
     ###########################
