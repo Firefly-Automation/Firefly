@@ -194,7 +194,9 @@ class Device(Device):
     except:
       return False
 
-  def setTarget(self, target):
+  def setTarget(self, args={}):
+    target = args.get('target')
+    logging.critical('-------------SET NEST TARGET TO: ' + str(target))
     try:
       self.login()
 
