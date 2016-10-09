@@ -211,6 +211,7 @@ class Device(Device):
       }
 
       data = {
+        'target_change_pending': True
         'target_temperature' : target
       }
 
