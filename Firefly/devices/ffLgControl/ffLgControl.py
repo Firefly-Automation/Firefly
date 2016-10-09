@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-25 22:13:31
-# @Last Modified by:   zpriddy
-# @Last Modified time: 2016-07-05 08:37:49
+# @Last Modified by:   Zachary Priddy
+# @Last Modified time: 2016-10-08 19:18:34
 
 import logging
 import requests
@@ -113,7 +113,8 @@ class Device(Device):
           'command' : {'cmd':'POWER'},
           'text' : 'Off'
         }
-      }
+      },
+      'card' : "<md-card layout='row' layout-align='center center' layout-wrap><device-card layout='row' flex layout-wrap layout-align='center center'><span  style='cursor: pointer;' ng-click='selectDeviceIndex($index)' layout-align='start center' flex=''> {{::item.name}} </span> </device-card></div><md-card-content ng-if='$index ==selectedDeviceIndex' flex=100 layout-wrap><md-divider></md-divider><div layout='row' layout-align='center center'><md-button flex=100 ng-click='switch(false)'>Off</md-button></div><md-divider></md-divider><md-subhead> Turn off in: </md-subhead> <div layout='row' layout-align='center center'><md-button flex=25>30m</md-button><md-button flex=25>1h</md-button><md-button flex=25>2h</md-button><md-button flex=25>4h</md-button></div><br><md-card-actions layout='row' layout-align='start center' flex='100'><md-button flex=50>More Info</md-button></md-card-actions></md-card-content></md-card>"
     }
 
     ###########################
