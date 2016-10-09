@@ -201,7 +201,7 @@ class Device(Device):
       self.login()
 
       url_base = self._auth_data.get('urls').get('transport_url')
-      url = url_base + '/v2/put/structure.' + self._structure_id
+      url = url_base + '/v2/put/device.' + self._serial
 
       headers = {
         "user-agent":"Nest/1.1.0.10 CFNetwork/548.0.4",
