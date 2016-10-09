@@ -195,6 +195,7 @@ class Device(Device):
       return False
 
   def setTarget(self, target):
+    try:
       self.login()
 
       url_base = self._auth_data.get('urls').get('transport_url')
