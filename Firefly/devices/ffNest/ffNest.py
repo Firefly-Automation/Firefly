@@ -188,8 +188,8 @@ class Device(Device):
       }
 
       r = requests.post(url, headers=headers, json=data)
-      print r
-
+      logging.critical(str(r))
+      
       return True
       
     except:
