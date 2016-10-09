@@ -218,6 +218,8 @@ class Device(Device):
 
       r = requests.post(url, headers=headers, json=data)
 
+      self.update()
+
       return True
       
     except:
