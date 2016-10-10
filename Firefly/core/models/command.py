@@ -2,10 +2,10 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 18:06:51
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-09 22:42:38
+# @Last Modified time: 2016-10-09 22:46:17
 import types
 
-from core import sendCommand
+from core.firefly import sendCommand
 
 class Command(object):
   def __init__(self, deviceID, command, routine=False, force=False, source=None, send_event=True):
