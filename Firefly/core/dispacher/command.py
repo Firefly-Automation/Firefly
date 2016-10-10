@@ -4,7 +4,7 @@ import pickle
 from core import appsDB, deviceDB, ffCommand, routineDB
 
 def sendCommand(command):
-  from core import ff_zwave
+  from core.firefly_api import ff_zwave
   logging.info("sendCommand: " + str(command))
   if command.routine:
     return sendRoutineCommand(command)
@@ -13,6 +13,7 @@ def sendCommand(command):
     if command.deviceID == ff_zwave.name:
       ff_zwave.sendCommand(command)
       return True
+
 
   #TODO: Have option in command for device/app
   success = False

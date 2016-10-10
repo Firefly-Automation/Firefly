@@ -44,7 +44,7 @@ from core.models.command import Command as ffCommand
 from core.models.event import Event as ffEvent
 from core.models.request import Request as ffRequest
 
-from core import appsDB, deviceDB, datalogDB, messageDB, routineDB, ffScheduler, sendCommand, sendRequest, sendEvent, ff_zwave
+from core import appsDB, datalogDB, deviceDB, ffScheduler, ff_zwave, messageDB, routineDB, sendCommand, sendEvent, sendRequest
 
 app = Klein()
 core_settings = core_settings.Settings()
