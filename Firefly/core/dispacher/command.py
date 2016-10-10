@@ -14,7 +14,7 @@ def sendCommand(command):
       ff_zwave.zwave.sendCommand(command)
       return True
 
-  if ff_zwave is None:
+  if ff_zwave.zwave is None:
     logging.critical('-------------------ZWAVE IS NONE--------------------')
 
 
