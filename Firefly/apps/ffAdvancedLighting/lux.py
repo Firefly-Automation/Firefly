@@ -117,7 +117,7 @@ class App(App):
         retunr -2
 
     if self.run_light is not None:
-      if not ffLocation.isLight:
+      if not ffLocation.isLight: 
         logging.critical("Not running because is light")
         return -2 
 
