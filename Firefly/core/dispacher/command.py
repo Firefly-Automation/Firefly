@@ -1,15 +1,17 @@
-from core import appsDB, deviceDB, routineDB, ff_zwave, ffCommand
-import pickle
 import logging
+import pickle
+
+from core import appsDB, deviceDB, ffCommand, ff_zwave, routineDB
 
 def sendCommand(command):
   logging.info("sendCommand: " + str(command))
   if command.routine:
     return sendRoutineCommand(command)
 
-  if command.deviceID == ff_zwave.name:
-    ff_zwave.sendCommand(command)
-    return True
+  if ff_zwave is not None:
+    if command.deviceID == ff_zwave.name:
+      ff_zwave.sendCommand(command)
+      return True
 
   #TODO: Have option in command for device/app
   success = False
