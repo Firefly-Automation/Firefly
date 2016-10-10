@@ -2,7 +2,7 @@
 # @Author: zpriddy
 # @Date:   2016-04-19 15:57:29
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-22 03:22:00
+# @Last Modified time: 2016-10-09 23:27:57
 import json
 import logging
 
@@ -15,7 +15,11 @@ from core.models.event import Event as ffEvent
 from core.scheduler import Scheduler as ffScheduler
 from core.utils.notify import Notification as ffNotify
 
+from core.utils.scheduler import Scheduler
+
 l_scheduler = ffScheduler()
+
+location_scheduler = Scheduler()
 
 
 class Location(object):
@@ -100,6 +104,7 @@ class Location(object):
     logging.debug("Dawn Time: " + str(dawn_time))
     delay_s = (dawn_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.dawn_handler, replace=True, uuid='DawnScheduler')
+    location_scheduler.runInS(delay_s, self.dawn_handler, replace=True, job_id='DawnScheduler')
 
     sunrise_time = self._city.sun(date=datetime.now(self._city.tz), local=True)['sunrise']
     now = self.now()
