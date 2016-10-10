@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:35
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-11 09:01:35
+# @Last Modified time: 2016-10-09 22:39:31
 
 ff_zwave = None
 
@@ -25,8 +25,8 @@ messageDB.ensure_index("timestamp", expireAfterSeconds=(60*60*24*7))
 from core.scheduler import Scheduler
 ffScheduler = Scheduler()
 
-from core.models.event import Event as ffEvent
 from core.models.command import Command as ffCommand
+from core.models.event import Event as ffEvent
 
 from core.dispacher.command import sendCommand
 from core.dispacher.event import sendEvent
