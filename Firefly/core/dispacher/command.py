@@ -4,7 +4,7 @@ import pickle
 from core import appsDB, deviceDB, ffCommand, routineDB
 
 def sendCommand(command):
-  from core.firefly_api import ff_zwave
+  from core import ff_zwave
   logging.info("sendCommand: " + str(command))
   if command.routine:
     return sendRoutineCommand(command)

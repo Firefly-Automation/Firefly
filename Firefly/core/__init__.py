@@ -2,8 +2,9 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:35
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-09 22:39:31
+# @Last Modified time: 2016-10-09 23:06:25
 
+global ff_zwave 
 ff_zwave = None
 
 ## Import and setup mongo
