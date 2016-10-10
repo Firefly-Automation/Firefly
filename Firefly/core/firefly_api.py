@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-09 23:14:16
+# @Last Modified time: 2016-10-09 23:20:00
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -375,7 +375,7 @@ def auto_start():
       if device.get('module') == "ffZwave":
         package_full_path = device.get('type') + 's.' + device.get('package') + '.' + device.get('module')
         package = __import__(package_full_path, globals={}, locals={}, fromlist=[device.get('package')], level=-1)
-        ff_zwave = package.Device(device.get('id'), device)
+        ff_zwave.zwave = package.Device(device.get('id'), device)
         #ffZwave.refresh_scheduler()
 
   for device in deviceDB.find({}):
