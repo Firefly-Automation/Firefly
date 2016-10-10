@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-08 00:02:05
+# @Last Modified time: 2016-10-09 23:14:16
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -359,7 +359,6 @@ def update_status(status):
     if device:
       currentStatus = device.get('status')
       if currentStatus != status:
-        logging.critical(str(status))
         deviceDB.update_one({'id':deviceID},{'$set': {'status': status}}) #, "$currentDate": {"lastModified": True}})
         return True
       else:
@@ -461,7 +460,6 @@ def APIDevicesStatusAll(request):
   deviceTypeList = []
 
   for name, d in deviceViews.iteritems():
-    logging.critical(str(d))
     if d.get('views'):
       dType = d.get('views').get('type')
       if dType and dType not in deviceTypeList:

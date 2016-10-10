@@ -2,10 +2,9 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:35
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-09 23:06:25
+# @Last Modified time: 2016-10-09 23:12:36
 
-global ff_zwave 
-ff_zwave = None
+ff_zwave = FireflyZwave()
 
 ## Import and setup mongo
 ## Monogo Setup ##
@@ -38,3 +37,8 @@ from core.firefly import getDeviceList, getRoutinesList
 from core.api.views import *
 
 __all__ = ['sendCommand', 'sendEvent', 'sendRequest', 'ffEvent', 'ffCommand', 'getDeviceList', 'getRoutinesList', 'ffScheduler']
+
+
+class FireflyZwave(object):
+  def __init__(self):
+    self.zwave = None

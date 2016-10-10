@@ -9,10 +9,13 @@ def sendCommand(command):
   if command.routine:
     return sendRoutineCommand(command)
 
-  if ff_zwave is not None:
+  if ff_zwave.zwave is not None:
     if command.deviceID == ff_zwave.name:
-      ff_zwave.sendCommand(command)
+      ff_zwave.zwave.sendCommand(command)
       return True
+
+  if ff_zwave is None:
+    logging.critical('-------------------ZWAVE IS NONE--------------------')
 
 
   #TODO: Have option in command for device/app
