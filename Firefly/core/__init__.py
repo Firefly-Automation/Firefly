@@ -25,12 +25,12 @@ messageDB.ensure_index("timestamp", expireAfterSeconds=(60*60*24*7))
 from core.scheduler import Scheduler
 ffScheduler = Scheduler()
 
+from core.models.event import Event as ffEvent
+from core.models.command import Command as ffCommand
+
 from core.dispacher.command import sendCommand
 from core.dispacher.event import sendEvent
 from core.dispacher.request import sendRequest
-
-from core.models.event import Event as ffEvent
-from core.models.command import Command as ffCommand
 
 from core.firefly import getDeviceList, getRoutinesList
 
