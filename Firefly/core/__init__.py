@@ -2,7 +2,11 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:35
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-09 23:12:36
+# @Last Modified time: 2016-10-09 23:15:02
+
+class FireflyZwave(object):
+  def __init__(self):
+    self.zwave = None
 
 ff_zwave = FireflyZwave()
 
@@ -39,6 +43,3 @@ from core.api.views import *
 __all__ = ['sendCommand', 'sendEvent', 'sendRequest', 'ffEvent', 'ffCommand', 'getDeviceList', 'getRoutinesList', 'ffScheduler']
 
 
-class FireflyZwave(object):
-  def __init__(self):
-    self.zwave = None
