@@ -10,7 +10,7 @@ def sendCommand(command):
     return sendRoutineCommand(command)
 
   if ff_zwave.zwave is not None:
-    if command.deviceID == ff_zwave.name:
+    if command.deviceID == ff_zwave.zwave.name:
       ff_zwave.zwave.sendCommand(command)
       return True
 
