@@ -1,7 +1,8 @@
 import core
 import logging
 
-from core import *
+from core import deviceDB, ffScheduler, ff_zwave, routineDB
+from core.models.event import Event as ffEvent
 from flask import Flask
 
 # Create app
