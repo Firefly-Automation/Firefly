@@ -44,14 +44,13 @@ from core.models.command import Command as ffCommand
 from core.models.event import Event as ffEvent
 from core.models.request import Request as ffRequest
 
-from core import appsDB, deviceDB, datalogDB, messageDB, routineDB, ffScheduler, sendCommand, sendRequest, sendEvent
+from core import appsDB, deviceDB, datalogDB, messageDB, routineDB, ffScheduler, sendCommand, sendRequest, sendEvent, ff_zwave
 
 app = Klein()
 core_settings = core_settings.Settings()
 
 ffLocation = Location('config/location.json')
 ffScheduler = Scheduler()
-ffZwave = None
 
 routine_list = []
 device_list = {}
@@ -182,7 +181,6 @@ def send_test_request(request):
 
 @app.route('/testInstall')
 def test_install(request):
-  global ffZwave
   deviceDB.remove({})
   with open('config/devices.json') as devices:
     allDevices = json.load(devices)
@@ -373,14 +371,13 @@ def update_status(status):
     logging.critical('ERROR UPDATING STATUS')
 
 def auto_start():
-  global ffZwave
   with open('config/devices.json') as devices:
     allDevices = json.load(devices)
     for name, device in allDevices.iteritems():
       if device.get('module') == "ffZwave":
         package_full_path = device.get('type') + 's.' + device.get('package') + '.' + device.get('module')
         package = __import__(package_full_path, globals={}, locals={}, fromlist=[device.get('package')], level=-1)
-        ffZwave = package.Device(device.get('id'), device)
+        ff_zwave = package.Device(device.get('id'), device)
         #ffZwave.refresh_scheduler()
 
   for device in deviceDB.find({}):

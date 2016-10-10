@@ -7,8 +7,8 @@ def sendCommand(command):
   if command.routine:
     return sendRoutineCommand(command)
 
-  if command.deviceID == ffZwave.name:
-    ffZwave.sendCommand(command)
+  if command.deviceID == ff_zwave.name:
+    ff_zwave.sendCommand(command)
     return True
 
   #TODO: Have option in command for device/app
@@ -35,11 +35,11 @@ def sendRoutineCommand(command):
   return False
 
 def sendAppCommand(command):
-  sucess = False
+  success = False
   for a in appsDB.find({'id':command.deviceID}):
     app = pickle.loads(a.get('ffObject'))
     app.sendCommand(command)
     appObj = pickle.dumps(app)
     appsDB.update_one({'id':app.id},{'$set': {'ffObject':appObj}, '$currentDate': {'lastModified': True}})
-    sucess = True
+    success = True
   return success

@@ -1,5 +1,5 @@
 from core.models.request import Request
-from core import deviceDB,
+from core import deviceDB
 import pickle
 import logging
 
