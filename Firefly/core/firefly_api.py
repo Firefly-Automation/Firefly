@@ -28,7 +28,6 @@ from bson.binary import Binary
 from collections import OrderedDict
 from datetime import datetime
 from klein import Klein
-from pymongo import MongoClient
 from sys import modules
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue
@@ -44,26 +43,12 @@ from core.location import Location
 from core.models.command import Command as ffCommand
 from core.models.event import Event as ffEvent
 from core.models.request import Request as ffRequest
-from core.scheduler import Scheduler
+
+from core import appsDB, deviceDB, datalogDB, messageDB, routineDB, ffScheduler, sendCommand, sendRequest, sendEvent
 
 app = Klein()
 core_settings = core_settings.Settings()
 
-## Monogo Setup ##
-client = MongoClient()
-ffDB = client.ff
-routineDB = ffDB.routines
-deviceDB = ffDB.devices
-datalogDB = ffDB.datalog
-messageDB = ffDB.message
-appsDB = ffDB.apps
-
-datalogDB.ensure_index("timestamp", expireAfterSeconds=(60*60*72))
-messageDB.ensure_index("timestamp", expireAfterSeconds=(60*60*24*7))
-
-
-
-testDevices = {}
 ffLocation = Location('config/location.json')
 ffScheduler = Scheduler()
 ffZwave = None
@@ -226,6 +211,8 @@ def install_child_device(deviceID, ffObject, config={}, status={}):
       
 
 def send_event(event):
+  sendEvent(event)
+  '''
   logging.info('send_event: ' + str(event))
 
   if event.sendToDevice:
@@ -244,10 +231,13 @@ def send_event(event):
   for d in  routineDB.find({'listen':event.deviceID}):
     s = pickle.loads(d.get('ffObject'))
     s.event(event)
+  '''
   
   data_log(event.log, logType='event')
 
 def send_command(command):
+  sendCommand(command)
+  '''
   global ffZwave
   logging.debug('send_command ' + str(command))
 
@@ -284,8 +274,11 @@ def send_command(command):
   return sucess
 
   # MAYBE ALSO SEND TO APPS 
+  '''
 
 def send_request(request):
+  return sendRequest(request)
+  '''
   logging.debug('send_request' + str(request))
   d = deviceDB.find_one({'id':request.deviceID})
   if d:
@@ -299,6 +292,7 @@ def send_request(request):
       data = device.requestData(request)
       return data
   return None
+  '''
 
 ############################## HTTP UTILES ###########################################
 
