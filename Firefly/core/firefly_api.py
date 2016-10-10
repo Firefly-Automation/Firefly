@@ -50,7 +50,6 @@ app = Klein()
 core_settings = core_settings.Settings()
 
 ffLocation = Location('config/location.json')
-ffScheduler = Scheduler()
 
 routine_list = []
 device_list = {}
