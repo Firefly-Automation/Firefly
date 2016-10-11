@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:35
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-10 22:20:04
+# @Last Modified time: 2016-10-10 22:20:49
 
 class FireflyZwave(object):
   def __init__(self):
@@ -37,6 +37,8 @@ from core.dispacher.event import sendEvent
 from core.dispacher.request import sendRequest
 
 ## SETUP LOCATION 
+import json
+
 from core.utils.location import Location
 zipcode = None
 modes = None
