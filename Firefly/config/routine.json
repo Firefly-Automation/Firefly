@@ -263,7 +263,7 @@
         {"location":{"time":"dawn"}}
       ],
       "scheduling" : [
-        "20 6 * * MON-SAT"
+        {"minute": 20, "hour": 6, "days": ["sun","mon","tue","wed"]}
       ],
       "notification_devices" : [
         "ZachPushover"
