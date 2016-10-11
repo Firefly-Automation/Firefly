@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-09 21:48:29
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-10 22:44:01
+# @Last Modified time: 2016-10-10 22:51:01
 import logging
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -33,7 +33,7 @@ class Scheduler(object):
           run_days.append(d)
       days_of_week = ','.join(run_days)
     logging.info('adding simple weekly cron job: {}'.format(str(job_id)))
-    self._scheduler.add_job(function, 'cron', args=args, kwargs=kwargs, minute=minute, hour=hour, day=*, month=*, day_of_week=days_of_week, year=*, id=job_id)
+    self._scheduler.add_job(function, 'cron', args=args, kwargs=kwargs, minute=minute, hour=hour, day='*', month='*', day_of_week=days_of_week, year='*', id=job_id)
 
 
   def runEveryS(self,delay, function, args=[], kwargs={}, job_id=None, replace=True):
