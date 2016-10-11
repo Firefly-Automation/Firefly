@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-10 22:19:47
+# @Last Modified time: 2016-10-10 22:49:30
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -382,7 +382,8 @@ def auto_start():
     deviceID = device.get('id')
     ffEvent(deviceID, {'startup': True})
 
-  ffScheduler.runEveryM(5, auto_refresh, replace=True, uuid='auto-refresh')
+  #ffScheduler.runEveryM(5, auto_refresh, replace=True, uuid='auto-refresh')
+  ffScheduler.runEveryM(5, auto_refresh, job_id='auto_refresh')
 
 
 def auto_refresh():

@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-16 16:23:41
+# @Last Modified time: 2016-10-10 22:48:22
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -21,7 +21,8 @@ import json
 import logging
 
 from collections import OrderedDict
-from core.firefly_api import ffScheduler
+#from core.firefly_api import ffScheduler
+from core import ffScheduler
 from core.models.command import Command as ffCommand
 
 class Routine(object):
@@ -50,9 +51,9 @@ class Routine(object):
       count = 0
       for cron_data in self._scheduling:
         uuid = self._name + str(count)
-        crondata = {'uuid':uuid, 'funct':self.executeRoutine, 'cron':cron_data}
-        ffScheduler.add_to_cron(crondata)
-
+        #crondata = {'uuid':uuid, 'funct':self.executeRoutine, 'cron':cron_data}
+        #ffScheduler.add_to_cron(crondata)
+        ffScheduler.runSimpleWeekCron(self.executeRoutine, minute=cron_data.get('minute'), hour=cron_data.get('hour'), days_of_week=cron_data.get('days'), job_id=uuid)
 
 
   def __str__(self):
