@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-09 21:48:29
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-10 22:51:01
+# @Last Modified time: 2016-10-10 23:08:33
 import logging
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -82,7 +82,11 @@ class Scheduler(object):
     self._scheduler.add_job(function, 'date', run_date=date, args=args, kwargs=kwargs, id=job_id, replace_existing=replace)
 
   def cancel(self, job_id):
-    logging.info('canceling job: {}'.format(str(job_id)))
-    self._scheduler.remove_job(job_id)
+    try:
+      logging.info('canceling job: {}'.format(str(job_id)))
+      self._scheduler.remove_job(job_id)
+      return True
+    except:
+      return False
 
 

@@ -22,7 +22,7 @@
         { "zwave-node-13" : {"open":true}}
         ],
       "scheduling" : [
-        {"minute": 10, "hour": 23, "days":"*"}
+        
       ],
       "notification_devices" : [
         "ZachPushover"
