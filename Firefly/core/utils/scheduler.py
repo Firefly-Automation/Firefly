@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-09 21:48:29
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-09 22:40:08
+# @Last Modified time: 2016-10-10 22:10:08
 import logging
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -57,6 +57,12 @@ class Scheduler(object):
     logging.info('runInH job: {}'.format(str(job_id)))
     run_time = datetime.now() + timedelta(hours=delay)
     self._scheduler.add_job(function, 'date', run_date=run_time, args=args, kwargs=kwargs, id=job_id, replace_existing=replace)
+
+  def runAt(self, date, function, args=[], kwargs={}, job_id=None, replace=True):
+    if job_id is None:
+      job_id=str(function)
+    logging.info('runAt job: {} date: {}'.format(str(job_id),str(date)))
+    self._scheduler.add_job(function, 'date', run_date=date, args=args, kwargs=kwargs, id=job_id, replace_existing=replace)
 
   def cancel(self, job_id):
     logging.info('canceling job: {}'.format(str(job_id)))

@@ -2,14 +2,19 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-09 23:39:47
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-09 23:53:51
+# @Last Modified time: 2016-10-10 22:15:57
+import logging
+
 from astral import Astral
 from astral import GoogleGeocoder
 from datetime import datetime, timedelta
 
+from core.utils.notify import Notification
 from core.utils.scheduler import Scheduler
 
 from core import ffEvent
+
+DAY_EVENTS = ['dawn', 'sunrise', 'noon', 'sunset', 'dusk']
 
 class Location(object):
   def __init__(self, zipcode, modes):
@@ -32,31 +37,41 @@ class Location(object):
     self.setupScheduler()
 
 
-
   def setupScheduler(self):
+    for e in DAY_EVENTS:
+      day_event_time = self.getNextDayEvent(e)
+      logging.info('Day Event: {} Time: {}'.format(e, str(day_event_time)))
+      self._scheduler.runAt(day_event_time, self.DayEventHandler, args=[e], job_id=e)
+
+  def DayEventHandler(self, day_event):
+    logging.info('day event handler - event: {}'.format(day_event))
+    #TODO: Remove
+    Notification('ZachPushover', 'LOCATION: is it {}'.format(day_event))
+    ffEvent('location',{'time':day_event})
+    next_day_event_time = self.getNextDayEvent(day_event)
+    self._scheduler.runAt(next_day_event_time, self.DayEventHandler, args=[e], job_id=e)
+
+  def getNextDayEvent(self, day_event):
     now = self.now
+    day_event_time = self.city.sun(date=now, local=True).get(day_event)
+    if day_event_time is None:
+      return False
+    if day_event_time < now:
+      day_event_time = self.city.sun(date=now + timedelta(days=1), local=True).get(day_event)
+    return day_event_time
 
-    # TODO: Make a more global function
-    dawn_time = self._city.sun(date=datetime.now(self._city.tz), local=True)['dawn']
-    if dawn_time < now:
-      dawn_time = self._city.sun(date=datetime.now(self._city.tz) + timedelta(days=1), local=True)['dawn']
-    logging.debug("Dawn Time: " + str(dawn_time))
-    delay_s = (dawn_time - now).total_seconds()
-    self._scheduler.runInS(delay_s, self.dawn_handler, replace=True, job_id='DawnScheduler')
-
+  @property
+  def mode(self):
+    return self._mode
 
   @mode.setter
   def mode(self, mode):
     mode = str(mode)
     if mode in self.modes:
       self._mode = mode
-      ffEvent('location':{'mode':self.mode})
+      ffEvent('location',{'mode':self.mode})
       return True
     return False
-
-  @property
-  def mode(self):
-    return self._mode
 
   @property
   def modes(self):
@@ -85,6 +100,10 @@ class Location(object):
   @property
   def latitude(self):
     return self._latitude
+
+  @property
+  def city(self):
+    return self._city
 
   @property
   def now(self):

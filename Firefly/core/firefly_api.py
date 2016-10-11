@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-09 23:20:00
+# @Last Modified time: 2016-10-10 22:19:47
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -44,12 +44,12 @@ from core.models.command import Command as ffCommand
 from core.models.event import Event as ffEvent
 from core.models.request import Request as ffRequest
 
-from core import appsDB, datalogDB, deviceDB, ffScheduler, ff_zwave, messageDB, routineDB, sendCommand, sendEvent, sendRequest
+from core import appsDB, datalogDB, deviceDB, ffLocation, ffScheduler, ff_zwave, messageDB, routineDB, sendCommand, sendEvent, sendRequest
 
 app = Klein()
 core_settings = core_settings.Settings()
 
-ffLocation = Location('config/location.json')
+#ffLocation = Location('config/location.json')
 
 routine_list = []
 device_list = {}

@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:35
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-09 23:15:02
+# @Last Modified time: 2016-10-10 22:20:04
 
 class FireflyZwave(object):
   def __init__(self):
@@ -36,10 +36,23 @@ from core.dispacher.command import sendCommand
 from core.dispacher.event import sendEvent
 from core.dispacher.request import sendRequest
 
+## SETUP LOCATION 
+from core.utils.location import Location
+zipcode = None
+modes = None
+location_config = 'config/location.json'
+with open(location_config) as data_file:
+  config = json.load(data_file)
+  zipcode = str(config.get('zip_code'))
+  modes = config.get('modes')
+ffLocation = Location(zipcode, modes)
+
+
+
 from core.firefly import getDeviceList, getRoutinesList
 
 from core.api.views import *
 
-__all__ = ['sendCommand', 'sendEvent', 'sendRequest', 'ffEvent', 'ffCommand', 'getDeviceList', 'getRoutinesList', 'ffScheduler']
+__all__ = ['sendCommand', 'sendEvent', 'sendRequest', 'ffEvent', 'ffCommand', 'getDeviceList', 'getRoutinesList', 'ffScheduler', 'ffLocation']
 
 
