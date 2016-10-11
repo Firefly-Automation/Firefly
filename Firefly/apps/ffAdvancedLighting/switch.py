@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 23:06:59
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-09 16:29:57
+# @Last Modified time: 2016-10-10 22:52:38
 
 
 import logging
@@ -123,7 +123,7 @@ class App(App):
       if self.delay_time is None:
         self.TurnLightsOff()
       else:
-        ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, uuid=self._id)
+        ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, job_id=self._id)
 
   def TurnLightsOff(self):
     from core.firefly_api import ffScheduler

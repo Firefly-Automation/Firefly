@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 16:09:01
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-07-27 22:45:35
+# @Last Modified time: 2016-10-10 22:52:51
 
 import logging
 
@@ -109,7 +109,7 @@ class App(App):
         ffScheduler.cancel(self._id)
 
     if not event.event.get('motion'):
-      ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, uuid=self._id)
+      ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, job_id=self._id)
 
   def TurnLightsOff(self):
     if self._disabled:
