@@ -87,12 +87,12 @@ def APICoreStatusDevicesAll():
 
 @app.route('/API/command', methods=['POST'])
 def APICommand():
-  c = dict(request.data)
+  c = request.get_json(force=True)
   logging.critical(str(c))
   
-  command = request.form.get('command')
+  command = c.get('command')
   logging.critical(command)
-  device = c.get('device')[0]
+  device = c.get('device')
   force = c.get('force')
   routine = c.get('routine')
   source = 'web: /API/command'
