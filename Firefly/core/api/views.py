@@ -1,9 +1,9 @@
 import json
 import logging
 
-from core import getDeviceStatusDict, getDeviceViewsList, getRoutineList
+from core import ffCommand, getDeviceStatusDict, getDeviceViewsList, getRoutineList
 from core.firefly import app
-from flask import Flask
+from flask import Flask, request
 
 @app.route('/')
 def baseView():
@@ -82,7 +82,13 @@ def APICoreStatusDevicesAll():
         'title': str(d)
       })
     device_index += 1
-
   return_data['types'] = device_types
-
   return json.dumps(return_data, sort_keys=True)
+
+@app.route('/API/command', methods=['POST'])
+def APICommand():
+  command = request.form.get('command')
+  logging.critical(str(command))
+  #if request.form.get('routine'):
+  #  ffCommand()
+
