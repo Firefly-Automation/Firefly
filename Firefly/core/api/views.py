@@ -8,7 +8,7 @@ from flask import Flask
 def baseView():
   return "This is the root page"
 
-@app.route('/API/core/views/routine'):
+@app.route('/API/core/views/routine')
 def APICoreViewRoutine():
   routine_list = getRoutineList()
   return_data = {}
