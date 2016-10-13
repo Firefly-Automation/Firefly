@@ -46,6 +46,7 @@
         "name" : "Turn entry lights on when door opens",
         "contact_sensors" : ["zwave-node-13", "zwave-node-5"],
         "lights" : ["hue-light-2"],
+        "no_run_modes": ["away"],
         "delay_time" : 3
       },
       {
