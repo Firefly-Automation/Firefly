@@ -2,12 +2,14 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-13 00:36:33
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-13 00:42:08
+# @Last Modified time: 2016-10-13 01:23:22
 
 import difflib
 import json
 
-from core import ffCommand, getDeviceList, getRoutineList
+from core import ffCommand
+from core.database.device_db import getDeviceList
+from core.database.routine_db import getRoutineList
 
 def alexaHandler(p_request):
   p_request = json.loads(p_request)
