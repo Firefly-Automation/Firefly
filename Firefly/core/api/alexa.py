@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-13 00:36:33
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-13 01:24:27
+# @Last Modified time: 2016-10-13 01:30:14
 
 import difflib
 import json
@@ -12,7 +12,9 @@ from core.database.device_db import getDeviceList
 from core.database.routine_db import getRoutineList
 
 def alexaHandler(p_request):
+  logging.critical(p_request)
   request = p_request.get('request')
+  logging.critical(request)
   r_type = None
   if request is not None:
     r_type = request.get('type')
