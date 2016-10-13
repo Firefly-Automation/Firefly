@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-13 00:36:33
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-13 01:34:47
+# @Last Modified time: 2016-10-13 02:56:55
 
 import difflib
 import json
@@ -61,9 +61,7 @@ def echo_change_mode(intent):
   routine_list = getRoutineList()
   mode = intent.get('slots').get('mode').get('value').lower()
   close_matches = difflib.get_close_matches(mode, routine_list)
-  if len(close_matches) < 1:
-    get_routines_list()
-    close_matches = difflib.get_close_matches(mode, routine_list)
+  
   if len(close_matches) > 0:
     routine = close_matches[0]
     myCommand = ffCommand(routine, None, routine=True, source="Echo command", force=True)
@@ -79,9 +77,6 @@ def echo_switch(intent):
   close_matches = difflib.get_close_matches(device, device_list.keys())
   logging.critical(device_list)
   logging.critical(close_matches)
-  if len(close_matches) < 1:
-    get_device_list()
-    close_matches = difflib.get_close_matches(device, device_list.keys())
   if len(close_matches) > 0:
     device = close_matches[0]
     myCommand = ffCommand(device_list.get(device), {'switch':state})
