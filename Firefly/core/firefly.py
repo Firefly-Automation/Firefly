@@ -23,7 +23,7 @@ def autoStart():
       if device.get('module') == "ffZwave":
         package_full_path = device.get('type') + 's.' + device.get('package') + '.' + device.get('module')
         package = __import__(package_full_path, globals={}, locals={}, fromlist=[device.get('package')], level=-1)
-        ff_zwave = package.Device(device.get('id'), device)
+        ff_zwave.zwave = package.Device(device.get('id'), device)
         #ff_zwave.refresh_scheduler()
 
   for device in deviceDB.find({}):
@@ -46,5 +46,5 @@ def getDeviceList(lower=True):
         device_list[d.get('config').get('name')] = d.get('id')
   return device_list
 
-#if __name__ == "__main__":
-#  run()
+if __name__ == "__main__":
+  run()
