@@ -30,12 +30,6 @@ def autoStart():
 
   ffScheduler.runEveryM(5, auto_refresh, replace=True, uuid='auto-refresh')
 
-def getRoutinesList():
-  routine_list = []
-  for r in routineDB.find():
-    routine_list.append(r.get('id'))
-  return routine_list
-
 def getDeviceList(lower=True):
   logging.critical("GET DEVICE LIST")
   device_list = {}

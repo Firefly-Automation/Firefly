@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-10 22:49:30
+# @Last Modified time: 2016-10-12 22:16:19
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -396,17 +396,19 @@ def auto_refresh():
 
 @app.route('/API/views/routine')
 def APIViewsRoutine(request):
-  returnData = {}
-  for r in routineDB.find({}).sort("id"):
+  from core import getRoutinesList
+  routine_list = getRoutinesList()
+  return_data = {}
+  for r in routine_list:
     if r.get('icon') is None:
       continue
     rID = r .get('id')
-    returnData[rID] = {}
-    returnData[rID]['id'] = rID
-    returnData[rID]['icon'] = r.get('icon')
+    return_data[rID] = {}
+    return_data[rID]['id'] = rID
+    return_data[rID]['icon'] = r.get('icon')
 
-  #logging.critical(str(returnData))
-  return json.dumps(returnData, sort_keys=True)
+  logging.critical(str(return_data))
+  return json.dumps(return_data, sort_keys=True)
 
 
 @app.route('/API/views/devices')
