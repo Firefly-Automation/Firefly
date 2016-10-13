@@ -1,7 +1,7 @@
 import json
 import logging
 
-from core import ffCommand, getDeviceStatusDict, getDeviceViewsList, getRoutineList
+from core import ffCommand, getDeviceStatusDict, getDeviceViewsList, getRoutineList, getRoutineViewsDict
 from core.api.alexa import alexaHandler
 from core.firefly import app
 from flask import Flask, request
@@ -17,7 +17,7 @@ def apiAlexa():
 
 @app.route('/API/core/views/routine')
 def apiCoreViewRoutine():
-  routine_list = getRoutineList()
+  routine_list = getRoutineViewsDict()
   return_data = {}
   for r in routine_list:
     if r.get('icon') is None:
