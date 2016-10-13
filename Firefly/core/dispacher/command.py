@@ -16,8 +16,7 @@ def sendCommand(command):
 
   #TODO: Have option in command for device/app
   success = False
-  success = success or sendDeviceCommand(command)
-  success = success or sendAppCommand(command)
+  success = success or sendDeviceCommand(command) or sendAppCommand(command)
   return success
 
 def sendDeviceCommand(command):
@@ -27,6 +26,7 @@ def sendDeviceCommand(command):
     s.sendCommand(command)
     d = pickle.dumps(s)
     deviceDB.update_one({'id':command.deviceID},{'$set': {'ffObject':d}, '$currentDate': {'lastModified': True}})
+    success = True
   return success
 
 def sendRoutineCommand(command):
