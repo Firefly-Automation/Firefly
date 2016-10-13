@@ -90,8 +90,8 @@ def APICommand():
   c = dict(request.form)
   logging.critical(str(c))
   
-  command = c.get('command')
-  device = c.get('device')
+  command = c.get('command')[0]
+  device = c.get('device')[0]
   force = c.get('force')
   routine = c.get('routine')
   source = 'web: /API/command'
