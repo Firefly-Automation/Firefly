@@ -91,6 +91,7 @@ def APICommand():
   logging.critical(str(c))
   
   command = request.form.get('command')
+  logging.critical(command)
   device = c.get('device')[0]
   force = c.get('force')
   routine = c.get('routine')
