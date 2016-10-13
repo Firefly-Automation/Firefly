@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-12 22:16:19
+# @Last Modified time: 2016-10-12 22:18:47
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -396,8 +396,8 @@ def auto_refresh():
 
 @app.route('/API/views/routine')
 def APIViewsRoutine(request):
-  from core import getRoutinesList
-  routine_list = getRoutinesList()
+  from core import getRoutineList
+  routine_list = getRoutineList()
   return_data = {}
   for r in routine_list:
     if r.get('icon') is None:
