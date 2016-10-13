@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-12 22:23:27
+# @Last Modified time: 2016-10-12 22:41:12
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -697,10 +697,11 @@ def get_device_list(lower=True):
 
 
 def run():
-  global core_settings
-  read_settings()
-  auto_start()
-  app.run(core_settings.ip_address, core_settings.port, logFile=open('logs/app.log','w'))
+  #global core_settings
+  #read_settings()
+  #auto_start()
+  #app.run(core_settings.ip_address, core_settings.port, logFile=open('logs/app.log','w'))
+  pass
 
 if __name__ == "__main__":
   run()
