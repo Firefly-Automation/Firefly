@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 23:06:59
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-10 22:52:44
+# @Last Modified time: 2016-10-12 23:14:47
 
 
 import logging
@@ -85,8 +85,8 @@ class App(App):
     return self._disabled
 
   def sensorHandler(self, event={}):
-    from core.firefly_api import ffScheduler
-    from core.firefly_api import ffLocation
+    from core import ffScheduler
+    from core import ffLocation
 
     logging.critical("ENTERNING LUX HANDELER")
 
@@ -137,8 +137,8 @@ class App(App):
         ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, job_id=self._id)
 
   def TurnLightsOff(self):
-    from core.firefly_api import ffScheduler
-    from core.firefly_api import ffLocation
+    from core import ffScheduler
+    from core import ffLocation
     
     if self._disabled:
       logging.critical('LUX Events Disabled')

@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:35
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-12 22:18:41
+# @Last Modified time: 2016-10-12 23:21:48
 
 class FireflyZwave(object):
   def __init__(self):
@@ -25,7 +25,7 @@ routineDB = ffDB.routines
 datalogDB.ensure_index("timestamp", expireAfterSeconds=(60*60*72))
 messageDB.ensure_index("timestamp", expireAfterSeconds=(60*60*24*7))
 
-from core.database import getRoutineList
+from core.database import getDeviceViewsList, getRoutineList
 
 ## SETUP SCHEDULER
 from core.utils.scheduler import Scheduler
@@ -57,6 +57,6 @@ from core.firefly import getDeviceList
 
 from core.api.views import *
 
-__all__ = ['sendCommand', 'sendEvent', 'sendRequest', 'ffEvent', 'ffCommand', 'getDeviceList', 'getRoutineList', 'ffScheduler', 'ffLocation']
+__all__ = ['sendCommand', 'sendEvent', 'sendRequest', 'ffEvent', 'ffCommand', 'getDeviceList', 'getRoutineList', 'ffScheduler', 'ffLocation', 'getDeviceViewsList']
 
 

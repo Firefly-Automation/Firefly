@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 16:09:01
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-10 22:52:51
+# @Last Modified time: 2016-10-12 23:14:59
 
 import logging
 
@@ -74,8 +74,8 @@ class App(App):
 
   def motionHandeler(self, event={}):
     logging.critical('Motion Handeler!!!##')
-    from core.firefly_api import ffScheduler
-    from core.firefly_api import ffLocation
+    from core import ffScheduler
+    from core import ffLocation
 
     logging.critical('Entered Motion Handeler')
 

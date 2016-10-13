@@ -1,7 +1,7 @@
 import json
 import logging
 
-from core import getRoutineList
+from core import getDeviceViewsList, getRoutineList
 from core.firefly import app
 from flask import Flask
 
@@ -20,4 +20,36 @@ def APICoreViewRoutine():
     return_data[rID] = {'id': rID, 'icon':r.get('icon')}
 
   logging.debug(str(return_data))
+  return json.dumps(return_data, sort_keys=True)
+
+@app.route('/API/core/views/devices')
+def APICoreViewDevices():
+  devices = getDeviceViewsList()
+  return_data = {'devices': devices}
+
+  device_type_list = []
+  for d in devices:
+    d_type = d.get('type')
+    if d_type not in device_type_list:
+      device_type_list.append(d_type)
+
+  device_types = [
+    {
+      'index': 0,
+      'type': 'all',
+      'title': 'all devices'
+    }
+  ]
+
+  device_index = 1
+  for d in sorted(device_type_list):
+    device_types.append({
+        'index': device_index,
+        'type': str(d),
+        'title': str(d)
+      })
+    device_index += 1
+
+  return_data['types'] = device_types
+
   return json.dumps(return_data, sort_keys=True)

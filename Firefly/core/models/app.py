@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-12 22:34:36
+# @Last Modified time: 2016-10-12 23:17:36
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -21,7 +21,6 @@ import json
 import logging
 
 from collections import OrderedDict
-from core.firefly_api import ffScheduler
 from core.models.command import Command as ffCommand
 
 class App(object):
