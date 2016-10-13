@@ -47,5 +47,5 @@ def getDeviceList(lower=True):
         device_list[d.get('config').get('name')] = d.get('id')
   return device_list
 
-if __name__ == "__main__":
-  run()
+#if __name__ == "__main__":
+#  run()
