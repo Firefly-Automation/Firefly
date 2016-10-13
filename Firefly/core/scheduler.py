@@ -8,7 +8,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-02-13 21:34:27
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-13 13:14:14
+# @Last Modified time: 2016-10-13 13:16:51
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -22,6 +22,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
+import logging
 
 from crontab import CronTab
 from datetime import datetime
