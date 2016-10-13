@@ -1,4 +1,3 @@
-import core
 import logging
 
 from core import deviceDB, ffScheduler, ff_zwave, routineDB
