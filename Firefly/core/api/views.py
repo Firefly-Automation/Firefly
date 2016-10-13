@@ -12,7 +12,9 @@ def baseView():
 
 @app.route('/API/alexa', methods=['POST'])
 def apiAlexa():
+  logging.critical('START ALEXA API')
   r = request.get_json(force=True)
+  logging.critical('GETTING ALEXA DATA')
   return alexaHandler(r)
 
 @app.route('/API/core/views/routine')
