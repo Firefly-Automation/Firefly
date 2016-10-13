@@ -14,7 +14,7 @@ def run():
   ## For now leave this disabled
   logging.critical('--------------------FIREFLY RUN---------------')
   autoStart()
-  app.run(host='0.0.0.0', port=6002, threaded=True)
+  app.run(host='0.0.0.0', port=6002, threaded=True, debug=False)
 
 
 def autoStart():
