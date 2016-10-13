@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-12 22:18:47
+# @Last Modified time: 2016-10-12 22:23:27
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -403,12 +403,16 @@ def APIViewsRoutine(request):
     if r.get('icon') is None:
       continue
     rID = r .get('id')
-    return_data[rID] = {}
-    return_data[rID]['id'] = rID
-    return_data[rID]['icon'] = r.get('icon')
+    return_data[rID] = {'id': rID, 'icon':r.get('icon')}
 
-  logging.critical(str(return_data))
+  logging.debug(str(return_data))
   return json.dumps(return_data, sort_keys=True)
+
+@app.route('/API/start')
+def startNewAPI(request):
+  from core.firefly import run as newRun
+  newRun()
+  return "started"
 
 
 @app.route('/API/views/devices')

@@ -9,9 +9,11 @@ from flask import Flask
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
+from core.api.views import *
+
 def run():
   autoStart()
-  app.run(host='0.0.0.0', port=6001, threaded=True)
+  app.run(host='0.0.0.0', port=6002, threaded=True)
 
 
 def autoStart():
