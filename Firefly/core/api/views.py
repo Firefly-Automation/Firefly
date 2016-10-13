@@ -2,6 +2,7 @@ import json
 import logging
 
 from core import ffCommand, getDeviceStatusDict, getDeviceViewsList, getRoutineList
+from core.api.alexa import alexaHandler
 from core.firefly import app
 from flask import Flask, request
 
@@ -9,8 +10,13 @@ from flask import Flask, request
 def baseView():
   return "This is the root page"
 
+@app.route('/API/alexa', methods=['POST'])
+def apiAlexa():
+  r = request.get_json(force=True)
+  return alexaHandler(r)
+
 @app.route('/API/core/views/routine')
-def APICoreViewRoutine():
+def apiCoreViewRoutine():
   routine_list = getRoutineList()
   return_data = {}
   for r in routine_list:
@@ -23,7 +29,7 @@ def APICoreViewRoutine():
   return json.dumps(return_data, sort_keys=True)
 
 @app.route('/API/core/views/devices')
-def APICoreViewDevices():
+def apiCoreViewDevices():
   devices = getDeviceViewsList()
   return_data = {'devices': devices}
 
@@ -55,7 +61,7 @@ def APICoreViewDevices():
   return json.dumps(return_data, sort_keys=True)
 
 @app.route('/API/core/status/devices/all')
-def APICoreStatusDevicesAll():
+def apiCoreStatusDevicesAll():
   device_status = getDeviceStatusDict()
   return_data = {'devices': device_status}
 
@@ -86,7 +92,7 @@ def APICoreStatusDevicesAll():
   return json.dumps(return_data, sort_keys=True)
 
 @app.route('/API/command', methods=['POST'])
-def APICommand():
+def apiCommand():
   c = request.get_json(force=True)
   logging.critical(str(c))
   
