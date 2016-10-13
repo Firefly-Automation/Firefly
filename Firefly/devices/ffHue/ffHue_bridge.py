@@ -2,12 +2,13 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 23:50:08
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-22 03:20:19
+# @Last Modified time: 2016-10-12 23:05:30
 
-import requests #TODO: Replace with core.http_request
-from core.models.event import Event as ffEvent
 import json
 import logging
+import requests #TODO: Replace with core.http_request
+
+from core.models.event import Event as ffEvent
 
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -105,7 +106,6 @@ class Bridge(object):
 
 
   def send_request(self, path, data=None, method='GET', return_json=True, no_username=False):
-    from core.firefly_api import http_request
     if data:
       data = json.dumps(data)
 
@@ -125,10 +125,10 @@ class Bridge(object):
       #  return r.json()
       #return r
       
-      http_request(url,method='POST',data=data)
+      requests.post(url,data=data)
 
     elif method == 'PUT':
-      http_request(url,method='PUT',data=data)
+      requests.put(url,data=data)
       
       #r = requests.put(url, data=data)
       #if return_json:
