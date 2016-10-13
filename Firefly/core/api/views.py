@@ -61,10 +61,10 @@ def APICoreStatusDevicesAll():
 
   device_type_list = []
   for name, d in device_status.iteritems():
-    if d.get('views')
-    d_type = d.get('views').get('type')
-    if d_type not in device_type_list:
-      device_type_list.append(d_type)
+    if d.get('views'):
+      d_type = d.get('views').get('type')
+      if d_type not in device_type_list:
+        device_type_list.append(d_type)
 
   device_types = [
     {
