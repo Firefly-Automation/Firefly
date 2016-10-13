@@ -87,7 +87,7 @@ def APICoreStatusDevicesAll():
 
 @app.route('/API/command', methods=['POST'])
 def APICommand():
-  c = dict(request.form)
+  c = dict(request.values)
   logging.critical(str(c))
   
   command = request.form.get('command')
