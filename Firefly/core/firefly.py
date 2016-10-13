@@ -27,14 +27,14 @@ def autoStart():
         ff_zwave = package.Device(device.get('id'), device)
         #ff_zwave.refresh_scheduler()
 
-def auto_refresh():
-  refresh_command = ffCommand('nest', 'update', source='NEST-UPDATER')
-
   for device in deviceDB.find({}):
     deviceID = device.get('id')
     ffEvent(deviceID, {'startup': True})
 
   ffScheduler.runEveryM(5, auto_refresh, replace=True, job_id='auto-refresh')
+
+def auto_refresh():
+  refresh_command = ffCommand('nest', 'update', source='NEST-UPDATER')
 
 def getDeviceList(lower=True):
   logging.critical("GET DEVICE LIST")
