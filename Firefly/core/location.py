@@ -1,8 +1,12 @@
+#####################################
+## THIS IS DEPRECATED - DO NOT USE ##
+#####################################
+
 # -*- coding: utf-8 -*-
 # @Author: zpriddy
 # @Date:   2016-04-19 15:57:29
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-09 23:27:57
+# @Last Modified time: 2016-10-13 13:15:30
 import json
 import logging
 
@@ -24,6 +28,7 @@ location_scheduler = Scheduler()
 
 class Location(object):
   def __init__(self, config_file):
+    logging.critical('#####################################\n## THIS IS DEPRECATED - DO NOT USE ##\n#####################################')
     self._config_file = config_file
     self._modes = []
     self._a = None

@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-12 22:47:26
+# @Last Modified time: 2016-10-13 13:15:53
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -208,6 +208,7 @@ def install_child_device(deviceID, ffObject, config={}, status={}):
       
 
 def send_event(event):
+  logging.critical('#####################################\n## THIS IS DEPRECATED - DO NOT USE ##\n#####################################')
   sendEvent(event)
   '''
   logging.info('send_event: ' + str(event))
@@ -233,6 +234,7 @@ def send_event(event):
   data_log(event.log, logType='event')
 
 def send_command(command):
+  logging.critical('#####################################\n## THIS IS DEPRECATED - DO NOT USE ##\n#####################################')
   sendCommand(command)
   '''
   global ffZwave
@@ -274,6 +276,7 @@ def send_command(command):
   '''
 
 def send_request(request):
+  logging.critical('#####################################\n## THIS IS DEPRECATED - DO NOT USE ##\n#####################################')
   return sendRequest(request)
   '''
   logging.debug('send_request' + str(request))
@@ -294,6 +297,7 @@ def send_request(request):
 ############################## HTTP UTILES ###########################################
 
 def http_request(url,method='GET',headers=None,params=None,data=None,callback=None,json=True, code_only=False):
+  logging.critical('#####################################\n## THIS IS DEPRECATED - DO NOT USE ##\n#####################################')
   request = treq.request(url=url,method=method,headers=headers,data=data)
   if callback:
     if code_only:

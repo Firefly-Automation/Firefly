@@ -1,10 +1,14 @@
+#####################################
+## THIS IS DEPRECATED - DO NOT USE ##
+#####################################
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @FileName: scheduler.py
 # @Author: Zachary Priddy
 # @Date:   2016-02-13 21:34:27
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-19 23:31:10
+# @Last Modified time: 2016-10-13 13:14:14
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -29,6 +33,7 @@ from uuid import uuid1
 
 class Scheduler(object):
   def __init__(self):
+    logging.critical('#####################################\n## THIS IS DEPRECATED - DO NOT USE ##\n#####################################')
     self._queue = {}
     self._loop = {}
     self._cron = {}
