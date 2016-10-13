@@ -13,7 +13,7 @@ from core.api.views import *
 
 def run():
   ## For now leave this disabled
-  #autoStart()
+  autoStart()
   app.run(host='0.0.0.0', port=6002, threaded=True)
 
 
@@ -27,11 +27,14 @@ def autoStart():
         ff_zwave = package.Device(device.get('id'), device)
         #ff_zwave.refresh_scheduler()
 
+def auto_refresh():
+  refresh_command = ffCommand('nest', 'update', source='NEST-UPDATER')
+
   for device in deviceDB.find({}):
     deviceID = device.get('id')
     ffEvent(deviceID, {'startup': True})
 
-  ffScheduler.runEveryM(5, auto_refresh, replace=True, uuid='auto-refresh')
+  ffScheduler.runEveryM(5, auto_refresh, replace=True, job_id='auto-refresh')
 
 def getDeviceList(lower=True):
   logging.critical("GET DEVICE LIST")

@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-28 10:40:17
+# @Last Modified time: 2016-10-12 22:34:36
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -19,9 +19,10 @@
 
 import json
 import logging
+
 from collections import OrderedDict
-from core.models.command import Command as ffCommand
 from core.firefly_api import ffScheduler
+from core.models.command import Command as ffCommand
 
 class App(object):
   def __init__(self, config, args={}):
