@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-12 23:18:17
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-12 23:21:11
+# @Last Modified time: 2016-10-12 23:41:44
 
 from core import deviceDB
 
@@ -19,7 +19,14 @@ def getDeviceList(lower=True):
 def getDeviceViewsList():
   devices = []
   for d in deviceDB.find({},{'status.views':1, 'id':1}):
-    dID = d.get('id')
     if (d.get('status').get('views')):
       devices.append(d.get('status').get('views'))
+  return devices
+
+def getDeviceStatusDict():
+  devices = []
+  for d in deviceDB.find({},{'status':1, 'id':1}):
+    d_id = d.get('id')
+    if (d.get('status')):
+      devices[d_id] = d.get('status')
   return devices

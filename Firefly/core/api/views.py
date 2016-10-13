@@ -1,7 +1,7 @@
 import json
 import logging
 
-from core import getDeviceViewsList, getRoutineList
+from core import getDeviceStatusDict, getDeviceViewsList, getRoutineList
 from core.firefly import app
 from flask import Flask
 
@@ -30,6 +30,39 @@ def APICoreViewDevices():
   device_type_list = []
   for d in devices:
     d_type = d.get('type')
+    if d_type not in device_type_list:
+      device_type_list.append(d_type)
+
+  device_types = [
+    {
+      'index': 0,
+      'type': 'all',
+      'title': 'all devices'
+    }
+  ]
+
+  device_index = 1
+  for d in sorted(device_type_list):
+    device_types.append({
+        'index': device_index,
+        'type': str(d),
+        'title': str(d)
+      })
+    device_index += 1
+
+  return_data['types'] = device_types
+
+  return json.dumps(return_data, sort_keys=True)
+
+@app.route('/API/core/status/devices/all')
+def APICoreStatusDevicesAll():
+  device_status = getDeviceStatusDict()
+  return_data = {'devices': device_status}
+
+  device_type_list = []
+  for name, d in device_status.iteritems():
+    if d.get('views')
+    d_type = d.get('views').get('type')
     if d_type not in device_type_list:
       device_type_list.append(d_type)
 
