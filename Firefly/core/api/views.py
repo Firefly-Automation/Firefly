@@ -87,9 +87,18 @@ def APICoreStatusDevicesAll():
 
 @app.route('/API/command', methods=['POST'])
 def APICommand():
-  command = dict(request.form)
-  logging.critical(str(command))
-  #if request.form.get('routine'):
-  #  ffCommand()
-  return ""
+  c = dict(request.form)
+  logging.critical(str(c))
+  
+  command = c.get('command')
+  device = c.get('device')
+  force = c.get('force')
+  routine = c.get('routine')
+  source = 'web: /API/command'
+
+  if routine:
+    ffCommand(device, command, routine=routine, force=force, source=source)
+  else:
+    ffCommand(device, command, source=source)
+  return "OK"
 
