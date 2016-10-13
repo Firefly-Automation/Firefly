@@ -3,7 +3,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:00:14
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-12 22:51:08
+# @Last Modified time: 2016-10-12 22:51:35
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -31,4 +31,4 @@ from core import firefly_api
 if __name__ == "__main__":
   #firefly_api.run()
   from core import firefly
-  #firefly.run()
+  firefly.run()
