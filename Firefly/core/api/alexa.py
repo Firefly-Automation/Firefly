@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-13 00:36:33
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-13 01:30:52
+# @Last Modified time: 2016-10-13 01:34:47
 
 import difflib
 import json
@@ -13,19 +13,22 @@ from core.database.device_db import getDeviceList
 from core.database.routine_db import getRoutineList
 
 def alexaHandler(p_request):
-  logging.critical(p_request)
-  request = p_request.get('request')
-  logging.critical(request)
+  echo_app_version = '1.0'
   r_type = None
+  response = None
+  request = p_request.get('request')
+
   if request is not None:
     r_type = request.get('type')
   
   if r_type == "LaunchRequest":
-    return launch_request(request)
+    response = launch_request(request)
   elif r_type == "IntentRequest":
-    return intent_request(request)
+    response = intent_request(request)
   else:
-    return launch_request(request)
+    response = launch_request(request)
+
+  return json.dumps({"version":echo_app_version,"response":response},indent=2,sort_keys=True)
   
 def launch_request(request):
   output_speech = "Welcome to Firefly Smart Home. Please say a command"
