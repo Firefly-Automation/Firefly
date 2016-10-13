@@ -2,10 +2,11 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-13 00:36:33
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-13 01:30:14
+# @Last Modified time: 2016-10-13 01:30:52
 
 import difflib
 import json
+import logging
 
 from core import ffCommand
 from core.database.device_db import getDeviceList
