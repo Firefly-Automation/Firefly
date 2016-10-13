@@ -20,6 +20,7 @@ def run():
 def autoStart():
   with open('config/devices.json') as devices:
     allDevices = json.load(devices)
+    logging.critical('devices: {}'.format(str(allDevices)))
     for name, device in allDevices.iteritems():
       if device.get('module') == "ffZwave":
         package_full_path = device.get('type') + 's.' + device.get('package') + '.' + device.get('module')

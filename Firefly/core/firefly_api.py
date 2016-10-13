@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-12 22:41:12
+# @Last Modified time: 2016-10-12 22:47:26
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -407,12 +407,6 @@ def APIViewsRoutine(request):
 
   logging.debug(str(return_data))
   return json.dumps(return_data, sort_keys=True)
-
-@app.route('/API/start')
-def startNewAPI(request):
-  from core.firefly import run as newRun
-  newRun()
-  return "started"
 
 
 @app.route('/API/views/devices')
