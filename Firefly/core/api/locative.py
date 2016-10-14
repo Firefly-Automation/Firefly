@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-14 15:29:06
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-14 16:12:26
+# @Last Modified time: 2016-10-14 16:42:52
 
 import logging
 
@@ -39,7 +39,7 @@ class LocativeMessage(object):
     return True if self.trigger == 'enter' else False
 
   def getValue(self, value):
-    return self._request.form.get(value)
+    return self._request.args.get(value)
 
 
 def locativeHandler(request):
