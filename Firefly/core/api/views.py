@@ -1,8 +1,9 @@
 import json
 import logging
 
-from core import ffCommand, getDeviceStatusDict, getDeviceViewsList, getRoutineList, getRoutineViewsDict
+from core import ffCommand, ffLocation, getDeviceStatusDict, getDeviceViewsList, getRoutineList, getRoutineViewsDict
 from core.api.alexa import alexaHandler
+from core.api.ifttt import iftttHandler
 from core.firefly import app
 from flask import Flask, request
 
@@ -14,6 +15,15 @@ def baseView():
 def apiAlexa():
   r = request.get_json(force=True)
   return alexaHandler(r)
+
+@app.route('/API/ifttt', methods=['POST'])
+def apiIFTTT():
+  r = request.get_json(force=True)
+  return iftttHandler(r)
+
+@app.route('/API/mode')
+def apiMode():
+  return ffLocation.mode
 
 @app.route('/API/core/views/routine')
 def apiCoreViewRoutine():
