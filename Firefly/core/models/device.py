@@ -4,7 +4,6 @@ from core.models.event import Event as ffEvent
 
 
 class Device(object):
-
   def __init__(self, deviceID, deviceName):
     self._id = deviceID
     self._name = deviceName
@@ -17,12 +16,13 @@ class Device(object):
 
     self.refreshData()
 
+
   def __str__(self):
-    status = ''
+    status_string = '<DEVICE:' + self.type.upper() + ' ID:' + self.id.upper() + ' NAME:' + self.name.upper()
+
     for item in self.requests.keys():
-      status += '{}: {} '.format(item.upper(), str(self.requests[item]))
-    status_string = '<DEVICE: {} ID: {} NAME: {} {} /DEVICE>'.format(
-        self.type.upper(), self.id.upper(), self.name.upper(), status)
+      status_string += ' ' + item.upper() + ': ' + str(self.requests[item]()) 
+    status_string += ' /DEVICE>'
     return status_string
 
   def sendEvent(self, event):
@@ -38,8 +38,13 @@ class Device(object):
   '''
 
   def sendCommand(self, command):
+    simpleCommand = None
     logging.debug('Reciving Command in ' + str(self.metadata.get('module')) + ' ' + str(command))
     if command.deviceID == self._id:
+      for item, value in command.command.iteritems():
+        if item in self._commands:
+          simpleCommand = self._commands[item](value)
+
       updated_status = self.refreshData()
       if command.send_event:
         if updated_status:
@@ -48,6 +53,7 @@ class Device(object):
           logging.debug('NO chnage in status')
       else:
         logging.debug('Set to not send event')
+    
 
   def requestData(self, request):
     logging.debug('Request made to ' + str(self.metadata.get('module')) + ' ' + str(request))
@@ -84,12 +90,12 @@ class Device(object):
     newChanges = {}
     for item in self._requests:
       returnData[item] = self._requests[item]()
-      # This builds a list of only the things that have changed - This way an event can be sent with only those items
+      #This builds a list of only the things that have changed - This way an event can be sent with only those items
       if returnData[item] != self._lastStatus.get(item):
         newChanges[item] = returnData[item]
     self._lastStatus = returnData
     returnData['deviceID'] = self._id
-    returnData['views'] = self.views
+    returnData['views'] = self._views
     updated = update_status(returnData)
     if updated and newChanges != {}:
       return newChanges
@@ -118,11 +124,4 @@ class Device(object):
 
   @property
   def views(self):
-    self._views = self.VIEWS
     return self._views
-  
-  
-  
-  
-  
-  
