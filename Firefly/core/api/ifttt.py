@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-13 19:02:52
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-13 20:40:46
+# @Last Modified time: 2016-10-13 22:18:43
 
 '''
 IFTTT API
@@ -34,7 +34,7 @@ from core.database.routine_db import getRoutineList
 def iftttHandler(p_request):
     action = p_request.get('action')
     if action == "mode":
-        return ifttt_change_mode(p_request)
+        return str(ifttt_change_mode(p_request))
     if action == "switch":
         return str(ifttt_switch(p_request))
     return str(False)
