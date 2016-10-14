@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-10 23:10:39
+# @Last Modified time: 2016-10-13 20:17:57
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -21,7 +21,6 @@ import json
 import logging
 
 from collections import OrderedDict
-#from core.firefly_api import ffScheduler
 from core import ffScheduler
 from core.models.command import Command as ffCommand
 
@@ -86,7 +85,7 @@ class Routine(object):
   def event(self, event):
     from core.firefly_api import send_request, event_message
     from core.models.request import Request as FFRequest
-    from core.firefly_api import ffLocation
+    from core import ffLocation
     logging.debug('ROUTINE: Receving Event In: ' + str(self._name))
 
     for trigger in self._triggers:
@@ -115,7 +114,7 @@ class Routine(object):
   def executeRoutine(self, force=False):
     from time import sleep
     from datetime import datetime, time
-    from core.firefly_api import ffLocation
+    from core import ffLocation
     from core.utils.notify import Notification as ffNotification
     logging.debug("Executing Routine: " + self._name)
 

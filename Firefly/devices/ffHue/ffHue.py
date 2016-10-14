@@ -2,11 +2,10 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 21:48:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-12 23:07:46
+# @Last Modified time: 2016-10-13 20:14:51
 from core.models import event
 from core.models.command import Command as ffCommand
 
-#from core.scheduler import Scheduler
 import ffHue_bridge as bridge
 import ffHue_group as groupDevice
 import ffHue_light as lightDevice
