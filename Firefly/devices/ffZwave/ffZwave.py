@@ -2,18 +2,19 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-24 17:40:36
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-05-22 14:19:16
-from time import sleep, time
-from sys import stdout
+# @Last Modified time: 2016-10-13 20:10:00
+from core.models.command import Command as ffCommand
 from core.models.device import Device
 from core.models.event import Event as ffEvent
-from openzwave.option import ZWaveOption
 from openzwave.network import ZWaveNetwork
-from core.models.command import Command as ffCommand
+from openzwave.option import ZWaveOption
+from sys import stdout
+from time import sleep, time
 
-from louie import dispatcher, All
-from core.scheduler import Scheduler
 import logging
+
+from core import ffScheduler
+from louie import All, dispatcher
 
 class Device(Device):
 
@@ -203,8 +204,7 @@ class Device(Device):
 
   def refresh_scheduler(self, args={}):
     logging.debug("Starting Zwave Scheduler")
-    zwaveRefresh = Scheduler()
-    zwaveRefresh.runEveryS(10,self.get_all_node_data,replace=True,uuid='ZwaveRefresher')
+    ffScheduler.runEveryS(10,self.get_all_node_data,replace=True,job_id='ZwaveRefresher')
 
   #########################################################################################
   #           ACTIONS
