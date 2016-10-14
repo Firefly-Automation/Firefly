@@ -8,6 +8,7 @@ from core import getDeviceViewsList
 from core import getRoutineViewsDict
 from core.api.alexa import alexaHandler
 from core.api.ifttt import iftttHandler
+from core.api.locative import locativeHandler
 from core.firefly import app
 from flask import request
 
@@ -27,6 +28,12 @@ def apiAlexa():
 def apiIFTTT():
   r = request.get_json(force=True)
   return iftttHandler(r)
+
+
+@app.route('/API/locative', methods=['POST'])
+def locativeAPI():
+  locativeHandler(request)
+  return str(True)
 
 
 @app.route('/API/mode')
