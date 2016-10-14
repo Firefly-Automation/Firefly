@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-13 20:17:57
+# @Last Modified time: 2016-10-13 21:23:46
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -24,7 +24,9 @@ from collections import OrderedDict
 from core import ffScheduler
 from core.models.command import Command as ffCommand
 
+
 class Routine(object):
+
   def __init__(self, configJson):
     config = json.loads(configJson, object_pairs_hook=OrderedDict)
 
@@ -45,42 +47,39 @@ class Routine(object):
 
     self._listen = list(set().union(*(d.keys() for d in self._triggers)))
 
-
     if self._scheduling:
       count = 0
       for cron_data in self._scheduling:
         uuid = self._name + str(count)
-        #crondata = {'uuid':uuid, 'funct':self.executeRoutine, 'cron':cron_data}
-        #ffScheduler.add_to_cron(crondata)
+        # crondata = {'uuid':uuid, 'funct':self.executeRoutine, 'cron':cron_data}
+        # ffScheduler.add_to_cron(crondata)
         ffScheduler.runSimpleWeekCron(self.executeRoutine, minute=cron_data.get('minute'), hour=cron_data.get('hour'), days_of_week=cron_data.get('days'), job_id=uuid)
 
-
   def __str__(self):
-    return ('<ROUTINE>\nName: ' + str(self._name) + 
-      '\nMode: ' + str(self._mode) + 
-      '\nListen: ' + str(self._listen) + 
-      '\n<END ROUTINE>')
+    return ('<ROUTINE>\nName: ' + str(self._name) +
+            '\nMode: ' + str(self._mode) +
+            '\nListen: ' + str(self._listen) +
+            '\n<END ROUTINE>')
 
   @property
   def listen(self):
-      return self._listen
+    return self._listen
 
   @property
   def mode(self):
-      return self._mode
+    return self._mode
 
   @property
   def triggers(self):
-      return self._triggers
+    return self._triggers
 
   @property
   def actions(self):
-      return self._actions
+    return self._actions
 
   @property
   def scheduling(self):
-      return self._scheduling
-
+    return self._scheduling
 
   def event(self, event):
     from core.firefly_api import send_request, event_message
@@ -93,9 +92,9 @@ class Routine(object):
         print 'Device in triggers'
         should_trigger = True
         for device, state in trigger.iteritems():
-          #TEMP FIX
+          # TEMP FIX
           if device != 'location':
-            status = send_request(FFRequest(device,state.keys()[0]))
+            status = send_request(FFRequest(device, state.keys()[0]))
             if str(status) == str(state.values()[0]):
               pass
             else:
@@ -107,7 +106,7 @@ class Routine(object):
               should_trigger = False
 
         if should_trigger:
-          event_message(self._name,"Routine Triggered")
+          event_message(self._name, "Routine Triggered")
           print str(self._mode)
           self.executeRoutine()
 
@@ -121,12 +120,14 @@ class Routine(object):
     if not force:
       if self._mode_no_run:
         if ffLocation.mode in self._mode_no_run:
-          logging.debug('Returning: Set to not execute in mode: ' + ffLocation.mode)
+          logging.debug(
+              'Returning: Set to not execute in mode: ' + ffLocation.mode)
           return
 
       if self._mode_run:
         if ffLocation.mode not in self._mode_run:
-          logging.debug('Returning: Set to not execute in mode: ' + ffLocation.mode)
+          logging.debug(
+              'Returning: Set to not execute in mode: ' + ffLocation.mode)
           return
 
       if self._run_time_ranges or self._no_run_time_ranges:
@@ -140,11 +141,11 @@ class Routine(object):
             endH = int(endH)
             endM = int(endM)
             if startH <= endH:
-              if not (now >= time(startH,startM) and now <= time(endH,endM)):
+              if not (now >= time(startH, startM) and now <= time(endH, endM)):
                 logging.critical("Not in time range to run routine")
                 return
             else:
-              if not (now >= time(startH,startM) or now <= time(endH,endM)):
+              if not (now >= time(startH, startM) or now <= time(endH, endM)):
                 logging.critical("Not in time range to run routine")
                 return
 
@@ -158,31 +159,29 @@ class Routine(object):
             endM = int(endM)
             logging.critical(str(startH) + ' ' + str(endH))
             if startH <= endH:
-              if now >= time(startH,startM) and now <= time(endH,endM):
+              if now >= time(startH, startM) and now <= time(endH, endM):
                 logging.critical("In time range to not run routine")
                 return
             else:
-              if now >= time(startH,startM) or now <= time(endH,endM):
+              if now >= time(startH, startM) or now <= time(endH, endM):
                 logging.critical("In time range to not run routine")
                 return
 
-
-
     for device, commands in self._actions.iteritems():
-      ffCommand(device,commands)
+      ffCommand(device, commands)
       if 'hue' in device:
         sleep(0.5)
 
     if ffLocation:
       if ffLocation.isLight:
         for device, commands in self._actions_day.iteritems():
-          ffCommand(device,commands)
+          ffCommand(device, commands)
           if 'hue' in device:
             sleep(0.5)
 
       if ffLocation.isDark:
         for device, commands in self._actions_night.iteritems():
-          ffCommand(device,commands)
+          ffCommand(device, commands)
           if 'hue' in device:
             sleep(0.5)
 
@@ -192,14 +191,3 @@ class Routine(object):
     if self._notification_devices and self._notification_message:
       for device in self._notification_devices:
         ffNotification(device, self._notification_message)
-
-
-
-
-  
-
-
-  
-  
-  
-  

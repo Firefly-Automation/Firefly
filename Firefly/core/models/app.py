@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-12 23:17:36
+# @Last Modified time: 2016-10-13 21:24:17
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -17,15 +17,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 
 from collections import OrderedDict
 from core.models.command import Command as ffCommand
 
+
 class App(object):
+
   def __init__(self, config, args={}):
-    #The config for each app will have its own json file - This way apps can easily be updated while running.
+    # The config for each app will have its own json file - This way apps can easily be updated while running.
     #config = json.loads(configJson, object_pairs_hook=OrderedDict)
     self._id = config.get('id')
     self._name = config.get('name')
@@ -35,7 +36,8 @@ class App(object):
     self._options = self.OPTIONS
     self._inputs = self.INPUTS
     self._events = self.EVENTS
-    self._listen = list(set().union(*(d for d in self._inputs.values() if d is not None)))
+    self._listen = list(set().union(
+        *(d for d in self._inputs.values() if d is not None)))
 
     for name, value in self._inputs.iteritems():
       setattr(self, name, value)
@@ -44,7 +46,8 @@ class App(object):
       setattr(self, name, value)
 
   def sendEvent(self, event):
-    logging.critical('Reciving Event in ' + str(self._metadata.get('module')) + ' ' + str(event))
+    logging.critical('Reciving Event in ' +
+                     str(self._metadata.get('module')) + ' ' + str(event))
 
     logging.critical('Event from: ' + event.deviceID)
     for eventType in self._events:
@@ -57,7 +60,8 @@ class App(object):
 
   def sendCommand(self, command):
     simpleCommand = None
-    logging.debug('Reciving Command in ' + str(self._metadata.get('module')) + ' ' + str(command))
+    logging.debug('Reciving Command in ' +
+                  str(self._metadata.get('module')) + ' ' + str(command))
     if command.deviceID == self._id:
       for item, value in command.command.iteritems():
         if item in self._commands:
@@ -70,4 +74,3 @@ class App(object):
   @property
   def id(self):
     return self._id
-  

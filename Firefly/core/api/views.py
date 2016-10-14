@@ -1,29 +1,38 @@
 import json
 import logging
 
-from core import ffCommand, ffLocation, getDeviceStatusDict, getDeviceViewsList, getRoutineList, getRoutineViewsDict
+from core import ffCommand
+from core import ffLocation
+from core import getDeviceStatusDict
+from core import getDeviceViewsList
+from core import getRoutineViewsDict
 from core.api.alexa import alexaHandler
 from core.api.ifttt import iftttHandler
 from core.firefly import app
-from flask import Flask, request
+from flask import request
+
 
 @app.route('/')
 def baseView():
   return "This is the root page"
+
 
 @app.route('/API/alexa', methods=['POST'])
 def apiAlexa():
   r = request.get_json(force=True)
   return alexaHandler(r)
 
+
 @app.route('/API/ifttt', methods=['POST'])
 def apiIFTTT():
   r = request.get_json(force=True)
   return iftttHandler(r)
 
+
 @app.route('/API/mode')
 def apiMode():
   return ffLocation.mode
+
 
 @app.route('/API/core/views/routine')
 def apiCoreViewRoutine():
@@ -33,10 +42,11 @@ def apiCoreViewRoutine():
     if r.get('icon') is None:
       continue
     rID = r .get('id')
-    return_data[rID] = {'id': rID, 'icon':r.get('icon')}
+    return_data[rID] = {'id': rID, 'icon': r.get('icon')}
 
   logging.debug(str(return_data))
   return json.dumps(return_data, sort_keys=True)
+
 
 @app.route('/API/core/views/devices')
 def apiCoreViewDevices():
@@ -50,11 +60,11 @@ def apiCoreViewDevices():
       device_type_list.append(d_type)
 
   device_types = [
-    {
-      'index': 0,
-      'type': 'all',
-      'title': 'all devices'
-    }
+      {
+          'index': 0,
+          'type': 'all',
+          'title': 'all devices'
+      }
   ]
 
   device_index = 1
@@ -63,12 +73,13 @@ def apiCoreViewDevices():
         'index': device_index,
         'type': str(d),
         'title': str(d)
-      })
+    })
     device_index += 1
 
   return_data['types'] = device_types
 
   return json.dumps(return_data, sort_keys=True)
+
 
 @app.route('/API/core/status/devices/all')
 def apiCoreStatusDevicesAll():
@@ -83,11 +94,11 @@ def apiCoreStatusDevicesAll():
         device_type_list.append(d_type)
 
   device_types = [
-    {
-      'index': 0,
-      'type': 'all',
-      'title': 'all devices'
-    }
+      {
+          'index': 0,
+          'type': 'all',
+          'title': 'all devices'
+      }
   ]
 
   device_index = 1
@@ -96,16 +107,17 @@ def apiCoreStatusDevicesAll():
         'index': device_index,
         'type': str(d),
         'title': str(d)
-      })
+    })
     device_index += 1
   return_data['types'] = device_types
   return json.dumps(return_data, sort_keys=True)
+
 
 @app.route('/API/command', methods=['POST'])
 def apiCommand():
   c = request.get_json(force=True)
   logging.critical(str(c))
-  
+
   command = c.get('command')
   logging.critical(command)
   device = c.get('device')
@@ -118,4 +130,3 @@ def apiCommand():
   else:
     ffCommand(device, command, source=source)
   return "OK"
-

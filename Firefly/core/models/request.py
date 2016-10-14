@@ -2,10 +2,12 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 18:06:51
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-11 20:50:14
+# @Last Modified time: 2016-10-13 21:22:51
 import types
 
+
 class Request(object):
+
   def __init__(self, deviceID, request, forceRefresh=False):
     self._deviceID = deviceID
     self._request = request
@@ -18,23 +20,20 @@ class Request(object):
 
   @property
   def deviceID(self):
-      return self._deviceID
-  
+    return self._deviceID
+
   @property
   def request(self):
-      return self._request
-  
+    return self._request
+
   @property
   def forceRefresh(self):
-      return self._forceRefresh
+    return self._forceRefresh
 
   @property
   def multi(self):
-      return self._multi
+    return self._multi
 
   @property
   def all(self):
-      return self._all
-  
-  
-  
+    return self._all

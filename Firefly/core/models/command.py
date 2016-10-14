@@ -2,10 +2,15 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 18:06:51
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-09 23:18:36
+# @Last Modified time: 2016-10-13 20:44:37
 import types
 
+
 class Command(object):
+  '''
+  Command is used to build and send a command to a firefly device
+  '''
+
   def __init__(self, deviceID, command, routine=False, force=False, source=None, send_event=True):
     from core import sendCommand
     self._deviceID = deviceID
@@ -14,54 +19,48 @@ class Command(object):
     self._force = force
     self._source = source
     self._send_event = send_event
-    self._simple = not isinstance(command, types.DictType) if command is not None else False
+    self._simple = not isinstance(
+        command, types.DictType) if command is not None else False
     if self._simple:
-      self._command = {command:''}
+      self._command = {command: ''}
 
     self._result = sendCommand(self)
-
 
   def __str__(self):
     return '<COMMAND DEVICE:' + str(self._deviceID) + ' COMMAND:' + str(self._command) + ' >'
 
   @property
   def log(self):
-    return str({'device':self._deviceID,'command':self._command, 'source':self._source, 'routine':self._routine, 'force':self._force})
+    return str({'device': self._deviceID, 'command': self._command, 'source': self._source, 'routine': self._routine, 'force': self._force})
 
   @property
   def deviceID(self):
-      return self._deviceID
-  
+    return self._deviceID
+
   @property
   def command(self):
-      return self._command
-  
+    return self._command
+
   @property
   def simple(self):
-      return self._simple
+    return self._simple
 
   @property
   def routine(self):
-      return self._routine
+    return self._routine
 
   @property
   def force(self):
-      return self._force
-  
+    return self._force
+
   @property
   def result(self):
-      return self._result
+    return self._result
 
   @property
   def source(self):
-      return self._source
+    return self._source
 
   @property
   def send_event(self):
-      return self._send_event
-  
-  
-  
-  
-  
-  
+    return self._send_event
