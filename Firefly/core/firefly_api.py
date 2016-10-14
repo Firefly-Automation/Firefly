@@ -6,7 +6,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-13 19:05:03
+# @Last Modified time: 2016-10-13 20:25:18
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -43,7 +43,6 @@ import templates
 
 from core.models import core_settings, event
 
-from core.location import Location
 from core.models.command import Command as ffCommand
 from core.models.event import Event as ffEvent
 from core.models.request import Request as ffRequest
