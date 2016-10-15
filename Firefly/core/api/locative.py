@@ -2,11 +2,12 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-14 15:29:06
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-14 16:42:52
+# @Last Modified time: 2016-10-14 17:32:51
 
 import logging
 
 from core import ffCommand
+from core import ffScheduler
 
 
 class LocativeMessage(object):
@@ -38,6 +39,10 @@ class LocativeMessage(object):
   def presence(self):
     return True if self.trigger == 'enter' else False
 
+  @property
+  def jobID(self):
+    return '{}PresenceUpdate'.format(str(self.ffDevice))
+
   def getValue(self, value):
     return self._request.args.get(value)
 
@@ -52,7 +57,13 @@ def locativeHandler(request):
   '''
   message = LocativeMessage(request)
   logging.debug('locative: got message from {} presence: {}'.format(message.ffDevice, message.presence))
-  ffCommand(message.ffDevice,
-            {'presence': message.presence},
-            source='Locative Presence API')
+  if message.presence:
+    ffScheduler.cancel(message.jobID)
+    ffCommand(message.ffDevice, {'presence': message.presence}, source='Locative Presence API')
+  else:
+    ffScheduler.runInM(5, delayedUpdatePresence, args=[message], job_id=message.jobID)
   return message
+
+
+def delayedUpdatePresence(message):
+  ffCommand(message.ffDevice, {'presence': message.presence}, source='Locative Presence API')

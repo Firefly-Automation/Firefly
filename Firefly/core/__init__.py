@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:35
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-14 17:12:43
+# @Last Modified time: 2016-10-14 17:20:16
 
 class FireflyZwave(object):
   def __init__(self):
@@ -28,7 +28,6 @@ messageDB.ensure_index("timestamp", expireAfterSeconds=(60*60*24*7))
 ## SETUP SCHEDULER
 from core.utils.scheduler import Scheduler
 ffScheduler = Scheduler()
-
 
 from core.models.routine import Routine
 
