@@ -6,6 +6,7 @@
 
 import logging
 
+import nest
 import requests
 
 from core.firefly_api import ffScheduler as Scheduler
@@ -101,6 +102,12 @@ class Device(Device):
     self._target_temperature_high = None
     self._target_temperature_low = None
     self._auto_away = None
+
+    self._nest_api = nest.Nest(self._username, self._password, local_time=True)
+
+    for structure in napi.structures:
+      for device in structure.devices:
+        logging.critical(device)
 
 
 

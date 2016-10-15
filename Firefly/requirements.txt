@@ -6,3 +6,4 @@ numpy
 webcolors
 colorpy
 astral
+python-nest
