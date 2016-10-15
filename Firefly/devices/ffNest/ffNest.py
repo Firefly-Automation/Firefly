@@ -105,12 +105,6 @@ class Device(Device):
 
     self._nest_api = nest.Nest(self._username, self._password, local_time=True)
 
-    for structure in napi.structures:
-      for device in structure.devices:
-        logging.critical(device)
-
-
-
 
     ###########################
     # DONT CHANGE
@@ -124,6 +118,10 @@ class Device(Device):
 
 
   def login(self, args={}):
+    for structure in self._nest_api.structures:
+      for device in structure.devices:
+        logging.critical(device)
+
     logging.critical("Logging into Nest.")
     data = {
       'username' : self._username,
