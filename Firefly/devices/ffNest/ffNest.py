@@ -3,6 +3,11 @@
 # @Date:   2016-08-15 21:15:42
 # @Last Modified by:   Zachary Priddy
 
+'''
+ffNest uses python-nest and the device will be identified 
+by the friendly name, ie: 'downstairs' All interaction with
+nest will be done by python-nest
+'''
 
 import logging
 
@@ -121,6 +126,7 @@ class Device(Device):
     # TODO: remove this/
     self._nest_api = nest.Nest(self._username, self._password, local_time=True)
     for structure in self._nest_api.structures:
+      logging.critical(structure)
       for device in structure.devices:
         logging.critical(device)
 
@@ -174,6 +180,9 @@ class Device(Device):
 
   def setPresence(self, value=True):
     logging.critical('SET NEST TO ' + str(value))
+    for structure in self._nest_api.structures:
+      structure.away = value
+    '''
     
     try:
       presence = not value
@@ -201,6 +210,7 @@ class Device(Device):
       
     except:
       return False
+     ''' 
 
   def setTarget(self, args={}):
     target = args.get('target')
