@@ -6,6 +6,7 @@ from core import ffLocation
 from core import getDeviceStatusDict
 from core import getDeviceViewsList
 from core import getRoutineViewsDict
+from core import reinstallRoutinesFromConfig
 from core.api.alexa import alexaHandler
 from core.api.ifttt import iftttHandler
 from core.api.locative import locativeHandler
@@ -39,6 +40,13 @@ def locativeAPI():
 @app.route('/API/mode')
 def apiMode():
   return ffLocation.mode
+
+
+@app.route('/support/reinstall_routines')
+def supportRinstallRoutines():
+  config_file = 'config/routine.json'
+  reinstallRoutinesFromConfig(config_file)
+  return 'Routines Reinstalled'
 
 
 @app.route('/API/core/views/routine')

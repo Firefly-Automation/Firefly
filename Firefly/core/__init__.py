@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:35
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-14 17:05:07
+# @Last Modified time: 2016-10-14 17:09:39
 
 class FireflyZwave(object):
   def __init__(self):
@@ -29,6 +29,7 @@ from core.database import getDeviceStatusDict
 from core.database import getDeviceViewsList
 from core.database import getRoutineList
 from core.database import getRoutineViewsDict
+from core.database import reinstallRoutinesFromConfig
 
 ## SETUP SCHEDULER
 from core.utils.scheduler import Scheduler
