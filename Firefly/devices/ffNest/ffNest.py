@@ -118,6 +118,8 @@ class Device(Device):
 
 
   def login(self, args={}):
+    # TODO: remove this/
+    self._nest_api = nest.Nest(self._username, self._password, local_time=True)
     for structure in self._nest_api.structures:
       for device in structure.devices:
         logging.critical(device)
