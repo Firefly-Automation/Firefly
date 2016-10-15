@@ -180,6 +180,8 @@ class Device(Device):
 
   def setPresence(self, value=True):
     logging.critical('SET NEST TO ' + str(value))
+    # TODO: remove this/
+    self._nest_api = nest.Nest(self._username, self._password, local_time=True)
     for structure in self._nest_api.structures:
       structure.away = value
     '''
