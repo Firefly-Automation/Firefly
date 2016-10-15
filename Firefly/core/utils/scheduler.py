@@ -2,11 +2,12 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-09 21:48:29
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-10 23:08:33
+# @Last Modified time: 2016-10-14 17:17:51
 import logging
 
 from apscheduler.schedulers.background import BackgroundScheduler
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
 
 DAYS_OF_WEEK = ['mon','tue','wed','thu','fri','sat','sun']
 
@@ -19,7 +20,7 @@ class Scheduler(object):
     if job_id is None:
       job_id=str(function)
     logging.info('adding cron job: {}'.format(str(job_id)))
-    self._scheduler.add_job(function, 'cron', args=args, kwargs=kwargs, minute=minute, hour=hour, day=None, month=month, day_of_week=day_week, year=year, id=job_id)
+    self._scheduler.add_job(function, 'cron', args=args, kwargs=kwargs, minute=minute, hour=hour, day=None, month=month, day_of_week=day_week, year=year, id=job_id, replace_existing=True)
 
   #TODO: Build cron class
   def runSimpleWeekCron(self, function, minute=None, hour=None, days_of_week=None, job_id=None, args=[], kwargs={}):
@@ -33,7 +34,7 @@ class Scheduler(object):
           run_days.append(d)
       days_of_week = ','.join(run_days)
     logging.info('adding simple weekly cron job: {}'.format(str(job_id)))
-    self._scheduler.add_job(function, 'cron', args=args, kwargs=kwargs, minute=minute, hour=hour, day='*', month='*', day_of_week=days_of_week, year='*', id=job_id)
+    self._scheduler.add_job(function, 'cron', args=args, kwargs=kwargs, minute=minute, hour=hour, day='*', month='*', day_of_week=days_of_week, year='*', id=job_id, replace_existing=True)
 
 
   def runEveryS(self,delay, function, args=[], kwargs={}, job_id=None, replace=True):
