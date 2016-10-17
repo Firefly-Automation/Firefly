@@ -295,6 +295,8 @@ class Device(Device):
     from core import ffNest
     from nest import utils as nest_utils
 
+    logging.critical('!!!!!!!!!!!!NEST!!!!!!!!!!!!!!')
+
     structure = ffNest.structures[0]
     if self._structure:
       structure = ffNest.structures[self._structure]
