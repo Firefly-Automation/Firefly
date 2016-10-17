@@ -82,7 +82,8 @@ class Device(Device):
     # SET VARS
     ###########################
     args = args.get('args')
-    self._device_name = args.get('nest_device_name')
+    self._where = args.get('where')
+    self._label = args.get('label')
     self._structure = args.get('structure_name')
     self._f = args.get('f')
 
@@ -103,6 +104,7 @@ class Device(Device):
 
     # new
     self._away = False
+    self._device_index = None
 
 
 
@@ -295,6 +297,15 @@ class Device(Device):
     from core import ffNestModule
     from nest import utils as nest_utils
 
+    if not self._device_index:
+      for idx, d in enumerate(ffNestModule.devices):
+        if self._where:
+          if d.where == self._where:
+            self._device_index = idx
+        if self._label:
+          if d.name == self._label:
+            self._device_index = idx
+
     logging.critical('!!!!!!!!!!!!NEST!!!!!!!!!!!!!!')
 
     for s in ffNestModule.structures:
@@ -303,13 +314,17 @@ class Device(Device):
         logging.critical(d)
 
     structure = ffNestModule.structures[0]
+
+    # TODO: This isnt working yet. This needs to use the same logic as above.
     if self._structure:
       structure = ffNestModule.structures[self._structure]
     self._away = structure.away
 
     logging.critical('NEST IS AWAY: {}'.format(self._away))
 
-    self._temp = ffNestModule.devices[self._device_name].temperature
+    device = ffNestModule.devices[self._device_index]
+
+    self._temp = device.temperature
 
     if self._f:
       self._temp = nest_utils.c_to_f(self._temp)
