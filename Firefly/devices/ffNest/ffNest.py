@@ -153,6 +153,8 @@ class Device(Device):
       else:
         device.target = settings['target']
 
+    self.update()
+
   def getStatus(self):
     from core import ffNestModule
     from nest import utils as nest_utils
@@ -198,36 +200,15 @@ class Device(Device):
 
   def getViewStatus(self, args={}):
     status = {
-      'current': self._temp,
-      'target': self._target_temperature,
-      'high': self._target_temperature_high,
-      'low': self._target_temperature_low
+      'current': round(self._temp, 1),
+      'target': round(self._target_temperature, 1),
+      'high': round(self._target_temperature_high, 1),
+      'low': round(self._target_temperature_low, 1)
     }
     return status
 
   def update(self, args={}):
     logging.critical('*************************** NEST UPDATE **********************************')
-
     self.getStatus()
-
-    self.VIEWS = {
-      'display': True,
-      'name': self.name,
-      'id': self.id,
-      'type': 'thermostat',
-      'card': "<md-card ><div layout='row'  layout-align='center center'><device-card layout='row' flex layout-wrap layout-align='center center'><span flex layout='row'><md-title layout-align='center center' style='cursor: pointer;' ng-click='selectDeviceIndex($index)'>{{ item.name }}</md-title></span><md-card-content layout-align='center center' style='padding:7px' layout='row'><md-button><ng-md-icon icon='expand_more' ng-click='setTarget(deviceStates[item.id].status.target-1.0)'></ng-md-icon></md-button><span layout-align='center center' style='font-size:20px'>{{deviceStates[item.id].status.current}}</span><md-button><ng-md-icon icon='expand_less' ng-click='setTarget(deviceStates[item.id].status.target+1.0)'></ng-md-icon></md-button></div></device-card><md-card-content ng-show='$index ==selectedDeviceIndex'><md-divider></md-divider><div layout='row' layout-align='center center' layout-wrap><md-button flex=50>On</md-button><md-button flex=50>Off</md-button></div><md-divider></md-divider><md-subhead> Turn off in: </md-subhead> <div layout='row' layout-align='center center'><md-button flex=25>30m</md-button><md-button flex=25>1h</md-button><md-button flex=25>2h</md-button><md-button flex=25>4h</md-button></div><br><md-card-actions layout='row' layout-align='start center'><md-button>More Info</md-button></md-card-actions></md-card-content></md-card-content></md-card>",
-      'status': {
-        'current': self._temp,
-        'target': self._target_temperature,
-        'high': self._target_temperature_high,
-        'low': self._target_temperature_low
-      }
-    }
-
-    logging.critical(str(self.VIEWS))
-
     self.refreshData()
     return 0
-
-  def getView(self, args={}):
-    return self.VIEWS
