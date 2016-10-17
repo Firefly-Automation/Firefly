@@ -297,6 +297,11 @@ class Device(Device):
 
     logging.critical('!!!!!!!!!!!!NEST!!!!!!!!!!!!!!')
 
+    for s in ffNestModule.structures:
+      logging.critical(s)
+      for d in s.devices:
+        logging.critical(d)
+
     structure = ffNestModule.structures[0]
     if self._structure:
       structure = ffNestModule.structures[self._structure]
