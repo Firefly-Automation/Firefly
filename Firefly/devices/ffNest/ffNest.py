@@ -72,9 +72,9 @@ class Device(Device):
     self._hvac_heater_state = None
     self._hvac_fan_state = None
     self._target_temperature_type = None
-    self._target_temperature = None
-    self._target_temperature_high = None
-    self._target_temperature_low = None
+    self._target_temperature = -0
+    self._target_temperature_high = -0
+    self._target_temperature_low = -0
     self._auto_away = None
 
     # new
