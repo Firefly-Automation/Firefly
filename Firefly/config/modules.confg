@@ -1,9 +1,8 @@
-[NEST]
-active: yes
-email: youremail.@mail.com
+[nest]
+enabled: yes
+username: youremail.@mail.com
 password: YourPassword
-structure: Home
 
-[ZWAVE]
-active: yes
+[zwave]
+enabled: yes
 port: /dev/ttyUSB0
