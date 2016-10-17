@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:46
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-16 21:47:30
+# @Last Modified time: 2016-10-16 22:05:41
 
 import configparser
 import logging
@@ -31,7 +31,7 @@ class Nest(object):
     self._password = None
     self._enabled = False
     if modules.hasModule('nest'):
-      self._config = modules['nest']
+      self._config = modules.config['nest']
       self.readConfig()
 
   def readConfig(self):
