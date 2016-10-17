@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:35
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-16 22:03:38
+# @Last Modified time: 2016-10-16 22:04:15
 
 import logging
 
@@ -52,8 +52,8 @@ from core.dispacher.request import sendRequest
 
 # START MODULES BASED OFF OF CONFIG
 
-from ..config import Modules
-from ..config import Nest
+from config import Modules
+from config import Nest
 
 ffModules = Modules()
 ffNestModule = None
