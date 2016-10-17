@@ -9,6 +9,7 @@ Firefly/config/devices.json
 design_notes
 Firefly/web_ui/certs/*
 *.sublime-*
+config/modules.confg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
