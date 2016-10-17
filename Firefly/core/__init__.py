@@ -2,11 +2,15 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:35
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-14 17:20:16
+# @Last Modified time: 2016-10-16 22:01:52
+
+import logging
+
 
 class FireflyZwave(object):
   def __init__(self):
     self.zwave = None
+
 
 ff_zwave = FireflyZwave()
 
@@ -46,10 +50,27 @@ from core.dispacher.command import sendCommand
 from core.dispacher.event import sendEvent
 from core.dispacher.request import sendRequest
 
-## SETUP LOCATION 
+# START MODULES BASED OFF OF CONFIG
+
+from ..config import Modules
+from ..config import Nest
+
+ffModules = Modules()
+ffNestModule = None
+
+if ffModules.hasModule('nest'):
+  import nest
+  nest_config = Nest(ffModules)
+  ffNestModule = nest.Nest(nest_config.username, nest_config.password, local_time=True)
+
+
+# SETUP LOCATION
+
 import json
 
 from core.utils.location import Location
+
+
 zipcode = None
 modes = None
 location_config = 'config/location.json'
