@@ -292,19 +292,19 @@ class Device(Device):
       return 0
 
   def getStatus(self):
-    from core import ffNest
+    from core import ffNestModule
     from nest import utils as nest_utils
 
     logging.critical('!!!!!!!!!!!!NEST!!!!!!!!!!!!!!')
 
-    structure = ffNest.structures[0]
+    structure = ffNestModule.structures[0]
     if self._structure:
-      structure = ffNest.structures[self._structure]
+      structure = ffNestModule.structures[self._structure]
     self._away = structure.away
 
     logging.critical('NEST IS AWAY: {}'.format(self._away))
 
-    self._temp = ffNest.devices[self._device_name].temperature
+    self._temp = ffNestModule.devices[self._device_name].temperature
 
     if self._f:
       self._temp = nest_utils.c_to_f(self._temp)
