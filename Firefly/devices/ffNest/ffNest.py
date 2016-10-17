@@ -121,25 +121,7 @@ class Device(Device):
     return self._away
 
   def getState(self, args={}):
-    try:
-      if self.getPresence() is False:
-        if self._hvac_ac_state is True:
-          self._thermostatOperatingState = "awaycool"
-        elif self._hvac_heater_state is True:
-          self._thermostatOperatingState = "awayheat"
-        else:
-          self._thermostatOperatingState = "awayidle"
-      else:
-        if self._hvac_ac_state is True:
-          self._thermostatOperatingState = "cool"
-        elif self._hvac_heater_state is True:
-          self._thermostatOperatingState = "heat"
-        else:
-          self._thermostatOperatingState = "idle"
-
-      return self._thermostatOperatingState
-    except:
-      return 0
+    return 0
 
   def getTemp(self, args={}):
     return self._temp
@@ -232,6 +214,8 @@ class Device(Device):
         'low': self._target_temperature_low
       }
     }
+
+    logging.critical(str(self.VIEWS))
 
     self.refreshData()
     return 0
