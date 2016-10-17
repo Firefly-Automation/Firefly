@@ -82,9 +82,8 @@ class Device(Device):
     # SET VARS
     ###########################
     args = args.get('args')
-    self._username = args.get('username')
-    self._password = args.get('password')
-    self._serial = args.get('serial')
+    self._device_name = args.get('nest_device_name')
+    self._structure = args.get('structure_name')
     self._f = args.get('f')
 
     self._auth_data = None
@@ -101,6 +100,9 @@ class Device(Device):
     self._target_temperature_high = None
     self._target_temperature_low = None
     self._auto_away = None
+
+    # new
+    self._away = False
 
 
 
@@ -289,67 +291,40 @@ class Device(Device):
     except:
       return 0
 
+  def getStatus(self):
+    from core import ffNest
+    from nest import utils as nest_utils
+
+    structure = ffNest.structures[0]
+    if self._structure:
+      structure = ffNest.structures[self._structure]
+    self._away = structure.away
+
+    logging.critical('NEST IS AWAY: {}'.format(self._away))
+
+    self._temp = ffNest.devices[self._device_name].temperature
+
+    if self._f:
+      self._temp = nest_utils.c_to_f(self._temp)
+
+    logging.critical('NEST CURRENT TEMP {}'.format(self._temp))
+
+
+
   def update(self, args={}):
-    self.login()
-    self.status()
+    self.getStatus()
 
     self.VIEWS = {
-      'display' : True,
-      'name' : self.name,
-      'id' : self.id,
-      'type' : 'thermostat',
-      'dash_view' : {
-        'request' : 'state',
-        'type' : 'stateValue', 
-        'state' : {
-          "idle" : {
-            'click' : 'true',
-            'color' : 'grey',
-            'command' : 'update',
-            'value' : self._temp
-          },
-          "cool" : {
-            'click' : 'false',
-            'color' : 'blue',
-            'command' : 'update',
-            'default' : True,
-            'value' : self._temp
-          },
-          "heat" : {
-            'click' : 'false',
-            'color' : 'red',
-            'command' : 'update',
-            'default' : True,
-            'value' : str(self._temp) + ' (away)'
-          },
-          "awayidle" : {
-            'click' : 'true',
-            'color' : 'grey',
-            'command' : 'update',
-            'value' : str(self._temp) + ' (away)'
-          },
-          "awaycool" : {
-            'click' : 'false',
-            'color' : 'blue',
-            'command' : 'update',
-            'default' : True,
-            'value' : str(self._temp) + ' (away)'
-          },
-          "awayheat" : {
-            'click' : 'false',
-            'color' : 'red',
-            'command' : 'update',
-            'default' : True,
-            'value' : str(self._temp) + ' (away)'
-          }
-        }
-      }, 
-      'card' : "<md-card ><div layout='row'  layout-align='center center'><device-card layout='row' flex layout-wrap layout-align='center center'><span flex layout='row'><md-title layout-align='center center' style='cursor: pointer;' ng-click='selectDeviceIndex($index)'>{{ item.name }}</md-title></span><md-card-content layout-align='center center' style='padding:7px' layout='row'><md-button><ng-md-icon icon='expand_more' ng-click='setTarget(deviceStates[item.id].views.status.target-1.0)'></ng-md-icon></md-button><span layout-align='center center' style='font-size:20px'>{{deviceStates[item.id].views.status.current}}</span><md-button><ng-md-icon icon='expand_less' ng-click='setTarget(deviceStates[item.id].views.status.target+1.0)'></ng-md-icon></md-button></div></device-card><md-card-content ng-show='$index ==selectedDeviceIndex'><md-divider></md-divider><div layout='row' layout-align='center center' layout-wrap><md-button flex=50>On</md-button><md-button flex=50>Off</md-button></div><md-divider></md-divider><md-subhead> Turn off in: </md-subhead> <div layout='row' layout-align='center center'><md-button flex=25>30m</md-button><md-button flex=25>1h</md-button><md-button flex=25>2h</md-button><md-button flex=25>4h</md-button></div><br><md-card-actions layout='row' layout-align='start center'><md-button>More Info</md-button></md-card-actions></md-card-content></md-card-content></md-card>",
+      'display': True,
+      'name': self.name,
+      'id': self.id,
+      'type': 'thermostat',
+      'card': "<md-card ><div layout='row'  layout-align='center center'><device-card layout='row' flex layout-wrap layout-align='center center'><span flex layout='row'><md-title layout-align='center center' style='cursor: pointer;' ng-click='selectDeviceIndex($index)'>{{ item.name }}</md-title></span><md-card-content layout-align='center center' style='padding:7px' layout='row'><md-button><ng-md-icon icon='expand_more' ng-click='setTarget(deviceStates[item.id].views.status.target-1.0)'></ng-md-icon></md-button><span layout-align='center center' style='font-size:20px'>{{deviceStates[item.id].views.status.current}}</span><md-button><ng-md-icon icon='expand_less' ng-click='setTarget(deviceStates[item.id].views.status.target+1.0)'></ng-md-icon></md-button></div></device-card><md-card-content ng-show='$index ==selectedDeviceIndex'><md-divider></md-divider><div layout='row' layout-align='center center' layout-wrap><md-button flex=50>On</md-button><md-button flex=50>Off</md-button></div><md-divider></md-divider><md-subhead> Turn off in: </md-subhead> <div layout='row' layout-align='center center'><md-button flex=25>30m</md-button><md-button flex=25>1h</md-button><md-button flex=25>2h</md-button><md-button flex=25>4h</md-button></div><br><md-card-actions layout='row' layout-align='start center'><md-button>More Info</md-button></md-card-actions></md-card-content></md-card-content></md-card>",
       'status' : {
-        'current' : self._temp,
-        'target' : self._target_temperature,
-        'high' : self._target_temperature_high,
-        'low' : self._target_temperature_low
+        'current': self._temp,
+        'target': self._target_temperature,
+        'high': self._target_temperature_high,
+        'low': self._target_temperature_low
         } 
     }
 
