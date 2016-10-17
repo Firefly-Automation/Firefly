@@ -65,7 +65,7 @@ class Device(Device):
     self._auth_data = None
     self._raw_status = None
     self._thermostatOperatingState = None
-    self._temp = None
+    self._temp = -0
     self._structure_id = None
 
     self._hvac_ac_state = None
