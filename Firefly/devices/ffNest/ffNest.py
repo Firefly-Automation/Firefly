@@ -97,11 +97,11 @@ class Device(Device):
 
   def setHome(self, args={}):
     logging.critical('SET NEST TO HOME')
-    return self.setPresence(value=True)
+    return self.setPresence(value=False)
 
   def setAway(self, args={}):
     logging.critical('SET NEST TO AWAY')
-    return self.setPresence(value=False)
+    return self.setPresence(value=True)
 
   def setPresence(self, value=True):
     settings = {'away': value}
