@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:35
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-16 22:01:52
+# @Last Modified time: 2016-10-16 22:03:38
 
 import logging
 
@@ -61,7 +61,8 @@ ffNestModule = None
 if ffModules.hasModule('nest'):
   import nest
   nest_config = Nest(ffModules)
-  ffNestModule = nest.Nest(nest_config.username, nest_config.password, local_time=True)
+  if nest_config.enabled:
+    ffNestModule = nest.Nest(nest_config.username, nest_config.password, local_time=True)
 
 
 # SETUP LOCATION
