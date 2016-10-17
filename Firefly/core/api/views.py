@@ -13,6 +13,9 @@ from core.api.locative import locativeHandler
 from core.firefly import app
 from flask import request
 
+#FIX
+from core.database.device_db import reinstallDevices
+
 
 @app.route('/')
 def baseView():
@@ -144,4 +147,10 @@ def apiCommand():
     ffCommand(device, command, routine=routine, force=force, source=source)
   else:
     ffCommand(device, command, source=source)
+  return "OK"
+
+
+@app.route('/reinstall_devices')
+def apiReinstallDevices():
+  reinstallDevices()
   return "OK"

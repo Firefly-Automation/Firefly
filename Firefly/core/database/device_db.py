@@ -2,9 +2,14 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-12 23:18:17
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-12 23:48:00
+# @Last Modified time: 2016-10-16 22:28:42
+
+import json
+
+import pickle
 
 from core import deviceDB
+from sys import modules
 
 def getDeviceList(lower=True):
   device_list = {}
@@ -30,3 +35,21 @@ def getDeviceStatusDict():
     if (d.get('status')):
       devices[d_id] = d.get('status')
   return devices
+
+
+def reinstallDevices():
+  deviceDB.remove({})
+  with open('config/devices.json') as devices:
+    allDevices = json.load(devices)
+    for name, device in allDevices.iteritems():
+      if device.get('module') != "ffZwave":
+        package_full_path = device.get('type') + 's.' + device.get('package') + '.' + device.get('module')
+        package = __import__(package_full_path, globals={}, locals={}, fromlist=[device.get('package')], level=-1)
+        reload(modules[package_full_path])
+        dObj = package.Device(device.get('id'), device)
+        d = {}
+        d['id'] = device.get('id')
+        d['ffObject'] = pickle.dumps(dObj)
+        d['config'] = device
+        d['status'] = {}
+        deviceDB.insert(d)
