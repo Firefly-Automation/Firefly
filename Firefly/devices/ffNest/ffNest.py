@@ -90,6 +90,9 @@ class Device(Device):
 
     self.update()
 
+  def startup(self, args={}):
+    self.update()
+
   def status(self, args={}):
     logging.debug("Getting nest status.")
     self.getState()
@@ -196,7 +199,6 @@ class Device(Device):
     self._target_temperature_type = device.mode
     self._hvac_fan_state = device.fan
 
-  @property
   def deviceIndex(self, ffNestModule):
     if not self._device_index:
       for idx, d in enumerate(ffNestModule.devices):
