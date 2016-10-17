@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-14 17:16:16
+# @Last Modified time: 2016-10-17 06:49:47
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -54,6 +54,7 @@ class Routine(object):
         # crondata = {'uuid':uuid, 'funct':self.executeRoutine, 'cron':cron_data}
         # ffScheduler.add_to_cron(crondata)
         ffScheduler.runSimpleWeekCron(self.executeRoutine, minute=cron_data.get('minute'), hour=cron_data.get('hour'), days_of_week=cron_data.get('days'), job_id=uuid)
+        count += 1
 
   def __str__(self):
     return ('<ROUTINE>\nName: ' + str(self._name) +
