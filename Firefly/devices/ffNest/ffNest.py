@@ -137,6 +137,7 @@ class Device(Device):
   def setNest(self, settings):
     from core import ffNestModule
     from nest import utils as nest_utils
+    from core import ffScheduler
 
     self.deviceIndex(ffNestModule)
     structure = ffNestModule.structures[0]
@@ -153,7 +154,7 @@ class Device(Device):
       else:
         device.target = settings['target']
 
-    self.update()
+    ffScheduler.runInS(10, self.update, job_id='nest-update-in-10')
 
   def getStatus(self):
     from core import ffNestModule
