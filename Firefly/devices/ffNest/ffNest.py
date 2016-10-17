@@ -177,6 +177,8 @@ class Device(Device):
     from core import ffNestModule
     from nest import utils as nest_utils
 
+    logging.critical('*************************** NEST GET STATUS **********************************')
+
     self.deviceIndex(ffNestModule)
     structure = ffNestModule.structures[0]
 
@@ -199,6 +201,7 @@ class Device(Device):
     self._target_temperature_type = device.mode
     self._hvac_fan_state = device.fan
 
+
   def deviceIndex(self, ffNestModule):
     if not self._device_index:
       for idx, d in enumerate(ffNestModule.devices):
@@ -212,6 +215,8 @@ class Device(Device):
     return self._device_index
 
   def update(self, args={}):
+    logging.critical('*************************** NEST UPDATE **********************************')
+
     self.getStatus()
 
     self.VIEWS = {
