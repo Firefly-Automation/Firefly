@@ -84,6 +84,13 @@ class Device(Device):
     args = args.get('args')
     self._where = args.get('where')
     self._label = args.get('label')
+
+    if self._where:
+      self._where = self._where.lower()
+
+    if self._label:
+      self._label = self._label.lower()
+
     self._structure = args.get('structure_name')
     self._f = args.get('f')
 
@@ -300,10 +307,10 @@ class Device(Device):
     if not self._device_index:
       for idx, d in enumerate(ffNestModule.devices):
         if self._where:
-          if d.where == self._where:
+          if d.where.lower() == self._where:
             self._device_index = idx
         if self._label:
-          if d.name == self._label:
+          if d.name.lower() == self._label:
             self._device_index = idx
 
     logging.critical('!!!!!!!!!!!!NEST!!!!!!!!!!!!!!')
