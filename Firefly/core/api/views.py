@@ -153,6 +153,8 @@ def apiCommand():
     ffCommand(device, command, routine=routine, force=force, source=source)
   else:
     ffCommand(device, command, source=source)
+  # Refresh device views on change on UI
+  device_views.refreshViews()
   return "OK"
 
 
