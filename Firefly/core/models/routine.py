@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:54:21
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-17 06:49:47
+# @Last Modified time: 2016-10-17 22:11:21
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -44,16 +44,15 @@ class Routine(object):
     self._run_time_ranges = config.get('run_time_ranges')
     self._no_run_time_ranges = config.get('no_run_time_ranges')
     self._icon = config.get('icon')
+    self._sunrise_offset = config.get('sunrise_offset')
 
     self._listen = list(set().union(*(d.keys() for d in self._triggers)))
 
     if self._scheduling:
       count = 0
       for cron_data in self._scheduling:
-        uuid = self._name + str(count)
-        # crondata = {'uuid':uuid, 'funct':self.executeRoutine, 'cron':cron_data}
-        # ffScheduler.add_to_cron(crondata)
-        ffScheduler.runSimpleWeekCron(self.executeRoutine, minute=cron_data.get('minute'), hour=cron_data.get('hour'), days_of_week=cron_data.get('days'), job_id=uuid)
+        job_id = self._name + str(count)
+        ffScheduler.runSimpleWeekCron(self.executeRoutine, minute=cron_data.get('minute'), hour=cron_data.get('hour'), days_of_week=cron_data.get('days'), job_id=job_id)
         count += 1
 
   def __str__(self):
@@ -174,13 +173,13 @@ class Routine(object):
         sleep(0.5)
 
     if ffLocation:
-      if ffLocation.isLight:
+      if ffLocation.isLightOffset(sunrise_offset=self._sunrise_offset):
         for device, commands in self._actions_day.iteritems():
           ffCommand(device, commands)
           if 'hue' in device:
             sleep(0.5)
 
-      if ffLocation.isDark:
+      elif ffLocation.isDark:
         for device, commands in self._actions_night.iteritems():
           ffCommand(device, commands)
           if 'hue' in device:
