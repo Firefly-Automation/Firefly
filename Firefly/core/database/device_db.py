@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-12 23:18:17
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-17 22:19:40
+# @Last Modified time: 2016-10-17 22:24:12
 
 import json
 
@@ -19,7 +19,7 @@ class DeviceViews(object):
     self.deviceViewsList = getDeviceViewsList()
     self.deviceStatusDict = getDeviceStatusDict()
 
-    ffScheduler.runEveryS(5, self.refreshViews, job_id='Device_Refresher')
+    ffScheduler.runEveryS(2, self.refreshViews, job_id='Device_Refresher')
 
   def refreshViews(self):
     self.deviceViewsList = getDeviceViewsList()
