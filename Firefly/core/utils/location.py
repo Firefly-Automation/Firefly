@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-09 23:39:47
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-17 22:09:32
+# @Last Modified time: 2016-10-17 22:14:49
 import logging
 
 from astral import Astral
@@ -108,7 +108,7 @@ class Location(object):
       if sunrise_offset is not None:
         offset_time = self.now - timedelta(hours=sunrise_offset)
         sun = self._city.sun(date=self.now, local=True)
-        if offset_time >= sun['sunrise'] or offset_time <= sun['sunset']:
+        if offset_time >= sun['sunrise'] and offset_time <= sun['sunset']:
           return True
         return False
     return not self.isDark

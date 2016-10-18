@@ -16,6 +16,10 @@ from flask import request
 #FIX
 from core.database.device_db import reinstallDevices
 
+from core.database.device_db import DeviceViews
+
+device_views = DeviceViews()
+
 
 @app.route('/')
 def baseView():
@@ -68,7 +72,8 @@ def apiCoreViewRoutine():
 
 @app.route('/API/core/views/devices')
 def apiCoreViewDevices():
-  devices = getDeviceViewsList()
+  #devices = getDeviceViewsList()
+  devices = device_views.deviceViewsList
   return_data = {'devices': devices}
 
   device_type_list = []
@@ -101,7 +106,8 @@ def apiCoreViewDevices():
 
 @app.route('/API/core/status/devices/all')
 def apiCoreStatusDevicesAll():
-  device_status = getDeviceStatusDict()
+  device_status = device_views.deviceStatusDict
+  #device_status = getDeviceStatusDict()
   return_data = {'devices': device_status}
 
   device_type_list = []
