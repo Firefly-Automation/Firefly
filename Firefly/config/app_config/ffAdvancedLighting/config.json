@@ -57,7 +57,7 @@
         "lights" : ["hue-light-2"],
         "delay_time" : 3,
         "actions_contact_open" : {
-          "ZachPushover": {"notify":{"message":"ALERT! FRONT DOOR OPENED WHILE IN AWAY MODE", "priority":"emergency"}}
+          "AllPushover": {"notify":{"message":"ALERT! FRONT DOOR OPENED WHILE IN AWAY MODE", "priority":"emergency"}}
         }
       },
       {
@@ -68,7 +68,7 @@
         "lights" : ["hue-light-2"],
         "delay_time" : 3,
         "actions_contact_open" : {
-          "ZachPushover": {"notify":{"message":"ALERT! FRONT DOOR OPENED WHILE IN NIGHT MODE", "priority":"emergency"}}
+          "AllPushover": {"notify":{"message":"ALERT! FRONT DOOR OPENED WHILE IN NIGHT MODE", "priority":"emergency"}}
         }
       },
       {
@@ -123,7 +123,7 @@
         "name" : "Send Notification If Lower Window is opened",
         "contact_sensors" : ["zwave-node-2"],
         "actions_contact_open" : {
-          "ZachPushover": {"notify":{"message":"ALERT! LOWER WINDOW IS OPEN!", "priority":"emergency"}}
+          "AllPushover": {"notify":{"message":"ALERT! LOWER WINDOW IS OPEN!", "priority":"emergency"}}
         }
       }
     ]

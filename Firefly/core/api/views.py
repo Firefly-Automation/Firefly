@@ -158,7 +158,38 @@ def apiCommand():
   return "OK"
 
 
+#rough hacks.. Fix soon
+
 @app.route('/reinstall_devices')
 def apiReinstallDevices():
   reinstallDevices()
   return "OK"
+
+@app.route('/reinstall_apps')
+def apiReinstallApps():
+  from core import appsDB
+  from sys import modules
+  from collections import OrderedDict
+  import pickle
+  appsDB.remove({})
+  with open('config/apps.json') as coreAppConfig:
+    appList = json.load(coreAppConfig)
+    for packageName, module in appList.iteritems():
+      for moduleName in module:
+        package_full_path = 'apps.' + str(packageName) + '.' + str(moduleName)
+        app_package_config = 'config/app_config/' + str(packageName) + '/config.json'
+        logging.critical(app_package_config)
+        with open(str(app_package_config)) as app_package_config_file:
+          app_package_config_data = json.load(app_package_config_file, object_pairs_hook=OrderedDict).get(moduleName) #json.load(app_package_config_file).get(moduleName)
+          logging.critical(app_package_config_data)
+          package = __import__(package_full_path, globals={}, locals={}, fromlist=[str(packageName)], level=-1)
+          reload(modules[package_full_path])
+          for install in app_package_config_data.get('installs'):
+            aObj = package.App(install)
+            aObjBin = pickle.dumps(aObj)
+            a = {}
+            a['id'] = aObj.id
+            a['ffObject'] = aObjBin
+            a['name'] = install.get('name')
+            a['listen'] = aObj.listen
+            appsDB.insert(a)
