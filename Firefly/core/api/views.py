@@ -193,3 +193,4 @@ def apiReinstallApps():
             a['name'] = install.get('name')
             a['listen'] = aObj.listen
             appsDB.insert(a)
+  return "OK"
