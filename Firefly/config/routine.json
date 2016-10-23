@@ -134,6 +134,7 @@
       "icon":"directions_run",
       "actions" : {
         "zwave-node-11" : "off",
+        "zwave-node-17" : "off",
         "lgtv" : {"cmd":"POWER"},
         "nest" : "away"
       },
