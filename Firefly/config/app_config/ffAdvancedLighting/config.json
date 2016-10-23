@@ -161,8 +161,10 @@
         "id":"TosterAutoOff",
         "name" : "Turn off toaster after 1 hour.",
         "switches" : ["zwave-node-17"],
-        "lights" : ["zwave-node-17"],
-        "delay_time" : 60
+        "actions_switch_on_delayed" : {
+          "zwave-node-17" : "off"
+        },
+        "delay_time" : 1
       },
       {
         "id":"UpstarisLights",
