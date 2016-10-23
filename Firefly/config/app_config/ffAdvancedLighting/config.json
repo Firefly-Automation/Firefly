@@ -164,7 +164,7 @@
         "actions_switch_on_delayed" : {
           "zwave-node-17" : "off"
         },
-        "delay_time" : 1
+        "delay_time" : 60
       },
       {
         "id":"UpstarisLights",

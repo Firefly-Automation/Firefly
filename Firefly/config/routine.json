@@ -24,7 +24,8 @@
       ],
       "sunrise_offset" : -2,
       "notification_devices" : [
-        "ZachPushover"
+        "ZachPushover",
+        "GuestPushover"
       ],
       "notification_message" : "Firefly has changed mode to Home!",
       "mode_no_run" : [
@@ -81,13 +82,15 @@
       },
       "triggers" : [ 
         { "ZachPresence" : {"presence":true}},
-        { "ArielPresence" : {"presence":true}}
+        { "ArielPresence" : {"presence":true}},
+        { "SerenaPresence" : {"presence":true}}
         ],
       "scheduling" : [
 
       ],
       "notification_devices" : [
-        "ZachPushover"
+        "ZachPushover",
+        "GuestPushover"
       ],
       "notification_message" : "Firefly has changed mode to Arriving!",
       "mode_no_run" : [
@@ -148,14 +151,15 @@
         "hue-group-4" : {"switch": "off"}
       },
       "triggers" : [ 
-        { "ZachPresence" : {"presence":false}, "ArielPresence" : {"presence":false}},
-        { "ZachPresence" : {"presence":false}, "ArielPresence" : {"presence":false},  "location":{"time":"sunset"}} 
+        { "ZachPresence" : {"presence":false}, "ArielPresence" : {"presence":false}, "SerenaPresence" : {"presence":false}},
+        { "ZachPresence" : {"presence":false}, "ArielPresence" : {"presence":false}, "SerenaPresence" : {"presence":false}, "location":{"time":"sunset"}} 
       ],
       "scheduling" : [
 
       ],
       "notification_devices" : [
-        "ZachPushover"
+        "ZachPushover",
+        "GuestPushover"
       ],
       "notification_message" : "Firefly has changed mode to Away!",
       "mode_no_run" : [
@@ -191,7 +195,8 @@
         {"minute": 30, "hour": 2, "days":"*"}
       ],
       "notification_devices" : [
-        "ZachPushover"
+        "ZachPushover",
+        "GuestPushover"
       ],
       "notification_message" : "Firefly has changed mode to Night!",
       "mode_no_run" : [
@@ -365,7 +370,7 @@
       },
       "triggers" : [ 
         {"location":{"time":"sunset"}},
-	      {"location":{"time":"sunrise"}}
+        {"location":{"time":"sunrise"}}
       ],
       "scheduling" : [
         
