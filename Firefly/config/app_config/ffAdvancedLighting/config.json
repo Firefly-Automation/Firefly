@@ -46,6 +46,7 @@
         "name" : "Turn entry lights on when door opens",
         "contact_sensors" : ["zwave-node-13", "zwave-node-5"],
         "lights" : ["hue-light-2"],
+        "no_run_modes": ["away"],
         "delay_time" : 3
       },
       {
@@ -56,7 +57,7 @@
         "lights" : ["hue-light-2"],
         "delay_time" : 3,
         "actions_contact_open" : {
-          "ZachPushover": {"notify":{"message":"ALERT! FRONT DOOR OPENED WHILE IN AWAY MODE", "priority":"emergency"}}
+          "AllPushover": {"notify":{"message":"ALERT! FRONT DOOR OPENED WHILE IN AWAY MODE", "priority":"emergency"}}
         }
       },
       {
@@ -67,7 +68,7 @@
         "lights" : ["hue-light-2"],
         "delay_time" : 3,
         "actions_contact_open" : {
-          "ZachPushover": {"notify":{"message":"ALERT! FRONT DOOR OPENED WHILE IN NIGHT MODE", "priority":"emergency"}}
+          "AllPushover": {"notify":{"message":"ALERT! FRONT DOOR OPENED WHILE IN NIGHT MODE", "priority":"emergency"}}
         }
       },
       {
@@ -122,7 +123,7 @@
         "name" : "Send Notification If Lower Window is opened",
         "contact_sensors" : ["zwave-node-2"],
         "actions_contact_open" : {
-          "ZachPushover": {"notify":{"message":"ALERT! LOWER WINDOW IS OPEN!", "priority":"emergency"}}
+          "AllPushover": {"notify":{"message":"ALERT! LOWER WINDOW IS OPEN!", "priority":"emergency"}}
         }
       }
     ]
@@ -155,6 +156,15 @@
         "name" : "Turn Bedroom Fan On With Switch",
         "switches" : ["hue-group-8"],
         "lights" : ["zwave-node-9"]
+      },
+      {
+        "id":"TosterAutoOff",
+        "name" : "Turn off toaster after 1 hour.",
+        "switches" : ["zwave-node-17"],
+        "actions_switch_on_delayed" : {
+          "zwave-node-17" : "off"
+        },
+        "delay_time" : 60
       },
       {
         "id":"UpstarisLights",

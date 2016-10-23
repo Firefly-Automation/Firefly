@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 23:06:59
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-09 16:29:48
+# @Last Modified time: 2016-10-12 23:14:39
 
 
 import logging
@@ -84,8 +84,8 @@ class App(App):
 
   def motionHandeler(self, event={}):
     logging.critical('Motion Handeler!!!##')
-    from core.firefly_api import ffScheduler
-    from core.firefly_api import ffLocation
+    from core import ffScheduler
+    from core import ffLocation
 
     logging.critical('Entered Motion Handeler')
 
@@ -124,11 +124,11 @@ class App(App):
       if self.delay_time is None:
         self.TurnLightsOff()
       else:
-        ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, uuid=self._id)
+        ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, job_id=self._id)
 
   def TurnLightsOff(self):
-    from core.firefly_api import ffScheduler
-    from core.firefly_api import ffLocation
+    from core import ffScheduler
+    from core import ffLocation
     
     if self._disabled:
       logging.critical('Motion Events Disabled')

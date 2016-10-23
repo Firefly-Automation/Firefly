@@ -2,11 +2,12 @@
 # @Author: zpriddy
 # @Date:   2016-04-18 20:56:52
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-05-09 16:38:42
+# @Last Modified time: 2016-10-12 23:16:14
 
-from core.scheduler import Scheduler
-from core.models.command import Command as ffCommand
 import logging
+
+from core import ffScheduler
+from core.models.command import Command as ffCommand
 
 class CTFade(object):
   def __init__(self, deviceID, startK, endK, fadeTimeS, startLevel, endLevel, run=True):
@@ -41,7 +42,7 @@ class CTFade(object):
       else:
         self._currnetL = self._endLevel
 
-    self._scheduler = Scheduler()
+    #self._scheduler = Scheduler()
 
     if self._run:
       self.runFade()
@@ -54,7 +55,7 @@ class CTFade(object):
       else:
         lightCommand = ffCommand(self._deviceID, {'setLight':{'ct':str(self._currentK)+'K','transitiontime':self._delay*10, 'ctfade':True}})
       if self._timeRemaining > 0:
-        self._scheduler.runInS(int(self._delay), self.runFade, replace=True, uuid=self._deviceID)
+        ffScheduler.runInS(int(self._delay), self.runFade, replace=True, job_id=self._deviceID)
       self._currentK -= self._step
       self._timeRemaining -= self._delay
 

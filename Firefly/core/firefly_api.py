@@ -1,8 +1,12 @@
+#####################################
+## THIS FILE IS GETTING DEPERCATED ##
+#####################################
+
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-07-28 22:28:42
+# @Last Modified time: 2016-10-13 20:25:18
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -28,7 +32,6 @@ from bson.binary import Binary
 from collections import OrderedDict
 from datetime import datetime
 from klein import Klein
-from pymongo import MongoClient
 from sys import modules
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue
@@ -40,33 +43,16 @@ import templates
 
 from core.models import core_settings, event
 
-from core.location import Location
 from core.models.command import Command as ffCommand
 from core.models.event import Event as ffEvent
 from core.models.request import Request as ffRequest
-from core.scheduler import Scheduler
+
+from core import appsDB, datalogDB, deviceDB, ffLocation, ffScheduler, ff_zwave, messageDB, routineDB, sendCommand, sendEvent, sendRequest
 
 app = Klein()
 core_settings = core_settings.Settings()
 
-## Monogo Setup ##
-client = MongoClient()
-ffDB = client.ff
-routineDB = ffDB.routines
-deviceDB = ffDB.devices
-datalogDB = ffDB.datalog
-messageDB = ffDB.message
-appsDB = ffDB.apps
-
-datalogDB.ensure_index("timestamp", expireAfterSeconds=(60*60*72))
-messageDB.ensure_index("timestamp", expireAfterSeconds=(60*60*24*7))
-
-
-
-testDevices = {}
-ffLocation = Location('config/location.json')
-ffScheduler = Scheduler()
-ffZwave = None
+#ffLocation = Location('config/location.json')
 
 routine_list = []
 device_list = {}
@@ -197,7 +183,6 @@ def send_test_request(request):
 
 @app.route('/testInstall')
 def test_install(request):
-  global ffZwave
   deviceDB.remove({})
   with open('config/devices.json') as devices:
     allDevices = json.load(devices)
@@ -226,6 +211,9 @@ def install_child_device(deviceID, ffObject, config={}, status={}):
       
 
 def send_event(event):
+  logging.critical('#####################################\n## THIS IS DEPRECATED - DO NOT USE ##\n#####################################')
+  sendEvent(event)
+  '''
   logging.info('send_event: ' + str(event))
 
   if event.sendToDevice:
@@ -244,10 +232,14 @@ def send_event(event):
   for d in  routineDB.find({'listen':event.deviceID}):
     s = pickle.loads(d.get('ffObject'))
     s.event(event)
+  '''
   
   data_log(event.log, logType='event')
 
 def send_command(command):
+  logging.critical('#####################################\n## THIS IS DEPRECATED - DO NOT USE ##\n#####################################')
+  sendCommand(command)
+  '''
   global ffZwave
   logging.debug('send_command ' + str(command))
 
@@ -284,8 +276,12 @@ def send_command(command):
   return sucess
 
   # MAYBE ALSO SEND TO APPS 
+  '''
 
 def send_request(request):
+  logging.critical('#####################################\n## THIS IS DEPRECATED - DO NOT USE ##\n#####################################')
+  return sendRequest(request)
+  '''
   logging.debug('send_request' + str(request))
   d = deviceDB.find_one({'id':request.deviceID})
   if d:
@@ -299,10 +295,12 @@ def send_request(request):
       data = device.requestData(request)
       return data
   return None
+  '''
 
 ############################## HTTP UTILES ###########################################
 
 def http_request(url,method='GET',headers=None,params=None,data=None,callback=None,json=True, code_only=False):
+  logging.critical('#####################################\n## THIS IS DEPRECATED - DO NOT USE ##\n#####################################')
   request = treq.request(url=url,method=method,headers=headers,data=data)
   if callback:
     if code_only:
@@ -362,32 +360,41 @@ def event_message(fromDevice, message):
 
 
 def update_status(status):
-  deviceID = status.get('deviceID')
-  device = deviceDB.find_one({'id':deviceID})
-  if device:
-    currentStatus = device.get('status')
-    if currentStatus != status:
-      deviceDB.update_one({'id':deviceID},{'$set': {'status': status}}) #, "$currentDate": {"lastModified": True}})
-      return True
+  try:
+    deviceID = status.get('deviceID')
+    device = deviceDB.find_one({'id':deviceID})
+    if device:
+      currentStatus = device.get('status')
+      if currentStatus != status:
+        deviceDB.update_one({'id':deviceID},{'$set': {'status': status}}) #, "$currentDate": {"lastModified": True}})
+        return True
+      else:
+        return False
     else:
-      return False
-  else:
-    return True
+      return True
+  except:
+    logging.critical('ERROR UPDATING STATUS')
 
 def auto_start():
-  global ffZwave
   with open('config/devices.json') as devices:
     allDevices = json.load(devices)
     for name, device in allDevices.iteritems():
       if device.get('module') == "ffZwave":
         package_full_path = device.get('type') + 's.' + device.get('package') + '.' + device.get('module')
         package = __import__(package_full_path, globals={}, locals={}, fromlist=[device.get('package')], level=-1)
-        ffZwave = package.Device(device.get('id'), device)
+        ff_zwave.zwave = package.Device(device.get('id'), device)
         #ffZwave.refresh_scheduler()
 
   for device in deviceDB.find({}):
     deviceID = device.get('id')
     ffEvent(deviceID, {'startup': True})
+
+  #ffScheduler.runEveryM(5, auto_refresh, replace=True, uuid='auto-refresh')
+  ffScheduler.runEveryM(5, auto_refresh, job_id='auto_refresh')
+
+
+def auto_refresh():
+  refresh_command = ffCommand('nest', 'update', source='NEST-UPDATER')
 
 
 ################################################################################
@@ -396,37 +403,94 @@ def auto_start():
 
 @app.route('/API/views/routine')
 def APIViewsRoutine(request):
-  returnData = {}
-  for r in routineDB.find({}).sort("id"):
+  from core import getRoutineList
+  routine_list = getRoutineList()
+  return_data = {}
+  for r in routine_list:
     if r.get('icon') is None:
       continue
     rID = r .get('id')
-    returnData[rID] = {}
-    returnData[rID]['id'] = rID
-    returnData[rID]['icon'] = r.get('icon')
+    return_data[rID] = {'id': rID, 'icon':r.get('icon')}
 
-  logging.critical(str(returnData))
-  return json.dumps(returnData, sort_keys=True)
+  logging.debug(str(return_data))
+  return json.dumps(return_data, sort_keys=True)
 
 
 @app.route('/API/views/devices')
 def APIViewsDevices(request):
-  returnData = {}
+  devices = []
   for d in deviceDB.find({},{'status.views':1, 'id':1}):
     dID = d.get('id')
     if (d.get('status').get('views')):
-      returnData[dID] = d.get('status').get('views')
+      devices.append(d.get('status').get('views'))
+
+  returnData = {'devices': devices}
+
+  deviceTypeList = []
+
+  for d in devices:
+    dType = d.get('type')
+    if dType and dType not in deviceTypeList:
+      deviceTypeList.append(str(dType))
+
+  deviceTypes = [
+    {
+      'index': 0,
+      "type": 'all',
+      'title': 'all devices'
+    }
+  ]
+
+  deviceIndex = 1
+  for d in sorted(deviceTypeList):
+    deviceTypes.append({
+        'index': deviceIndex,
+        'type': str(d),
+        'title': str(d)
+      })
+    deviceIndex += 1
+
+  returnData['types'] = deviceTypes
 
   return json.dumps(returnData, sort_keys=True)
 
 
 @app.route('/API/status/devices/all')
 def APIDevicesStatusAll(request):
-  returnData = {}
+  deviceViews = {}
   for d in deviceDB.find({},{'status':1, 'id':1}):
     dID = d.get('id')
     if (d.get('status')):
-      returnData[dID] = d.get('status')
+      deviceViews[dID] = d.get('status')
+
+  returnData = {'devices': deviceViews}
+
+  deviceTypeList = []
+
+  for name, d in deviceViews.iteritems():
+    if d.get('views'):
+      dType = d.get('views').get('type')
+      if dType and dType not in deviceTypeList:
+        deviceTypeList.append(str(dType))
+
+  deviceTypes = [
+    {
+      'index': 0,
+      "type": 'all',
+      'title': 'all devices'
+    }
+  ]
+
+  deviceIndex = 1
+  for d in sorted(deviceTypeList):
+    deviceTypes.append({
+        'index': deviceIndex,
+        'type': str(d),
+        'title': str(d)
+      })
+    deviceIndex+=1
+
+  returnData['types'] = deviceTypes
 
   return json.dumps(returnData, sort_keys=True)
 
@@ -634,10 +698,11 @@ def get_device_list(lower=True):
 
 
 def run():
-  global core_settings
-  read_settings()
-  auto_start()
-  app.run(core_settings.ip_address, core_settings.port, logFile=open('logs/app.log','w'))
+  #global core_settings
+  #read_settings()
+  #auto_start()
+  #app.run(core_settings.ip_address, core_settings.port, logFile=open('logs/app.log','w'))
+  pass
 
 if __name__ == "__main__":
   run()

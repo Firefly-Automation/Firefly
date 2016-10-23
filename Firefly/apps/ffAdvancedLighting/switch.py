@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 23:06:59
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-09 16:29:57
+# @Last Modified time: 2016-10-22 18:29:10
 
 
 import logging
@@ -23,6 +23,7 @@ class App(App):
         'actions_switch_off' : {'type':'action', 'multi':True, 'help':'Non generic actions when switch turns off'}
       },
       'options' : {
+        'actions_switch_on_delayed' : {'type':'action', 'multi':True, 'help':'Non generic actions when switch turns on after delay'},
         'delay_time' : {'type':'number', 'help':'Delay time in minutes from last activity before off actions applied', 'required':True},
         'run_modes' : {'type':'mode', 'multi':True, 'help':'Modes to run in.'},
         'no_run_modes' : {'type':'mode', 'multi':True, 'help':'Modes to not run in.'},
@@ -41,6 +42,7 @@ class App(App):
       'switches' : config.get('switches'),
       'lights' : config.get('lights'),
       'actions_switch_on' : config.get('actions_switch_on'),
+      'actions_switch_on_delayed' : config.get('actions_switch_on_delayed'),
       'actions_switch_off' : config.get('actions_switch_off')
     }
     self.OPTIONS = {
@@ -83,8 +85,8 @@ class App(App):
     return self._disabled
 
   def switchHandler(self, event={}):
-    from core.firefly_api import ffScheduler
-    from core.firefly_api import ffLocation
+    from core import ffScheduler
+    from core import ffLocation
 
     if self._disabled:
       logging.critical('Switch Events Disabled')
@@ -118,16 +120,20 @@ class App(App):
         for device, action in self.actions_switch_on.iteritems():
           ffCommand(device, action, send_event=self._send_event)
       ffScheduler.cancel(self._id)
+      #Hack to be fixed soon
+      if self.actions_switch_on_delayed:
+        ffScheduler.cancel(self._id+"delayed")
+        ffScheduler.runInM(self.delay_time, self.SwitchOnDelayed, replace=True, job_id=self._id+"delayed")
 
     if not event.event.get('on'):
       if self.delay_time is None:
         self.TurnLightsOff()
       else:
-        ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, uuid=self._id)
+        ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, job_id=self._id)
 
   def TurnLightsOff(self):
-    from core.firefly_api import ffScheduler
-    from core.firefly_api import ffLocation
+    from core import ffScheduler
+    from core import ffLocation
     
     if self._disabled:
       logging.critical('Switch Events Disabled')
@@ -149,6 +155,13 @@ class App(App):
 
     if self.actions_switch_off:
       for device, action in self.actions_switch_off.iteritems():
+        ffCommand(device, action, send_event=self._send_event)
+        if 'hue' in device:
+          sleep(0.5)
+
+  def SwitchOnDelayed(self):
+    if self.actions_switch_on_delayed:
+      for device, action in self.actions_switch_on_delayed.iteritems():
         ffCommand(device, action, send_event=self._send_event)
         if 'hue' in device:
           sleep(0.5)

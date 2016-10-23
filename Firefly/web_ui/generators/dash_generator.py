@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-05-22 14:40:40
-# @Last Modified by:   zpriddy
-# @Last Modified time: 2016-07-05 09:30:28
+# @Last Modified by:   Zachary Priddy
+# @Last Modified time: 2016-08-16 13:51:18
 
 import collections
 import json
@@ -19,6 +19,8 @@ def dash_generator(devices):
         returnData[config.get('name')] = generate_text(config)
       if config.get('dash_view').get('type') == "button":
         returnData[config.get('name')] = generate_button(config)
+      if config.get('dash_view').get('type') == "stateValue":
+        returnData[config.get('name')] = generate_stateValue(config)
 
   returnData = collections.OrderedDict(sorted(returnData.items()))
   return returnData
@@ -205,6 +207,41 @@ def generate_text(config):
   generated_text = deviceTemplate.replace('$ID$', 'D_' + str(deviceID)).replace('$NAME$', name).replace('$IDRAW$',deviceIDRaw).replace('$COMMANDS$', json.dumps(settings))
 
   return generated_text
+
+def generate_stateValue(config):
+
+  deviceTemplate = '''
+    <ul class="collection">
+      <li class="collection-item grey lighten-3">
+        <span class="title">$NAME$</span>
+        <a class="modal-trigger" href="#$ID$-modal"><i class="material-icons grey-text" style="vertical-align: middle">more_vert</i></a>
+        <div class="secondary-content" style="vertical-align: middle">
+          <a name="$ID$_stateValue" class="grey-text" raw="$IDRAW$" commands='$COMMANDS$' style="font-size:90%;" href="#" onClick="myFunct(null, this.name, 'stateValue', this.getAttribute('raw'), this.getAttribute('commands'))">Unknown</a>
+        </div>
+      </li>
+    </ul>
+    <div id="$ID$-modal" class="modal modal-fixed-footer" style="height:100%; overflow-y:hidden">
+      <div class="modal-content center grey-text scroll-wrapper">
+        <h4>$NAME$</h4>
+        <embed src="/devices/views/$IDRAW$" width="100%" height="85%" />
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+      </div>
+    </div>
+  '''
+
+  name = config.get('name')
+  deviceIDRaw = config.get('id')
+  deviceID = config.get('id').replace('-',"__")
+  stateValue = config.get('dash_view').get('state')
+  settings = {}
+  for c, s in stateValue.iteritems():
+    settings[c] = {"command":s.get('command'), "value":s.get('value'), "color":s.get('color')}
+
+  generated_stateValue = deviceTemplate.replace('$ID$', 'D_' + str(deviceID)).replace('$NAME$', name).replace('$IDRAW$',deviceIDRaw).replace('$COMMANDS$', json.dumps(settings))
+
+  return generated_stateValue
 
 
 def generate_button(config):

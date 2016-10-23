@@ -1,0 +1,1 @@
+2016-10-15: IN-PROGRESS: Added modules to framework. Modules can act as a connector for devices and plugins. IE. Nest and ZWave

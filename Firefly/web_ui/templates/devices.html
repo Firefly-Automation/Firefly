@@ -106,7 +106,7 @@ function refreshFunction(){
 
 
   
-  console.log(data)
+  //console.log(data)
   var allDevices = eval('(' + data + ')');
   for (var device in allDevices){
       if (allDevices[device]['views']){ 
@@ -116,15 +116,15 @@ function refreshFunction(){
         var deviceID = 'D_' + device.replaceAll('-','__')
         if (allDevices[device]['views']['dash_view']['type'] === "switch") {
           deviceID = deviceID + '_switch'
-          console.log(deviceID + ' ' + status)
+          //console.log(deviceID + ' ' + status)
           Array.from(document.getElementsByName(deviceID)).forEach(function (element) {element.checked=status})
         }
         if (allDevices[device]['views']['dash_view']['type'] === "text") {
           deviceID = deviceID + '_text'
-          console.log('TEXT - ' + deviceID + ' ' + status)
+          //console.log('TEXT - ' + deviceID + ' ' + status)
           var c = document.getElementsByName(deviceID)[0].getAttribute('commands')
           c = jQuery.parseJSON(c)
-          console.log(c[status])
+          //console.log(c[status])
           //This is where my issue is
          Array.from( document.getElementsByName(deviceID)).forEach(function (element) {
             element.innerHTML=c[status]['text']
@@ -132,6 +132,20 @@ function refreshFunction(){
             element.setAttribute('value', status)
           })
         }
+
+        // State Value
+        if (allDevices[device]['views']['dash_view']['type'] === "stateValue") {
+          console.log('STATEVLAUE TYPE')
+          deviceID = deviceID + '_stateValue'
+
+          Array.from( document.getElementsByName(deviceID)).forEach(function (element) {
+             console.log(allDevices[device]['views']['dash_view']['state'][status])
+             element.innerHTML=allDevices[device]['views']['dash_view']['state'][status]['value']
+             element.className = allDevices[device]['views']['dash_view']['state'][status]['color'] + '-text'
+             element.setAttribute('value', status)
+           })
+        }
+
         //console.log(deviceID)
         //console.log(status)
 
@@ -164,7 +178,7 @@ function myFunct(value, name, ctype, raw, commands, send) {
     document.getElementById(sliderID).value = value
   }
 
-  else if (ctype == "text"){
+  else if (ctype == "text" || ctype == "stateValue"){
     var c = document.getElementsByName(name)[0].getAttribute('commands')
     var current = document.getElementsByName(name)[0].getAttribute('value')
     c = jQuery.parseJSON(c)

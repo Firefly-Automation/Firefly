@@ -2,6 +2,7 @@ import logging
 
 from core.models.event import Event as ffEvent
 
+
 class Device(object):
   def __init__(self, deviceID, deviceName):
     self._id = deviceID
@@ -124,9 +125,3 @@ class Device(object):
   @property
   def views(self):
     return self._views
-  
-  
-  
-  
-  
-  

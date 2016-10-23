@@ -2,11 +2,13 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 21:48:42
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-05-22 14:16:36
+# @Last Modified time: 2016-10-12 23:01:32
 
+
+import logging
+import requests
 
 from core.models.device import Device
-import logging
 
 class Device(Device):
 
@@ -54,7 +56,6 @@ class Device(Device):
       return self._user_key
 
   def notify(self, args):
-    from core.firefly_api import http_request
     post_data = {
       'token':self.api_key,
       'user' : self.user_key,
@@ -76,7 +77,7 @@ class Device(Device):
     if args.get('device'):
       post_data['device'] = args.get('device')
 
-    http_request('https://api.pushover.net/1/messages.json',method='POST', data=post_data, callback=self.print_response_code)
+    requests.post('https://api.pushover.net/1/messages.json', data=post_data)
 
 
   def print_response_code(self, response):

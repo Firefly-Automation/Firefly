@@ -1,24 +1,34 @@
+#####################################
+## THIS IS DEPRECATED - DO NOT USE ##
+#####################################
+
 # -*- coding: utf-8 -*-
 # @Author: zpriddy
 # @Date:   2016-04-19 15:57:29
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-22 03:22:00
-from astral import Astral
-from astral import GoogleGeocoder
-from datetime import datetime, timedelta
+# @Last Modified time: 2016-10-13 13:15:30
 import json
 import logging
 
-from core.scheduler import Scheduler as ffScheduler
+from astral import Astral
+from astral import GoogleGeocoder
+from datetime import datetime, timedelta
+
 from core.models.command import Command as ffCommand
 from core.models.event import Event as ffEvent
+from core.scheduler import Scheduler as ffScheduler
 from core.utils.notify import Notification as ffNotify
 
+from core.utils.scheduler import Scheduler
+
 l_scheduler = ffScheduler()
+
+location_scheduler = Scheduler()
 
 
 class Location(object):
   def __init__(self, config_file):
+    logging.critical('#####################################\n## THIS IS DEPRECATED - DO NOT USE ##\n#####################################')
     self._config_file = config_file
     self._modes = []
     self._a = None
@@ -99,6 +109,7 @@ class Location(object):
     logging.debug("Dawn Time: " + str(dawn_time))
     delay_s = (dawn_time - now).total_seconds()
     l_scheduler.runInS(delay_s, self.dawn_handler, replace=True, uuid='DawnScheduler')
+    location_scheduler.runInS(delay_s, self.dawn_handler, replace=True, job_id='DawnScheduler')
 
     sunrise_time = self._city.sun(date=datetime.now(self._city.tz), local=True)['sunrise']
     now = self.now()

@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-26 23:06:59
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-08-09 16:30:22
+# @Last Modified time: 2016-10-13 21:28:39
 
 
 import logging
@@ -39,29 +39,29 @@ class App(App):
     #METADAT is set above so that we can pull it during install
     #self.METADATA = METADATA
     self.INPUTS = {
-      'contact_sensors' : config.get('contact_sensors'),
-      'lights' : config.get('lights'),
-      'actions_contact_open' : config.get('actions_contact_open'),
-      'actions_contact_closed' : config.get('actions_contact_closed')
+        'contact_sensors': config.get('contact_sensors'),
+        'lights': config.get('lights'),
+        'actions_contact_open': config.get('actions_contact_open'),
+        'actions_contact_closed': config.get('actions_contact_closed')
     }
     self.OPTIONS = {
-      'delay_time' : config.get('delay_time'),
-      'run_modes' : config.get('run_modes'),
-      'no_run_modes' : config.get('no_run_modes'),
-      'run_dark' : config.get('run_dark'),
-      'run_light' : config.get('run_light'),
-      'run_conditions' : config.get('run_conditions'),
-      'no_run_conditions' : config.get('no_run_modes')
+        'delay_time': config.get('delay_time'),
+        'run_modes': config.get('run_modes'),
+        'no_run_modes': config.get('no_run_modes'),
+        'run_dark': config.get('run_dark'),
+        'run_light': config.get('run_light'),
+        'run_conditions': config.get('run_conditions'),
+        'no_run_conditions': config.get('no_run_modes')
     }
     self.EVENTS = {
-      'contact_sensors' : self.contactHandler
+        'contact_sensors': self.contactHandler
     }
     self.COMMANDS = {
-      'disable' : self.setDisable
+        'disable': self.setDisable
     }
 
     self.REQUESTS = {
-      'disable' : self.getDisable
+        'disable': self.getDisable
     }
     super(App, self).__init__(config, args)
 
@@ -84,8 +84,8 @@ class App(App):
     return self._disabled
 
   def contactHandler(self, event={}):
-    from core.firefly_api import ffScheduler
-    from core.firefly_api import ffLocation
+    from core import ffScheduler
+    from core import ffLocation
 
     if self._disabled:
       logging.critical('Contact Events Disabled')
@@ -124,11 +124,11 @@ class App(App):
       if self.delay_time is None:
         self.TurnLightsOff()
       else:
-        ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, uuid=self._id)
+        ffScheduler.runInM(self.delay_time, self.TurnLightsOff, replace=True, job_id=self._id)
 
   def TurnLightsOff(self):
-    from core.firefly_api import ffScheduler
-    from core.firefly_api import ffLocation
+    from core import ffScheduler
+    from core import ffLocation
 
     if self._disabled:
       logging.critical('Contact Events Disabled')

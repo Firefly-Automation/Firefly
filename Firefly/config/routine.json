@@ -6,15 +6,13 @@
       "mode" : "home",
       "icon" : "home",
       "actions" : {
-        "ecobee" : "setHome"
+        "nest" : "home"
       },
       "actions_night" : {
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:2700", "brightness":1, "duration":2}}},
         "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"soft white", "transitiontime": 1}},
         "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"soft white"}}
       },
       "actions_day" : {
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:5200", "brightness":1, "duration":2}}},
         "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"noon", "transitiontime": 1}},
         "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"noon"}}
       },
@@ -22,10 +20,12 @@
         { "zwave-node-13" : {"open":true}}
         ],
       "scheduling" : [
-
+        
       ],
+      "sunrise_offset" : -2,
       "notification_devices" : [
-        "ZachPushover"
+        "ZachPushover",
+        "GuestPushover"
       ],
       "notification_message" : "Firefly has changed mode to Home!",
       "mode_no_run" : [
@@ -43,12 +43,10 @@
       "actions" : {
       },
       "actions_night" : {
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:6500", "brightness":1, "duration":2}}},
         "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"cloudy", "transitiontime": 1}},
         "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"cloudy"}}
       },
       "actions_day" : {
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:6500", "brightness":1, "duration":2}}},
         "hue-group-4" : {"setLight": {"on":true, "level":1, "preset":"cloudy", "transitiontime": 1}},
         "hue-group-4" : {"setLight": {"on":true, "level":100, "preset":"cloudy"}}
       },
@@ -60,7 +58,7 @@
       "notification_devices" : [
 
       ],
-      "notification_message" : "Firefly has changed mode to Home!",
+      "notification_message" : "Firefly has changed mode to Art Mode!",
       "mode_no_run" : [
 
       ],
@@ -74,7 +72,7 @@
       "mode" : "arriving",
       "icon":"transfer_within_a_station",
       "actions" : {
-        "ecobee" : "setHome"
+        "nest" : "home"
       },
       "actions_night" : {
 
@@ -84,13 +82,15 @@
       },
       "triggers" : [ 
         { "ZachPresence" : {"presence":true}},
-        { "ArielPresence" : {"presence":true}}
+        { "ArielPresence" : {"presence":true}},
+        { "SerenaPresence" : {"presence":true}}
         ],
       "scheduling" : [
 
       ],
       "notification_devices" : [
-        "ZachPushover"
+        "ZachPushover",
+        "GuestPushover"
       ],
       "notification_message" : "Firefly has changed mode to Arriving!",
       "mode_no_run" : [
@@ -105,7 +105,6 @@
       "type": "routine",
       "mode" : null,
       "actions" : {
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:2700", "brightness":1, "duration":1200}}},
         "hue-group-4": {"ctfade":{"startK":6000, "endK":2700, "fadeS":1200}}
       },
       "actions_night" : {
@@ -138,30 +137,29 @@
       "icon":"directions_run",
       "actions" : {
         "zwave-node-11" : "off",
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off", "duration":2}}},
+        "zwave-node-17" : "off",
         "lgtv" : {"cmd":"POWER"},
-        "ecobee" : "setAway"
+        "nest" : "away"
       },
       "actions_night" : {
         "hue-group-3" : {"setLight": {"on":false}},
         "hue-light-1" : {"setLight": {"on":false}},
         "hue-light-5" : {"setLight": {"name":"indigo","level":10}},
-        "hue-light-2" : {"setLight": {"name":"indigo","level":20}},
-        "lgtv" : {"cmd":"POWER"},
-        "ecobee" : "setAway"
+        "hue-light-2" : {"setLight": {"name":"indigo","level":20}}
       },
       "actions_day" : {
         "hue-group-4" : {"switch": "off"}
       },
       "triggers" : [ 
-        { "ZachPresence" : {"presence":false}, "ArielPresence" : {"presence":false}},
-        { "ZachPresence" : {"presence":false}, "ArielPresence" : {"presence":false},  "location":{"time":"sunset"}} 
+        { "ZachPresence" : {"presence":false}, "ArielPresence" : {"presence":false}, "SerenaPresence" : {"presence":false}},
+        { "ZachPresence" : {"presence":false}, "ArielPresence" : {"presence":false}, "SerenaPresence" : {"presence":false}, "location":{"time":"sunset"}} 
       ],
       "scheduling" : [
 
       ],
       "notification_devices" : [
-        "ZachPushover"
+        "ZachPushover",
+        "GuestPushover"
       ],
       "notification_message" : "Firefly has changed mode to Away!",
       "mode_no_run" : [
@@ -182,14 +180,11 @@
         "lgtv" : {"cmd":"POWER"}
       },
       "actions_night" : {
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off", "duration":2}}},
         "hue-light-1" : {"setLight": {"on":false}},
         "hue-group-4" : {"setLight": {"on":false, "level":1, "transitiontime":200}},
-        "hue-light-5" : {"setLight": {"on":true, "name":"indigo","level":20, "transitiontime":200}},
-        "ecobee" : {"setMode" : {"mode":"sleep"}}
+        "hue-light-5" : {"setLight": {"on":true, "name":"indigo","level":20, "transitiontime":200}}
       },
       "actions_day" : {
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off","duration":2}}},
         "hue-group-3" : {"setLight": {"on":false}},
         "lgtv" : {"cmd":"POWER"}
       },
@@ -197,10 +192,11 @@
 
       ],
       "scheduling" : [
-        "20 2 * * *"
+        {"minute": 30, "hour": 2, "days":"*"}
       ],
       "notification_devices" : [
-        "ZachPushover"
+        "ZachPushover",
+        "GuestPushover"
       ],
       "notification_message" : "Firefly has changed mode to Night!",
       "mode_no_run" : [
@@ -220,7 +216,6 @@
         "lgtv" : {"cmd":"POWER"}
       },
       "actions_night" : {
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off","color":"kelvin:2700", "brightness":0.1, "duration":2}}},
         "hue-group-4" : {"setLight": {"on":true, "level":50, "preset":"candle", "transitiontime": 20}}   
       },
       "actions_day" : {
@@ -235,7 +230,7 @@
       "notification_devices" : [
         "ZachPushover"
       ],
-      "notification_message" : "Firefly has changed mode to Night!",
+      "notification_message" : "Firefly has changed mode to Late Night!",
       "mode_no_run" : [
 
       ],
@@ -249,7 +244,6 @@
       "mode" : "morning",
       "icon":"brightness_4",
       "actions" : {
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"on","color":"kelvin:5200", "brightness":1, "duration":1200}}},
         "hue-group-4" : {"setLight" : {"preset":"candle", "transitiontime":1, "level":1}},
         "hue-group-4": {"ctfade":{"startK":2000, "endK":5200, "fadeS":1200, "startL":1, "endL":100}}
       },
@@ -263,7 +257,8 @@
         {"location":{"time":"dawn"}}
       ],
       "scheduling" : [
-        "20 6 * * MON-SAT"
+        {"minute": 20, "hour": 6, "days": ["sun","mon","tue","wed"]},
+        {"minute": 30, "hour": 9, "days": ["thu","fri","sat"]}
       ],
       "notification_devices" : [
         "ZachPushover"
@@ -285,7 +280,6 @@
         "zwave-node-11" : "off"
       },
       "actions_night" : {
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off", "duration":20}}},
         "hue-group-3" : {"setLight": {"on":false, "transitiontime":200}},
         "hue-light-5" : {"setLight": {"name":"indigo","level":20, "transitiontime":200}},
         "hue-light-6" : {"setLight": {"name":"navy","level":10, "transitiontime":200}},
@@ -293,7 +287,6 @@
         "hue-light-10" : {"setLight": {"name":"navy","level":10, "transitiontime":200}}
       },
       "actions_day" : {
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off", "duration":20}}},
         "hue-group-3" : {"setLight": {"on":false}}
       },
       "triggers" : [ 
@@ -325,13 +318,12 @@
       "mode" : "lowpower",
       "icon" : "battery_alert",
       "actions" : {
-        "ecobee" : {"setMode" : {"mode":"smart2"}}
+        "nest" : "away"
       },
       "actions_night" : {
 
       },
       "actions_day" : {
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off", "duration":1}}},
         "hue-group-3" : {"setLight": {"on":false}},
         "zwave-node-11" : "off"
       },
@@ -373,13 +365,12 @@
         "zwave-node-11" : "off"
       },
       "actions_day" : {
-        "lifx-hub" : {"sendAll":{"lightCommand":{"power":"off", "duration":1}}},
         "hue-group-3" : {"setLight": {"on":false}},
         "zwave-node-11" : "off"
       },
       "triggers" : [ 
         {"location":{"time":"sunset"}},
-	{"location":{"time":"sunrise"}}
+        {"location":{"time":"sunrise"}}
       ],
       "scheduling" : [
         

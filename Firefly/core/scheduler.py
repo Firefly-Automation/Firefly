@@ -1,10 +1,14 @@
+#####################################
+## THIS IS DEPRECATED - DO NOT USE ##
+#####################################
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @FileName: scheduler.py
 # @Author: Zachary Priddy
 # @Date:   2016-02-13 21:34:27
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-19 23:31:10
+# @Last Modified time: 2016-10-13 20:22:29
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -19,16 +23,19 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from twisted.internet import reactor, task
-from uuid import uuid1
+import logging
+
 from crontab import CronTab
 from datetime import datetime
+from twisted.internet import reactor, task
+from uuid import uuid1
 
 '''Sample cron_data = {'uuid':'blah','funct':s,'cron':'0 8 * * 1'}  **UUID is optional'''
 '''Or crondata can be  cron_data = {'uuid':'blah','funct':s,'cron':'0 8 * * MON,TUE'}'''
 
 class Scheduler(object):
   def __init__(self):
+    logging.critical('#####################################\n## THIS IS DEPRECATED - DO NOT USE ##\n#####################################')
     self._queue = {}
     self._loop = {}
     self._cron = {}

@@ -1,0 +1,11 @@
+[FIREFLY]
+host: localhost
+port: 6002
+
+[USER]
+username: admin
+password: FFPassword123
+
+[LOCATION]
+zipcode: 95110
+modes: [home, away, night, art-mode, vacation]

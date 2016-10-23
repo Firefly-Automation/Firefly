@@ -2,8 +2,9 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-19 21:57:10
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-04-19 22:32:54
+# @Last Modified time: 2016-10-09 22:40:00
 
+from core import deviceDB, ffCommand
 
 class Notification(object):
   def __init__(self, deviceID, message, priority=0):
@@ -17,15 +18,9 @@ class Notification(object):
       self.send()
 
   def send_all(self):
-    from pymongo import MongoClient
-    from core.models.command import Command as ffCommand
-    client = MongoClient()
-    ffDB = client.ff
-    deviceDB = ffDB.devices
     for device in deviceDB.find({"config.subType":"notification"}):
       dID = device.get('id')
       notificationEvent = ffCommand(str(dID), {'notify': {'message' :self._message}})
 
   def send(self):
-    from core.models.command import Command as ffCommand
     notificationEvent = ffCommand(self._deviceID, {'notify': {'message' :self._message}})
