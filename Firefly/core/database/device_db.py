@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-12 23:18:17
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-17 22:28:58
+# @Last Modified time: 2016-12-24 13:14:11
 
 import json
 
@@ -43,6 +43,22 @@ def getDeviceViewsList():
       devices.append(d.get('status').get('views'))
   return devices
 
+def getDeviceInfo(filters=None):
+  devices = {}
+  for d in deviceDB.find({},{"config.name":1,"id":1}):
+    if d.get('config').get('name') is not None:
+      if filters:
+        if d.get('config').get('type') not in filters:
+          continue
+      devices[d.get('config').get('name')] = {
+        'name': d.get('config').get('name'),
+        'type': d.get('config').get('type'),
+        'subtype': d.get('config').get('subtype'),
+        'commands': d.get('commands'),
+        'id': d.get('id')
+      }
+  return devices
+
 def getDeviceStatusDict():
   devices = {}
   for d in deviceDB.find({},{'status':1, 'id':1}):
@@ -67,4 +83,5 @@ def reinstallDevices():
         d['ffObject'] = pickle.dumps(dObj)
         d['config'] = device
         d['status'] = {}
+        d['commands'] = dObj.COMMANDS.keys()
         deviceDB.insert(d)

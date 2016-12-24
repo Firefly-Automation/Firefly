@@ -10,6 +10,7 @@ from core import reinstallRoutinesFromConfig
 from core.api.alexa import alexaHandler
 from core.api.ifttt import iftttHandler
 from core.api.locative import locativeHandler
+from core.api.ha-bridge import ha_bridge_handler, ha_bridge_push_config
 from core.firefly import app
 from flask import request
 
@@ -43,6 +44,15 @@ def locativeAPI():
   locativeHandler(request)
   return str(True)
 
+@app.route('/API/habridge/command', methods=['POST'])
+def ha_bridge_command():
+  r = request.get_json(force=True)
+  return ha_bridge_handler(r)
+
+@app.route('/API/habridge/config', methods=['POST'])
+def ha_bridge_command():
+  r = request.get_json(force=True)
+  return ha_bridge_push_config(r)
 
 @app.route('/API/mode')
 def apiMode():
