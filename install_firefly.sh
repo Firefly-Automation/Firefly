@@ -37,6 +37,8 @@ ask() {
     done
 }
 
+echo "\n\nThis is the Firefly install script. Please make sure that you have expanded your filesystem before running. It is recommended that you use a dynamic dns provider or have a domain setup for you home, Please see the readme for more info.\n\n"
+
 if ask "Have you expanded the filesystem?"; then
 	echo "Good"
 else
