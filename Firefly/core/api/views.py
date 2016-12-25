@@ -49,7 +49,7 @@ def ha_bridge_command():
   r = request.get_json(force=True)
   return ha_bridge_handler(r)
 
-@app.route('/API/habridge/config', methods=['POST'])
+@app.route('/API/habridge/config', methods=['POST','GET'])
 def ha_bridge_config():
   r = request.get_json(force=True)
   return ha_bridge_push_config(r)
