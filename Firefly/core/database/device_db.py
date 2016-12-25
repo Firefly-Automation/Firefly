@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-12 23:18:17
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 17:18:41
+# @Last Modified time: 2016-12-24 17:23:58
 
 import json
 
@@ -52,6 +52,8 @@ def getDeviceInfo(filters=None):
       if filters:
         print d.get('type')
         if d.get('type') not in filters:
+          print '**********DEVICE FILTERED OUT*****************'
+          print filters
           continue
       devices[d.get('config').get('name')] = {
         'name': d.get('config').get('name'),
