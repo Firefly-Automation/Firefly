@@ -6,7 +6,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 08:56:32
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 17:26:53
+# @Last Modified time: 2016-12-24 17:31:54
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -207,7 +207,14 @@ def install_child_device(deviceID, ffObject, config={}, status={}):
   d['ffObject'] = pickle.dumps(ffObject)
   d['config'] = config
   d['status'] = status
-  d['type'] = ffObject.type
+  try:
+    d['commands'] = ffObject.commands
+  except:
+    d['commands'] = []
+  try:
+    d['type'] = ffObject.type
+  except:
+    d['type'] = "UNKNOWN"
   deviceDB.insert(d)
       
 
