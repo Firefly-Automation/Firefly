@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-12-24 12:39:45
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 19:39:07
+# @Last Modified time: 2016-12-24 19:40:34
 
 import difflib
 import json
@@ -70,7 +70,7 @@ def ha_bridge_push_config():
 
 	current_devices = requests.get(HA_BRIDGE_ADDRESS).json()
 	for d in current_devices:
-		if d.get('targetDevice') == 'Firefly - Auto-added' or d.get('targetDevice') is None:
+		if d.get('targetDevice') == 'Firefly - Auto-added':
 			requests.delete(HA_BRIDGE_ADDRESS + '/' + str(d.get('id')))
 
 
