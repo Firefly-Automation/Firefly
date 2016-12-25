@@ -4,7 +4,7 @@ FIREFLYROOT="/opt/firefly_system"
 DOMAIN=""
 
 if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root" 
+   echo -e "This script must be run as root" 
    exit 1
 fi
 
@@ -22,7 +22,7 @@ ask() {
             default=
         fi
         # Ask the question (not using "read -p" as it uses stderr not stdout)
-        echo -n "$1 [$prompt] "
+        echo -e -n "$1 [$prompt] "
         # Read the answer (use /dev/tty in case stdin is redirected from somewhere else)
         read REPLY </dev/tty
         # Default?
@@ -37,24 +37,24 @@ ask() {
     done
 }
 
-echo "\n\nThis is the Firefly install script. Please make sure that you have expanded your filesystem before running. It is recommended that you use a dynamic dns provider or have a domain setup for you home, Please see the readme for more info.\n\n"
+echo -e "\n\nThis is the Firefly install script. Please make sure that you have expanded your filesystem before running. It is recommended that you use a dynamic dns provider or have a domain setup for you home, Please see the readme for more info.\n\n"
 
 if ask "Have you expanded the filesystem?"; then
-	echo "Good"
+	echo -e "Good"
 else
-	echo "Please expand the filesystem."
-	echo "Please run 'sudo raspi-config' and select Expand Filesystem"
+	echo -e "Please expand the filesystem."
+	echo -e "Please run 'sudo raspi-config' and select Expand Filesystem"
 	exit
 fi
 
 if ask "Would you like to chnage the password for the default pi user?" Y; then
 	passwd
 else
-	echo "It is recommended to chnage the defualt password if you have not already"
+	echo -e "It is recommended to chnage the defualt password if you have not already"
 fi
 
 if ask "Would you like to add the Firefly User." Y; then
-	echo "Please fill out the following prompts to add the firefly user"
+	echo -e "Please fill out the following prompts to add the firefly user"
 	sudo adduser firefly
 	sudo adduser firefly sudo
 fi
@@ -67,7 +67,7 @@ cd firefly_system
 # INSTALL OPENZWAVE
 ##################################
 if ask "\n\nWould you like to install ZWave Support? This might take a while.. its a good time to get lunch.." Y; then
-	echo "\n\nInstalling Python OpenZWave... This might take some time.. Its a good time to go get a snack.. or Lunch..\n\n"
+	echo -e "\n\nInstalling Python OpenZWave... This might take some time.. Its a good time to go get a snack.. or Lunch..\n\n"
 
 	cd /opt/firefly_system
 	sudo apt-get install -y make build-esential libudev-dev build-essential python2.7-dev python-pip libu
@@ -81,7 +81,7 @@ if ask "\n\nWould you like to install ZWave Support? This might take a while.. i
 	cd /opt/firefly_system
 	rm python-openzwave-0.3.1.tgz
 
-	echo "\n\nDone installing Python OpenZWave!\n\n"
+	echo -e "\n\nDone installing Python OpenZWave!\n\n"
 fi
 
 ##################################
@@ -101,7 +101,7 @@ fi
 # INSTALL FIREFLY
 ##################################
 
-echo "\n\nInstalling Firefly Backend\n\n"
+echo -e "\n\nInstalling Firefly Backend\n\n"
 
 cd /opt/firefly_system
 sudo apt-get install -y git mongodb
@@ -114,21 +114,21 @@ fi
 cd $FIREFLYROOT/Firefly/Firefly
 sudo pip install -r requirements.txt
 
-echo "\n\nDone Installing Firefly Backend\n\n"
+echo -e "\n\nDone Installing Firefly Backend\n\n"
 
 ##################################
 # INSTALL ASK FOR DYNAMIC DNS
 ##################################
 
-echo "\n\nA dynamic dns domain will allow you to acccess your firefly system from anywhere. There are many options, the two I recommend are:"
-echo "1) Google Domains (domains.google.com - \$12+/yr) - Google domains will allow you to choose any domain and set up a subdomain to access firefly, i.e. firefly.yourname.com"
-echo "2) DuckDNS (duckdns.org - Free) - DuckDNS is a free  dynamic DNS provider and will allow you to have a domain like myName-firefly.duckdns.org to access your firefly system. However duckdns may be blocked by workplace firewalls."
+echo -e "\n\nA dynamic dns domain will allow you to acccess your firefly system from anywhere. There are many options, the two I recommend are:"
+echo -e "1) Google Domains (domains.google.com - \$12+/yr) - Google domains will allow you to choose any domain and set up a subdomain to access firefly, i.e. firefly.yourname.com"
+echo -e "2) DuckDNS (duckdns.org - Free) - DuckDNS is a free  dynamic DNS provider and will allow you to have a domain like myName-firefly.duckdns.org to access your firefly system. However duckdns may be blocked by workplace firewalls."
 if ask "Would you like to use a dynamic dns domain?"; then
 
-	echo -n "\n\nPlease enter the external domain for Firefly. [ENTER]:"
+	echo -e -n "\n\nPlease enter the external domain for Firefly. [ENTER]:"
 	read DOMAIN
 
-	echo "\n\nTBD - Add chron job for updating dynamic dns doamin."
+	echo -e "\n\nTBD - Add chron job for updating dynamic dns doamin."
 
 
 	##################################
@@ -136,10 +136,12 @@ if ask "Would you like to use a dynamic dns domain?"; then
 	##################################
 
 	if ask "\n\nWould you like to install and setup LetsEncrypt? This requires a dynamic dns domain to have been setup."; then
-		echo "\n\nInstalling LetsEncrypt and getting first certificate.\n\n"
+		echo -e "\n\nInstalling LetsEncrypt and getting first certificate.\n\n"
 
 		sudo apt-get -y install certbot
-		cd /var/www
+		cd /var
+		sudo mkdir www
+		cd www
 		sudo mkdir firefly_www
 		cd firefly_www
 		sudo mkdir .well-known
@@ -148,11 +150,11 @@ if ask "Would you like to use a dynamic dns domain?"; then
 		cd /var/www
 		sudo chown -R www-data:www-data firefly_www
 
-		echo -n "\n\nPlsease enter you email. [ENTER]:"
+		echo -e -n "\n\nPlsease enter you email. [ENTER]:"
 		read EMAIL
 		certbot certonly --standalone --standalone-supported-challenges tls-sni-01 --agree-tos --email $EMAIL -d $DOMAIN
 
-		echo "\n\nFinished installing first cert\n\n"
+		echo -e "\n\nFinished installing first cert\n\n"
 	fi 
 fi
 
@@ -162,9 +164,11 @@ fi
 # INSTALL SERENITY [TODO]
 ##################################
 
-echo "\n\nInstalling Serenity WEB UI\n\n"
+echo -e "\n\nInstalling Serenity WEB UI\n\n"
 
 sudo apt-get install -y nginx
+
+cd $FIREFLYROOT
 
 if [ -d "$FIREFLYROOT/Serenity" ]; then
 	cd $FIREFLYROOT/Serenity
@@ -179,8 +183,8 @@ sudo pip install -r requirements.txt
 # Need to update and copy the nginx config - if not dynamic DNS then need to chnage to port 80 instead.
 # Need to then restart nginx
 
-echo "\n\nThe nginx config has not been automated out yet. Please copy the nginx config from: /opt/firefly_system/Serenity/nginx.confg to /etx/nginx/sites-enabled/default"
-echo "After copying this file please edit it do that the domains are correct."
+echo -e "\n\nThe nginx config has not been automated out yet. Please copy the nginx config from: /opt/firefly_system/Serenity/nginx.confg to /etx/nginx/sites-enabled/default"
+echo -e "After copying this file please edit it do that the domains are correct."
 
 ##################################
 # INSTALL AUTO-START SCRIPTS [TODO]
@@ -190,12 +194,12 @@ echo "After copying this file please edit it do that the domains are correct."
 # Need to start Firefly on boot
 # Need to start Serenity on boot
 # Need to start ha-bridge on boot
-echo "\n\nSetting Firefly to start on boot.\n\n"
+echo -e "\n\nSetting Firefly to start on boot.\n\n"
 cd $FIREFLYROOT/Firefly
 cp firefly_startup.sh $FIREFLYROOT
 cd $FIREFLYROOT
 chmod +x firefly_startup.sh
-(sudo crontab -l; echo "@reboot /opt/firefly_system/firefly_startup.sh &") | crontab -
+(sudo crontab -l; echo -e "@reboot /opt/firefly_system/firefly_startup.sh &") | crontab -
 
 # OPTIONAL: Start web browser to UI in fullscreen
 
@@ -213,7 +217,7 @@ chmod +x firefly_startup.sh
 # Set password in config file for serenity
 # On reboot it should then apply the new admin password
 
-echo "\n\nThe default username is admin and the password is FireflyPassword1234. PLEASE CHANGE THIS PASSWORD WHEN YOU LOG IN!!\n\n"
+echo -e "\n\nThe default username is admin and the password is FireflyPassword1234. PLEASE CHANGE THIS PASSWORD WHEN YOU LOG IN!!\n\n"
 
 ##################################
 # CLEANUP
