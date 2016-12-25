@@ -24,3 +24,9 @@ Firefly has an easy to use Web based UI and a token based API
 - Alexa (Amazon Echo)
 
 
+## Install Firefly
+
+- Setup a raspberrypi with raspbian (GUI is Okay)
+- Expand Filesystem $ sudo raspi-config
+- Get install script $ wget ........................
+- Run setup script
