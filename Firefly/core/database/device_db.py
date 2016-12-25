@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-12 23:18:17
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-17 22:28:58
+# @Last Modified time: 2016-12-24 20:09:31
 
 import json
 
@@ -36,11 +36,32 @@ def getDeviceList(lower=True):
         device_list[d.get('config').get('name')] = d.get('id')
   return device_list
 
-def getDeviceViewsList():
+def getDeviceViewsList(filters=['hgrp-']):
   devices = []
   for d in deviceDB.find({},{'status.views':1, 'id':1}):
     if (d.get('status').get('views')):
-      devices.append(d.get('status').get('views'))
+      for f in filters:
+        if d.get('status').get('views').get('name').find(f) != -1:
+          continue
+        devices.append(d.get('status').get('views'))
+  return devices
+
+def getDeviceInfo(filters=None):
+  devices = {}
+  for d in deviceDB.find({}):
+    if not d.get('config').get('name'):
+      continue
+    if d.get('config').get('name') is not None:
+      if filters:
+        if d.get('type') not in filters:
+          continue
+      devices[d.get('config').get('name')] = {
+        'name': d.get('config').get('name'),
+        'type': d.get('type'),
+        'subtype': d.get('config').get('subtype'),
+        'commands': d.get('commands'),
+        'id': d.get('id')
+      }
   return devices
 
 def getDeviceStatusDict():
@@ -67,4 +88,12 @@ def reinstallDevices():
         d['ffObject'] = pickle.dumps(dObj)
         d['config'] = device
         d['status'] = {}
+        try:
+          d['commands'] = dObj.commands
+        except:
+          d['commands'] = []
+        try: 
+          d['type'] = dObj.type
+        except:
+          d['type'] = 'UNKNOWN'
         deviceDB.insert(d)
