@@ -12,15 +12,50 @@ Firefly has a very easy to use plugin framework that allows you to make plugins 
 
 Firefly has an easy to use Web based UI and a token based API
 
-## What deviecs are supported? 
+## What deviecs are supported?
 
-- Hue Lights
-- Lifx Lights*
-- ZWave Devices*
-- Nest*
-- Ecobee*
-- Pushover
-- IFTTT
+Voice commands using HA-Bridge (color commands not yet supported):
+
+- Google Home
+  - Hey Google, turn on kitchen lights
+  - Hey Google, set lamp to 10%
 - Alexa (Amazon Echo)
+  - Alexa, turn on kitchen lights
+  - Alexa, set lamp to 10%
+
+Services:
+
+- IFTTT
+- Pushover
+- Locative (geofencing)
+
+Devices:
+- Hue Lights
+- Nest
+- Zwave sensors and switches
+
+Partial Support:
+
+- Lifx Lights*
+- Ecobee*
+- LG TV*
+
+Coming Soon: 
+
+- Chromecast
+- Sonos
+- Harmony Support (Using HA-Bridge)
 
 
+## Requirements
+
+- Dynamic DNS Service (Google Domains or DuckDNS.org)
+- Port 443 forawrded to the IP of the RaspberryPi (This is for LetsEncrypt and Remote Access)
+
+
+## Install Firefly
+
+- Setup a raspberrypi with raspbian (GUI is Okay)
+- Expand Filesystem $ sudo raspi-config
+- Get install script $ wget https://raw.githubusercontent.com/zpriddy/Firefly/install_script/install_firefly.sh
+- Run setup script $ sudo ./install_firefly.sh
