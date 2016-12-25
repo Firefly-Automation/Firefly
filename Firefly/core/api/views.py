@@ -10,7 +10,7 @@ from core import reinstallRoutinesFromConfig
 from core.api.alexa import alexaHandler
 from core.api.ifttt import iftttHandler
 from core.api.locative import locativeHandler
-from core.api.ha-bridge import ha_bridge_handler, ha_bridge_push_config
+from core.api.ha_bridge import ha_bridge_handler, ha_bridge_push_config
 from core.firefly import app
 from flask import request
 

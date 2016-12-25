@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-12-24 12:39:45
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 13:54:59
+# @Last Modified time: 2016-12-24 16:47:29
 
 import difflib
 import json
@@ -14,7 +14,7 @@ from core.database.device_db import getDeviceList
 from core.database.routine_db import getRoutineList
 from core.database.device_db import getDeviceInfo
 
-FIREFLY_ADDRESS = 'http://localhost:6001'
+FIREFLY_ADDRESS = 'http://localhost:6002'
 HA_BRIDGE_ADDRESS = 'http://localhost:80'
 
 
