@@ -50,7 +50,7 @@ def ha_bridge_command():
   return ha_bridge_handler(r)
 
 @app.route('/API/habridge/config', methods=['POST'])
-def ha_bridge_command():
+def ha_bridge_config():
   r = request.get_json(force=True)
   return ha_bridge_push_config(r)
 
