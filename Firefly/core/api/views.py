@@ -52,7 +52,6 @@ def ha_bridge_command():
 
 @app.route('/API/habridge/config', methods=['POST','GET'])
 def ha_bridge_config():
-  print '****************** -1 ************************'
   return ha_bridge_push_config()
 
 @app.route('/API/mode')
