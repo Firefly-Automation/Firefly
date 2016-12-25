@@ -104,6 +104,7 @@ class Device(object):
 
   @property
   def commands(self):
+    print '*************************************************************************'
     return self._commands.keys()
 
   @property
