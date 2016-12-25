@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-12-24 12:39:45
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 17:35:55
+# @Last Modified time: 2016-12-24 17:37:34
 
 import difflib
 import json
@@ -15,7 +15,7 @@ from core.database.routine_db import getRoutineList
 from core.database.device_db import getDeviceInfo
 
 FIREFLY_ADDRESS = 'http://localhost:6002'
-HA_BRIDGE_ADDRESS = 'http://localhost:80'
+HA_BRIDGE_ADDRESS = 'http://localhost:80/api/devices'
 
 
 def ha_bridge_handler(p_request):
