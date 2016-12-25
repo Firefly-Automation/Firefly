@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-12-24 12:39:45
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 18:00:33
+# @Last Modified time: 2016-12-24 18:05:30
 
 import difflib
 import json
@@ -62,7 +62,7 @@ def ha_bridge_push_config():
 			'contentType': 'application/json',
 			'contentBody': '{"device": "' + config.get('id') + '" ,"action": "on"}',
 			'contentBodyOff': '{"device": "' + config.get('id') + '" ,"action": "off"}',
-			'contentBodyDim': '{"device": "' + config.get('id') + '" ,"action": "on", "level":${intensity.percent}}'
+			'contentBodyDim': '{"device": "' + config.get('id') + '" ,"action": "dim", "level":${intensity.percent}}'
 		}
 		device_config.append(d_config)
 
