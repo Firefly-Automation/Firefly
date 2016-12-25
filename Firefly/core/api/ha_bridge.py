@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-12-24 12:39:45
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 17:40:40
+# @Last Modified time: 2016-12-24 18:00:33
 
 import difflib
 import json
@@ -60,6 +60,32 @@ def ha_bridge_push_config():
 			'dimUrl': FIREFLY_ADDRESS + '/API/habridge/command',
 			'httpVerb': 'POST',
 			'contentType': 'application/json',
+			'contentBody': '{"device": "' + config.get('id') + '" ,"action": "on"}',
+			'contentBodyOff': '{"device": "' + config.get('id') + '" ,"action": "off"}',
+			'contentBodyDim': '{"device": "' + config.get('id') + '" ,"action": "on", "level":${intensity.percent}}'
+		}
+		device_config.append(d_config)
+
+
+	for d in device_config:
+		print json.dumps(d)
+		r = requests.post(HA_BRIDGE_ADDRESS, json=d)
+		logging.critical('Added ' + d.get('name') + ' to HA Bridge')
+
+	logging.critical('Done addeding devices to HA Bridge.')
+
+	return str(device_config)
+
+'''
+for device, config in devices.iteritems(): 
+		d_config = {
+			'name': config.get('name'),
+			'deviceType': config.get('type'),
+			'onUrl': FIREFLY_ADDRESS + '/API/habridge/command',
+			'offUrl': FIREFLY_ADDRESS + '/API/habridge/command',
+			'dimUrl': FIREFLY_ADDRESS + '/API/habridge/command',
+			'httpVerb': 'POST',
+			'contentType': 'application/json',
 			'contentBody': {
 				'device': config.get('id'),
 				'action': 'on'
@@ -75,16 +101,5 @@ def ha_bridge_push_config():
 			}
 		}
 		device_config.append(d_config)
-
-
-	for d in device_config:
-		print json.dumps(d)
-		r = requests.post(HA_BRIDGE_ADDRESS, json=d)
-		logging.critical('Added ' + d.get('name') + ' to HA Bridge')
-
-	logging.critical('Done addeding devices to HA Bridge.')
-
-	return str(device_config)
-
-
+'''
 
