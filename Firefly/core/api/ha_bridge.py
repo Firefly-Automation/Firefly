@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-12-24 12:39:45
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 17:30:38
+# @Last Modified time: 2016-12-24 17:34:08
 
 import difflib
 import json
@@ -51,27 +51,25 @@ def ha_bridge_push_config():
 
 	device_config = []
 	
-	for d in devices: 
-		print d
-		'''
+	for device, config in devices.iteritems(): 
 		d_config = {
-			'name': d.get('name'),
-			'deviceType': d.get('type'),
+			'name': config.get('name'),
+			'deviceType': config.get('type'),
 			'onUrl': FIREFLY_ADDRESS + '/API/habridge/command',
 			'offUrl': FIREFLY_ADDRESS + '/API/habridge/command',
 			'dimUrl': FIREFLY_ADDRESS + '/API/habridge/command',
 			'httpVerb': 'POST',
 			'contentType': 'application/json',
 			'contentBody': {
-				'device': d.get('id'),
+				'device': config.get('id'),
 				'action': 'on'
 			},
 			'contentBodyOff': {
-				'device': d.get('id'),
+				'device': config.get('id'),
 				'action': 'off'
 			},
 			'contentBodyDim': {
-				'device': d.get('id'),
+				'device': config.get('id'),
 				'action': 'dim',
 				'level': '${intensity.percent}'
 			}
@@ -84,7 +82,7 @@ def ha_bridge_push_config():
 		logging.critical('Added ' + d.get('name') + ' to HA Bridge')
 
 	logging.critical('Done addeding devices to HA Bridge.')
-	'''
+
 	return str(device_config)
 
 
