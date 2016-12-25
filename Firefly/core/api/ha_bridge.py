@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-12-24 12:39:45
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 20:10:45
+# @Last Modified time: 2016-12-24 20:18:38
 
 import difflib
 import json
@@ -75,10 +75,6 @@ def ha_bridge_push_config():
 
 
 	for d in device_config:
-		# For now dont hadd ue lights - Just add groups and switches
-		# TODO: Chnage this to HUE
-		if d.get('deviceType') == 'light':
-			continue
 		r = requests.post(HA_BRIDGE_ADDRESS, json=d)
 		logging.critical('Added ' + d.get('name') + ' to HA Bridge')
 
