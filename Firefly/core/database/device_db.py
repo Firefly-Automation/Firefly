@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-12 23:18:17
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 17:15:57
+# @Last Modified time: 2016-12-24 17:18:41
 
 import json
 
@@ -45,11 +45,13 @@ def getDeviceViewsList():
 
 def getDeviceInfo(filters=None):
   devices = {}
-  for d in deviceDB.find({},{"config.name":1,"id":1}):
+  for d in deviceDB.find({}):
+    if not d.get('config').get('name'):
+      continue
     if d.get('config').get('name') is not None:
       if filters:
-        print d
-        if d.get('config').get('type') not in filters:
+        print d.get('type')
+        if d.get('type') not in filters:
           continue
       devices[d.get('config').get('name')] = {
         'name': d.get('config').get('name'),
