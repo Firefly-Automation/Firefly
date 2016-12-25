@@ -61,7 +61,7 @@
     "subType" : "hub",
     "args" : {
       "configFile" : "/opt/firefly_system/python-openzwave-0.3.1/openzwave/config",
-      "port" : "/dev/ttyUSB0"
+      "port" : "/dev/ttyACM0"
     }
   }
 }

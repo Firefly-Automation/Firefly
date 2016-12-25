@@ -87,6 +87,9 @@ fi
 
 if ask "Do you want to install HA-Bridge for voice commands?" Y; then
 	cd /opt/firefly_system
+	mkdir ha_bridge
+	cd ha_bridge
+	rm ha-bridge-*.jar
 	sudo apt-get install -y openjdk-8-jre
 	wget https://github.com/bwssytems/ha-bridge/releases/download/v3.5.1/ha-bridge-3.5.1.jar
 fi
