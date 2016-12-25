@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-12-24 12:39:45
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 18:05:30
+# @Last Modified time: 2016-12-24 19:39:07
 
 import difflib
 import json
@@ -44,7 +44,8 @@ def ha_bridge_off(p_request):
 def ha_bridge_push_config():
 	# 1) Get the HA-Bridge config details from request.
 	# 2) Build of the URLS and JSON for each device and push them.
-	# 3) Add the devices to the HA-Bridge
+	# 3) Delete existing Firefly Configs
+	# 4) Add the devices to the HA-Bridge
 
 	devices = getDeviceInfo(filters=['lights','light','switch','hue','dimmer','fan','group'])
 
@@ -58,6 +59,7 @@ def ha_bridge_push_config():
 			'onUrl': FIREFLY_ADDRESS + '/API/habridge/command',
 			'offUrl': FIREFLY_ADDRESS + '/API/habridge/command',
 			'dimUrl': FIREFLY_ADDRESS + '/API/habridge/command',
+			'targetDevice': 'Firefly - Auto-added',
 			'httpVerb': 'POST',
 			'contentType': 'application/json',
 			'contentBody': '{"device": "' + config.get('id') + '" ,"action": "on"}',
@@ -65,6 +67,11 @@ def ha_bridge_push_config():
 			'contentBodyDim': '{"device": "' + config.get('id') + '" ,"action": "dim", "level":${intensity.percent}}'
 		}
 		device_config.append(d_config)
+
+	current_devices = requests.get(HA_BRIDGE_ADDRESS).json()
+	for d in current_devices:
+		if d.get('targetDevice') == 'Firefly - Auto-added' or d.get('targetDevice') is None:
+			requests.delete(HA_BRIDGE_ADDRESS + '/' + str(d.get('id')))
 
 
 	for d in device_config:
