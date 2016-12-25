@@ -138,7 +138,10 @@ if ask "Would you like to use a dynamic dns domain?"; then
 	if ask "\n\nWould you like to install and setup LetsEncrypt? This requires a dynamic dns domain to have been setup."; then
 		echo -e "\n\nInstalling LetsEncrypt and getting first certificate.\n\n"
 
-		sudo apt-get -y install certbot
+		#sudo apt-get -y install certbot
+		cd $FIREFLYROOT
+		wget https://dl.eff.org/certbot-auto
+		chmod a+x certbot-auto
 		cd /var
 		sudo mkdir www
 		cd www
@@ -152,7 +155,8 @@ if ask "Would you like to use a dynamic dns domain?"; then
 
 		echo -e -n "\n\nPlsease enter you email. [ENTER]:"
 		read EMAIL
-		certbot certonly --standalone --standalone-supported-challenges tls-sni-01 --agree-tos --email $EMAIL -d $DOMAIN
+		cd $FIREFLYROOT
+		sudo ./certbot-auto certonly --standalone --standalone-supported-challenges tls-sni-01 --agree-tos --email $EMAIL -d $DOMAIN
 
 		echo -e "\n\nFinished installing first cert\n\n"
 	fi 
