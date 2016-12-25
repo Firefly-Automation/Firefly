@@ -56,18 +56,23 @@ cd firefly_system
 ##################################
 # INSTALL OPENZWAVE
 ##################################
+if ask "Would you like to install ZWave Support? This might take a while.. its a good time to get lunch.." Y; then
+	echo "Installing Python OpenZWave... This might take some time.. Its a good time to go get a snack.. or Lunch.."
 
-echo "Installing Python OpenZWave... This might take some time.. Its a good time to go get a snack.. or Lunch.."
+	cd /opt/firefly_system
+	sudo apt-get install -Y make build-esential libudev-dev build-essential python2.7-dev python-pip libu
+	wget https://github.com/OpenZWave/python-openzwave/raw/master/archives/python-openzwave-0.3.1.tgz
+	tar xvzf python-openzwave-0.3.1.tgz
+	cd python-openzwave-0.3.1
+	sudo make clean
+	sudo make deps
+	sudo make build
+	sudo make install
+	cd /opt/firefly_system
+	rm python-openzwave-0.3.1.tgz
 
-sudo apt-get install -Y make build-esential libudev-dev build-essential python2.7-dev python-pip libu
-wget https://github.com/OpenZWave/python-openzwave/raw/master/archives/python-openzwave-0.3.1.tgz
-tar xvzf python-openzwave-0.3.1.tgz
-cd python-openzwave-0.3.1
-sudo make deps
-make build
-sudo make install
-
-echo "Done installing Python OpenZWave!"
+	echo "Done installing Python OpenZWave!"
+fi
 
 ##################################
 # INSTALL HA-BRIDGE
@@ -105,4 +110,7 @@ git clone https://github.com/zpriddy/Firefly.git
 ##################################
 # SET PASSWORD ETC
 ##################################
+
+cd /opt/firefly_system
+sudo chown -R firefly:firefly * 
 
