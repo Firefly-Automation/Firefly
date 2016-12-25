@@ -1,5 +1,7 @@
 #! /bin/bash
 
+FIREFLYROOT="/opt/firefly_system"
+
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root" 
    exit 1
@@ -97,7 +99,14 @@ echo "Installing Firefly Backend"
 
 cd /opt/firefly_system
 sudo apt-get install -y git mongodb
-git clone https://github.com/zpriddy/Firefly.git
+if [ -d "$FIREFLYROOT/Firefly" ]; then
+	cd $FIREFLYROOT/Firefly
+	git pull
+else
+	git clone https://github.com/zpriddy/Firefly.git
+fi
+cd $FIREFLYROOT/Firefly/Firefly
+sudo pip install -r requirements.txt
 
 
 ##################################
