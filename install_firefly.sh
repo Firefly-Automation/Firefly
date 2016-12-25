@@ -38,22 +38,24 @@ else
 fi
 
 if ask "Would you like to chnage the password for the default pi user?" Y; then
-	#remove echo
-	echo "passwd"
+	passwd
 else
 	echo "It is recommended to chnage the defualt password if you have not already"
 fi
 
 if ask "Would you like to add the Firefly User." Y; then
 	echo "Please fill out the following prompts to add the firefly user"
-	#remove echo
-	echo "sudo adduser firefly"
-	echo "sudo adduser firefly sudo"
+	sudo adduser firefly
+	sudo adduser firefly sudo
 fi
 
 cd /opt
 mkdir firefly_system
 cd firefly_system
+
+##################################
+# INSTALL OPENZWAVE
+##################################
 
 echo "Installing Python OpenZWave... This might take some time.. Its a good time to go get a snack.. or Lunch.."
 
@@ -65,7 +67,27 @@ sudo make deps
 make build
 sudo make install
 
-echo "Done installing Python OpenZWave"
+echo "Done installing Python OpenZWave!"
+
+##################################
+# INSTALL HA-BRIDGE
+##################################
+
+if ask "Do you want to install HA-Bridge for voice commands?" Y; then
+	cd /opt/firefly_system
+	sudo apt-get install openjdk-8-jre
+	wget https://github.com/bwssytems/ha-bridge/releases/download/v3.5.1/ha-bridge-3.5.1.jar
+fi
+
+##################################
+# INSTALL FIREFLY
+##################################
+
+echo "Installing Firefly Backend"
+
+cd /opt/firefly_system
+sudo apt-get install git mongodb
+git clone https://github.com/zpriddy/Firefly.git
 
 
 

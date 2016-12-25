@@ -28,5 +28,5 @@ Firefly has an easy to use Web based UI and a token based API
 
 - Setup a raspberrypi with raspbian (GUI is Okay)
 - Expand Filesystem $ sudo raspi-config
-- Get install script $ wget ........................
-- Run setup script
+- Get install script $ wget https://raw.githubusercontent.com/zpriddy/Firefly/install_script/install_firefly.sh
+- Run setup script $ sudo ./install_firefly.sh
