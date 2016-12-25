@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-12 23:18:17
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 20:07:18
+# @Last Modified time: 2016-12-24 20:09:31
 
 import json
 
@@ -42,7 +42,8 @@ def getDeviceViewsList(filters=['hgrp-']):
     if (d.get('status').get('views')):
       for f in filters:
         if d.get('status').get('views').get('name').find(f) != -1:
-          devices.append(d.get('status').get('views'))
+          continue
+        devices.append(d.get('status').get('views'))
   return devices
 
 def getDeviceInfo(filters=None):
