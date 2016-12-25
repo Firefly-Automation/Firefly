@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-12-24 12:39:45
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 17:22:55
+# @Last Modified time: 2016-12-24 17:25:08
 
 import difflib
 import json
@@ -46,7 +46,7 @@ def ha_bridge_push_config():
 	# 2) Build of the URLS and JSON for each device and push them.
 	# 3) Add the devices to the HA-Bridge
 
-	devices = getDeviceInfo(filters=['lights','light','siwtch','hue','dimmer','fan','group'])
+	devices = getDeviceInfo(filters=['lights','light','switch','hue','dimmer','fan','group'])
 
 
 	device_config = []
