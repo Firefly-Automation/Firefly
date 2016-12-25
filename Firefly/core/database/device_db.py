@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-12 23:18:17
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 13:14:11
+# @Last Modified time: 2016-12-24 16:51:33
 
 import json
 
@@ -83,5 +83,5 @@ def reinstallDevices():
         d['ffObject'] = pickle.dumps(dObj)
         d['config'] = device
         d['status'] = {}
-        d['commands'] = dObj.COMMANDS.keys()
+        d['commands'] = dObj.commands
         deviceDB.insert(d)

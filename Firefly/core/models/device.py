@@ -103,6 +103,10 @@ class Device(object):
     return False
 
   @property
+  def commands(self):
+    return self._commands.keys()
+
+  @property
   def metadata(self):
       return self._metadata
 
