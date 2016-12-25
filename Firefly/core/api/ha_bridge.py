@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-12-24 12:39:45
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 20:18:38
+# @Last Modified time: 2016-12-24 20:34:28
 
 import difflib
 import json
@@ -14,6 +14,7 @@ from core.database.device_db import getDeviceList
 from core.database.routine_db import getRoutineList
 from core.database.device_db import getDeviceInfo
 
+# TODO: Pull this info from the firefly.confg 
 FIREFLY_ADDRESS = 'http://localhost:6002'
 HA_BRIDGE_ADDRESS = 'http://localhost:80/api/devices'
 
@@ -82,30 +83,4 @@ def ha_bridge_push_config():
 
 	return str(device_config)
 
-'''
-for device, config in devices.iteritems(): 
-		d_config = {
-			'name': config.get('name'),
-			'deviceType': config.get('type'),
-			'onUrl': FIREFLY_ADDRESS + '/API/habridge/command',
-			'offUrl': FIREFLY_ADDRESS + '/API/habridge/command',
-			'dimUrl': FIREFLY_ADDRESS + '/API/habridge/command',
-			'httpVerb': 'POST',
-			'contentType': 'application/json',
-			'contentBody': {
-				'device': config.get('id'),
-				'action': 'on'
-			},
-			'contentBodyOff': {
-				'device': config.get('id'),
-				'action': 'off'
-			},
-			'contentBodyDim': {
-				'device': config.get('id'),
-				'action': 'dim',
-				'level': '${intensity.percent}'
-			}
-		}
-		device_config.append(d_config)
-'''
 

@@ -9,3 +9,8 @@ password: FFPassword123
 [LOCATION]
 zipcode: 95110
 modes: [home, away, night, art-mode, vacation]
+
+[HABRIDGE]
+enabled: true
+host: localhost
+port: 80
