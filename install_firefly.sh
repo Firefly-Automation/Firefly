@@ -157,7 +157,7 @@ fi
 
 
 ##################################
-# INSTALL SERENITY
+# INSTALL SERENITY [TODO]
 ##################################
 
 echo "\n\nInstalling Serenity WEB UI\n\n"
@@ -181,7 +181,7 @@ echo "\n\nThe nginx config has not been automated out yet. Please copy the nginx
 echo "After copying this file please edit it do that the domains are correct."
 
 ##################################
-# INSTALL AUTO-START SCRIPTS
+# INSTALL AUTO-START SCRIPTS [TODO]
 ##################################
 
 # Need to verify permissions of serial port
@@ -198,13 +198,13 @@ chmod +x firefly_startup.sh
 # OPTIONAL: Start web browser to UI in fullscreen
 
 ##################################
-# INSTALL LETS ENCRYPT RENEWAL
+# INSTALL LETS ENCRYPT RENEWAL [TODO]
 ##################################
 
 #certbot renew --pre-hook "service nginx stop" --post-hook "service nginx start" --standalone --standalone-supported-challenges tls-sni-01 --agree-tos --email $EMAIL -d $DOMAIN
 
 ##################################
-# SET PASSWORD ETC
+# SET PASSWORD ETC [TODO]
 ##################################
 
 # ask for Admin password
