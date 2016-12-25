@@ -65,7 +65,7 @@ if ask "Would you like to install ZWave Support? This might take a while.. its a
 	echo "Installing Python OpenZWave... This might take some time.. Its a good time to go get a snack.. or Lunch.."
 
 	cd /opt/firefly_system
-	sudo apt-get install -Y make build-esential libudev-dev build-essential python2.7-dev python-pip libu
+	sudo apt-get install -y make build-esential libudev-dev build-essential python2.7-dev python-pip libu
 	wget https://github.com/OpenZWave/python-openzwave/raw/master/archives/python-openzwave-0.3.1.tgz
 	tar xvzf python-openzwave-0.3.1.tgz
 	cd python-openzwave-0.3.1
@@ -85,7 +85,7 @@ fi
 
 if ask "Do you want to install HA-Bridge for voice commands?" Y; then
 	cd /opt/firefly_system
-	sudo apt-get install -Y openjdk-8-jre
+	sudo apt-get install -y openjdk-8-jre
 	wget https://github.com/bwssytems/ha-bridge/releases/download/v3.5.1/ha-bridge-3.5.1.jar
 fi
 
@@ -96,7 +96,7 @@ fi
 echo "Installing Firefly Backend"
 
 cd /opt/firefly_system
-sudo apt-get install -Y git mongodb
+sudo apt-get install -y git mongodb
 git clone https://github.com/zpriddy/Firefly.git
 
 
