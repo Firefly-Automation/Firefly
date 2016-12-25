@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-12 23:18:17
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 17:09:48
+# @Last Modified time: 2016-12-24 17:13:43
 
 import json
 
@@ -53,7 +53,7 @@ def getDeviceInfo(filters=None):
           continue
       devices[d.get('config').get('name')] = {
         'name': d.get('config').get('name'),
-        'type': d.get('config').get('type'),
+        'type': d.get('type'),
         'subtype': d.get('config').get('subtype'),
         'commands': d.get('commands'),
         'id': d.get('id')
@@ -88,4 +88,8 @@ def reinstallDevices():
           d['commands'] = dObj.commands
         except:
           d['commands'] = []
+        try: 
+          d['type'] = dObj.type
+        except:
+          d['type'] = 'UNKNOWN'
         deviceDB.insert(d)
