@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-12-24 12:39:45
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 16:56:18
+# @Last Modified time: 2016-12-24 16:58:22
 
 import difflib
 import json
@@ -76,8 +76,10 @@ def ha_bridge_push_config(p_request):
 
 	for d in device_config:
 		r = requests.put(HA_BRIDGE_ADDRESS, json=d)
-		logging.info('Added ' + d.get('name') + ' to HA Bridge')
+		logging.critical('Added ' + d.get('name') + ' to HA Bridge')
 
-	logging.info('Done addeding devices to HA Bridge.')
+	logging.critical('Done addeding devices to HA Bridge.')
+
+	return str(device_config)
 
 
