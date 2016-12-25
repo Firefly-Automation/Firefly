@@ -7,3 +7,6 @@ webcolors
 colorpy
 astral
 python-nest
+tzlocal
+apscheduler
+configparser
