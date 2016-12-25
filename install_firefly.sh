@@ -59,7 +59,7 @@ cd firefly_system
 
 echo "Installing Python OpenZWave... This might take some time.. Its a good time to go get a snack.. or Lunch.."
 
-sudo apt-get install make build-esential libudev-dev build-essential python2.7-dev python-pip
+sudo apt-get install -Y make build-esential libudev-dev build-essential python2.7-dev python-pip libu
 wget https://github.com/OpenZWave/python-openzwave/raw/master/archives/python-openzwave-0.3.1.tgz
 tar xvzf python-openzwave-0.3.1.tgz
 cd python-openzwave-0.3.1
@@ -75,7 +75,7 @@ echo "Done installing Python OpenZWave!"
 
 if ask "Do you want to install HA-Bridge for voice commands?" Y; then
 	cd /opt/firefly_system
-	sudo apt-get install openjdk-8-jre
+	sudo apt-get install -Y openjdk-8-jre
 	wget https://github.com/bwssytems/ha-bridge/releases/download/v3.5.1/ha-bridge-3.5.1.jar
 fi
 
@@ -86,8 +86,23 @@ fi
 echo "Installing Firefly Backend"
 
 cd /opt/firefly_system
-sudo apt-get install git mongodb
+sudo apt-get install -Y git mongodb
 git clone https://github.com/zpriddy/Firefly.git
 
 
+##################################
+# INSTALL SERENITY
+##################################
+
+##################################
+# INSTALL LETS ENCRYPT
+##################################
+
+##################################
+# INSTALL AUTO-START SCRIPTS
+##################################
+
+##################################
+# SET PASSWORD ETC
+##################################
 
