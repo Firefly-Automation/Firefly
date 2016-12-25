@@ -1,6 +1,7 @@
 #! /bin/bash
 
 FIREFLYROOT="/opt/firefly_system"
+DOMAIN=""
 
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root" 
@@ -63,8 +64,8 @@ cd firefly_system
 ##################################
 # INSTALL OPENZWAVE
 ##################################
-if ask "Would you like to install ZWave Support? This might take a while.. its a good time to get lunch.." Y; then
-	echo "Installing Python OpenZWave... This might take some time.. Its a good time to go get a snack.. or Lunch.."
+if ask "\n\nWould you like to install ZWave Support? This might take a while.. its a good time to get lunch.." Y; then
+	echo "\n\nInstalling Python OpenZWave... This might take some time.. Its a good time to go get a snack.. or Lunch..\n\n"
 
 	cd /opt/firefly_system
 	sudo apt-get install -y make build-esential libudev-dev build-essential python2.7-dev python-pip libu
@@ -78,14 +79,14 @@ if ask "Would you like to install ZWave Support? This might take a while.. its a
 	cd /opt/firefly_system
 	rm python-openzwave-0.3.1.tgz
 
-	echo "Done installing Python OpenZWave!"
+	echo "\n\nDone installing Python OpenZWave!\n\n"
 fi
 
 ##################################
 # INSTALL HA-BRIDGE
 ##################################
 
-if ask "Do you want to install HA-Bridge for voice commands?" Y; then
+if ask "\n\nDo you want to install HA-Bridge for voice commands?" Y; then
 	cd /opt/firefly_system
 	mkdir ha_bridge
 	cd ha_bridge
@@ -98,7 +99,7 @@ fi
 # INSTALL FIREFLY
 ##################################
 
-echo "Installing Firefly Backend"
+echo "\n\nInstalling Firefly Backend\n\n"
 
 cd /opt/firefly_system
 sudo apt-get install -y git mongodb
@@ -111,23 +112,115 @@ fi
 cd $FIREFLYROOT/Firefly/Firefly
 sudo pip install -r requirements.txt
 
+echo "\n\nDone Installing Firefly Backend\n\n"
+
+##################################
+# INSTALL ASK FOR DYNAMIC DNS
+##################################
+
+echo "\n\nA dynamic dns domain will allow you to acccess your firefly system from anywhere. There are many options, the two I recommend are:"
+echo "1) Google Domains (domains.google.com - \$12+/yr) - Google domains will allow you to choose any domain and set up a subdomain to access firefly, i.e. firefly.yourname.com"
+echo "2) DuckDNS (duckdns.org - Free) - DuckDNS is a free  dynamic DNS provider and will allow you to have a domain like myName-firefly.duckdns.org to access your firefly system. However duckdns may be blocked by workplace firewalls."
+if ask "Would you like to use a dynamic dns domain?"; then
+
+	echo -n "\n\nPlease enter the external domain for Firefly. [ENTER]:"
+	read DOMAIN
+
+	echo "\n\nTBD - Add chron job for updating dynamic dns doamin."
+
+
+	##################################
+	# INSTALL LETS ENCRYPT
+	##################################
+
+	if ask "\n\nWould you like to install and setup LetsEncrypt? This requires a dynamic dns domain to have been setup."; then
+		echo "\n\nInstalling LetsEncrypt and getting first certificate.\n\n"
+
+		sudo apt-get -y install certbot
+		cd /var/www
+		sudo mkdir firefly_www
+		cd firefly_www
+		sudo mkdir .well-known
+		cd .well-known
+		sudo mkdir acme-challenge
+		cd /var/www
+		sudo chown -R www-data:www-data firefly_www
+
+		echo -n "\n\nPlsease enter you email. [ENTER]:"
+		read EMAIL
+		certbot certonly --standalone --standalone-supported-challenges tls-sni-01 --agree-tos --email $EMAIL -d $DOMAIN
+
+		echo "\n\nFinished installing first cert\n\n"
+	fi 
+fi
+
+
 
 ##################################
 # INSTALL SERENITY
 ##################################
 
-##################################
-# INSTALL LETS ENCRYPT
-##################################
+echo "\n\nInstalling Serenity WEB UI\n\n"
+
+sudo apt-get install -y nginx
+
+if [ -d "$FIREFLYROOT/Serenity" ]; then
+	cd $FIREFLYROOT/Serenity
+	git pull
+else
+	git clone https://github.com/zpriddy/Serenity.git
+fi
+
+cd $FIREFLYROOT/Serenity
+sudo pip install -r requirements.txt
+
+# Need to update and copy the nginx config - if not dynamic DNS then need to chnage to port 80 instead.
+# Need to then restart nginx
+
+echo "\n\nThe nginx config has not been automated out yet. Please copy the nginx config from: /opt/firefly_system/Serenity/nginx.confg to /etx/nginx/sites-enabled/default"
+echo "After copying this file please edit it do that the domains are correct."
 
 ##################################
 # INSTALL AUTO-START SCRIPTS
 ##################################
 
+# Need to verify permissions of serial port
+# Need to start Firefly on boot
+# Need to start Serenity on boot
+# Need to start ha-bridge on boot
+echo "\n\nSetting Firefly to start on boot.\n\n"
+cd $FIREFLYROOT/Firefly
+cp firefly_startup.sh $FIREFLYROOT
+cd $FIREFLYROOT
+chmod +x firefly_startup.sh
+(sudo crontab -l; echo "@reboot /opt/firefly_system/firefly_startup.sh &") | crontab -
+
+# OPTIONAL: Start web browser to UI in fullscreen
+
+##################################
+# INSTALL LETS ENCRYPT RENEWAL
+##################################
+
+#certbot renew --pre-hook "service nginx stop" --post-hook "service nginx start" --standalone --standalone-supported-challenges tls-sni-01 --agree-tos --email $EMAIL -d $DOMAIN
+
 ##################################
 # SET PASSWORD ETC
+##################################
+
+# ask for Admin password
+# Set password in config file for serenity
+# On reboot it should then apply the new admin password
+
+echo "\n\nThe default username is admin and the password is FireflyPassword1234. PLEASE CHANGE THIS PASSWORD WHEN YOU LOG IN!!\n\n"
+
+##################################
+# CLEANUP
 ##################################
 
 cd /opt/firefly_system
 sudo chown -R firefly:firefly * 
 
+# reboot to finish setup
+if ask "Would you like to reboot now?" Y; then
+	sudo reboot
+fi
