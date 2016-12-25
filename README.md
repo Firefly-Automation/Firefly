@@ -57,5 +57,5 @@ Coming Soon:
 
 - Setup a raspberrypi with raspbian (GUI is Okay)
 - Expand Filesystem $ sudo raspi-config
-- Get install script $ wget https://raw.githubusercontent.com/zpriddy/Firefly/install_script/install_firefly.sh
-- Run setup script $ sudo ./install_firefly.sh
+- Get install script $ wget https://raw.githubusercontent.com/zpriddy/Firefly/master/install_firefly.sh
+- Run setup script $ sudo bash install_firefly.sh
