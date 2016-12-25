@@ -2,7 +2,7 @@
 # @Author: Zachary Priddy
 # @Date:   2016-10-12 23:18:17
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-12-24 16:55:14
+# @Last Modified time: 2016-12-24 17:09:48
 
 import json
 
@@ -48,6 +48,7 @@ def getDeviceInfo(filters=None):
   for d in deviceDB.find({},{"config.name":1,"id":1}):
     if d.get('config').get('name') is not None:
       if filters:
+        print d.get('config').get('type')
         if d.get('config').get('type') not in filters:
           continue
       devices[d.get('config').get('name')] = {
