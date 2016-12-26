@@ -59,6 +59,10 @@ if ask "Would you like to add the Firefly User." Y; then
 	sudo adduser firefly sudo
 fi
 
+echo -e "\n\nUpdating RaspberryPi...\n\n"
+sudo apt-get update
+sudo apt-get dist-upgrade
+
 cd /opt
 mkdir firefly_system
 cd firefly_system
@@ -71,6 +75,8 @@ if ask "\n\nWould you like to install ZWave Support? This might take a while.. i
 
 	cd /opt/firefly_system
 	sudo apt-get install -y make build-esential libudev-dev build-essential python2.7-dev python-pip libu
+	# Not sure why libudev-dev game me an error.. But trying this fix..
+	sudo apt-get install -y libudev-dev 
 	wget https://github.com/OpenZWave/python-openzwave/raw/master/archives/python-openzwave-0.3.1.tgz
 	tar xvzf python-openzwave-0.3.1.tgz
 	cd python-openzwave-0.3.1
@@ -196,7 +202,7 @@ if ask "Would you like to use a dynamic dns domain?"; then
 			sudo mkdir /var/www
 		fi
 		if [ ! -d "/var/www/firefly_www" ]; then
-			sudo mkdir var/www/firefly_www
+			sudo mkdir /var/www/firefly_www
 		fi
 		if [ ! -d "/var/www/firefly_www.well-known" ]; then
 			sudo mkdir /var/www/firefly_www/.well-known
@@ -204,7 +210,6 @@ if ask "Would you like to use a dynamic dns domain?"; then
 		if [ ! -d "var/www/firefly_www/.well-known/acme-challenge" ]; then
 			sudo mkdir /var/www/firefly_www/.well-known/acme-challenge
 		fi
-		sudo chown -R www-data:www-data /var/www/firefly_www
 
 		echo -e -n "\n\nPlsease enter you email. [ENTER]:"
 		read EMAIL
@@ -224,6 +229,7 @@ fi
 echo -e "\n\nInstalling Serenity WEB UI\n\n"
 
 sudo apt-get install -y nginx
+sudo chown -R www-data:www-data /var/www/firefly_www
 
 cd $FIREFLYROOT
 
@@ -259,6 +265,12 @@ cp firefly_startup.sh $FIREFLYROOT
 cd $FIREFLYROOT
 chmod +x firefly_startup.sh
 (sudo crontab -l; echo -e "@reboot /opt/firefly_system/firefly_startup.sh &") | crontab -
+
+cd $FIREFLYROOT/Firefly/sysetm_scripts
+cp firefly_initd.sh /etc/init.d/firefly
+chmod +x /etc/init.d/firefly
+chmod 755 /etc/init.d/firefly
+update-rc.d firefly defaults
 
 # OPTIONAL: Start web browser to UI in fullscreen
 
