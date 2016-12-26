@@ -59,9 +59,47 @@ if ask "Would you like to add the Firefly User." Y; then
 	sudo adduser firefly sudo
 fi
 
+#################################
+# ASK FUTURE INSTALL QUESTIONS
+#################################
+
+ZWAVE_INSTALL=false
+if ask "\n\nWould you like to install ZWave Support? This might take a while.. its a good time to get lunch.." Y; then
+	ZWAVE_INSTALL=true
+fi
+
+HA_BRIDGE_INSTALL=false
+if ask "\n\nDo you want to install HA-Bridge for voice commands?" Y; then
+	HA_BRIDGE_INSTALL=true
+fi
+
+DYNAMIC_DOMAIN=false
+LETS_ENCRYPT_INSTALL=false
+DOMAIN=""
+EMAIL=""
+echo -e "\n\nA dynamic dns domain will allow you to acccess your firefly system from anywhere. There are many options, the two I recommend are:"
+echo -e "1) Google Domains (domains.google.com - \$12+/yr) - Google domains will allow you to choose any domain and set up a subdomain to access firefly, i.e. firefly.yourname.com"
+echo -e "2) DuckDNS (duckdns.org - Free) - DuckDNS is a free  dynamic DNS provider and will allow you to have a domain like myName-firefly.duckdns.org to access your firefly system. However duckdns may be blocked by workplace firewalls."
+if ask "Would you like to use a dynamic dns domain?"; then
+	DYNAMIC_DOMAIN=true
+	echo -e -n "\n\nPlease enter the external domain for Firefly. [ENTER]:"
+	read DOMAIN
+
+	if ask "\n\nWould you like to install and setup LetsEncrypt? This requires a dynamic dns domain to have been setup."; then
+		LETS_ENCRYPT_INSTALL=true
+		echo -e -n "\n\nPlsease enter you email. [ENTER]:"
+		read EMAIL
+	fi
+fi
+
+#################################
+# DONE ASKING QUESTIONS
+#################################
+
+
 echo -e "\n\nUpdating RaspberryPi...\n\n"
 sudo apt-get update
-sudo apt-get dist-upgrade
+sudo apt-get dist-upgrade -y
 
 cd /opt
 mkdir firefly_system
@@ -70,10 +108,10 @@ cd firefly_system
 ##################################
 # INSTALL OPENZWAVE
 ##################################
-if ask "\n\nWould you like to install ZWave Support? This might take a while.. its a good time to get lunch.." Y; then
+if $ZWAVE_INSTALL; then
 	echo -e "\n\nInstalling Python OpenZWave... This might take some time.. Its a good time to go get a snack.. or Lunch..\n\n"
 
-	cd /opt/firefly_system
+	cd $FIREFLYROOT
 	sudo apt-get install -y make build-esential libudev-dev build-essential python2.7-dev python-pip libu
 	# Not sure why libudev-dev game me an error.. But trying this fix..
 	sudo apt-get install -y libudev-dev 
@@ -84,9 +122,16 @@ if ask "\n\nWould you like to install ZWave Support? This might take a while.. i
 	sudo make deps
 	sudo make build
 	sudo make install
-	cd /opt/firefly_system
+	cd $FIREFLYROOT
 	rm python-openzwave-0.3.1.tgz
 
+	python -c "import openzwave"
+	if [ $? == 1 ]; then
+		cd $FIREFLYROOT/python-openzwave-0.3.1/openzwave/
+		sudo make clean
+		sudo make build
+		sudo make install
+	fi
 	echo -e "\n\nDone installing Python OpenZWave!\n\n"
 fi
 
@@ -94,7 +139,7 @@ fi
 # INSTALL HA-BRIDGE
 ##################################
 
-if ask "\n\nDo you want to install HA-Bridge for voice commands?" Y; then
+if $HA_BRIDGE_INSTALL; then
 	cd /opt/firefly_system
 	mkdir ha_bridge
 	cd ha_bridge
@@ -176,13 +221,7 @@ echo -e "\n\nDone Installing Firefly Backend\n\n"
 # INSTALL ASK FOR DYNAMIC DNS
 ##################################
 
-echo -e "\n\nA dynamic dns domain will allow you to acccess your firefly system from anywhere. There are many options, the two I recommend are:"
-echo -e "1) Google Domains (domains.google.com - \$12+/yr) - Google domains will allow you to choose any domain and set up a subdomain to access firefly, i.e. firefly.yourname.com"
-echo -e "2) DuckDNS (duckdns.org - Free) - DuckDNS is a free  dynamic DNS provider and will allow you to have a domain like myName-firefly.duckdns.org to access your firefly system. However duckdns may be blocked by workplace firewalls."
-if ask "Would you like to use a dynamic dns domain?"; then
-
-	echo -e -n "\n\nPlease enter the external domain for Firefly. [ENTER]:"
-	read DOMAIN
+if $DYNAMIC_DOMAIN; then
 
 	echo -e "\n\nTBD - Add chron job for updating dynamic dns doamin."
 
@@ -191,7 +230,7 @@ if ask "Would you like to use a dynamic dns domain?"; then
 	# INSTALL LETS ENCRYPT
 	##################################
 
-	if ask "\n\nWould you like to install and setup LetsEncrypt? This requires a dynamic dns domain to have been setup."; then
+	if $LETS_ENCRYPT_INSTALL; then
 		echo -e "\n\nInstalling LetsEncrypt and getting first certificate.\n\n"
 
 		#sudo apt-get -y install certbot
@@ -211,8 +250,6 @@ if ask "Would you like to use a dynamic dns domain?"; then
 			sudo mkdir /var/www/firefly_www/.well-known/acme-challenge
 		fi
 
-		echo -e -n "\n\nPlsease enter you email. [ENTER]:"
-		read EMAIL
 		cd $FIREFLYROOT
 		sudo ./certbot-auto certonly --standalone --standalone-supported-challenges tls-sni-01 --agree-tos --email $EMAIL -d $DOMAIN
 
