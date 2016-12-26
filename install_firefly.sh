@@ -1,7 +1,7 @@
 #! /bin/bash
 
 FIREFLYROOT="/opt/firefly_system"
-DOMAIN=""
+DOMAIN=$HOSTNAME
 
 if [[ $EUID -ne 0 ]]; then
    echo -e "This script must be run as root" 
@@ -79,19 +79,18 @@ fi
 
 DYNAMIC_DOMAIN=false
 LETS_ENCRYPT_INSTALL=false
-DOMAIN=""
 EMAIL=""
 echo -e "\n\nA dynamic dns domain will allow you to acccess your firefly system from anywhere. There are many options, the two I recommend are:"
 echo -e "1) Google Domains (domains.google.com - \$12+/yr) - Google domains will allow you to choose any domain and set up a subdomain to access firefly, i.e. firefly.yourname.com"
 echo -e "2) DuckDNS (duckdns.org - Free) - DuckDNS is a free  dynamic DNS provider and will allow you to have a domain like myName-firefly.duckdns.org to access your firefly system. However duckdns may be blocked by workplace firewalls."
 if ask "Would you like to use a dynamic dns domain?"; then
 	DYNAMIC_DOMAIN=true
-	echo -e -n "\n\nPlease enter the external domain for Firefly. [ENTER]:"
+	echo -e -n "\n\nPlease enter the external domain for Firefly. [ENTER]: "
 	read DOMAIN
 
 	if ask "\n\nWould you like to install and setup LetsEncrypt? This requires a dynamic dns domain to have been setup."; then
 		LETS_ENCRYPT_INSTALL=true
-		echo -e -n "\n\nPlsease enter you email. [ENTER]:"
+		echo -e -n "\n\nPlsease enter you email. [ENTER]: "
 		read EMAIL
 	fi
 fi
@@ -172,7 +171,7 @@ MONGO_VERSION="$(mongo --version)"
 if [[ $MONGO_VERSION =~ "3.0.9" ]]; then
 	echo -e "Mongo already installed!"
 else
-	if [ ! $MONGOUSER ]; then
+	if [ !$MONGOUSER ]; then
 		sudo adduser --ingroup nogroup --shell /etc/false --disabled-password --gecos "" --no-create-home mongodb
 	fi
 	if [ ! -d "$FIREFLYROOT/mongodb" ]; then 
@@ -200,6 +199,12 @@ else
 		echo -e "# /etc/mongodb.conf\n# minimal config file (old style)\n# Run mongod --help to see a list of options\n\nbind_ip = 127.0.0.1\nquiet = true\ndbpath = /var/lib/mongodb\nlogpath = /var/log/mongodb/mongod.log\nlogappend = true\nstorageEngine = mmapv1" > /etc/mongodb.conf
 
 		echo -e "[Unit]\nDescription=High-performance, schema-free document-oriented database\nAfter=network.target\n\n[Service]\nUser=mongodb\nExecStart=/usr/bin/mongod --quiet --config /etc/mongodb.conf\n\n[Install]\nWantedBy=multi-user.target" > /lib/systemd/system/mongodb.service
+
+		sudo mkdir /data
+		sudo chown -R mongodb:root /data 
+
+		sudo mkdir /data/db
+		sudo chown -R mongodb:root /data/db
 
 		sudo service mongodb start
 
@@ -321,11 +326,12 @@ cd $FIREFLYROOT
 chmod +x firefly_startup.sh
 (sudo crontab -l; echo -e "@reboot /opt/firefly_system/firefly_startup.sh &") | crontab -
 
+# TODO (Replace the startup script with a nice service like script)
 cd $FIREFLYROOT/Firefly/system_scripts
 cp firefly_initd.sh /etc/init.d/firefly
 chmod +x /etc/init.d/firefly
 chmod 755 /etc/init.d/firefly
-update-rc.d firefly defaults
+sudo update-rc.d firefly defaults
 
 # OPTIONAL: Start web browser to UI in fullscreen
 

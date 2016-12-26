@@ -1,3 +1,4 @@
-#!/bin/sh
-script='/opt/firefly_system/Firefly/Firefly/run_firefly.py'
-/usr/bin/python $script &
+#! /bin/bash
+cd /opt/firefly_system/Firefly/Firefly
+sudo python run_firefly.py & 
+disown
