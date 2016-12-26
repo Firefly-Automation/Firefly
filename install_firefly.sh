@@ -98,13 +98,63 @@ if ask "\n\nDo you want to install HA-Bridge for voice commands?" Y; then
 fi
 
 ##################################
+# INSTALL MONGO
+##################################
+echo -e "\n\nInstalling MongoDB\n\n"
+
+MONGOUSER=false
+mongodb passwd $1 >/dev/null 2>&1 && MONGOUSER=true
+if [ ! $MONGOUSER ]; then
+	sudo adduser --ingroup nogroup --shell /etc/false --disabled-password --gecos "" --no-create-home mongodb
+fi
+if [ ! -d "$FIREFLYROOT/mongodb" ]; then 
+	cd $FIREFLYROOT
+	mkdir mongodb
+	cd mongodb
+	wget https://github.com/zpriddy/Firefly/releases/download/0.0.1-alpha/core_mongodb.tar.gz
+	wget https://github.com/zpriddy/Firefly/releases/download/0.0.1-alpha/tools_mongodb.tar.gz
+
+	tar xvzf core_mongodb.tar.gz
+	cd core_mongodb
+
+	sudo chown root:root mongo*
+	sudo chmod 755 mongo*
+	sudo strip mongo*
+	sudo cp -p mongo* /usr/bin
+
+	sudo mkdir /var/log/mongodb
+	sudo chown mongodb:nogroup /var/log/mongodb
+
+	sudo mkdir /var/lib/mongodb
+	sudo chown mongodb:root /var/lib/mongodb
+	sudo chmod 775 /var/lib/mongodb
+	
+	echo -e "# /etc/mongodb.conf\n# minimal config file (old style)\n# Run mongod --help to see a list of options\n\nbind_ip = 127.0.0.1\nquiet = true\ndbpath = /var/lib/mongodb\nlogpath = /var/log/mongodb/mongod.log\nlogappend = true\nstorageEngine = mmapv1" > /etc/mongodb.conf
+
+	echo -e "[Unit]\nDescription=High-performance, schema-free document-oriented database\nAfter=network.target\n\n[Service]\nUser=mongodb\nExecStart=/usr/bin/mongod --quiet --config /etc/mongodb.conf\n\n[Install]\nWantedBy=multi-user.target" > /lib/systemd/system/mongodb.service
+
+	sudo service mongodb start
+
+	cd $FIREFLYROOT/mongodb
+	tar zxvf tools_mongodb.tar.gz
+	sudo strip mongo*
+	sudo chown root:root mongo*
+	sudo chmod 755 mongo*
+	sudo mv mongo* /usr/bin
+
+	echo -e "\n\nFinished installing Mongo\n\n"
+else
+	echo -e "\n\n!!!!!!! ERROR INSTALLING MONGO !!!!!!!\n\n"
+fi
+
+
+##################################
 # INSTALL FIREFLY
 ##################################
 
 echo -e "\n\nInstalling Firefly Backend\n\n"
 
 cd /opt/firefly_system
-sudo apt-get install -y git mongodb
 if [ -d "$FIREFLYROOT/Firefly" ]; then
 	cd $FIREFLYROOT/Firefly
 	git pull
@@ -142,16 +192,19 @@ if ask "Would you like to use a dynamic dns domain?"; then
 		cd $FIREFLYROOT
 		wget https://dl.eff.org/certbot-auto
 		chmod a+x certbot-auto
-		cd /var
-		sudo mkdir www
-		cd www
-		sudo mkdir firefly_www
-		cd firefly_www
-		sudo mkdir .well-known
-		cd .well-known
-		sudo mkdir acme-challenge
-		cd /var/www
-		sudo chown -R www-data:www-data firefly_www
+		if [ ! -d "/var/www" ]; then
+			sudo mkdir /var/www
+		fi
+		if [ ! -d "/var/www/firefly_www" ]; then
+			sudo mkdir var/www/firefly_www
+		fi
+		if [ ! -d "/var/www/firefly_www.well-known" ]; then
+			sudo mkdir /var/www/firefly_www/.well-known
+		fi
+		if [ ! -d "var/www/firefly_www/.well-known/acme-challenge" ]; then
+			sudo mkdir /var/www/firefly_www/.well-known/acme-challenge
+		fi
+		sudo chown -R www-data:www-data /var/www/firefly_www
 
 		echo -e -n "\n\nPlsease enter you email. [ENTER]:"
 		read EMAIL
@@ -187,8 +240,10 @@ sudo pip install -r requirements.txt
 # Need to update and copy the nginx config - if not dynamic DNS then need to chnage to port 80 instead.
 # Need to then restart nginx
 
-echo -e "\n\nThe nginx config has not been automated out yet. Please copy the nginx config from: /opt/firefly_system/Serenity/nginx.confg to /etx/nginx/sites-enabled/default"
-echo -e "After copying this file please edit it do that the domains are correct."
+#echo -e "\n\nThe nginx config has not been automated out yet. Please copy the nginx config from: /opt/firefly_system/Serenity/nginx.confg to /etx/nginx/sites-enabled/default"
+#echo -e "After copying this file please edit it do that the domains are correct."
+
+sed "s/<<DOMAIN>>/$DOMAIN/" nginx.confg > /etx/nginx/sites-enabled/default
 
 ##################################
 # INSTALL AUTO-START SCRIPTS [TODO]
@@ -227,8 +282,8 @@ echo -e "\n\nThe default username is admin and the password is FireflyPassword12
 # CLEANUP
 ##################################
 
-cd /opt/firefly_system
-sudo chown -R firefly:firefly * 
+cd /opt
+sudo chown -R firefly:firefly firefly_system 
 
 # reboot to finish setup
 if ask "Would you like to reboot now?" Y; then
