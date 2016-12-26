@@ -1,16 +1,14 @@
-# Firefly 
-
-
-# NOTE: This is currently in development
-
+# Firefly Home Automation
 
 ## What is Firefly? 
 
-Firefly is a python based open source home automation system. It is desigend to run on a raspberrypi, however it can run on anything and even on a docker image. 
+Firefly is an opensource home automation system. It is light weight and can run off of a rasberryPi. The python based framework allows for easy development of apps and new devices. Using this advanced framework Firefly is able to do complex actions in different scenarios.
 
-Firefly has a very easy to use plugin framework that allows you to make plugins for devices as well as applications. (To be documented)
+Actions can be based off of time of day, if the sun is up, who is home, sensor state and anything else you can imagine!
 
-Firefly has an easy to use Web based UI and a token based API
+For example my Hue lights fade from an orange to a daylight white either before my alarm goes off, or if its my day off, when the sun comes up. After I wake up the lights and the level of them are based off of a light sensor in each room, if its cloudy the lights are at 100%, if its sunny they are off, or if its partly cloudy they may be at 50%. At sunset the lights start to fade from the daylight white to a soft white and as it get closer to bedtime they go to a candle light. This is only one example of what can be done with Firefly.
+
+Firefly has an open API that makes it easy to integrate with other systems allowing for seamless interactions such as the included ha-bridge functionality. 
 
 ## What deviecs are supported?
 
@@ -26,7 +24,7 @@ Voice commands using HA-Bridge (color commands not yet supported):
 Services:
 
 - IFTTT
-- Pushover
+- Pushover (notifications)
 - Locative (geofencing)
 
 Devices:
@@ -49,13 +47,16 @@ Coming Soon:
 
 ## Requirements
 
-- Dynamic DNS Service (Google Domains or DuckDNS.org)
+- Dynamic DNS Service (Google Domains or DuckDNS.org) 
+  - Currently working on other options but using the install script will only work if using dynamic DNS
 - Port 443 forawrded to the IP of the RaspberryPi (This is for LetsEncrypt and Remote Access)
 
 
 ## Install Firefly
 
 - Setup a raspberrypi with raspbian (GUI is Okay)
+- Set timezone and keyboard settings in raspberry pi
+- Set hostname of system (use the subdomain of the dynamic DNS domain as the hostname)
 - Expand Filesystem $ sudo raspi-config
 - Get install script $ wget https://raw.githubusercontent.com/zpriddy/Firefly/master/install_firefly.sh
 - Run setup script $ sudo bash install_firefly.sh
