@@ -40,7 +40,7 @@ class ServiceConfig(object):
 
 class Modules(object):
 
-  def __init__(self, config_file='config/modules.confg'):
+  def __init__(self, config_file='/opt/firefly_system/config/services.config'):
     self._config = ConfigParser.ConfigParser()
     self._config.read(config_file)
 
