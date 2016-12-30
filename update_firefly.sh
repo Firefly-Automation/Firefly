@@ -51,6 +51,20 @@ else
     chown -R fiefly:firefly $FIREFLYROOT/config
 fi
 
+
+cd $FIREFLYROOT/Serenity
+git pull
+
+if [ "$CURRENT_VERSION" == "a-0.0.1" ]; then
+    ##################################
+    # COPY CONFIG FILES
+    ##################################
+
+    cp $FIREFLYROOT/Serenity/serenity.config $FIREFLYROOT/config/
+
+fi
+
+
 # Leaving this in for now, but when I can confirm that all configs are no longer stored here then I will remove it
 cp -r $FIREFLYROOT/.backup/config $FIREFLYROOT/FIrefly/Firefly/
 # End of temp
