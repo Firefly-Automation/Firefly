@@ -13,14 +13,14 @@ if [ -e "$FIREFLYROOT/.firefly.version" ]; then
     CURRENT_VERSION=line=$(head -1 $FIREFLYROOT)
 else
 
-    git config --global user.email $GIT_EMAIL
-    git config --global user.name $GIT_NAME
-
-    echo -e -n "Please enter your email for git config"
+    echo -e -n "Please enter your email for git config: "
     read GIT_EMAIL
 
-    echo -e -n "Please enter your name for git config"
+    echo -e -n "Please enter your name for git config: "
     read GIT_NAME
+
+    git config --global user.email "$GIT_EMAIL"
+    git config --global user.name "$GIT_NAME"
 
     CURRENT_VERSION="a-0.0.1"
     echo "a-0.0.2" > .firefly.version
