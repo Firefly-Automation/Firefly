@@ -9,11 +9,20 @@ FIREFLYROOT="/opt/firefly_system"
 
 cd $FIREFLYROOT
 
-if [ -e "$FIREFLYROOT/firefly.version" ]; then
+if [ -e "$FIREFLYROOT/.firefly.version" ]; then
+    git config --global user.email $GIT_EMAIL
+    git config --global user.name $GIT_NAME
+
+    echo -e -n "Please enter your email for git config"
+    read GIT_EMAIL
+
+    echo -e -n "Please enter your name for git config"
+    read GIT_NAME
+
     CURRENT_VERSION=line=$(head -1 $FIREFLYROOT)
 else
     CURRENT_VERSION="a-0.0.1"
-    echo "a-0.0.2" > firefly.version
+    echo "a-0.0.2" > .firefly.version
 fi
 
 # Leaving this in for now, but when I can confirm that all configs are no longer stored here then I will remove it
@@ -21,7 +30,8 @@ cd $FIREFLYROOT
 if [ ! -d "$FIREFLYROOT/.backup" ]; then
     mkdir .backup
 fi
-cp -r $FIREFLYROOT/Fiefly/Firefly/config $FIREFLYROOT/.backup
+
+cp -r $FIREFLYROOT/Firefly/Firefly/config $FIREFLYROOT/.backup
 # End of TEMP
 
 cd Firefly
