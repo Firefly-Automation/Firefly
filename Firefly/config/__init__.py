@@ -36,7 +36,7 @@ class ServiceConfig(object):
 
   @property
   def config(self):
-    return self.config
+    return self._config
 
 class Modules(object):
 
