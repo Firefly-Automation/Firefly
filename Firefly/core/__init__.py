@@ -79,7 +79,7 @@ from core.utils.location import Location
 
 zipcode = None
 modes = None
-location_config = 'config/location.json'
+location_config = '/opt/firefly_system/config/location.json'
 with open(location_config) as data_file:
   config = json.load(data_file)
   zipcode = str(config.get('zip_code'))
@@ -92,6 +92,6 @@ from core.firefly import getDeviceList
 
 from core.api.views import *
 
-__all__ = ['sendCommand', 'sendEvent', 'sendRequest', 'ffEvent', 'ffCommand', 'getDeviceList', 'getRoutineList', 'ffScheduler', 'ffLocation', 'getDeviceViewsList', 'getDeviceStatusDict', 'getRoutineViewsDict']
+__all__ = ['sendCommand', 'sendEvent', 'sendRequest', 'ffEvent', 'ffCommand', 'getDeviceList', 'getRoutineList', 'ffScheduler', 'ffLocation', 'getDeviceViewsList', 'getDeviceStatusDict', 'getRoutineViewsDict', 'ffServices', 'ffIndigo']
 
 

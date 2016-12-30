@@ -16,7 +16,7 @@ def run():
 
 
 def autoStart():
-  with open('config/devices.json') as devices:
+  with open('/opt/firefly_system/config/devices.json') as devices:
     allDevices = json.load(devices)
     logging.critical('devices: {}'.format(str(allDevices)))
     for name, device in allDevices.iteritems():
