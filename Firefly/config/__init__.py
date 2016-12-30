@@ -1,17 +1,47 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author: Zachary Priddy
 # @Date:   2016-04-11 09:01:46
 # @Last Modified by:   Zachary Priddy
-# @Last Modified time: 2016-10-16 22:05:41
+# @Last Modified time: 2016-12-29 23:53:18
 
-import configparser
+import ConfigParser
 import logging
 
+
+class ServiceConfig(object):
+  '''This is the updated version'''
+
+  def __init__(self, config_file='/opt/firefly_system/config/modules/config'):
+    self._config = ConfigParser.ConfigParser()
+    self._config.read(config_file)
+
+  def has_service(self, service):
+    return True if self.config.has_section(service) else False
+
+  def get_service_config(self, service):
+    if not self.has_service(service):
+      return False
+    return dict(self._config.items(service))
+
+  def get_boolean(self, service, item):
+    if not self.has_service(service):
+      return False
+    return self._config.getboolean(service, item)
+
+  def get_item(self, service, item):
+    if not self.has_service(service):
+      return False
+    return self._config.get(service, item)
+
+  @property
+  def config(self):
+    return self.config
 
 class Modules(object):
 
   def __init__(self, config_file='config/modules.confg'):
-    self._config = configparser.ConfigParser()
+    self._config = ConfigParser.ConfigParser()
     self._config.read(config_file)
 
   def hasModule(self, module):

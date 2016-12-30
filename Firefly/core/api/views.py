@@ -61,7 +61,7 @@ def apiMode():
 
 @app.route('/support/reinstall_routines')
 def supportRinstallRoutines():
-  config_file = 'config/routine.json'
+  config_file = '/opt/firefly_syste/config/routine.json'
   reinstallRoutinesFromConfig(config_file)
   return 'Routines Reinstalled'
 

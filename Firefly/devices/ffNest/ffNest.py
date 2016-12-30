@@ -160,8 +160,6 @@ class Device(Device):
     from core import ffNestModule
     from nest import utils as nest_utils
 
-    logging.critical('*************************** NEST GET STATUS **********************************')
-
     self.deviceIndex(ffNestModule)
     structure = ffNestModule.structures[0]
 

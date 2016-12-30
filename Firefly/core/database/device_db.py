@@ -75,6 +75,8 @@ def getDeviceStatusDict():
 
 def reinstallDevices():
   deviceDB.remove({})
+  from core import ffIndigo
+  from core import ffNestModule
   with open('config/devices.json') as devices:
     allDevices = json.load(devices)
     for name, device in allDevices.iteritems():

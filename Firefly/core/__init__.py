@@ -53,6 +53,7 @@ from core.dispacher.request import sendRequest
 # START MODULES BASED OFF OF CONFIG
 
 from config import Modules
+from config import ServiceConfig
 from config import Nest
 
 ffModules = Modules()
@@ -64,6 +65,10 @@ if ffModules.hasModule('nest'):
   if nest_config.enabled:
     ffNestModule = nest.Nest(nest_config.username, nest_config.password, local_time=True)
 
+ffServices = ServiceConfig()
+
+from core.services import ffIndigo
+
 
 # SETUP LOCATION
 
@@ -74,7 +79,7 @@ from core.utils.location import Location
 
 zipcode = None
 modes = None
-location_config = 'config/location.json'
+location_config = '/opt/firefly_system/config/location.json'
 with open(location_config) as data_file:
   config = json.load(data_file)
   zipcode = str(config.get('zip_code'))
@@ -87,6 +92,6 @@ from core.firefly import getDeviceList
 
 from core.api.views import *
 
-__all__ = ['sendCommand', 'sendEvent', 'sendRequest', 'ffEvent', 'ffCommand', 'getDeviceList', 'getRoutineList', 'ffScheduler', 'ffLocation', 'getDeviceViewsList', 'getDeviceStatusDict', 'getRoutineViewsDict']
+__all__ = ['sendCommand', 'sendEvent', 'sendRequest', 'ffEvent', 'ffCommand', 'getDeviceList', 'getRoutineList', 'ffScheduler', 'ffLocation', 'getDeviceViewsList', 'getDeviceStatusDict', 'getRoutineViewsDict', 'ffServices', 'ffIndigo']
 
 
