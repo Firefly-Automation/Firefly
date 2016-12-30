@@ -59,7 +59,7 @@ if [ "$CURRENT_VERSION" == "a-0.0.1" ]; then
 else
     cd $FIREFLYROOT
     cp Firefly/setup_files/config/*.sample.* $FIREFLYROOT/config
-    chown -R fiefly:firefly $FIREFLYROOT/config
+    chown -R firefly:firefly $FIREFLYROOT/config
 fi
 
 
@@ -77,7 +77,7 @@ fi
 
 
 # Leaving this in for now, but when I can confirm that all configs are no longer stored here then I will remove it
-cp -r $FIREFLYROOT/.backup/config $FIREFLYROOT/FIrefly/Firefly/
+cp -r $FIREFLYROOT/.backup/config $FIREFLYROOT/Firefly/Firefly/
 # End of temp
 
 sudo chown -R firefly:firefly /opt/firefly_system
