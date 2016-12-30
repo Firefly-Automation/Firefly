@@ -77,6 +77,13 @@ if ask "\n\nDo you want to install HA-Bridge for voice commands?" Y; then
 	HA_BRIDGE_INSTALL=true
 fi
 
+echo -e -n "Please enter your email for git config"
+read GIT_EMAIL
+
+echo -e -n "Please enter your name for git config"
+read GIT_NAME
+
+
 DYNAMIC_DOMAIN=false
 LETS_ENCRYPT_INSTALL=false
 EMAIL=""
@@ -359,6 +366,9 @@ echo -e "\n\nThe default username is admin and the password is FireflyPassword12
 # COPY CONFIG FILES
 # on updates it will only copy *.sample.*
 ##################################
+
+git config --global user.email $GIT_EMAIL
+git config --global user.name $GIT_NAME
 
 cd $FIREFLYROOT
 cp -r Firefly/setup_files/config .
