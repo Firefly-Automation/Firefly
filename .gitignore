@@ -11,6 +11,8 @@ Firefly/web_ui/certs/*
 *.sublime-*
 config/modules.confg
 
+.idea/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

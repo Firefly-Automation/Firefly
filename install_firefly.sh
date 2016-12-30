@@ -336,6 +336,9 @@ sudo update-rc.d firefly defaults
 
 # OPTIONAL: Start web browser to UI in fullscreen
 
+# Copy update script
+cp FIREFLYROOT/Firefly/system_scripts/update_firefly.sh $FIREFLYROOT
+
 ##################################
 # INSTALL LETS ENCRYPT RENEWAL [TODO]
 ##################################
@@ -351,6 +354,15 @@ sudo update-rc.d firefly defaults
 # On reboot it should then apply the new admin password
 
 echo -e "\n\nThe default username is admin and the password is FireflyPassword1234. PLEASE CHANGE THIS PASSWORD WHEN YOU LOG IN!!\n\n"
+
+##################################
+# COPY CONFIG FILES
+# on updates it will only copy *.sample.*
+##################################
+
+cd $FIREFLYROOT
+cp -r Firefly/setup_files/config .
+
 
 ##################################
 # CLEANUP

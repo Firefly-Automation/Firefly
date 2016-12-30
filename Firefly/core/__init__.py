@@ -53,6 +53,7 @@ from core.dispacher.request import sendRequest
 # START MODULES BASED OFF OF CONFIG
 
 from config import Modules
+from config import ServiceConfig
 from config import Nest
 
 ffModules = Modules()
@@ -63,6 +64,10 @@ if ffModules.hasModule('nest'):
   nest_config = Nest(ffModules)
   if nest_config.enabled:
     ffNestModule = nest.Nest(nest_config.username, nest_config.password, local_time=True)
+
+ffServices = ServiceConfig()
+
+from core.services import ffIndigo
 
 
 # SETUP LOCATION
