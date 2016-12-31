@@ -16,7 +16,8 @@ class IndigoService(object):
     self._https = ffServices.get_boolean('INDIGO', 'https')
     self._devices = self.get_devices()
 
-    self.install_devices()
+    # This is disabled to prevent duplicate device installs
+    #self.install_devices()
     ffScheduler.runEveryS(10, self.refresh_devices)
 
   @property

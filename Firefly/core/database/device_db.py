@@ -5,7 +5,7 @@
 # @Last Modified time: 2016-12-24 20:09:31
 
 import json
-
+import re
 import pickle
 
 from core import deviceDB
@@ -72,11 +72,16 @@ def getDeviceStatusDict():
       devices[d_id] = d.get('status')
   return devices
 
+def reinstall_indigo():
+  from core import ffIndigo
+  deviceDB.remove({'id': re.compile('indigo-.*')})
+  ffIndigo.install_devices()
+
 
 def reinstallDevices():
   deviceDB.remove({})
-  from core import ffIndigo
   from core import ffNestModule
+  reinstall_indigo()
   with open('config/devices.json') as devices:
     allDevices = json.load(devices)
     for name, device in allDevices.iteritems():

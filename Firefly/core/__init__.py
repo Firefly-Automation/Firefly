@@ -50,6 +50,24 @@ from core.dispacher.command import sendCommand
 from core.dispacher.event import sendEvent
 from core.dispacher.request import sendRequest
 
+
+
+# SETUP LOCATION
+
+import json
+
+from core.utils.location import Location
+
+
+zipcode = None
+modes = None
+location_config = '/opt/firefly_system/config/location.json'
+with open(location_config) as data_file:
+  config = json.load(data_file)
+  zipcode = str(config.get('zip_code'))
+  modes = config.get('modes')
+ffLocation = Location(zipcode, modes)
+
 # START MODULES BASED OFF OF CONFIG
 
 from config import Modules
@@ -68,23 +86,6 @@ if ffModules.hasModule('nest'):
 ffServices = ServiceConfig()
 
 from core.services import ffIndigo
-
-
-# SETUP LOCATION
-
-import json
-
-from core.utils.location import Location
-
-
-zipcode = None
-modes = None
-location_config = '/opt/firefly_system/config/location.json'
-with open(location_config) as data_file:
-  config = json.load(data_file)
-  zipcode = str(config.get('zip_code'))
-  modes = config.get('modes')
-ffLocation = Location(zipcode, modes)
 
 
 

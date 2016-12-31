@@ -41,7 +41,7 @@ ask() {
 # ASK BASIC QUESTIONS
 #################################
 
-echo -e "\n\nThis is the Firefly install script. Please make sure that you have expanded your filesystem before running. It is recommended that you use a dynamic dns provider or have a domain setup for you home, Please see the readme for more info.\n\n"
+echo -e "\n\nThis is the Firefly install script. Please make sure that you have expanded your filesystem before running. It is recommended that you use a dynamic dns provider or have a domain setup for your home, Please see the readme for more info.\n\n"
 
 if ask "Have you expanded the filesystem?"; then
 	echo -e "Good"
@@ -51,10 +51,10 @@ else
 	exit
 fi
 
-if ask "Would you like to chnage the password for the default pi user?" Y; then
+if ask "Would you like to change the password for the default pi user?" Y; then
 	passwd
 else
-	echo -e "It is recommended to chnage the defualt password if you have not already"
+	echo -e "It is recommended to change the defualt password if you have not already"
 fi
 
 if ask "Would you like to add the Firefly User." Y; then
@@ -311,7 +311,7 @@ fi
 cd $FIREFLYROOT/Serenity
 sudo pip install -r requirements.txt
 
-# Need to update and copy the nginx config - if not dynamic DNS then need to chnage to port 80 instead.
+# Need to update and copy the nginx config - if not dynamic DNS then need to change to port 80 instead.
 # Need to then restart nginx
 
 #echo -e "\n\nThe nginx config has not been automated out yet. Please copy the nginx config from: /opt/firefly_system/Serenity/nginx.confg to /etx/nginx/sites-enabled/default"

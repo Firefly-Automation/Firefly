@@ -12,7 +12,7 @@ import logging
 class ServiceConfig(object):
   '''This is the updated version'''
 
-  def __init__(self, config_file='/opt/firefly_system/config/modules/config'):
+  def __init__(self, config_file='/opt/firefly_system/config/services.config'):
     self._config = ConfigParser.ConfigParser()
     self._config.read(config_file)
 

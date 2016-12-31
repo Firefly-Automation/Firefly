@@ -17,6 +17,7 @@ from flask import request
 
 #FIX
 from core.database.device_db import reinstallDevices
+from core.database.device_db import reinstall_indigo
 
 from core.database.device_db import DeviceViews
 
@@ -170,9 +171,14 @@ def apiCommand():
 
 #rough hacks.. Fix soon
 
-@app.route('/reinstall_devices')
+@app.route('/support/reinstall_devices')
 def apiReinstallDevices():
   reinstallDevices()
+  return "OK"
+
+@app.route('/support/reinstall_indigo')
+def apiSupportReinstallIndigo():
+  reinstall_indigo()
   return "OK"
 
 @app.route('/reinstall_apps')
