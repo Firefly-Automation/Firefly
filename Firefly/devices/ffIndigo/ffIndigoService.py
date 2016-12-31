@@ -63,13 +63,13 @@ class IndigoService(object):
 
     '''
     devices = {}
-    url = self.url + '/devices.json/'
-    device_list = requests.get(url,auth=HTTPDigestAuth(self.user, self.password)).json()
+    url = self.url + '/devices.json'
+    device_list = requests.get(url,auth=HTTPDigestAuth(self.user, self.password), verify=False).json()
 
     for d in device_list:
       url = self.url + d.get('restURL')
       ff_name = 'indigo-%s' % d.get('name')
-      devices[ff_name] = requests.get(url,auth=HTTPDigestAuth(self.user, self.password)).json()
+      devices[ff_name] = requests.get(url,auth=HTTPDigestAuth(self.user, self.password), verify=False).json()
       devices[ff_name]['restURL'] = d.get('restURL')
 
     return devices
@@ -91,7 +91,7 @@ class IndigoService(object):
 
     '''
     url = self.url + device_url
-    r = requests.put(url, data=command)
+    r = requests.put(url, data=command, verify=False)
     return r.status_code == requests.codes.ok
 
   def install_devices(self):
