@@ -107,6 +107,7 @@ if ask "Would you like to use a dynamic dns domain?"; then
 	DYNAMIC_DOMAIN=true
 	echo -e -n "\n\nPlease enter the external domain for Firefly. [ENTER]: "
 	read DOMAIN
+	echo $DOMAIN > /etc/hostname
 
 	if ask "\n\nWould you like to install and setup LetsEncrypt? This requires a dynamic dns domain to have been setup and port 443 to be forwarded to the pi."; then
 		LETS_ENCRYPT_INSTALL=true
@@ -122,7 +123,7 @@ COUNTRY=""
 STATE=""
 LOCALITY=""
 
-if [ !$LETS_ENCRYPT_INSTALL ]; then
+if ! $LETS_ENCRYPT_INSTALL ; then
   	echo -e "\n\nWe will then generate a self signed ssl cert for your system. The next few questions are for that."
   	SELF_SIGNED_CERT=true
   	echo -e -n "Please enter your country: "
