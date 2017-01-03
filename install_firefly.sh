@@ -427,6 +427,9 @@ git config --global user.name $GIT_NAME
 cd $FIREFLYROOT
 cp -r Firefly/setup_files/config .
 
+# copy the update script for easy updates
+cp $FIREFLYROOT/Firefly/system_scripts/update_firefly.sh $FIREFLYROOT
+
 
 ##################################
 # CLEANUP
