@@ -89,7 +89,7 @@ if ask "\n\nDo you want to install HA-Bridge for voice commands?" Y; then
 	HA_BRIDGE_INSTALL=true
 fi
 
-echo -e -n "Please enter your email for git config (This does not require a github account): "
+echo -e -n "\n\nPlease enter your email for git config (This does not require a github account ans is used only on this host.): "
 read GIT_EMAIL
 
 echo -e -n "Please enter your name for git config: "
