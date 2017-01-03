@@ -133,6 +133,9 @@ if [ !$LETS_ENCRYPT_INSTALL ]; then
 
   	echo -e -n "Please enter your locality: "
   	read LOCALITY
+
+  	echo -e -n "\n\Please enter you email: "
+    read EMAIL
 fi
 
 #################################
@@ -352,7 +355,7 @@ fi
 
 echo -e "\n\nInstalling Serenity WEB UI\n\n"
 
-sudo apt-get install -y nginx
+sudo apt-get install -y nginx libffi-dev python-bcrypt
 sudo chown -R www-data:www-data /var/www/firefly_www
 
 cd $FIREFLYROOT
@@ -365,13 +368,8 @@ else
 fi
 
 cd $FIREFLYROOT/Serenity
+cp serenity.config $FIREFLYROOT/config/
 sudo pip install -r requirements.txt
-
-# Need to update and copy the nginx config - if not dynamic DNS then need to change to port 80 instead.
-# Need to then restart nginx
-
-#echo -e "\n\nThe nginx config has not been automated out yet. Please copy the nginx config from: /opt/firefly_system/Serenity/nginx.confg to /etx/nginx/sites-enabled/default"
-#echo -e "After copying this file please edit it do that the domains are correct."
 
 sed "s/<<DOMAIN>>/$DOMAIN/" nginx.confg > /etc/nginx/sites-enabled/default
 
@@ -435,6 +433,7 @@ cp -r Firefly/setup_files/config .
 ##################################
 
 echo $DOMAIN > $FIREFLYROOT/config/.domain
+echo "a-0.0.2" > $FIREFLYROOT/.firefly.version
 
 sudo chown -R firefly:firefly /opt/firefly_system
 
