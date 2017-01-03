@@ -9,32 +9,32 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 ask() {
-    local prompt default REPLY
-    while true; do
-        if [ "${2:-}" = "Y" ]; then
-            prompt="Y/n"
-            default=Y
-        elif [ "${2:-}" = "N" ]; then
-            prompt="y/N"
-            default=N
-        else
-            prompt="y/n"
-            default=
-        fi
-        # Ask the question (not using "read -p" as it uses stderr not stdout)
-        echo -e -n "$1 [$prompt] "
-        # Read the answer (use /dev/tty in case stdin is redirected from somewhere else)
-        read REPLY </dev/tty
-        # Default?
-        if [ -z "$REPLY" ]; then
-            REPLY=$default
-        fi
-        # Check if the reply is valid
-        case "$REPLY" in
-            Y*|y*) return 0 ;;
-            N*|n*) return 1 ;;
-        esac
-    done
+	local prompt default REPLY
+  	while true; do
+  	  	if [ "${2:-}" = "Y" ]; then
+  	  	  	prompt="Y/n"
+  	  	  	default=Y
+  	  	elif [ "${2:-}" = "N" ]; then
+  	  	  	prompt="y/N"
+  	  	  	default=N
+  	  	else
+  	  	  	prompt="y/n"
+  	  	  	default=
+  	  	fi
+  	  	# Ask the question (not using "read -p" as it uses stderr not stdout)
+  	  	echo -e -n "$1 [$prompt] "
+  	  	# Read the answer (use /dev/tty in case stdin is redirected from somewhere else)
+  	  	read REPLY </dev/tty
+  	  	# Default?
+  	  	if [ -z "$REPLY" ]; then
+  	  	  	REPLY=$default
+  	  	fi
+  	  	# Check if the reply is valid
+  	  	case "$REPLY" in
+  	  	  	Y*|y*) return 0 ;;
+  	  	  	N*|n*) return 1 ;;
+  	  	esac
+  	done
 }
 
 #################################
@@ -50,6 +50,18 @@ else
 	echo -e "Please run 'sudo raspi-config' and select Expand Filesystem"
 	exit
 fi
+
+if ask "Would you like to change the hostanme to Firefly" Y; then
+  	DOMAIN="firefly"
+  	sudo echo $DOMAIN > /etc/hostname
+else
+  	if ask "Would you like to set a custom hostname?" N; then
+  	  	echo -e -c "What hostname would you like to use? "
+  	  	read DOMAIN
+  	  	sudo echo $DOMAIN > /etc/hostname
+  	fi
+fi
+
 
 if ask "Would you like to change the password for the default pi user?" Y; then
 	passwd
@@ -77,15 +89,16 @@ if ask "\n\nDo you want to install HA-Bridge for voice commands?" Y; then
 	HA_BRIDGE_INSTALL=true
 fi
 
-echo -e -n "Please enter your email for git config"
+echo -e -n "Please enter your email for git config (This does not require a github account):"
 read GIT_EMAIL
 
-echo -e -n "Please enter your name for git config"
+echo -e -n "Please enter your name for git config :"
 read GIT_NAME
 
 
 DYNAMIC_DOMAIN=false
 LETS_ENCRYPT_INSTALL=false
+SELF_SIGNED_CERT=false
 EMAIL=""
 echo -e "\n\nA dynamic dns domain will allow you to acccess your firefly system from anywhere. There are many options, the two I recommend are:"
 echo -e "1) Google Domains (domains.google.com - \$12+/yr) - Google domains will allow you to choose any domain and set up a subdomain to access firefly, i.e. firefly.yourname.com"
@@ -95,11 +108,31 @@ if ask "Would you like to use a dynamic dns domain?"; then
 	echo -e -n "\n\nPlease enter the external domain for Firefly. [ENTER]: "
 	read DOMAIN
 
-	if ask "\n\nWould you like to install and setup LetsEncrypt? This requires a dynamic dns domain to have been setup."; then
+	if ask "\n\nWould you like to install and setup LetsEncrypt? This requires a dynamic dns domain to have been setup and port 443 to be forwarded to the pi."; then
 		LETS_ENCRYPT_INSTALL=true
-		echo -e -n "\n\nPlsease enter you email. [ENTER]: "
+		echo -e -n "\n\Please enter you email. [ENTER]: "
 		read EMAIL
 	fi
+fi
+
+echo $DOMAIN > $FIREFLYROOT/config/.domain
+
+
+COUNTRY=""
+STATE=""
+LOCALITY=""
+
+if [ ! $LETS_ENCRYPT_INSTALL ]; then
+  	echo -e "\n\nWe will then generate a self signed ssl cert for your system. The next few questions are for that."
+  	SELF_SIGNED_CERT=true
+  	echo -e -n "Please enter your country: "
+  	read COUNTRY
+
+  	echo -e -n "Please enter your state: "
+  	read STATE
+
+  	echo -e -n "Please enter your locality: "
+  	read LOCALITY
 fi
 
 #################################
@@ -132,7 +165,7 @@ if $ZWAVE_INSTALL; then
 	cd $FIREFLYROOT
 	sudo apt-get install -y make build-esential libudev-dev build-essential python2.7-dev python-pip libu
 	# Not sure why libudev-dev game me an error.. But trying this fix..
-	sudo apt-get install -y libudev-dev 
+	sudo apt-get install -y libudev-dev
 	wget https://github.com/OpenZWave/python-openzwave/raw/master/archives/python-openzwave-0.3.1.tgz
 	tar xvzf python-openzwave-0.3.1.tgz
 	cd python-openzwave-0.3.1
@@ -181,7 +214,7 @@ else
 	if [ !$MONGOUSER ]; then
 		sudo adduser --ingroup nogroup --shell /etc/false --disabled-password --gecos "" --no-create-home mongodb
 	fi
-	if [ ! -d "$FIREFLYROOT/mongodb" ]; then 
+	if [ ! -d "$FIREFLYROOT/mongodb" ]; then
 		cd $FIREFLYROOT
 		mkdir mongodb
 		cd mongodb
@@ -202,14 +235,14 @@ else
 		sudo mkdir /var/lib/mongodb
 		sudo chown mongodb:root /var/lib/mongodb
 		sudo chmod 775 /var/lib/mongodb
-		
+
 		echo -e "# /etc/mongodb.conf\n# minimal config file (old style)\n# Run mongod --help to see a list of options\n\nbind_ip = 127.0.0.1\nquiet = true\ndbpath = /var/lib/mongodb\nlogpath = /var/log/mongodb/mongod.log\nlogappend = true\nstorageEngine = mmapv1" > /etc/mongodb.conf
 
 		echo -e "[Unit]\nDescription=High-performance, schema-free document-oriented database\nAfter=network.target\n\n[Service]\nUser=mongodb\nExecStart=/usr/bin/mongod --quiet --config /etc/mongodb.conf\n\n[Install]\nWantedBy=multi-user.target" > /lib/systemd/system/mongodb.service
 		sudo chmod +x /lib/systemd/system/mongodb.service
 
 		sudo mkdir /data
-		sudo chown -R mongodb:root /data 
+		sudo chown -R mongodb:root /data
 
 		sudo mkdir /data/db
 		sudo chown -R mongodb:root /data/db
@@ -285,9 +318,32 @@ if $DYNAMIC_DOMAIN; then
 		sudo ./certbot-auto certonly --standalone --standalone-supported-challenges tls-sni-01 --agree-tos --email $EMAIL -d $DOMAIN
 
 		echo -e "\n\nFinished installing first cert\n\n"
-	fi 
+	fi
 fi
 
+##################################
+# INSTALL SELF SIGNED CERT
+##################################
+if $SELF_SIGNED_CERT ; then
+	sudo apt-get install -y openssl
+
+	cd $FIREFLYROOT
+	mkdir .ssl
+	cd .ssl
+	password=dummypassword
+	echo "Generating key request for $DOMAIN"
+	openssl genrsa -des3 -passout pass:$password -out $DOMAIN.key 2048 -noout
+	openssl rsa -in $DOMAIN.key -passin pass:$password -out $DOMAIN.key
+	openssl req -new -key $DOMAIN.key -out $DOMAIN.csr -subj "/C=$COUNTRY/ST=$STATE/L=$LOCALITY/O=FIREFLY/OU=AUTOMATION/CN=$DOMAIN/emailAddress=$EMAIL"
+	openssl x509 -req -days 3650 -in $DOMAIN.csr -signkey $DOMAIN.key -out $DOMAIN.crt
+
+	mkdir /etc/letsencrypt/
+	mkdir /etc/letsencrypt/live
+	mkdir /etc/letsencrypt/live/$DOMAIN
+	cp $DOMAIN.key /etc/letsencrypt/live/$DOMAIN/privkey.pem
+	cp $DOMAIN.crt /etc/letsencrypt/live/$DOMAIN/fullchain.pem
+
+fi
 
 
 ##################################
