@@ -111,7 +111,7 @@ if ask "Would you like to use a dynamic dns domain?"; then
 
 	if ask "\n\nWould you like to install and setup LetsEncrypt? This requires a dynamic dns domain to have been setup and port 443 to be forwarded to the pi."; then
 		LETS_ENCRYPT_INSTALL=true
-		echo -e -n "\n\Please enter you email. [ENTER]: "
+		echo -e -n "\n\nPlease enter you email. [ENTER]: "
 		read EMAIL
 	fi
 fi
