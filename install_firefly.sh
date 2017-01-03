@@ -89,10 +89,10 @@ if ask "\n\nDo you want to install HA-Bridge for voice commands?" Y; then
 	HA_BRIDGE_INSTALL=true
 fi
 
-echo -e -n "Please enter your email for git config (This does not require a github account):"
+echo -e -n "Please enter your email for git config (This does not require a github account): "
 read GIT_EMAIL
 
-echo -e -n "Please enter your name for git config :"
+echo -e -n "Please enter your name for git config: "
 read GIT_NAME
 
 
@@ -115,7 +115,7 @@ if ask "Would you like to use a dynamic dns domain?"; then
 	fi
 fi
 
-echo $DOMAIN > $FIREFLYROOT/config/.domain
+
 
 
 COUNTRY=""
@@ -433,6 +433,8 @@ cp -r Firefly/setup_files/config .
 ##################################
 # CLEANUP
 ##################################
+
+echo $DOMAIN > $FIREFLYROOT/config/.domain
 
 sudo chown -R firefly:firefly /opt/firefly_system
 
