@@ -122,7 +122,7 @@ COUNTRY=""
 STATE=""
 LOCALITY=""
 
-if [ ! $LETS_ENCRYPT_INSTALL ]; then
+if [ !$LETS_ENCRYPT_INSTALL ]; then
   	echo -e "\n\nWe will then generate a self signed ssl cert for your system. The next few questions are for that."
   	SELF_SIGNED_CERT=true
   	echo -e -n "Please enter your country: "
