@@ -370,7 +370,7 @@ fi
 
 sudo cp $FIREFLYROOT/Serenity/serenity.config $FIREFLYROOT/config
 
-sudo pip install -r requirements.txt
+sudo pip install -r $FIREFLYROOT/Serenity/requirements.txt
 
 sed "s/<<DOMAIN>>/$DOMAIN/" nginx.confg > /etc/nginx/sites-enabled/default
 
@@ -422,8 +422,7 @@ echo -e "\n\nThe default username is admin and the password is FireflyPassword12
 git config --global user.email $GIT_EMAIL
 git config --global user.name $GIT_NAME
 
-cd $FIREFLYROOT
-cp -r Firefly/setup_files/config .
+cp -r $FIREFLYROOT/Firefly/setup_files/config/* $FIREFLYROOT/config/
 
 # copy the update script for easy updates
 cp $FIREFLYROOT/Firefly/system_scripts/update_firefly.sh $FIREFLYROOT
@@ -443,7 +442,7 @@ sudo chmod -R 777 /var/www/firefly_www/audio
 # CLEANUP
 ##################################
 
-echo $DOMAIN > $FIREFLYROOT/config/.domain
+sudo echo $DOMAIN > $FIREFLYROOT/config/.domain
 echo "a-0.0.2" > $FIREFLYROOT/.firefly.version
 
 sudo chown -R firefly:firefly /opt/firefly_system

@@ -11,3 +11,6 @@ tzlocal
 apscheduler
 configparser
 pychromecast
+enum
+netifaces
+enum34

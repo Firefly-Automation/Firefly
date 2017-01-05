@@ -20,14 +20,14 @@ class Notification(object):
     if cast:
       if not config.get_boolean('SPEECH','enable'):
         return False
-      return self.send_cast()
+      return self.send_cast(self._deviceID)
 
     if self._deviceID.lower() == 'all':
       return self.send_all()
     else:
       return self.send()
 
-  def send_cast(self, device=self._deviceID):
+  def send_cast(self, device\):
     polly_server = config.get_item('SPEECH', 'polly_server')
     media_url = requests.post(polly_server, json={'speech': self._message}).text
     chromecasts = pychromecast.get_chromecasts()
@@ -41,7 +41,7 @@ class Notification(object):
       dID = device.get('id')
       ffCommand(str(dID), {'notify': {'message' :self._message}})
     if config.get_boolean('SPEECH','enable'):
-      self.send_cast(device=config.get_item('SPEECH','default_device'))
+      self.send_cast(config.get_item('SPEECH','default_device'))
     return True
 
 
