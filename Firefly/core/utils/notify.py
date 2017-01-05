@@ -27,7 +27,7 @@ class Notification(object):
     else:
       return self.send()
 
-  def send_cast(self, device\):
+  def send_cast(self, device):
     polly_server = config.get_item('SPEECH', 'polly_server')
     media_url = requests.post(polly_server, json={'speech': self._message}).text
     chromecasts = pychromecast.get_chromecasts()
