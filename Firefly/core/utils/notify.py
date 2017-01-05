@@ -36,7 +36,9 @@ class Notification(object):
     chromecasts = pychromecast.get_chromecasts()
     logging.error(media_url)
     logging.error(chromecasts)
-    cast = next(cc for cc in chromecasts if cc.device.friendly_name == device)
+    cast = next(cc for cc in chromecasts if cc.device.friendly_name == str(device))
+    logging.error(cast)
+    logging.error('***************************************')
     cast.set_volume(.5)
     mc = cast.media_controller
     mc.play_media(media_url, 'audio/mp3')
