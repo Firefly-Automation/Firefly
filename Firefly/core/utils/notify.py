@@ -8,6 +8,7 @@ import pychromecast
 import requests
 from core import deviceDB, ffCommand
 from config import ServiceConfig
+import logging
 
 config = ServiceConfig()
 
@@ -28,6 +29,8 @@ class Notification(object):
       return self.send()
 
   def send_cast(self, device):
+    logging.error('***************************************')
+    logging.error(device)
     polly_server = config.get_item('SPEECH', 'polly_server')
     media_url = requests.post(polly_server, json={'speech': self._message}).text
     chromecasts = pychromecast.get_chromecasts()
