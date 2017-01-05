@@ -311,7 +311,7 @@ if $DYNAMIC_DOMAIN; then
 		if [ ! -d "/var/www/firefly_www" ]; then
 			sudo mkdir /var/www/firefly_www
 		fi
-		if [ ! -d "/var/www/firefly_www.well-known" ]; then
+		if [ ! -d "/var/www/firefly_www/.well-known" ]; then
 			sudo mkdir /var/www/firefly_www/.well-known
 		fi
 		if [ ! -d "var/www/firefly_www/.well-known/acme-challenge" ]; then
@@ -368,8 +368,8 @@ else
 	git clone https://github.com/zpriddy/Serenity.git
 fi
 
-cd $FIREFLYROOT/Serenity
-cp serenity.config $FIREFLYROOT/config/
+sudo cp $FIREFLYROOT/Serenity/serenity.config $FIREFLYROOT/config
+
 sudo pip install -r requirements.txt
 
 sed "s/<<DOMAIN>>/$DOMAIN/" nginx.confg > /etc/nginx/sites-enabled/default
@@ -397,9 +397,6 @@ chmod 755 /etc/init.d/firefly
 sudo update-rc.d firefly defaults
 
 # OPTIONAL: Start web browser to UI in fullscreen
-
-# Copy update script
-cp FIREFLYROOT/Firefly/system_scripts/update_firefly.sh $FIREFLYROOT
 
 ##################################
 # INSTALL LETS ENCRYPT RENEWAL [TODO]
@@ -430,6 +427,16 @@ cp -r Firefly/setup_files/config .
 
 # copy the update script for easy updates
 cp $FIREFLYROOT/Firefly/system_scripts/update_firefly.sh $FIREFLYROOT
+
+##################################
+# CREATE PLACE FOR AUDIO FILES
+# This is where sound clips go for casting.
+##################################
+
+sudo mkdir /var/www/firefly_www/audio
+sudo chown -R www-data:www-data /var/www/firefly_www/audio
+sudo chmod -R 777 /var/www/firefly_www/audio
+
 
 
 ##################################

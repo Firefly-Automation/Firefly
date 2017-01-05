@@ -10,3 +10,4 @@ python-nest
 tzlocal
 apscheduler
 configparser
+pychromecast

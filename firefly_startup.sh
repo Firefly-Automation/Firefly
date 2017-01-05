@@ -18,3 +18,7 @@ disown
 cd /opt/firefly_system/ha_bridge
 sudo java -jar ha-bridge-3.5.1.jar & 
 disown
+
+sleep 20
+
+sudo service nginx restart
