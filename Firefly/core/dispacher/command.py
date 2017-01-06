@@ -1,7 +1,8 @@
 import logging
 import pickle
 
-from core import appsDB, deviceDB, ffCommand, routineDB, notify
+from core.utils import notify
+from core import appsDB, deviceDB, routineDB
 
 def sendCommand(command):
   from core import ff_zwave
