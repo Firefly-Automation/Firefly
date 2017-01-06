@@ -1,6 +1,7 @@
 #! /bin/bash
 
-FIREFLYROOT="/opt/firefly_system"
+FIREFLY_ROOT="/opt/firefly_system"
+FIREFLY_CONFIG="/opt/firefly/config"
 DOMAIN=$HOSTNAME
 
 if [[ $EUID -ne 0 ]]; then
@@ -38,6 +39,14 @@ ask() {
 }
 
 #################################
+# MAKE OPT/FIREFLY_SYSTEM
+#################################
+
+mkdir -p $FIREFLY_ROOT
+mkdir -p $FIREFLY_ROOT/config
+
+
+#################################
 # ASK BASIC QUESTIONS
 #################################
 
@@ -53,12 +62,12 @@ fi
 
 if ask "Would you like to change the hostanme to Firefly" Y; then
   	DOMAIN="firefly"
-  	sudo echo $DOMAIN > /etc/hostname
+  	echo $DOMAIN > /etc/hostname
 else
   	if ask "Would you like to set a custom hostname?" N; then
   	  	echo -e -c "What hostname would you like to use? "
   	  	read DOMAIN
-  	  	sudo echo $DOMAIN > /etc/hostname
+  	  	echo $DOMAIN > /etc/hostname
   	fi
 fi
 
@@ -69,11 +78,11 @@ else
 	echo -e "It is recommended to change the defualt password if you have not already"
 fi
 
-if ask "Would you like to add the Firefly User." Y; then
-	echo -e "Please fill out the following prompts to add the firefly user"
-	sudo adduser firefly
-	sudo adduser firefly sudo
-fi
+
+echo -e "We are now adding a default Firefly user.\n Please fill out the following prompts to add the firefly user\n\m"
+adduser firefly
+adduser firefly sudo
+
 
 #################################
 # ASK FUTURE INSTALL QUESTIONS
@@ -89,11 +98,21 @@ if ask "\n\nDo you want to install HA-Bridge for voice commands?" Y; then
 	HA_BRIDGE_INSTALL=true
 fi
 
-echo -e -n "\n\nPlease enter your email for git config (This does not require a github account ans is used only on this host.): "
-read GIT_EMAIL
 
-echo -e -n "Please enter your name for git config: "
-read GIT_NAME
+if [ ! -f ~/.gitconfig ]; then
+    echo -e -n "\n\nPlease enter your email for git config (This does not require a github account ans is used only on this host.): "
+    read GIT_EMAIL
+
+    echo -e -n "Please enter your name for git config: "
+    read GIT_NAME
+
+    # Copy this git config to the other users too.
+    cp ~/.gitconfig /home/pi
+    chown pi /home/pi/.gitconfig
+    cp ~/.gitconfig /home/firefly
+    chown pi /home/firefly/.gitconfig
+fi
+
 
 
 DYNAMIC_DOMAIN=false
@@ -107,13 +126,16 @@ if ask "Would you like to use a dynamic dns domain?"; then
 	DYNAMIC_DOMAIN=true
 	echo -e -n "\n\nPlease enter the external domain for Firefly. [ENTER]: "
 	read DOMAIN
-	echo $DOMAIN > /etc/hostname
+	echo $DOMAIN > $FIREFLY_CONFIG/.domain
 
 	if ask "\n\nWould you like to install and setup LetsEncrypt? This requires a dynamic dns domain to have been setup and port 443 to be forwarded to the pi."; then
 		LETS_ENCRYPT_INSTALL=true
 		echo -e -n "\n\nPlease enter you email. [ENTER]: "
 		read EMAIL
+		echo $EMAIL > $FIREFLY_CONFIG/.letsencrypt_email
 	fi
+else
+    echo "FALSE" > $FIREFLY_CONFIG/.domain
 fi
 
 
@@ -148,17 +170,11 @@ fi
 # UPDATE PI
 #################################
 
-echo -e "\n\nUpdating RaspberryPi...\n\n"
-sudo apt-get update
-sudo apt-get dist-upgrade -y
+echo -e "\n\nAbout to update the raspberryPi. There may be some required interactions during this process. Please check every once in a while. If there is a screen of text telling you about a change you should be able to press q to continue.\n\n"
+read -n 1 -s -p "Press any key to continue"
+apt-get update
+apt-get dist-upgrade -y
 
-#################################
-# MAKE OPT/FIREFLY_SYSTEM
-#################################
-
-cd /opt
-mkdir firefly_system
-cd firefly_system
 
 ##################################
 # INSTALL OPENZWAVE
@@ -166,7 +182,7 @@ cd firefly_system
 if $ZWAVE_INSTALL; then
 	echo -e "\n\nInstalling Python OpenZWave... This might take some time.. Its a good time to go get a snack.. or Lunch..\n\n"
 
-	cd $FIREFLYROOT
+	cd $FIREFLY_ROOT
 	sudo apt-get install -y make build-esential libudev-dev build-essential python2.7-dev python-pip libu
 	# Not sure why libudev-dev game me an error.. But trying this fix..
 	sudo apt-get install -y libudev-dev
@@ -177,12 +193,12 @@ if $ZWAVE_INSTALL; then
 	sudo make deps
 	sudo make build
 	sudo make install
-	cd $FIREFLYROOT
+	cd $FIREFLY_ROOT
 	rm python-openzwave-0.3.1.tgz
 
 	python -c "import openzwave"
 	if [ $? == 1 ]; then
-		cd $FIREFLYROOT/python-openzwave-0.3.1/openzwave/
+		cd $FIREFLY_ROOT/python-openzwave-0.3.1/openzwave/
 		sudo make clean
 		sudo make build
 		sudo make install
@@ -218,8 +234,8 @@ else
 	if [ !$MONGOUSER ]; then
 		sudo adduser --ingroup nogroup --shell /etc/false --disabled-password --gecos "" --no-create-home mongodb
 	fi
-	if [ ! -d "$FIREFLYROOT/mongodb" ]; then
-		cd $FIREFLYROOT
+	if [ ! -d "$FIREFLY_ROOT/mongodb" ]; then
+		cd $FIREFLY_ROOT
 		mkdir mongodb
 		cd mongodb
 		wget https://github.com/zpriddy/Firefly/releases/download/0.0.1-alpha/core_mongodb.tar.gz
@@ -253,7 +269,7 @@ else
 
 		sudo service mongodb start
 
-		cd $FIREFLYROOT/mongodb
+		cd $FIREFLY_ROOT/mongodb
 		tar zxvf tools_mongodb.tar.gz
 		sudo strip mongo*
 		sudo chown root:root mongo*
@@ -274,13 +290,13 @@ fi
 echo -e "\n\nInstalling Firefly Backend\n\n"
 
 cd /opt/firefly_system
-if [ -d "$FIREFLYROOT/Firefly" ]; then
-	cd $FIREFLYROOT/Firefly
+if [ -d "$FIREFLY_ROOT/Firefly" ]; then
+	cd $FIREFLY_ROOT/Firefly
 	git pull
 else
 	git clone https://github.com/zpriddy/Firefly.git
 fi
-cd $FIREFLYROOT/Firefly/Firefly
+cd $FIREFLY_ROOT/Firefly/Firefly
 sudo pip install -r requirements.txt
 
 echo -e "\n\nDone Installing Firefly Backend\n\n"
@@ -302,24 +318,14 @@ if $DYNAMIC_DOMAIN; then
 		echo -e "\n\nInstalling LetsEncrypt and getting first certificate.\n\n"
 
 		#sudo apt-get -y install certbot
-		cd $FIREFLYROOT
+		cd $FIREFLY_ROOT
 		wget https://dl.eff.org/certbot-auto
 		chmod a+x certbot-auto
-		if [ ! -d "/var/www" ]; then
-			sudo mkdir /var/www
-		fi
-		if [ ! -d "/var/www/firefly_www" ]; then
-			sudo mkdir /var/www/firefly_www
-		fi
-		if [ ! -d "/var/www/firefly_www/.well-known" ]; then
-			sudo mkdir /var/www/firefly_www/.well-known
-		fi
-		if [ ! -d "var/www/firefly_www/.well-known/acme-challenge" ]; then
-			sudo mkdir /var/www/firefly_www/.well-known/acme-challenge
-		fi
 
-		cd $FIREFLYROOT
-		sudo ./certbot-auto certonly --standalone --standalone-supported-challenges tls-sni-01 --agree-tos --email $EMAIL -d $DOMAIN
+		mkdir -p /var/www/firefly_www/.well-known/acme-challenge
+
+		cd $FIREFLY_ROOT
+		./certbot-auto certonly --standalone --standalone-supported-challenges tls-sni-01 --agree-tos --email $EMAIL -d $DOMAIN --noninteractive
 
 		echo -e "\n\nFinished installing first cert\n\n"
 	fi
@@ -331,7 +337,7 @@ fi
 if $SELF_SIGNED_CERT ; then
 	sudo apt-get install -y openssl
 
-	cd $FIREFLYROOT
+	cd $FIREFLY_ROOT
 	mkdir .ssl
 	cd .ssl
 	password=dummypassword
@@ -359,20 +365,20 @@ echo -e "\n\nInstalling Serenity WEB UI\n\n"
 sudo apt-get install -y nginx libffi-dev python-bcrypt
 sudo chown -R www-data:www-data /var/www/firefly_www
 
-cd $FIREFLYROOT
+cd $FIREFLY_ROOT
 
-if [ -d "$FIREFLYROOT/Serenity" ]; then
-	cd $FIREFLYROOT/Serenity
+if [ -d "$FIREFLY_ROOT/Serenity" ]; then
+	cd $FIREFLY_ROOT/Serenity
 	git pull
 else
 	git clone https://github.com/zpriddy/Serenity.git
 fi
 
-sudo cp $FIREFLYROOT/Serenity/serenity.config $FIREFLYROOT/config
+sudo cp $FIREFLY_ROOT/Serenity/serenity.config $FIREFLY_ROOT/config
 
-sudo pip install -r $FIREFLYROOT/Serenity/requirements.txt
+sudo pip install -r $FIREFLY_ROOT/Serenity/requirements.txt
 
-sed "s/<<DOMAIN>>/$DOMAIN/" nginx.confg > /etc/nginx/sites-enabled/default
+sed "s/<<DOMAIN>>/$DOMAIN/" $FIREFLY_ROOT/Serenity/nginx.confg > /etc/nginx/sites-enabled/default
 
 ##################################
 # INSTALL AUTO-START SCRIPTS [TODO]
@@ -383,18 +389,17 @@ sed "s/<<DOMAIN>>/$DOMAIN/" nginx.confg > /etc/nginx/sites-enabled/default
 # Need to start Serenity on boot
 # Need to start ha-bridge on boot
 echo -e "\n\nSetting Firefly to start on boot.\n\n"
-cd $FIREFLYROOT/Firefly
-cp firefly_startup.sh $FIREFLYROOT
-cd $FIREFLYROOT
+cd $FIREFLY_ROOT/Firefly
+cp firefly_startup.sh $FIREFLY_ROOT
+cd $FIREFLY_ROOT
 chmod +x firefly_startup.sh
 (sudo crontab -l; echo -e "@reboot /opt/firefly_system/firefly_startup.sh &") | crontab -
 
-# TODO (Replace the startup script with a nice service like script)
-cd $FIREFLYROOT/Firefly/system_scripts
-cp firefly_initd.sh /etc/init.d/firefly
-chmod +x /etc/init.d/firefly
-chmod 755 /etc/init.d/firefly
-sudo update-rc.d firefly defaults
+
+cp $FIREFLY_ROOT/Firefly/system_scripts/firefly.service /lib/systemd/system
+chmod 644 /lib/systemd/system/firefly.service
+sudo systemctl daemon-reload
+sudo systemctl enable firefly.service
 
 # OPTIONAL: Start web browser to UI in fullscreen
 
@@ -422,19 +427,19 @@ echo -e "\n\nThe default username is admin and the password is FireflyPassword12
 git config --global user.email $GIT_EMAIL
 git config --global user.name $GIT_NAME
 
-cp -r $FIREFLYROOT/Firefly/setup_files/config/* $FIREFLYROOT/config/
+cp -r $FIREFLY_ROOT/Firefly/setup_files/config/* $FIREFLY_ROOT/config/
 
 # copy the update script for easy updates
-cp $FIREFLYROOT/Firefly/system_scripts/update_firefly.sh $FIREFLYROOT
+cp $FIREFLY_ROOT/Firefly/system_scripts/update_firefly.sh $FIREFLY_ROOT
 
 ##################################
 # CREATE PLACE FOR AUDIO FILES
 # This is where sound clips go for casting.
 ##################################
 
-sudo mkdir /var/www/firefly_www/audio
-sudo chown -R www-data:www-data /var/www/firefly_www/audio
-sudo chmod -R 777 /var/www/firefly_www/audio
+mkdir /var/www/firefly_www/audio
+chown -R www-data:www-data /var/www/firefly_www/audio
+chmod -R 777 /var/www/firefly_www/audio
 
 
 
@@ -442,10 +447,13 @@ sudo chmod -R 777 /var/www/firefly_www/audio
 # CLEANUP
 ##################################
 
-sudo echo $DOMAIN > $FIREFLYROOT/config/.domain
-echo "a-0.0.2" > $FIREFLYROOT/.firefly.version
+mkdir $FIREFLY_ROOT/logs
 
-sudo chown -R firefly:firefly /opt/firefly_system
+echo -e -n "/opt/firefly_system/logs/firefly.log {\n\tsize 100M\n\tcreate 766 root root\n\trotate 5\n}" >> /etc/logrotate.conf
+
+echo "a-0.0.2" > $FIREFLY_ROOT/.firefly.version
+
+chown -R firefly:firefly /opt/firefly_system
 
 # reboot to finish setup
 if ask "Would you like to reboot now?" Y; then
