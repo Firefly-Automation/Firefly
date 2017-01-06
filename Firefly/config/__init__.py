@@ -72,7 +72,7 @@ class NestConfig(object):
   def readConfig(self):
     self._username = self.config.get('username')
     self._password = self.config.get('password')
-    self._enabled = self.config.getboolean('enabled')
+    self._enabled = self.config.getboolean('enable')
 
     if not self.username or not self.password:
       self._enabled = False
