@@ -36,10 +36,7 @@ class Notification(object):
   def send_cast(self, device):
     polly_server = config.get_item('SPEECH', 'polly_server')
     media_url = requests.post(polly_server, json={'speech': self._message}).text
-    logging.error('********************************************')
-    logging.error(device)
-    logging.error(cc_devices)
-    cast = next(cc for cc in chromecasts if cc.device.friendly_name.lower() == device)
+    cast = next(cc for cc in chromecasts if cc.device.friendly_name.lower() == device.lower())
     cast.set_volume(.5)
     mc = cast.media_controller
     mc.play_media(media_url, 'audio/mp3')
