@@ -135,13 +135,13 @@ class Device(Device):
       }
 
   def setNest(self, settings):
-    from core import ffNestModule
+    from core import ffNest
     from nest import utils as nest_utils
     from core import ffScheduler
 
-    self.deviceIndex(ffNestModule)
-    structure = ffNestModule.structures[0]
-    device = ffNestModule.devices[self._device_index]
+    self.deviceIndex(ffNest)
+    structure = ffNest.structures[0]
+    device = ffNest.devices[self._device_index]
 
     setting_options = settings.keys()
 
@@ -157,18 +157,18 @@ class Device(Device):
     ffScheduler.runInS(10, self.update, job_id='nest-update-in-10')
 
   def getStatus(self):
-    from core import ffNestModule
+    from core import ffNest
     from nest import utils as nest_utils
 
-    self.deviceIndex(ffNestModule)
-    structure = ffNestModule.structures[0]
+    self.deviceIndex(ffNest)
+    structure = ffNest.structures[0]
 
     # TODO: This isnt working yet. This needs to use the same logic as above.
     if self._structure:
-      structure = ffNestModule.structures[self._structure]
+      structure = ffNest.structures[self._structure]
     self._away = structure.away
 
-    device = ffNestModule.devices[self._device_index]
+    device = ffNest.devices[self._device_index]
 
     self._temp = device.temperature
     if self._f:
@@ -185,9 +185,9 @@ class Device(Device):
     self._hvac_fan_state = device.fan
 
 
-  def deviceIndex(self, ffNestModule):
+  def deviceIndex(self, ffNest):
     if not self._device_index:
-      for idx, d in enumerate(ffNestModule.devices):
+      for idx, d in enumerate(ffNest.devices):
         if self._where:
           if d.where.lower() == self._where:
             self._device_index = idx
