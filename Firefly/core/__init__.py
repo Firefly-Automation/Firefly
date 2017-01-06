@@ -82,8 +82,10 @@ ffNestModule = None
 
 if ffModules.hasModule('nest'):
   import nest
+  logging.critical('********************** NEST ***************************')
   nest_config = Nest(ffModules)
   if nest_config.enabled:
+    logging.critical(nest_config)
     ffNestModule = nest.Nest(nest_config.username, nest_config.password, local_time=True)
 
 ffServices = ServiceConfig()
