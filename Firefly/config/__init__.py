@@ -57,7 +57,7 @@ class Modules(object):
     return self._config
 
 
-class Nest(object):
+class NestConfig(object):
 
   def __init__(self, modules):
     logging.critical('Importing Nest Module')

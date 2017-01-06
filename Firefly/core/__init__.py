@@ -75,7 +75,7 @@ ffLocation = Location(zipcode, modes)
 
 from config import Modules
 from config import ServiceConfig
-from config import Nest
+from config import NestConfig
 
 ffModules = Modules()
 ffNestModule = None
@@ -83,7 +83,8 @@ ffNestModule = None
 if ffModules.hasModule('nest'):
   import nest
   logging.critical('********************** NEST ***************************')
-  nest_config = Nest(ffModules)
+  nest_config = NestConfig(ffModules)
+  logging.critical(nest_config.username)
   if nest_config.enabled:
     logging.critical(nest_config)
     ffNestModule = nest.Nest(nest_config.username, nest_config.password, local_time=True)
