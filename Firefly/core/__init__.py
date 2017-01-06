@@ -80,7 +80,7 @@ from config import NestConfig
 ffModules = Modules()
 ffNestModule = None
 
-if ffModules.hasModule('nest'):
+if ffModules.hasModule('NEST'):
   import nest
   logging.critical('********************** NEST ***************************')
   nest_config = NestConfig(ffModules)
