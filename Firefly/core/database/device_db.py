@@ -83,7 +83,7 @@ def reinstall_indigo():
 
 def reinstallDevices():
   deviceDB.remove({})
-  from core import ffNestModule
+  from core import ffNest
   reinstall_indigo()
   with open(os.path.join(configPath,'devices.json')) as devices:
     allDevices = json.load(devices)
