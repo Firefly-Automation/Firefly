@@ -65,8 +65,8 @@ class NestConfig(object):
     self._username = None
     self._password = None
     self._enabled = False
-    if modules.hasModule('nest'):
-      self._config = modules.config['nest']
+    if modules.hasModule('NEST'):
+      self._config = modules.config['NEST']
       self.readConfig()
 
   def readConfig(self):
