@@ -7,11 +7,13 @@
 import json
 import re
 import pickle
+import os
 
 from core import deviceDB
 from sys import modules
 
 from core import ffScheduler
+from core import configPath
 
 class DeviceViews(object):
 
@@ -83,7 +85,7 @@ def reinstallDevices():
   deviceDB.remove({})
   from core import ffNestModule
   reinstall_indigo()
-  with open('config/devices.json') as devices:
+  with open(os.path.join(configPath,'devices.json')) as devices:
     allDevices = json.load(devices)
     for name, device in allDevices.iteritems():
       if device.get('module') != "ffZwave":

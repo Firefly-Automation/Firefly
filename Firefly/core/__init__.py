@@ -29,6 +29,8 @@ routineDB = ffDB.routines
 datalogDB.ensure_index("timestamp", expireAfterSeconds=(60*60*72))
 messageDB.ensure_index("timestamp", expireAfterSeconds=(60*60*24*7))
 
+configPath = '/opt/firefly_system/config/'
+
 ## SETUP SCHEDULER
 from core.utils.scheduler import Scheduler
 ffScheduler = Scheduler()
