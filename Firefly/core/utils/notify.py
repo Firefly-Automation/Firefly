@@ -11,6 +11,7 @@ from config import ServiceConfig
 import logging
 
 config = ServiceConfig()
+chromecasts = pychromecast.get_chromecasts()
 
 class Notification(object):
   def __init__(self, deviceID, message, priority=0, cast=False):
@@ -29,13 +30,9 @@ class Notification(object):
       self.send()
 
   def send_cast(self, device):
-    logging.error('***************************************')
-    logging.error(device)
     polly_server = config.get_item('SPEECH', 'polly_server')
     media_url = requests.post(polly_server, json={'speech': self._message}).text
-    chromecasts = pychromecast.get_chromecasts()
-    logging.error(media_url)
-    logging.error(chromecasts)
+
     cast = next(cc for cc in chromecasts if cc.device.friendly_name.lower() == device)
     cast.set_volume(.5)
     mc = cast.media_controller
