@@ -74,8 +74,9 @@ def getDeviceStatusDict():
 
 def reinstall_indigo():
   from core import ffIndigo
-  deviceDB.remove({'id': re.compile('indigo-.*')})
-  ffIndigo.install_devices()
+  if ffIndigo:
+    deviceDB.remove({'id': re.compile('indigo-.*')})
+    ffIndigo.install_devices()
 
 
 def reinstallDevices():
