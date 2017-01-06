@@ -3,8 +3,8 @@ Description=Firefly Startup Script
 After=multi-user.target
 
 [Service]
-Type=idle
-ExecStart=/usr/bin/python /opt/firefly_system/Firefly/Firefly/run_firefly.py > /opt/firefly_system/logs/firefly.log 2>&1
+WorkingDirectory=/opt/firefly_system/Firefly/Firefly
+ExecStart=/bin/sh -c ''/usr/bin/python /opt/firefly_system/Firefly/Firefly/run_firefly.py > /opt/firefly_system/logs/firefly.log 2>&1'
 
 [Install]
 WantedBy=multi-user.target
