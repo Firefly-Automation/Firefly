@@ -1,7 +1,7 @@
 #! /bin/bash
 
 FIREFLY_ROOT="/opt/firefly_system"
-FIREFLY_CONFIG="/opt/firefly/config"
+FIREFLY_CONFIG="/opt/firefly_system/config"
 DOMAIN=$HOSTNAME
 
 if [[ $EUID -ne 0 ]]; then
@@ -43,7 +43,7 @@ ask() {
 #################################
 
 mkdir -p $FIREFLY_ROOT
-mkdir -p $FIREFLY_ROOT/config
+mkdir -p $FIREFLY_CONFIG
 
 
 #################################
@@ -377,7 +377,7 @@ else
 	git clone https://github.com/zpriddy/Serenity.git
 fi
 
-sudo cp $FIREFLY_ROOT/Serenity/serenity.config $FIREFLY_ROOT/config
+sudo cp $FIREFLY_ROOT/Serenity/serenity.config $FIREFLY_CONFIG
 
 sudo pip install -r $FIREFLY_ROOT/Serenity/requirements.txt
 
