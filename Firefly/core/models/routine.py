@@ -41,6 +41,8 @@ class Routine(object):
     self._mode_run = config.get('mode_run')
     self._notification_devices = config.get('notification_devices')
     self._notification_message = config.get('notification_message')
+    self._speech = config.get('speech')
+    self._speech_device = config.get('speech_device')
     self._run_time_ranges = config.get('run_time_ranges')
     self._no_run_time_ranges = config.get('no_run_time_ranges')
     self._icon = config.get('icon')
@@ -171,6 +173,9 @@ class Routine(object):
       ffCommand(device, commands)
       if 'hue' in device:
         sleep(0.5)
+
+    if self._speech and self._speech_device:
+      ffCommand(self._speech_device, {'message': self._speech}, speech=True)
 
     if ffLocation:
       if ffLocation.isLightOffset(sunrise_offset=self._sunrise_offset):

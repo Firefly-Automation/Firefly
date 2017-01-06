@@ -26,6 +26,8 @@
         "ZachPushover",
         "GuestPushover"
       ],
+      "speech": "This will get spoken out",
+      "speech_device": "All Chirps",
       "notification_message": "Firefly has changed mode to Home!",
       "mode_no_run": [
         "home",
