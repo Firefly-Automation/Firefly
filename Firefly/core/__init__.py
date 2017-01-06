@@ -74,7 +74,7 @@ ffLocation = Location(zipcode, modes)
 # START MODULES BASED OFF OF CONFIG
 
 from config import Modules
-#from config import ServiceConfig
+from config import ServiceConfig
 from config import NestConfig
 
 #ffModules = Modules()
