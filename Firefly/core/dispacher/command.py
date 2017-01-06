@@ -52,5 +52,5 @@ def sendAppCommand(command):
   return success
 
 def sendSpeechNotification(command):
-  notify.Notification(command.deviceID, command.command.get('speeh'), cast=True)
+  notify.Notification(command.deviceID, command.command.get('speech'), cast=True)
   return True

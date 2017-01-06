@@ -175,7 +175,7 @@ class Routine(object):
         sleep(0.5)
 
     if self._speech and self._speech_device:
-      ffCommand(self._speech_device, {'message': self._speech}, speech=True)
+      ffCommand(self._speech_device, {'speech': self._speech}, speech=True)
 
     if ffLocation:
       if ffLocation.isLightOffset(sunrise_offset=self._sunrise_offset):
