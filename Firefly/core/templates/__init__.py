@@ -22,7 +22,7 @@ class Templates(object):
     Returns:
       template (str): string of switch template
     """
-    return self._switch
+    return self._switch_template
 
 
 ffTemplates = Templates()
