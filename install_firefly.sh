@@ -79,7 +79,7 @@ else
 fi
 
 
-echo -e "We are now adding a default Firefly user.\n Please fill out the following prompts to add the firefly user\n\m"
+echo -e "\n\nWe are now adding a default Firefly user.\n Please fill out the following prompts to add the firefly user\n\n"
 adduser firefly
 adduser firefly sudo
 
@@ -105,6 +105,9 @@ if [ ! -f ~/.gitconfig ]; then
 
     echo -e -n "Please enter your name for git config: "
     read GIT_NAME
+
+    git config --global user.email $GIT_EMAIL
+    git config --global user.name $GIT_NAME
 
     # Copy this git config to the other users too.
     cp ~/.gitconfig /home/pi
@@ -423,9 +426,6 @@ echo -e "\n\nThe default username is admin and the password is FireflyPassword12
 # COPY CONFIG FILES
 # on updates it will only copy *.sample.*
 ##################################
-
-git config --global user.email $GIT_EMAIL
-git config --global user.name $GIT_NAME
 
 cp -r $FIREFLY_ROOT/Firefly/setup_files/config/* $FIREFLY_ROOT/config/
 
