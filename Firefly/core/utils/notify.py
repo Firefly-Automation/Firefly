@@ -12,6 +12,7 @@ import logging
 
 config = ServiceConfig()
 chromecasts = pychromecast.get_chromecasts()
+cc_devices = [cc.device.friendly_name.lower() for cc in chromecasts]
 
 class Notification(object):
   def __init__(self, deviceID, message, priority=0, cast=False):
@@ -22,6 +23,9 @@ class Notification(object):
     if cast:
       if not config.get_boolean('SPEECH','enable'):
          return
+      self.send_cast(self._deviceID)
+
+    if self._deviceID.lower() in cc_devices:
       self.send_cast(self._deviceID)
 
     if self._deviceID.lower() == 'all':

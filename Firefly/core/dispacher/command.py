@@ -1,13 +1,16 @@
 import logging
 import pickle
 
-from core import appsDB, deviceDB, ffCommand, routineDB
+from core import appsDB, deviceDB, ffCommand, routineDB, notify
 
 def sendCommand(command):
   from core import ff_zwave
   logging.info("sendCommand: " + str(command))
   if command.routine:
     return sendRoutineCommand(command)
+
+  if command.speech:
+    return sendSpeechNotification(command)
 
   if ff_zwave.zwave is not None:
     if command.deviceID == ff_zwave.zwave.name:
@@ -46,3 +49,7 @@ def sendAppCommand(command):
     appsDB.update_one({'id':app.id},{'$set': {'ffObject':appObj}, '$currentDate': {'lastModified': True}})
     success = True
   return success
+
+def sendSpeechNotification(command):
+  notify.Notification(command.deviceID, command.command.get('speeh'), cast=True)
+  return True

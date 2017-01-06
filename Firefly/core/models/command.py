@@ -11,13 +11,15 @@ class Command(object):
   Command is used to build and send a command to a firefly device
   '''
 
-  def __init__(self, deviceID, command, routine=False, force=False, source=None, send_event=True):
+  def __init__(self, deviceID, command, routine=False, force=False, source=None, send_event=True, notify=False, speech=False):
     from core import sendCommand
     self._deviceID = deviceID
     self._command = command
     self._routine = routine
     self._force = force
+    self._notify = notify
     self._source = source
+    self._speech = speech
     self._send_event = send_event
     self._simple = not isinstance(
         command, types.DictType) if command is not None else False
@@ -54,12 +56,20 @@ class Command(object):
     return self._force
 
   @property
+  def notify(self):
+    return self._notify
+
+  @property
   def result(self):
     return self._result
 
   @property
   def source(self):
     return self._source
+
+  @property
+  def speech(self):
+    return self._speech
 
   @property
   def send_event(self):
