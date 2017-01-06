@@ -1,0 +1,10 @@
+[Unit]
+Description=Firefly Startup Script
+After=multi-user.target
+
+[Service]
+WorkingDirectory=/opt/firefly_system/Serenity
+ExecStart=/bin/sh -c ''/usr/bin/python /opt/firefly_system/Serenity/runserver.py > /opt/firefly_system/logs/serenity.log 2>&1'
+
+[Install]
+WantedBy=multi-user.target

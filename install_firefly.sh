@@ -384,25 +384,23 @@ sudo pip install -r $FIREFLY_ROOT/Serenity/requirements.txt
 sed "s/<<DOMAIN>>/$DOMAIN/" $FIREFLY_ROOT/Serenity/nginx.confg > /etc/nginx/sites-enabled/default
 
 ##################################
-# INSTALL AUTO-START SCRIPTS [TODO]
+# INSTALL AUTO-START SCRIPTS
 ##################################
-
-# Need to verify permissions of serial port
-# Need to start Firefly on boot
-# Need to start Serenity on boot
-# Need to start ha-bridge on boot
-echo -e "\n\nSetting Firefly to start on boot.\n\n"
-cd $FIREFLY_ROOT/Firefly
-cp firefly_startup.sh $FIREFLY_ROOT
-cd $FIREFLY_ROOT
-chmod +x firefly_startup.sh
-(sudo crontab -l; echo -e "@reboot /opt/firefly_system/firefly_startup.sh &") | crontab -
-
 
 cp $FIREFLY_ROOT/Firefly/system_scripts/firefly.service /lib/systemd/system
 chmod 644 /lib/systemd/system/firefly.service
 sudo systemctl daemon-reload
 sudo systemctl enable firefly.service
+
+cp $FIREFLY_ROOT/Firefly/system_scripts/serenity.service /lib/systemd/system
+chmod 644 /lib/systemd/system/serenity.service
+sudo systemctl daemon-reload
+sudo systemctl enable serenity.service
+
+cp $FIREFLY_ROOT/Firefly/system_scripts/habridge.service /lib/systemd/system
+chmod 644 /lib/systemd/system/habridge.service
+sudo systemctl daemon-reload
+sudo systemctl enable habridge.service
 
 # OPTIONAL: Start web browser to UI in fullscreen
 
@@ -450,6 +448,7 @@ chmod -R 777 /var/www/firefly_www/audio
 mkdir $FIREFLY_ROOT/logs
 
 echo -e -n "/opt/firefly_system/logs/firefly.log {\n\tsize 100M\n\tcreate 766 root root\n\trotate 5\n}" >> /etc/logrotate.conf
+echo -e -n "/opt/firefly_system/logs/serenity.log {\n\tsize 100M\n\tcreate 766 root root\n\trotate 5\n}" >> /etc/logrotate.conf
 
 echo "a-0.0.2" > $FIREFLY_ROOT/.firefly.version
 
