@@ -34,6 +34,11 @@ class ServiceConfig(object):
       return False
     return self._config.get(service, item)
 
+  def get_string(self, service, item):
+    if not self.has_service(service):
+      return False
+    return self._config.get(service, item)
+
   @property
   def config(self):
     return self._config
