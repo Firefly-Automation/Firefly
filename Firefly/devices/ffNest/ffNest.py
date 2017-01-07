@@ -207,6 +207,7 @@ class Device(Device):
     return status
 
   def update(self, args={}):
+    from core import ffScheduler
     logging.critical('*************************** NEST UPDATE **********************************')
     self.getStatus()
     self.refreshData()
