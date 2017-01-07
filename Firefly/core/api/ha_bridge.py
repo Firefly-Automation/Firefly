@@ -13,6 +13,8 @@ from core import ffCommand
 from core.database.device_db import getDeviceList
 from core.database.routine_db import getRoutineList
 from core.database.device_db import getDeviceInfo
+from core import configPath
+import os
 
 # TODO: Pull this info from the firefly.confg 
 FIREFLY_ADDRESS = 'http://localhost:6002'
@@ -55,7 +57,7 @@ def ha_bridge_push_config():
 
   # TODO make this read the ha-bridge config fiel
   ha_bride_alias = {}
-  with open('/opt/firefly_syste/config/ha_bridge_alias.json') as alias:
+  with open(os.path.join(configPath,'ha_bridge_alias.json')) as alias:
     ha_bride_alias = json.load(alias)
     
   

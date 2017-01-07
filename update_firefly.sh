@@ -22,4 +22,7 @@ git pull
 cd $FIREFLYROOT/Firefly/setup_files/
 find  config/ -name '*.sample.*' -exec cp -pvr --parents '{}' $FIREFLYROOT ';'
 
+systemctl restart firefly.service
+systemctl restart serenity.service
+
 chown -R firefly:firefly $FIREFLYROOT
