@@ -27,7 +27,7 @@ class Command(object):
     if self._simple:
       self._command = {command: ''}
 
-    is seld._command is not None:
+    if self._command is not None:
       if self._command.get('isSpeech'):
         self._speech = True
 
