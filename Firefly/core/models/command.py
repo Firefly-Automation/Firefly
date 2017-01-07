@@ -30,6 +30,9 @@ class Command(object):
     if self._command.get('isSpeech'):
       self._speech = True
 
+    logging.critical('*****************')
+    logging.critical(self._command)
+
     self._result = sendCommand(self)
 
   def __str__(self):
