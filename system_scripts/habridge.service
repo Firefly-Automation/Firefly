@@ -5,7 +5,8 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/java -jar -Dconfig.file=/opt/firefly_system/config/habridge.config /opt/firefly_system/ha_bridge/ha-bridge-3.5.1.jar
+WorkingDirectory=/opt/firefly_system/config/habridge
+ExecStart=/usr/bin/java -jar -Dconfig.file=/opt/firefly_system/config/habridge/habridge.config /opt/firefly_system/ha_bridge/ha-bridge-3.5.1.jar
 
 [Install]
 WantedBy=multi-user.target

@@ -26,6 +26,9 @@ class Command(object):
     if self._simple:
       self._command = {command: ''}
 
+    if command.get('isSpeech'):
+      self._speech = True
+
     self._result = sendCommand(self)
 
   def __str__(self):
