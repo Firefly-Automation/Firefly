@@ -27,9 +27,7 @@ class Command(object):
     if self._simple:
       self._command = {command: ''}
 
-    logging.critical('********************')
-    logging.critical(command)
-    if command.get('isSpeech'):
+    if self._command.get('isSpeech'):
       self._speech = True
 
     self._result = sendCommand(self)
