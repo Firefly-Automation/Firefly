@@ -4,7 +4,6 @@
 # @Last Modified by:   Zachary Priddy
 # @Last Modified time: 2016-10-13 20:44:37
 import types
-import logging
 
 
 class Command(object):
@@ -30,9 +29,6 @@ class Command(object):
     if self._command is not None:
       if self._command.get('isSpeech'):
         self._speech = True
-
-    logging.critical('*****************')
-    logging.critical(self._command)
 
     self._result = sendCommand(self)
 
