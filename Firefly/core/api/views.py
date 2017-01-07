@@ -193,7 +193,7 @@ def apiReinstallApps():
     for packageName, module in appList.iteritems():
       for moduleName in module:
         package_full_path = 'apps.' + str(packageName) + '.' + str(moduleName)
-        app_package_config = '/opt/firefly_system/config/app_config/' + str(packageName) + '/config.json'
+        app_package_config = '/opt/firefly_system/config/app_config/' + str(packageName) + '/config.sample.json'
         logging.critical(app_package_config)
         with open(str(app_package_config)) as app_package_config_file:
           app_package_config_data = json.load(app_package_config_file, object_pairs_hook=OrderedDict).get(moduleName) #json.load(app_package_config_file).get(moduleName)

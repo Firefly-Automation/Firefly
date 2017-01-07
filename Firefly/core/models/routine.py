@@ -84,7 +84,8 @@ class Routine(object):
     return self._scheduling
 
   def event(self, event):
-    from core.firefly_api import send_request, event_message
+    from core.firefly_api import event_message
+    from core import sendRequest
     from core.models.request import Request as FFRequest
     from core import ffLocation
     logging.debug('ROUTINE: Receving Event In: ' + str(self._name))
@@ -96,7 +97,7 @@ class Routine(object):
         for device, state in trigger.iteritems():
           # TEMP FIX
           if device != 'location':
-            status = send_request(FFRequest(device, state.keys()[0]))
+            status = sendRequest(FFRequest(device, state.keys()[0]))
             if str(status) == str(state.values()[0]):
               pass
             else:

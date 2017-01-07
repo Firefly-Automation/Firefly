@@ -1,8 +1,0 @@
-[nest]
-enabled: yes
-username: youremail.@mail.com
-password: YourPassword
-
-[zwave]
-enabled: yes
-port: /dev/ttyUSB0

@@ -141,7 +141,7 @@ def ff_read_device_config(request):
 
   #Remove Existing Routines
   routineDB.remove({})
-  with open('config/routine.json') as routines:
+  with open('/opt/firefly_system/config/routine.json') as routines:
     testRoutines = json.load(routines, object_pairs_hook=OrderedDict)
     for r in testRoutines.get('routines'):
       rObj = routine.Routine(json.dumps(r))
@@ -158,7 +158,7 @@ def ff_instal_apps(request):
     for packageName, module in appList.iteritems():
       for moduleName in module:
         package_full_path = 'apps.' + str(packageName) + '.' + str(moduleName)
-        app_package_config = 'config/app_config/' + str(packageName) + '/config.json'
+        app_package_config = 'config/app_config/' + str(packageName) + '/config.sample.json'
         logging.critical(app_package_config)
         with open(str(app_package_config)) as app_package_config_file:
           app_package_config_data = json.load(app_package_config_file, object_pairs_hook=OrderedDict).get(moduleName) #json.load(app_package_config_file).get(moduleName)

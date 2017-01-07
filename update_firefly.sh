@@ -1,83 +1,25 @@
 #!/usr/bin/env bash
 
+FIREFLYROOT="/opt/firefly_system"
+
 if [[ $EUID -ne 0 ]]; then
    echo -e "This script must be run as root"
    exit 1
 fi
 
-FIREFLYROOT="/opt/firefly_system"
+DATE=$(date --iso-8601)
+mkdir -p $FIREFLYROOT/.backup
+tar cvzf $FIREFLYROOT/.backup/firefly-backup-$DATE.tar.gz $FIREFLYROOT/config
 
-cd $FIREFLYROOT
-
-if [ -e "$FIREFLYROOT/.firefly.version" ]; then
-    CURRENT_VERSION=line=$(head -1 $FIREFLYROOT)
-else
-
-    echo -e -n "Please enter your email for git config: "
-    read GIT_EMAIL
-
-    echo -e -n "Please enter your name for git config: "
-    read GIT_NAME
-
-    git config --global user.email "$GIT_EMAIL"
-    git config --global user.name "$GIT_NAME"
-
-    CURRENT_VERSION="a-0.0.1"
-    echo "a-0.0.2" > .firefly.version
-fi
-
-# Leaving this in for now, but when I can confirm that all configs are no longer stored here then I will remove it
-cd $FIREFLYROOT
-if [ ! -d "$FIREFLYROOT/.backup" ]; then
-    mkdir .backup
-fi
-
-cp -r $FIREFLYROOT/Firefly/Firefly/config $FIREFLYROOT/.backup
-# End of TEMP
-
-cd Firefly
+cd $FIREFLYROOT/Firefly
 git stash
 git pull
 
-cd $FIREFLYROOT
-
-if [ "$CURRENT_VERSION" == "a-0.0.1" ]; then
-    ##################################
-    # COPY CONFIG FILES
-    ##################################
-
-    cd $FIREFLYROOT
-    cp -r Firefly/setup_files/config .
-    chown -R fiefly:firefly $FIREFLYROOT/config
-
-    cp $FIREFLYROOT/Firefly/system_scripts/update_firefly.sh $FIREFLYROOT
-
-    cp $FIREFLYROOT/.backup/devices.json $FIREFLYROOT/config/
-    cp $FIREFLYROOT/.backup/location.json $FIREFLYROOT/config/
-    cp $FIREFLYROOT/.backup/routine.json $FIREFLYROOT/config/
-
-else
-    cd $FIREFLYROOT
-    cp Firefly/setup_files/config/*.sample.* $FIREFLYROOT/config
-    chown -R firefly:firefly $FIREFLYROOT/config
-fi
-
-
 cd $FIREFLYROOT/Serenity
+git stash
 git pull
 
-if [ "$CURRENT_VERSION" == "a-0.0.1" ]; then
-    ##################################
-    # COPY CONFIG FILES
-    ##################################
+cd $FIREFLYROOT/Firefly/setup_files/
+find  config/ -name '*.sample.*' -exec cp -pvr --parents '{}' $FIREFLYROOT ';'
 
-    cp $FIREFLYROOT/Serenity/serenity.config $FIREFLYROOT/config/
-
-fi
-
-
-# Leaving this in for now, but when I can confirm that all configs are no longer stored here then I will remove it
-cp -r $FIREFLYROOT/.backup/config $FIREFLYROOT/Firefly/Firefly/
-# End of temp
-
-sudo chown -R firefly:firefly /opt/firefly_system
+chown -R firefly:firefly $FIREFLYROOT

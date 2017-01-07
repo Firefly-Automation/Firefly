@@ -210,4 +210,5 @@ class Device(Device):
     logging.critical('*************************** NEST UPDATE **********************************')
     self.getStatus()
     self.refreshData()
+    ffScheduler.runInM(5, self.update)
     return 0
