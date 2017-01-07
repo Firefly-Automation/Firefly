@@ -4,6 +4,7 @@
 # @Last Modified by:   Zachary Priddy
 # @Last Modified time: 2016-10-13 20:44:37
 import types
+import logging
 
 
 class Command(object):
@@ -26,6 +27,8 @@ class Command(object):
     if self._simple:
       self._command = {command: ''}
 
+    logging.crititcal('********************')
+    logging.crititcal(command)
     if command.get('isSpeech'):
       self._speech = True
 
