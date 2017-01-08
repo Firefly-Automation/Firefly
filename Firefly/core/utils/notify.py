@@ -8,6 +8,7 @@ import pychromecast
 import requests
 from core import deviceDB, ffCommand
 from config import ServiceConfig
+from core import ffScheduler
 import logging
 
 config = ServiceConfig()
@@ -34,13 +35,27 @@ class Notification(object):
       self.send()
 
   def send_cast(self, device):
-    polly_server = config.get_item('SPEECH', 'polly_server')
-    media_url = requests.post(polly_server, json={'speech': self._message}).text
+    ffScheduler.runInS(1,self.send_cast_run, args=[device])
 
-    cast = next(cc for cc in chromecasts if cc.device.friendly_name.lower() == device.lower())
-    cast.set_volume(.5)
+  def send_cast_run(self, device):
+    cast = None
+    try:
+      polly_server = config.get_item('SPEECH', 'polly_server')
+      media_url = requests.post(polly_server, json={'speech': self._message}).text
+      cast = next(cc for cc in chromecasts if cc.device.friendly_name.lower() == device.lower())
+      cast.set_volume(.5)
+    except:
+      chromecasts = pychromecast.get_chromecasts()
+      polly_server = config.get_item('SPEECH', 'polly_server')
+      media_url = requests.post(polly_server, json={'speech': self._message}).text
+      cast = next(cc for cc in chromecasts if cc.device.friendly_name.lower() == device.lower())
+      cast.set_volume(.5)
+    if not cast:
+      return
     mc = cast.media_controller
     mc.play_media(media_url, 'audio/mp3')
+
+
 
   def send_all(self):
     for device in deviceDB.find({"config.subType":"notification"}):
