@@ -52,5 +52,8 @@ def sendAppCommand(command):
   return success
 
 def sendSpeechNotification(command):
-  notify.Notification(command.deviceID, command.command.get('speech'), cast=True)
+  try:
+    notify.Notification(command.deviceID, command.command.get('speech'), cast=True)
+  except:
+    logging.error('Error sending message to chromecast')
   return True
