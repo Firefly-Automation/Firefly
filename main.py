@@ -1,12 +1,13 @@
 from Firefly.core import Firefly
 from Firefly.helpers.settings import Settings
+from Firefly.const import CONFIG_FILE
 
 from Firefly.api import FireflyCoreAPI
 
 
 def main():
   # Get settings for Firefly.
-  firefly_settings = Settings('firefly.config')
+  firefly_settings = Settings(CONFIG_FILE)
 
   # Initialize Firefly.
   firefly = Firefly(firefly_settings)

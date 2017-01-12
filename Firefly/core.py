@@ -6,7 +6,12 @@ from aiohttp import web
 from Firefly.helpers.events import (Event, Command, Request)
 
 from Firefly.helpers.subscribers import Subscriptions
+from Firefly.helpers.alias import Alias
 from Firefly import logging
+from Firefly import aliases
+from Firefly import scheduler
+from Firefly.helpers.location import Location
+from Firefly.const import (ACTION_ON)
 
 import importlib
 
@@ -23,16 +28,28 @@ class Firefly(object):
     self.settings = settings
     self.loop = asyncio.get_event_loop()
     self.subscriptions = Subscriptions()
+    self.location = Location(self, "95110", ['HOME'])
 
     # TODO: Expand this
     self._devices = {}
     here = os.path.join(os.path.split(__file__)[0])
     print(here)
     module = importlib.import_module('Firefly.devices.test_device')
-    package = module.Setup(self)
+    package = module.Setup(self, alias='Test Device')
     #module = importlib.import_module('firefly.devices.test_device', package)
     #new_device = module.TestDevice()
     #self._devices['test_device'] = new_device
+
+    # TODO: Remove this. This is a POC for scheduler.
+    c = Command('Test Device', 'web_api', ACTION_ON)
+    print(c.export())
+    d_args = c.export()
+    d = Command(**d_args)
+    scheduler.runEveryS(15, self.send_command, command=d)
+
+
+    # TODO: Leave In.
+    scheduler.runEveryM(10, self.export_current_values)
 
 
 
@@ -44,7 +61,7 @@ class Firefly(object):
     logging.message('Starting Firefly')
 
     try:
-      web.run_app(app)
+      web.run_app(app, host=self.settings.firefly_host, port=self.settings.firefly_port)
     except KeyboardInterrupt:
       pass
     finally:
@@ -59,6 +76,7 @@ class Firefly(object):
     # TODO: Export current state of devices on shutdown
 
     logging.message('Stopping Firefly')
+    self.export_current_values()
 
     # TODO: Remove this once exporting works
     for device in self.devices:
@@ -73,7 +91,27 @@ class Firefly(object):
     future.set_result(r)
     return r
 
-  # TODO: Send Event / Broadcast
+  def export_current_values(self) -> None:
+    """
+    Export current values to backup files to restore current config on reboot.
+    """
+    logging.message('Exporting current config.')
+    aliases.export_aliases()
+
+  @asyncio.coroutine
+  def send_event(self, event: Event) -> None:
+    yield from self.add_task(self._send_event(event))
+
+  @asyncio.coroutine
+  def _send_event(self, event: Event) -> None:
+    send_to = self.subscriptions.get_subscribers(event.source, event_action=event.event_action)
+    logging.debug('Sending Event: %s -> %s' % (event, str(send_to)))
+    for s in send_to:
+      yield from self.__send_event(s, event)
+
+  @asyncio.coroutine
+  def __send_event(self, send_to: str, event: Event) -> None:
+    self.devices[send_to].event(event)
 
   @asyncio.coroutine
   def send_request(self, request: Request) -> Any:

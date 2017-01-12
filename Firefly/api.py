@@ -34,21 +34,23 @@ class FireflyCoreAPI:
   def test(self, request):
     action = request.match_info['action']
     if action == 'off':
-      c = Command('test_device', 'web_api', ACTION_OFF)
+      c = Command('Test Device', 'web_api', ACTION_OFF)
       yield from self.firefly.send_command(c)
-      request = Request('test_device', 'web_api', STATE)
+      request = Request('Test Device', 'web_api', STATE)
       state = yield from self.firefly.send_request(request)
       r = web.Response(text=str(state))
       return r
     if action == 'on':
-      c = Command('test_device', 'web_api', ACTION_ON)
+      c = Command('Test Device', 'web_api', ACTION_ON)
       yield from self.firefly.send_command(c)
-      request = Request('test_device', 'web_api', STATE)
+      request = Request('Test Device', 'web_api', STATE)
       state = yield from self.firefly.send_request(request)
       r = web.Response(text=str(state))
       return r
 
-    return web.Response(text=self.firefly._devices['test_device'].state)
+    request = Request('Test Device', 'web_api', STATE)
+    state = yield from self.firefly.send_request(request)
+    return web.Response(text=str(state))
 
 
 

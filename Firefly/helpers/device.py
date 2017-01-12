@@ -2,12 +2,13 @@ from Firefly import logging
 from Firefly.helpers.events import Event, Command, Request
 from Firefly.const import EVENT_TYPE_BROADCAST
 from typing import Callable, Any
+import uuid
 from Firefly.const import STATE
+from Firefly import aliases
 
 class Device(object):
-  def __init__(self, firefly, device_id, title, author, package, commands, requests):
+  def __init__(self, firefly, device_id, title, author, package, commands, requests, alias=''):
     self._firefly = firefly
-    self._id = device_id
     self._title = title
     self._author = author
     self._package = package
@@ -15,6 +16,23 @@ class Device(object):
     self._requests = requests
     self._command_mapping = {}
     self._request_mapping = {}
+
+    # If alias given but no ID look at config files for ID.
+    if not device_id and alias:
+      if aliases.get_device_id(alias):
+        device_id = aliases.get_device_id(alias)
+
+    elif device_id and not alias:
+      if aliases.get_alias(device_id):
+        alias = aliases.get_alias(device_id)
+
+    # If no device ID given -> generate random ID.
+    if not device_id:
+      device_id = uuid.uuid4()
+
+    self._id = device_id
+    self._alias = alias if alias else device_id
+    aliases.set_alias(self._id , self._alias)
 
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
@@ -58,7 +76,8 @@ class Device(object):
         return True
       logging.info('Change detected: %s' % self)
       # TODO: If change detected then send broadcast event
-      broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action)
+      broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=event_action)
+      yield from self._firefly.send_event(broadcast)
       logging.info(broadcast)
       # TODO: END
       return True
@@ -80,6 +99,9 @@ class Device(object):
     if request.request in self.request_map.keys():
       return self.request_map[request.request](**request.args)
     return None
+
+  def event(self, event: Event) -> None:
+    logging.error('Devices currently dont support events')
 
   @property
   def id(self):

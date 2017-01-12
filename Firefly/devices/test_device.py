@@ -12,14 +12,15 @@ REQUESTS = [STATE]
 INITIAL_VALUES = {'_state': STATE_OFF}
 
 
-def Setup(firefly):
+def Setup(firefly, device_id='', alias=''):
   logging.info('Entering Device Setup')
-  firefly._devices['test_device'] = TestDevice(firefly)
+  new_device = TestDevice(firefly, device_id=device_id, alias=alias)
+  firefly._devices[new_device.id] = new_device
   return {'title': TITLE, 'author': AUTHOR, 'package': PACKAGE, 'commands': COMMANDS, 'requests': REQUESTS}
 
 class TestDevice(Device):
-  def __init__(self, firefly):
-    super().__init__(firefly, 'device_id', TITLE, AUTHOR, PACKAGE, COMMANDS, REQUESTS)
+  def __init__(self, firefly, device_id='', alias=''):
+    super().__init__(firefly, device_id, TITLE, AUTHOR, PACKAGE, COMMANDS, REQUESTS, alias=alias)
 
     self.add_command(ACTION_OFF, self.off)
     self.add_command(ACTION_ON, self.on)
