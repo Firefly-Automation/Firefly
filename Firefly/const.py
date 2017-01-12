@@ -9,6 +9,7 @@ CONFIG_DEFAULT_HOST = 'localhost'
 CONFIG_FILE = 'dev_config/firefly.config'
 
 ALIAS_FILE = 'dev_config/device_alias.json'
+DEVICE_FILE = 'dev_config/devices.json'
 
 # #### EVENT TYPES ####
 EVENT_TYPE_ANY = 'ANY'

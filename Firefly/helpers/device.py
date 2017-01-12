@@ -7,13 +7,14 @@ from Firefly.const import STATE
 from Firefly import aliases
 
 class Device(object):
-  def __init__(self, firefly, device_id, title, author, package, commands, requests, alias=''):
+  def __init__(self, firefly, device_id, title, author, package, commands, requests, initial_values, alias=''):
     self._firefly = firefly
     self._title = title
     self._author = author
     self._package = package
     self._commands = commands
     self._requests = requests
+    self._initial_values = initial_values
     self._command_mapping = {}
     self._request_mapping = {}
 
@@ -36,6 +37,19 @@ class Device(object):
 
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
+
+  def export(self):
+    current_values = {}
+    for item in self._initial_values.keys():
+      current_values[item] = self.__getattribute__(item)
+
+    export_data = {
+      'package': self._package,
+      'device_id': self.id,
+      'alias': self._alias,
+      'initial_values': current_values
+    }
+    return export_data
 
   def add_command(self, command: str, function: Callable) -> None:
     """

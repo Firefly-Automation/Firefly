@@ -1,4 +1,5 @@
 import asyncio
+import json
 from typing import Any
 
 from aiohttp import web
@@ -11,7 +12,7 @@ from Firefly import logging
 from Firefly import aliases
 from Firefly import scheduler
 from Firefly.helpers.location import Location
-from Firefly.const import (ACTION_ON)
+from Firefly.const import (ACTION_ON, DEVICE_FILE)
 
 import importlib
 
@@ -29,16 +30,15 @@ class Firefly(object):
     self.loop = asyncio.get_event_loop()
     self.subscriptions = Subscriptions()
     self.location = Location(self, "95110", ['HOME'])
-
-    # TODO: Expand this
     self._devices = {}
-    here = os.path.join(os.path.split(__file__)[0])
-    print(here)
-    module = importlib.import_module('Firefly.devices.test_device')
-    package = module.Setup(self, alias='Test Device')
-    #module = importlib.import_module('firefly.devices.test_device', package)
-    #new_device = module.TestDevice()
-    #self._devices['test_device'] = new_device
+
+    # TODO: POC of passing initial values. These values would comve from the export of the current state.
+    #self.install_package('Firefly.devices.test_device', alias='Test Device', initial_values={'_state': 'UNKNOWN'})
+    self.import_devices()
+
+    for _, device in self._devices.items():
+      print(device.export())
+
 
     # TODO: Remove this. This is a POC for scheduler.
     c = Command('Test Device', 'web_api', ACTION_ON)
@@ -98,6 +98,29 @@ class Firefly(object):
     logging.message('Exporting current config.')
     aliases.export_aliases()
 
+  def import_devices(self, config_file=DEVICE_FILE):
+    devices = {}
+    with open(config_file) as file:
+      devices = json.loads(file.read())
+
+    for device in devices:
+      self.install_package(device.get('package'), **device)
+
+  def install_package(self, module: str, **kwargs):
+    """
+    Installs a package from the module. The package must support the Setup(firefly, **kwargs) function.
+
+    The setup function can (and should) add the device (if a device) to the firefly._devices dict.
+
+    Args:
+      module (str): path to module being imported
+      **kwargs (): If possible supply alias and/or device_id
+    """
+    logging.message('Installing module from %s %s' % (module, str(kwargs)))
+    package = importlib.import_module(module)
+    package.Setup(self, module, **kwargs)
+
+  @asyncio.coroutine
   @asyncio.coroutine
   def send_event(self, event: Event) -> None:
     yield from self.add_task(self._send_event(event))
