@@ -4,6 +4,7 @@
     <list default="true" id="782782d9-fe62-4a15-82e4-766d0b64b7c3" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Firefly/core.py" afterPath="$PROJECT_DIR$/Firefly/core.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Firefly/helpers/device.py" afterPath="$PROJECT_DIR$/Firefly/helpers/device.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dev_config/devices.json" afterPath="$PROJECT_DIR$/dev_config/devices.json" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,7 +17,7 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Firefly$Unittests_in_test_subscribers.coverage" NAME="Unittests in test_subscribers Coverage Results" MODIFIED="1484207995761" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Firefly$Unnamed.coverage" NAME="Unnamed Coverage Results" MODIFIED="1484197774110" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Firefly$main.coverage" NAME="main Coverage Results" MODIFIED="1484213380356" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Firefly$main.coverage" NAME="main Coverage Results" MODIFIED="1484214036730" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Firefly$Unittests_in_test_events.coverage" NAME="Unittests in test_events Coverage Results" MODIFIED="1484208562224" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="CreatePatchCommitExecutor">
@@ -25,16 +26,6 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Firefly/__init__.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="22" lean-forward="false" selection-start-line="8" selection-start-column="22" selection-end-line="8" selection-end-column="22" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="const.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Firefly/const.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -45,11 +36,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="devices.json" pinned="false" current-in-tab="true">
+      <file leaf-file-name="devices.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dev_config/devices.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+            <state relative-caret-position="90">
+              <caret line="6" column="1" lean-forward="false" selection-start-line="6" selection-start-column="1" selection-end-line="6" selection-end-column="1" />
               <folding />
             </state>
           </provider>
@@ -97,15 +88,26 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="core.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="core.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Firefly/core.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="405">
-              <caret line="41" column="0" lean-forward="true" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+            <state relative-caret-position="1215">
+              <caret line="98" column="24" lean-forward="false" selection-start-line="98" selection-start-column="24" selection-end-line="98" selection-end-column="24" />
               <folding>
                 <element signature="e#2494#2584#1" expanded="true" />
-                <element signature="e#3359#3696#1" expanded="true" />
+                <element signature="e#3081#3283#1" expanded="true" />
+                <element signature="e#3620#3957#1" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="device.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Firefly/helpers/device.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="345">
+              <caret line="47" column="74" lean-forward="false" selection-start-line="47" selection-start-column="74" selection-end-line="47" selection-end-column="74" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -167,9 +169,9 @@
         <option value="$PROJECT_DIR$/Firefly/helpers/scheduler.py" />
         <option value="$PROJECT_DIR$/Firefly/helpers/events.py" />
         <option value="$PROJECT_DIR$/tests/test_events.py" />
-        <option value="$PROJECT_DIR$/Firefly/helpers/device.py" />
         <option value="$PROJECT_DIR$/Firefly/devices/test_device.py" />
         <option value="$PROJECT_DIR$/Firefly/const.py" />
+        <option value="$PROJECT_DIR$/Firefly/helpers/device.py" />
         <option value="$PROJECT_DIR$/dev_config/device_alias.json" />
         <option value="$PROJECT_DIR$/dev_config/devices.json" />
         <option value="$PROJECT_DIR$/Firefly/core.py" />
@@ -693,7 +695,7 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296617" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296617" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3296617" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3296617" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -768,7 +770,8 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#2494#2584#1" expanded="true" />
-            <element signature="e#3359#3696#1" expanded="true" />
+            <element signature="e#3081#3283#1" expanded="true" />
+            <element signature="e#3620#3957#1" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -936,14 +939,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/helpers/device.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="555">
-          <caret line="51" column="22" lean-forward="false" selection-start-line="51" selection-start-column="22" selection-end-line="51" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Firefly/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
@@ -978,14 +973,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/const.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="38" lean-forward="false" selection-start-line="11" selection-start-column="38" selection-end-line="11" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Firefly/helpers/alias.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -994,21 +981,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/core.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="41" column="0" lean-forward="true" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
-          <folding>
-            <element signature="e#2494#2584#1" expanded="true" />
-            <element signature="e#3359#3696#1" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/dev_config/firefly.config">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/const.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="38" lean-forward="false" selection-start-line="11" selection-start-column="38" selection-end-line="11" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/helpers/device.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="47" column="74" lean-forward="false" selection-start-line="47" selection-start-column="74" selection-end-line="47" selection-end-column="74" />
           <folding />
         </state>
       </provider>
@@ -1023,9 +1015,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/dev_config/devices.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+        <state relative-caret-position="90">
+          <caret line="6" column="1" lean-forward="false" selection-start-line="6" selection-start-column="1" selection-end-line="6" selection-end-column="1" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1215">
+          <caret line="98" column="24" lean-forward="false" selection-start-line="98" selection-start-column="24" selection-end-line="98" selection-end-column="24" />
+          <folding>
+            <element signature="e#2494#2584#1" expanded="true" />
+            <element signature="e#3081#3283#1" expanded="true" />
+            <element signature="e#3620#3957#1" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

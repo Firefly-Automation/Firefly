@@ -6,6 +6,7 @@ import uuid
 from Firefly.const import STATE
 from Firefly import aliases
 
+
 class Device(object):
   def __init__(self, firefly, device_id, title, author, package, commands, requests, initial_values, alias=''):
     self._firefly = firefly
@@ -33,22 +34,35 @@ class Device(object):
 
     self._id = device_id
     self._alias = alias if alias else device_id
-    aliases.set_alias(self._id , self._alias)
+    aliases.set_alias(self._id, self._alias)
 
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
 
-  def export(self):
-    current_values = {}
-    for item in self._initial_values.keys():
-      current_values[item] = self.__getattribute__(item)
+  def export(self, current_values: bool=True) -> dict:
 
+    """
+    Export device config with options current values to a dictionary.
+
+    Args:
+      current_values (bool): Include current values as new initial values.
+
+    Returns:
+      (dict): A dict of the device config.
+    """
     export_data = {
-      'package': self._package,
+      'package':   self._package,
       'device_id': self.id,
-      'alias': self._alias,
-      'initial_values': current_values
+      'alias':     self._alias
     }
+
+    if current_values:
+      current_values = {}
+      for item in self._initial_values.keys():
+        current_values[item] = self.__getattribute__(item)
+
+      export_data['initial_values'] = current_values
+
     return export_data
 
   def add_command(self, command: str, function: Callable) -> None:

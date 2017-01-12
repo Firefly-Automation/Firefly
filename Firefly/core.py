@@ -108,11 +108,18 @@ class Firefly(object):
     for device in devices:
       self.install_package(device.get('package'), **device)
 
-  def export_devices(self, config_file=DEVICE_FILE):
+  def export_devices(self, config_file: str=DEVICE_FILE, current_values: bool=True) -> None:
+    """
+    Export all devices with config and optional current states to a config file.
+
+    Args:
+      config_file (str): Path to config file.
+      current_values (bool): Include current values.
+    """
     logging.message('Exporting devices and states to config file.')
     devices = []
     for _, device in self.devices.items():
-      devices.append(device.export())
+      devices.append(device.export(current_values))
 
     with open(config_file, 'w') as file:
       json.dump(devices, file, indent=4, sort_keys=True)

@@ -2,9 +2,6 @@
     {
         "alias": "Test Device",
         "device_id": "66fdff0a-1fa5-4234-91bc-465c72aafb23",
-        "initial_values": {
-            "_state": "ON"
-        },
         "package": "Firefly.devices.test_device"
     }
 ]
