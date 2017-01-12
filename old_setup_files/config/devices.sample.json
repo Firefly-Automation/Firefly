@@ -1,0 +1,80 @@
+{
+  "Zach Presence" : {
+    "id" : "Zach Presence",
+    "package" : "ffPresence",
+    "module" : "ffPresence",
+    "type" : "device", 
+    "subType" : "presence",
+    "name" : "Zach Presence",
+    "args" : {
+      "name" : "Zach Presence",
+      "notify_present" : true,
+      "notify_not_present" : true,
+      "notify_device" : "all"
+    }
+  },
+  "Ariel Presence" : {
+    "id" : "Ariel Presence",
+    "package" : "ffPresence",
+    "module" : "ffPresence",
+    "type" : "device", 
+    "subType" : "presence",
+    "name" : "Ariel Presence",
+    "args" : {
+      "name" : "Ariel Presence",
+      "notify_present" : true,
+      "notify_not_present" : true,
+      "notify_device" : "all"
+    }
+  },
+  "ZachPushover" : {
+    "id" : "ZachPushover",
+    "package" : "ffPushover",
+    "module" : "ffPushover",
+    "type" : "device",
+    "subType" : "notification",
+    "name" : "ZachPushover",
+    "args" : {
+      "name" : "ZachPushover",
+      "api_key" : "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "user_key" : "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    }
+  },
+  "Hue" : {
+    "id" : "hue",
+    "package" : "ffHue",
+    "module" : "ffHue",
+    "type" : "device",
+    "subType" : "light",
+    "args" : {
+      "name" : "Hue",
+      "username" : "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "install_lights"  : true,
+      "install_groups" : true
+    }
+  },
+  "zwave" : {
+    "id" : "zwave",
+    "package" : "ffZwave",
+    "module" : "ffZwave",
+    "type" : "device",
+    "subType" : "hub",
+    "args" : {
+      "configFile" : "/opt/firefly_system/python-openzwave-0.3.1/openzwave/config",
+      "port" : "/dev/ttyACM0"
+    }
+  },
+    "nest" : {
+    "id" : "nest",
+    "package" : "ffNest",
+    "module" : "ffNest",
+    "type" : "device",
+    "subType" : "thermostat",
+    "args" : {
+      "name" : "nest",
+      "serial":"09AB01AC35160D3P",
+      "f":true,
+      "where":"downstairs"
+    }
+  }
+}

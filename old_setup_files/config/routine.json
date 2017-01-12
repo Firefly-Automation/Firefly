@@ -1,0 +1,36 @@
+{
+  "routines": [
+    {
+      "id": "home",
+      "type": "routine",
+      "mode": "home",
+      "icon": "home",
+      "actions": {
+      },
+      "actions_night": {
+
+      },
+      "actions_day": {
+
+      },
+      "triggers": [
+
+      ],
+      "scheduling": [
+      ],
+      "sunrise_offset": -2,
+      "notification_devices": [
+
+      ],
+      "notification_message": "Firefly has changed mode to Home!",
+      "mode_no_run": [
+        "home",
+        "night",
+        "away",
+        "vacation"
+      ],
+      "mode_run": [
+      ]
+    }
+  ]
+}

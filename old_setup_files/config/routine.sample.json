@@ -1,0 +1,382 @@
+{
+  "routines": [
+    {
+      "id": "home",
+      "type": "routine",
+      "mode": "home",
+      "icon": "home",
+      "actions": {
+        "nest": "home"
+      },
+      "actions_night": {
+        "hue-group-4": {"setLight": {"on": true, "level": 1, "preset": "soft white", "transitiontime": 1}},
+        "hue-group-4": {"setLight": {"on": true, "level": 100, "preset": "soft white"}}
+      },
+      "actions_day": {
+        "hue-group-4": {"setLight": {"on": true, "level": 1, "preset": "noon", "transitiontime": 1}},
+        "hue-group-4": {"setLight": {"on": true, "level": 100, "preset": "noon"}}
+      },
+      "triggers": [
+        {"zwave-node-13": {"open": true}}
+      ],
+      "scheduling": [
+      ],
+      "sunrise_offset": -2,
+      "notification_devices": [
+        "ZachPushover",
+        "GuestPushover"
+      ],
+      "speech": "This will get spoken out",
+      "speech_device": "All Chirps",
+      "notification_message": "Firefly has changed mode to Home!",
+      "mode_no_run": [
+        "home",
+        "night",
+        "away",
+        "vacation"
+      ],
+      "mode_run": [
+      ]
+    },
+    {
+      "id": "art-mode",
+      "type": "routine",
+      "mode": "home",
+      "icon": "brush",
+      "actions": {
+      },
+      "actions_night": {
+        "hue-group-4": {"setLight": {"on": true, "level": 1, "preset": "cloudy", "transitiontime": 1}},
+        "hue-group-4": {"setLight": {"on": true, "level": 100, "preset": "cloudy"}}
+      },
+      "actions_day": {
+        "hue-group-4": {"setLight": {"on": true, "level": 1, "preset": "cloudy", "transitiontime": 1}},
+        "hue-group-4": {"setLight": {"on": true, "level": 100, "preset": "cloudy"}}
+      },
+      "triggers": [
+      ],
+      "scheduling": [
+      ],
+      "notification_devices": [
+      ],
+      "notification_message": "Firefly has changed mode to Art Mode!",
+      "mode_no_run": [
+      ],
+      "mode_run": [
+      ]
+    },
+    {
+      "id": "arriving",
+      "type": "routine",
+      "mode": "arriving",
+      "icon": "transfer_within_a_station",
+      "actions": {
+        "nest": "home"
+      },
+      "actions_night": {
+      },
+      "actions_day": {
+      },
+      "triggers": [
+        {"ZachPresence": {"presence": true}},
+        {"ArielPresence": {"presence": true}},
+        {"SerenaPresence": {"presence": true}}
+      ],
+      "scheduling": [
+      ],
+      "notification_devices": [
+        "ZachPushover",
+        "GuestPushover"
+      ],
+      "notification_message": "Firefly has changed mode to Arriving!",
+      "mode_no_run": [
+        "home",
+        "arriving",
+        "night"
+      ],
+      "mode_run": [
+        "away"
+      ]
+    },
+    {
+      "id": "sunset",
+      "type": "routine",
+      "mode": null,
+      "actions": {
+        "hue-group-4": {"ctfade": {"startK": 6000, "endK": 2700, "fadeS": 1200}}
+      },
+      "actions_night": {
+      },
+      "actions_day": {
+      },
+      "triggers": [
+        {"location": {"time": "sunset"}}
+      ],
+      "scheduling": [
+      ],
+      "notification_devices": [
+        "ZachPushover"
+      ],
+      "notification_message": "Firefly is changing to sunset colors",
+      "mode_no_run": [
+      ],
+      "mode_run": [
+        "home"
+      ]
+    },
+    {
+      "id": "away",
+      "type": "routine",
+      "mode": "away",
+      "icon": "directions_run",
+      "actions": {
+        "zwave-node-11": "off",
+        "zwave-node-17": "off",
+        "lgtv": {"cmd": "POWER"},
+        "nest": "away"
+      },
+      "actions_night": {
+        "hue-group-3": {"setLight": {"on": false}},
+        "hue-light-1": {"setLight": {"on": false}},
+        "hue-light-5": {"setLight": {"name": "indigo", "level": 10}},
+        "hue-light-2": {"setLight": {"name": "indigo", "level": 20}}
+      },
+      "actions_day": {
+        "hue-group-4": {"switch": "off"}
+      },
+      "triggers": [
+        {
+          "ZachPresence": {"presence": false}, "ArielPresence": {"presence": false},
+          "SerenaPresence": {"presence": false}
+        },
+        {
+          "ZachPresence": {"presence": false}, "ArielPresence": {"presence": false},
+          "SerenaPresence": {"presence": false}, "location": {"time": "sunset"}
+        }
+      ],
+      "scheduling": [
+      ],
+      "notification_devices": [
+        "ZachPushover",
+        "GuestPushover"
+      ],
+      "notification_message": "Firefly has changed mode to Away!",
+      "mode_no_run": [
+        "vacation"
+      ],
+      "mode_run": [
+      ]
+    },
+    {
+      "id": "night",
+      "type": "routine",
+      "mode": "night",
+      "icon": "brightness_3",
+      "actions": {
+        "zwave-node-11": "off",
+        "lgtv": {"cmd": "POWER"}
+      },
+      "actions_night": {
+        "hue-light-1": {"setLight": {"on": false}},
+        "hue-group-4": {"setLight": {"on": false, "level": 1, "transitiontime": 200}},
+        "hue-light-5": {"setLight": {"on": true, "name": "indigo", "level": 20, "transitiontime": 200}}
+      },
+      "actions_day": {
+        "hue-group-3": {"setLight": {"on": false}},
+        "lgtv": {"cmd": "POWER"}
+      },
+      "triggers": [
+      ],
+      "scheduling": [
+        {"minute": 30, "hour": 2, "days": "*"}
+      ],
+      "notification_devices": [
+        "ZachPushover",
+        "GuestPushover"
+      ],
+      "notification_message": "Firefly has changed mode to Night!",
+      "mode_no_run": [
+        "away"
+      ],
+      "mode_run": [
+      ]
+    },
+    {
+      "id": "late-Night",
+      "type": "routine",
+      "mode": "home",
+      "icon": "brightness_2",
+      "actions": {
+        "zwave-node-11": "off",
+        "lgtv": {"cmd": "POWER"}
+      },
+      "actions_night": {
+        "hue-group-4": {"setLight": {"on": true, "level": 50, "preset": "candle", "transitiontime": 20}}
+      },
+      "actions_day": {
+      },
+      "triggers": [
+      ],
+      "scheduling": [
+      ],
+      "notification_devices": [
+        "ZachPushover"
+      ],
+      "notification_message": "Firefly has changed mode to Late Night!",
+      "mode_no_run": [
+      ],
+      "mode_run": [
+      ]
+    },
+    {
+      "id": "morning",
+      "type": "routine",
+      "mode": "morning",
+      "icon": "brightness_4",
+      "actions": {
+        "hue-group-4": {"setLight": {"preset": "candle", "transitiontime": 1, "level": 1}},
+        "hue-group-4": {"ctfade": {"startK": 2000, "endK": 5200, "fadeS": 1200, "startL": 1, "endL": 100}}
+      },
+      "actions_night": {
+      },
+      "actions_day": {
+      },
+      "triggers": [
+        {"location": {"time": "dawn"}}
+      ],
+      "scheduling": [
+        {
+          "minute": 20, "hour": 6, "days": [
+          "sun",
+          "mon",
+          "tue",
+          "wed"
+        ]
+        },
+        {
+          "minute": 30, "hour": 9, "days": [
+          "thu",
+          "fri",
+          "sat"
+        ]
+        }
+      ],
+      "notification_devices": [
+        "ZachPushover"
+      ],
+      "notification_message": "Firefly has changed mode to Morning!",
+      "mode_no_run": [
+        "home",
+        "morning"
+      ],
+      "mode_run": [
+        "night"
+      ]
+    },
+    {
+      "id": "sexy",
+      "type": "routine",
+      "mode": "sexy",
+      "icon": "whatshot",
+      "actions": {
+        "zwave-node-11": "off"
+      },
+      "actions_night": {
+        "hue-group-3": {"setLight": {"on": false, "transitiontime": 200}},
+        "hue-light-5": {"setLight": {"name": "indigo", "level": 20, "transitiontime": 200}},
+        "hue-light-6": {"setLight": {"name": "navy", "level": 10, "transitiontime": 200}},
+        "hue-light-9": {"setLight": {"name": "red", "level": 10, "transitiontime": 200}},
+        "hue-light-10": {"setLight": {"name": "navy", "level": 10, "transitiontime": 200}}
+      },
+      "actions_day": {
+        "hue-group-3": {"setLight": {"on": false}}
+      },
+      "triggers": [
+      ],
+      "scheduling": [
+      ],
+      "notification_devices": [
+        "ZachPushover"
+      ],
+      "notification_message": "Firefly has changed mode to Sexy!",
+      "mode_no_run": [
+      ],
+      "mode_run": [
+      ],
+      "run_time_ranges": [
+      ],
+      "no_run_time_ranges": [
+      ]
+    },
+    {
+      "id": "low-power",
+      "type": "routine",
+      "mode": "lowpower",
+      "icon": "battery_alert",
+      "actions": {
+        "nest": "away"
+      },
+      "actions_night": {
+      },
+      "actions_day": {
+        "hue-group-3": {"setLight": {"on": false}},
+        "zwave-node-11": "off"
+      },
+      "triggers": [
+      ],
+      "scheduling": [
+      ],
+      "notification_devices": [
+        "ZachPushover"
+      ],
+      "notification_message": "Firefly has changed mode to Low Power Mode!",
+      "mode_no_run": [
+      ],
+      "mode_run": [
+        "home"
+      ],
+      "run_time_ranges": [
+      ],
+      "no_run_time_ranges": [
+      ]
+    },
+    {
+      "id": "vacation",
+      "type": "routine",
+      "mode": "vacation",
+      "icon": "local_airport",
+      "actions": {
+      },
+      "actions_night": {
+        "hue-group-3": {"setLight": {"on": false}},
+        "hue-light-1": {"setLight": {"on": false}},
+        "hue-light-5": {"setLight": {"name": "indigo", "level": 30}},
+        "hue-light-2": {"setLight": {"name": "indigo", "level": 30}},
+        "zwave-node-11": "off"
+      },
+      "actions_day": {
+        "hue-group-3": {"setLight": {"on": false}},
+        "zwave-node-11": "off"
+      },
+      "triggers": [
+        {"location": {"time": "sunset"}},
+        {"location": {"time": "sunrise"}}
+      ],
+      "scheduling": [
+      ],
+      "notification_devices": [
+        "ZachPushover"
+      ],
+      "notification_message": "Vacation Mode has been activated.",
+      "mode_no_run": [
+      ],
+      "mode_run": [
+        "vacation"
+      ],
+      "run_time_ranges": [
+      ],
+      "no_run_time_ranges": [
+      ]
+    }
+  ]
+}
