@@ -96,15 +96,26 @@ class Firefly(object):
     Export current values to backup files to restore current config on reboot.
     """
     logging.message('Exporting current config.')
+    self.export_devices()
     aliases.export_aliases()
 
   def import_devices(self, config_file=DEVICE_FILE):
+    logging.message('Importing devices from config file.')
     devices = {}
     with open(config_file) as file:
       devices = json.loads(file.read())
 
     for device in devices:
       self.install_package(device.get('package'), **device)
+
+  def export_devices(self, config_file=DEVICE_FILE):
+    logging.message('Exporting devices and states to config file.')
+    devices = []
+    for _, device in self.devices.items():
+      devices.append(device.export())
+
+    with open(config_file, 'w') as file:
+      json.dump(devices, file, indent=4, sort_keys=True)
 
   def install_package(self, module: str, **kwargs):
     """
