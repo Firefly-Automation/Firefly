@@ -12,7 +12,7 @@ from Firefly import logging
 from Firefly import aliases
 from Firefly import scheduler
 from Firefly.helpers.location import Location
-from Firefly.const import (ACTION_ON, DEVICE_FILE)
+from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE)
 
 import importlib
 
@@ -40,7 +40,7 @@ class Firefly(object):
       print(device.export())
 
     # TODO: Remove this. This is a POC for scheduler.
-    c = Command('Test Device', 'web_api', ACTION_ON)
+    c = Command('Test Device', 'web_api', ACTION_TOGGLE)
     print(c.export())
     d_args = c.export()
     d = Command(**d_args)

@@ -1,5 +1,5 @@
 from Firefly import logging
-from Firefly.const import (STATE_OFF, STATE_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON)
+from Firefly.const import (STATE_OFF, STATE_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_TOGGLE)
 
 from Firefly.helpers.device import Device
 
@@ -8,7 +8,7 @@ TITLE = 'Test Light Device'
 AUTHOR = 'Zachary Priddy - me@zpriddy.com'
 # Writing install package to device instead of metadata package so reinstall scripts will function correctly.
 PACKAGE = 'TestDevice'
-COMMANDS = [ACTION_OFF, ACTION_ON]
+COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE]
 REQUESTS = [STATE]
 INITIAL_VALUES = {'_state': STATE_OFF}
 
@@ -24,6 +24,7 @@ class TestDevice(Device):
 
     self.add_command(ACTION_OFF, self.off)
     self.add_command(ACTION_ON, self.on)
+    self.add_command(ACTION_TOGGLE, self.toggle)
 
     self.add_request(STATE, self.get_state)
 
@@ -40,6 +41,11 @@ class TestDevice(Device):
   def on(self, **kwargs):
     self._state = STATE_ON
     return EVENT_ACTION_ON
+
+  def toggle(self, **kwargs):
+    if self.state == STATE_ON:
+      return self.off()
+    return self.on()
 
   def get_state(self, **kwargs):
     return self.state
