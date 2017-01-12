@@ -21,9 +21,9 @@ import os
 app = web.Application()
 
 
-
 class Firefly(object):
   ''' Core running loop and scheduler of Firefly'''
+
   def __init__(self, settings):
     logging.message('Initializing Firefly')
     self.settings = settings
@@ -33,12 +33,11 @@ class Firefly(object):
     self._devices = {}
 
     # TODO: POC of passing initial values. These values would comve from the export of the current state.
-    #self.install_package('Firefly.devices.test_device', alias='Test Device', initial_values={'_state': 'UNKNOWN'})
+    # self.install_package('Firefly.devices.test_device', alias='Test Device', initial_values={'_state': 'UNKNOWN'})
     self.import_devices()
 
     for _, device in self._devices.items():
       print(device.export())
-
 
     # TODO: Remove this. This is a POC for scheduler.
     c = Command('Test Device', 'web_api', ACTION_ON)
@@ -47,15 +46,13 @@ class Firefly(object):
     d = Command(**d_args)
     scheduler.runEveryS(15, self.send_command, command=d)
 
-
     # TODO: Leave In.
     scheduler.runEveryM(10, self.export_current_values)
 
-
-
   def start(self) -> None:
-    ''' Start up Firefly.
-    '''
+    """
+    Start up Firefly.
+    """
     # TODO: Import current state of devices on boot.
 
     logging.message('Starting Firefly')
@@ -66,7 +63,6 @@ class Firefly(object):
       pass
     finally:
       self.stop()
-
 
   def stop(self) -> None:
     ''' Shutdown firefly.
@@ -108,7 +104,7 @@ class Firefly(object):
     for device in devices:
       self.install_package(device.get('package'), **device)
 
-  def export_devices(self, config_file: str=DEVICE_FILE, current_values: bool=True) -> None:
+  def export_devices(self, config_file: str = DEVICE_FILE, current_values: bool = True) -> None:
     """
     Export all devices with config and optional current states to a config file.
 
@@ -174,7 +170,6 @@ class Firefly(object):
       return False
     return self.devices[request.device].request(request)
 
-
   @asyncio.coroutine
   def send_command(self, command: Command) -> bool:
     """
@@ -195,13 +190,11 @@ class Firefly(object):
       return False
     return self.devices[command.device].command(command)
 
-
   def add_route(self, route, method, handler):
     app.router.add_route(method, route, handler)
 
   def add_get(self, route, handler, *args):
     app.router.add_get(route, handler)
-
 
   @property
   def devices(self):

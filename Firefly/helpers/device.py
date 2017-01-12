@@ -39,7 +39,7 @@ class Device(object):
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
 
-  def export(self, current_values: bool=True) -> dict:
+  def export(self, current_values: bool = True) -> dict:
 
     """
     Export device config with options current values to a dictionary.

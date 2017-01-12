@@ -8,15 +8,16 @@ from Firefly.const import (SOURCE_LOCATION, EVENT_TYPE_BROADCAST, DAY_EVENTS)
 
 from Firefly.helpers.events import Event
 
-#from core.utils.notify import Notification
+# from core.utils.notify import Notification
 from Firefly import scheduler
 
-#from core import ffEvent
+
+# from core import ffEvent
 
 class Location(object):
   def __init__(self, firefly, zipcode, modes):
     self._firefly = firefly
-    self._modes=modes
+    self._modes = modes
     self._zipcode = zipcode
     self._isDark = True
     self._city = None
@@ -32,7 +33,6 @@ class Location(object):
 
     self.setupScheduler()
 
-
   def setupScheduler(self):
     for e in DAY_EVENTS:
       day_event_time = self.getNextDayEvent(e)
@@ -41,10 +41,10 @@ class Location(object):
 
   def DayEventHandler(self, day_event):
     logging.info('day event handler - event: {}'.format(day_event))
-    #TODO: Remove
+    # TODO: Remove
     # Notification('ZachPushover', 'LOCATION: is it {}'.format(day_event))
-    #ffEvent('location', {'time': day_event})
-    event = Event(SOURCE_LOCATION,EVENT_TYPE_BROADCAST, event_action=day_event)
+    # ffEvent('location', {'time': day_event})
+    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action=day_event)
     next_day_event_time = self.getNextDayEvent(day_event)
     scheduler.runAt(next_day_event_time, self.DayEventHandler, day_event=day_event, job_id=day_event)
 

@@ -1,12 +1,13 @@
 import logging
 
 LOGGING_LEVEL = {
-  'debug': logging.DEBUG,
-  'info': logging.INFO,
-  'warn': logging.WARNING,
-  'error': logging.ERROR,
+  'debug':    logging.DEBUG,
+  'info':     logging.INFO,
+  'warn':     logging.WARNING,
+  'error':    logging.ERROR,
   'critical': logging.CRITICAL
 }
+
 
 class FireflyLogging(object):
   '''FireflyLogging waraps the default logging module.
@@ -14,6 +15,7 @@ class FireflyLogging(object):
   Using FireflyLogging allows logging messages to also go into the database be be used and displayed in the ui. This is
   a work in progress and only logs out to the screen now.
   '''
+
   def __init__(self, filename=None, level='debug'):
     if filename:
       logging.basicConfig(filename=filename)
