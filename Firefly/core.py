@@ -28,7 +28,7 @@ class Firefly(object):
     logging.message('Initializing Firefly')
     self.settings = settings
     self.loop = asyncio.get_event_loop()
-    self.subscriptions = Subscriptions()
+    self._subscriptions = Subscriptions()
     self.location = Location(self, "95110", ['HOME'])
     self._devices = {}
 
@@ -44,10 +44,10 @@ class Firefly(object):
     print(c.export())
     d_args = c.export()
     d = Command(**d_args)
-    scheduler.runEveryS(15, self.send_command, command=d)
+    scheduler.runEveryM(1, self.send_command, command=d)
 
     # TODO: Leave In.
-    scheduler.runEveryM(10, self.export_current_values)
+    scheduler.runEveryM(1, self.export_current_values)
 
   def start(self) -> None:
     """
@@ -97,6 +97,7 @@ class Firefly(object):
 
   def import_devices(self, config_file=DEVICE_FILE):
     logging.message('Importing devices from config file.')
+    # TODO: Check for duplicate alias and or IDs.
     devices = {}
     with open(config_file) as file:
       devices = json.loads(file.read())
@@ -141,7 +142,7 @@ class Firefly(object):
 
   @asyncio.coroutine
   def _send_event(self, event: Event) -> None:
-    send_to = self.subscriptions.get_subscribers(event.source, event_action=event.event_action)
+    send_to = self._subscriptions.get_subscribers(event.source, event_action=event.event_action)
     logging.debug('Sending Event: %s -> %s' % (event, str(send_to)))
     for s in send_to:
       yield from self.__send_event(s, event)
@@ -199,6 +200,10 @@ class Firefly(object):
   @property
   def devices(self):
     return self._devices
+
+  @property
+  def subscriptions(self):
+    return self._subscriptions
 
 
 async def myTestFunction():

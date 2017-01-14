@@ -45,10 +45,7 @@ class Location(object):
     # Notification('ZachPushover', 'LOCATION: is it {}'.format(day_event))
     # ffEvent('location', {'time': day_event})
     event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action=day_event)
-    print('Triggering Day Event')
-    print(event)
-    yield from self._firefly.send_event(event)
-    print('Done sending event')
+    self._firefly.send_event(event)
     next_day_event_time = self.getNextDayEvent(day_event)
     scheduler.runAt(next_day_event_time, self.DayEventHandler, day_event=day_event, job_id=day_event)
 
@@ -70,7 +67,8 @@ class Location(object):
     mode = str(mode)
     if mode in self.modes:
       self._mode = mode
-      ffEvent('location', {'mode': self.mode})
+      #ffEvent('location', {'mode': self.mode})
+      event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST,'EVENT_ACTION_MODE')
       return True
     return False
 

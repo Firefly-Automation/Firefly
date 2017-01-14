@@ -30,7 +30,7 @@ class Device(object):
 
     # If no device ID given -> generate random ID.
     if not device_id:
-      device_id = uuid.uuid4()
+      device_id = str(uuid.uuid4())
 
     self._id = device_id
     self._alias = alias if alias else device_id

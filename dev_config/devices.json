@@ -6,5 +6,13 @@
             "_state": "OFF"
         },
         "package": "Firefly.devices.test_device"
+    },
+    {
+        "alias": "Test Device2",
+        "device_id": "f917a699-1aa3-4d71-b5b8-cbc8ff2c52a6",
+        "initial_values": {
+            "_state": "OFF"
+        },
+        "package": "Firefly.devices.test_device"
     }
 ]
