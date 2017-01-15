@@ -52,9 +52,7 @@ class Location(object):
     event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action=day_event)
     yield from self._firefly.send_event(event)
     # TODO: Remove
-    # print(event)
     # scheduler.runInS(0, self._firefly.send_event, event=event)
-    # print('**********************************************************************************************************')
     next_day_event_time = self.getNextDayEvent(day_event)
     scheduler.runAt(next_day_event_time, self.DayEventHandler, day_event=day_event, job_id=day_event)
 

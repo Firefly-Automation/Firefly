@@ -18,6 +18,8 @@ class Routine(object):
     self._conditions = {}
 
   def add_trigger(self, trigger, **kwargs):
+    # TODO: Check trigger for list, dict or Trigger and properly import it. This can be useful to exporting/importing triggers
+    # TODO cont: This might be a automation export / import function that can be called from the child object
     self._triggers.add_trigger(trigger)
 
   def add_condition(self, condition: dict) -> None:
