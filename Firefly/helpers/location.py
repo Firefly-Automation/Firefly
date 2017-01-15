@@ -8,14 +8,14 @@ from Firefly.const import (SOURCE_LOCATION, EVENT_TYPE_BROADCAST, DAY_EVENTS)
 
 from Firefly.helpers.events import Event
 
-# from core.utils.notify import Notification
 from Firefly import scheduler
 
+import asyncio
 
-# from core import ffEvent
 
 class Location(object):
   def __init__(self, firefly, zipcode, modes):
+    logging.info('Setup Location')
     self._firefly = firefly
     self._modes = modes
     self._zipcode = zipcode
@@ -33,19 +33,28 @@ class Location(object):
 
     self.setupScheduler()
 
+  #@asyncio.coroutine
   def setupScheduler(self):
+    logging.debug('******* SETUP LOCATION *************')
     for e in DAY_EVENTS:
       day_event_time = self.getNextDayEvent(e)
       logging.info('Day Event: {} Time: {}'.format(e, str(day_event_time)))
       scheduler.runAt(day_event_time, self.DayEventHandler, day_event=e, job_id=e)
+      #scheduler.runAt(self.now + timedelta(seconds=3), self.DayEventHandler, day_event=e, job_id=e)
 
+    # TODO: Remove this
+    #event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action='STARTUP')
+    #scheduler.runInS(0, self._firefly.send_event, event=event)
+
+  @asyncio.coroutine
   def DayEventHandler(self, day_event):
     logging.info('day event handler - event: {}'.format(day_event))
-    # TODO: Remove
-    # Notification('ZachPushover', 'LOCATION: is it {}'.format(day_event))
-    # ffEvent('location', {'time': day_event})
     event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action=day_event)
-    self._firefly.send_event(event)
+    yield from self._firefly.send_event(event)
+    # TODO: Remove
+    # print(event)
+    # scheduler.runInS(0, self._firefly.send_event, event=event)
+    # print('**********************************************************************************************************')
     next_day_event_time = self.getNextDayEvent(day_event)
     scheduler.runAt(next_day_event_time, self.DayEventHandler, day_event=day_event, job_id=day_event)
 
@@ -67,8 +76,8 @@ class Location(object):
     mode = str(mode)
     if mode in self.modes:
       self._mode = mode
-      #ffEvent('location', {'mode': self.mode})
-      event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST,'EVENT_ACTION_MODE')
+      # ffEvent('location', {'mode': self.mode})
+      event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, 'EVENT_ACTION_MODE')
       return True
     return False
 

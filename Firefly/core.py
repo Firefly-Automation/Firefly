@@ -12,7 +12,7 @@ from Firefly import logging
 from Firefly import aliases
 from Firefly import scheduler
 from Firefly.helpers.location import Location
-from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE)
+from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE, EVENT_ACTION_ANY, SOURCE_LOCATION)
 
 import importlib
 
@@ -36,18 +36,28 @@ class Firefly(object):
     # self.install_package('Firefly.devices.test_device', alias='Test Device', initial_values={'_state': 'UNKNOWN'})
     self.import_devices()
 
-    for _, device in self._devices.items():
-      print(device.export())
+    #for _, device in self._devices.items():
+    #  print(device.export())
+
+    # TODO: Test of routines
+    from Firefly.automation.routine import Routine
+    from Firefly.automation.triggers import Trigger
+    self._devices['test_routine'] = Routine(self, 'test_routine')
+    self._devices['test_routine'].add_trigger(Trigger('66fdff0a-1fa5-4234-91bc-465c72aafb23',EVENT_ACTION_ANY))
+    self._devices['test_routine'].add_trigger(Trigger(SOURCE_LOCATION, EVENT_ACTION_ANY))
+
+
+
 
     # TODO: Remove this. This is a POC for scheduler.
     c = Command('Test Device', 'web_api', ACTION_TOGGLE)
     print(c.export())
     d_args = c.export()
     d = Command(**d_args)
-    scheduler.runEveryM(1, self.send_command, command=d)
+    scheduler.runEveryH(1, self.send_command, command=d)
 
     # TODO: Leave In.
-    scheduler.runEveryM(1, self.export_current_values)
+    scheduler.runEveryH(1, self.export_current_values)
 
   def start(self) -> None:
     """
@@ -136,7 +146,6 @@ class Firefly(object):
     package.Setup(self, module, **kwargs)
 
   @asyncio.coroutine
-  @asyncio.coroutine
   def send_event(self, event: Event) -> None:
     yield from self.add_task(self._send_event(event))
 
@@ -163,6 +172,7 @@ class Firefly(object):
       Requested data.
     """
     result = yield from self.add_task(self._send_request(request))
+    #result =  yield from self.loop.create_task(self._send_request(request))
     return result
 
   @asyncio.coroutine
@@ -206,5 +216,5 @@ class Firefly(object):
     return self._subscriptions
 
 
-async def myTestFunction():
+def myTestFunction():
   print('Running Test Function')

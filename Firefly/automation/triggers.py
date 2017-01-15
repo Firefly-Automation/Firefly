@@ -5,8 +5,6 @@ from Firefly.const import SOURCE_TRIGGER, EVENT_ACTION_ANY
 
 from typing import TypeVar, List
 
-
-
 """
 An individual trigger should be a dict type. Each individual trigger will be treated as an 'OR' trigger. Meaning
 Trigger A 'OR' Trigger B.
@@ -57,8 +55,10 @@ Example Trigger:
 
 """
 
+
 class Trigger(object):
-  def __init__(self, listen_id: str, listen_action: str='', request: str='', request_verify: str='', source: str=SOURCE_TRIGGER):
+  def __init__(self, listen_id: str, listen_action: str = '', request: str = '', request_verify: str = '',
+               source: str = SOURCE_TRIGGER):
     self._listen_id = listen_id
     self._listen_action = listen_action if listen_action else EVENT_ACTION_ANY
     self._request = request
@@ -102,7 +102,7 @@ class Trigger(object):
 
   @property
   def request(self):
-    Request(self.listen_id, self.source, self.request_property)
+    return Request(self.listen_id, self.source, self.request_property)
 
 
 TriggerType = TypeVar('TriggerType', Trigger, List[Trigger])
@@ -201,7 +201,6 @@ class Triggers(object):
         index += 1
     return False
 
-
   def export(self):
     logging.info('Exporting triggers')
     export_data = []
@@ -233,7 +232,9 @@ class Triggers(object):
 
     return import_count
 
-  def check_triggers(self, event: Event, ignore_event: bool=False, **kwargs) -> bool:
+
+
+  def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
     """
     Check triggers should be called when an event is received.
 
@@ -251,11 +252,43 @@ class Triggers(object):
                            met.
       **kwargs ():
     """
+    valid = len(self.triggers) > 0
     for trigger in self.triggers:
       if type(trigger) == Trigger:
         valid = True
         valid &= (event.source == trigger.listen_id)
         valid &= (event.event_action == trigger.listen_action or trigger.listen_action == EVENT_ACTION_ANY)
+
+        if (trigger.request_property != '' and trigger.request_verify != '' and trigger.request_verify != EVENT_ACTION_ANY) and not ignore_event:
+          response = self._firefly.send_request(trigger.request)
+          valid &= response == trigger.request_verify
+
+        # If a single trigger is valid then it should respond as true.
+        if valid:
+          return True
+
+      # TODO: rewrite this... This is from hell
+      if type(trigger) == list:
+        for t in trigger:
+          valid_t = True
+          valid_event = False
+          no_request_count = 0
+          # If trigger is not type Trigger then it fails
+          if not type(t) == Trigger:
+            valid = False
+          if (event.source == t.listen_id) and (event.event_action == t.listen_action or t.listen_action == EVENT_ACTION_ANY):
+            valid_event = True
+          if (t.request_property != '' and t.request_verify != '' and t.request_verify != EVENT_ACTION_ANY) and not ignore_event:
+            response = self._firefly.send_request(t.request)
+            valid_t &= response == t.request_verify
+          elif t.request_property == '' and t.request_verify == '':
+            no_request_count += 1
+
+          if valid_t or ((no_request_count <= 1 and valid_event) or ignore_event):
+            valid_t &= True
+          else:
+            valid_t &= False
+          valid &= valid_t
         if valid:
           return True
 

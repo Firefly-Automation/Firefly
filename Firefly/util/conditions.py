@@ -5,7 +5,7 @@ from Firefly.const import (IS_DARK, IS_LIGHT, IS_MODE, IS_NOT_MODE, IS_NOT_TIME_
 def check_conditions(firefly, condition: dict) -> bool:
   verify = True
   if not condition:
-    return False
+    return True
 
   for c, value in condition.items():
     if c == IS_DARK:

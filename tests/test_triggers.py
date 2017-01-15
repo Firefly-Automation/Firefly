@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, PropertyMock
 from Firefly.automation.triggers import Trigger, Triggers
-from Firefly.const import EVENT_ACTION_CLOSE, STATE, STATE_CLOSED, STATE_ON, EVENT_TYPE_BROADCAST, EVENT_ACTION_ANY, EVENT_ACTION_OPEN
+from Firefly.const import EVENT_ACTION_CLOSE, STATE, STATE_CLOSED, STATE_ON, EVENT_TYPE_BROADCAST, EVENT_ACTION_ANY, EVENT_ACTION_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, STATE_OFF
 from Firefly.helpers.subscribers import Subscriptions
 from Firefly.helpers.events import Event
 
@@ -164,27 +164,121 @@ class TestTriggers(unittest.TestCase):
     self.assertEqual(triggers.export(), import_data)
 
 
+
   def test_check_trigger_one_simple(self):
-    triggers = Triggers(self.firefly, 'test_device')
-    trigger = Trigger('test_device2', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED)
-    triggers.add_trigger(trigger)
+    with patch('Firefly.core.Firefly.send_request') as mock:
+      mock.return_value = STATE_ON
 
-    event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_CLOSE)
-    valid = triggers.check_triggers(event)
-    self.assertTrue(valid)
+      self.firefly.send_request = mock
 
-    event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_OPEN)
-    valid = triggers.check_triggers(event)
-    self.assertFalse(valid)
+      triggers = Triggers(self.firefly, 'test_device')
+      trigger = Trigger('test_device2', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED)
+      triggers.add_trigger(trigger)
 
-    triggers = Triggers(self.firefly, 'test_device')
-    trigger = Trigger('test_device2', EVENT_ACTION_CLOSE, STATE, EVENT_ACTION_ANY)
-    triggers.add_trigger(trigger)
+      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_CLOSE)
+      valid = triggers.check_triggers(event, ignore_event=True)
+      self.assertTrue(valid)
 
-    event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_CLOSE)
-    valid = triggers.check_triggers(event)
-    self.assertTrue(valid)
+      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_OPEN)
+      valid = triggers.check_triggers(event)
+      self.assertFalse(valid)
 
+      triggers = Triggers(self.firefly, 'test_device')
+      trigger = Trigger('test_device2', EVENT_ACTION_CLOSE, STATE, EVENT_ACTION_ANY)
+      triggers.add_trigger(trigger)
+
+      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_CLOSE)
+      valid = triggers.check_triggers(event)
+      self.assertTrue(valid)
+
+
+  def test_check_trigger_one_with_request(self):
+    with patch('Firefly.core.Firefly.send_request') as mock:
+      mock.return_value = STATE_ON
+
+      self.firefly.send_request = mock
+
+      triggers = Triggers(self.firefly, 'test_device')
+      trigger = Trigger('test_device2', EVENT_ACTION_ON, STATE, STATE_ON)
+      triggers.add_trigger(trigger)
+
+      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
+      valid = triggers.check_triggers(event)
+      self.assertTrue(valid)
+
+      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_OFF)
+      valid = triggers.check_triggers(event)
+      self.assertFalse(valid)
+
+      triggers = Triggers(self.firefly, 'test_device')
+      trigger = Trigger('test_device2', EVENT_ACTION_ANY, STATE, STATE_ON)
+      triggers.add_trigger(trigger)
+
+      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_OFF)
+      valid = triggers.check_triggers(event)
+      self.assertTrue(valid)
+
+
+  def test_check_two_single_triggers(self):
+    with patch('Firefly.core.Firefly.send_request') as mock:
+      mock.return_value = STATE_ON
+
+      self.firefly.send_request = mock
+
+      triggers = Triggers(self.firefly, 'test_device')
+      trigger = Trigger('test_device2', EVENT_ACTION_ON, STATE, STATE_ON)
+      triggers.add_trigger(trigger)
+      trigger = Trigger('test_device1', EVENT_ACTION_ON, STATE, STATE_ON)
+      triggers.add_trigger(trigger)
+
+      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
+      valid = triggers.check_triggers(event)
+      self.assertTrue(valid)
+
+      event = Event('test_device1', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
+      valid = triggers.check_triggers(event)
+      self.assertTrue(valid)
+
+
+  def test_check_triggers_multiple(self):
+    with patch('Firefly.core.Firefly.send_request') as mock:
+      mock.return_value = STATE_ON
+
+      self.firefly.send_request = mock
+
+      triggers = Triggers(self.firefly, 'test_device')
+      trigger = [Trigger('test_device2', EVENT_ACTION_ON, STATE, STATE_ON), Trigger('test_device1', EVENT_ACTION_ON, STATE, STATE_OFF)]
+      triggers.add_trigger(trigger)
+
+      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
+      valid = triggers.check_triggers(event)
+      self.assertFalse(valid)
+
+      event = Event('test_device1', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
+      valid = triggers.check_triggers(event)
+      self.assertFalse(valid)
+
+      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_OFF)
+      valid = triggers.check_triggers(event)
+      self.assertFalse(valid)
+
+      triggers = Triggers(self.firefly, 'test_device')
+      trigger = [Trigger('test_device2', EVENT_ACTION_ON, STATE, STATE_ON),
+                 Trigger('test_device1', EVENT_ACTION_ON, STATE, STATE_ON)]
+      triggers.add_trigger(trigger)
+
+      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
+      valid = triggers.check_triggers(event)
+      self.assertTrue(valid)
+
+      triggers = Triggers(self.firefly, 'test_device')
+      trigger = [Trigger('test_device2', EVENT_ACTION_ON, STATE, STATE_ON),
+                 Trigger('test_device1', EVENT_ACTION_ON, STATE, STATE_OFF)]
+      triggers.add_trigger(trigger)
+
+      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
+      valid = triggers.check_triggers(event)
+      self.assertFalse(valid)
 
 
 

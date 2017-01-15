@@ -29,6 +29,8 @@ class Subscriptions(object):
     Returns:
       list: List of subscriber IDs
     """
+    if type(event_action) == str:
+      event_action = [event_action]
     listeners = []
     if subscriber_id not in self.subscriptions:
       return listeners
@@ -55,6 +57,9 @@ class Subscriptions(object):
       subscribe_to_id (str): id of device listening to.
       event_action (list): The event types to listen to.
     """
+    if type(event_action) == str:
+      event_action = [event_action]
+
     if subscribe_to_id not in self.subscriptions:
       self.subscriptions[subscribe_to_id] = {}
     subscriptions = self.subscriptions[subscribe_to_id]
@@ -77,6 +82,9 @@ class Subscriptions(object):
     Returns:
       (int): The number of subscriptions deleted
     """
+    if type(event_action) == str:
+      event_action = [event_action]
+
     deleted_subscriptions = 0
     if subscribe_to_id not in self.subscriptions:
       return 0
