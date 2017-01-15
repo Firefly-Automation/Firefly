@@ -47,3 +47,6 @@ class Routine(object):
 
   def event_handler(self, event, **kwargs):
     logging.critical('********************* ROUTINE ******************************')
+
+  def type(self):
+    return 'UNKNOWN'

@@ -12,7 +12,7 @@ from Firefly import logging
 from Firefly import aliases
 from Firefly import scheduler
 from Firefly.helpers.location import Location
-from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE, EVENT_ACTION_ANY, SOURCE_LOCATION)
+from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE, EVENT_ACTION_ANY, SOURCE_LOCATION, TYPE_DEVICE)
 
 import importlib
 
@@ -126,7 +126,8 @@ class Firefly(object):
     logging.message('Exporting devices and states to config file.')
     devices = []
     for _, device in self.devices.items():
-      devices.append(device.export(current_values))
+      if device.type == TYPE_DEVICE:
+        devices.append(device.export(current_values))
 
     with open(config_file, 'w') as file:
       json.dump(devices, file, indent=4, sort_keys=True)

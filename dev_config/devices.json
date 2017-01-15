@@ -5,7 +5,8 @@
         "initial_values": {
             "_state": "ON"
         },
-        "package": "Firefly.devices.test_device"
+        "package": "Firefly.devices.test_device",
+        "type": "TYPE_DEVICE"
     },
     {
         "alias": "Test Device2",
@@ -13,6 +14,7 @@
         "initial_values": {
             "_state": "OFF"
         },
-        "package": "Firefly.devices.test_device"
+        "package": "Firefly.devices.test_device",
+        "type": "TYPE_DEVICE"
     }
 ]

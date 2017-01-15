@@ -1,6 +1,6 @@
 from Firefly import logging
 from Firefly.helpers.events import Event, Command, Request
-from Firefly.const import EVENT_TYPE_BROADCAST
+from Firefly.const import EVENT_TYPE_BROADCAST, TYPE_DEVICE
 from typing import Callable, Any
 import uuid
 from Firefly.const import STATE
@@ -53,7 +53,8 @@ class Device(object):
     export_data = {
       'package':   self._package,
       'device_id': self.id,
-      'alias':     self._alias
+      'alias':     self._alias,
+      'type': self.type
     }
 
     if current_values:
@@ -142,3 +143,7 @@ class Device(object):
   @property
   def request_map(self):
     return self._request_mapping
+
+  @property
+  def type(self):
+    return TYPE_DEVICE
