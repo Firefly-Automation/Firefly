@@ -13,7 +13,6 @@ from Firefly import aliases
 from Firefly import scheduler
 from Firefly.helpers.location import Location
 from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE, EVENT_ACTION_ANY, SOURCE_LOCATION, TYPE_DEVICE)
-
 import importlib
 
 import os
@@ -35,6 +34,7 @@ class Firefly(object):
     # TODO: POC of passing initial values. These values would comve from the export of the current state.
     # self.install_package('Firefly.devices.test_device', alias='Test Device', initial_values={'_state': 'UNKNOWN'})
     self.import_devices()
+    #self.install_package('Firefly.components.virtual_devices.switch', alias='Test Device', initial_values={'_state': 'UNKNOWN'})
 
     #for _, device in self._devices.items():
     #  print(device.export())
@@ -144,6 +144,7 @@ class Firefly(object):
     """
     logging.message('Installing module from %s %s' % (module, str(kwargs)))
     package = importlib.import_module(module)
+    kwargs.pop('package')
     package.Setup(self, module, **kwargs)
 
   @asyncio.coroutine

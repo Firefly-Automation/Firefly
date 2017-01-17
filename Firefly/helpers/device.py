@@ -1,6 +1,6 @@
 from Firefly import logging
 from Firefly.helpers.events import Event, Command, Request
-from Firefly.const import EVENT_TYPE_BROADCAST, TYPE_DEVICE
+from Firefly.const import EVENT_TYPE_BROADCAST, TYPE_DEVICE,API_INFO_REQUEST
 from typing import Callable, Any
 import uuid
 from Firefly.const import STATE
@@ -8,14 +8,18 @@ from Firefly import aliases
 
 
 class Device(object):
-  def __init__(self, firefly, device_id, title, author, package, commands, requests, initial_values, alias=''):
+  def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
+    device_id = kwargs.get('ff_id')
+    alias = kwargs.get('alias')
+
     self._firefly = firefly
     self._title = title
     self._author = author
     self._package = package
     self._commands = commands
     self._requests = requests
-    self._initial_values = initial_values
+    self._device_type = device_type
+    self._initial_values = kwargs.get('initial_values')
     self._command_mapping = {}
     self._request_mapping = {}
 
@@ -52,7 +56,7 @@ class Device(object):
     """
     export_data = {
       'package':   self._package,
-      'device_id': self.id,
+      'ff_id': self.id,
       'alias':     self._alias,
       'type': self.type
     }
@@ -125,12 +129,27 @@ class Device(object):
 
     """
     logging.debug('%s: Got Request %s' % (self.id, request))
+    if request.request == API_INFO_REQUEST:
+      return self.get_api_info()
     if request.request in self.request_map.keys():
       return self.request_map[request.request](**request.args)
     return None
 
   def event(self, event: Event) -> None:
     logging.error('Devices currently dont support events')
+
+  def get_api_info(self):
+    return_data = {}
+    return_data['commands'] = self._commands
+    return_data['requests'] = self._requests
+    return_data['device_type'] = self._device_type
+    return_data.update(self.export())
+    return_data['current_values'] = return_data['initial_values']
+    return_data.pop('initial_values')
+    return_data['request_values'] = {}
+    for r in self._requests:
+      return_data['request_values'][r] = self.request_map[r]()
+    return return_data
 
   @property
   def id(self):

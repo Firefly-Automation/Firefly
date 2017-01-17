@@ -1,20 +1,11 @@
 [
     {
         "alias": "Test Device",
-        "device_id": "66fdff0a-1fa5-4234-91bc-465c72aafb23",
+        "ff_id": "66fdff0a-1fa5-4234-91bc-465c72aafb23",
         "initial_values": {
             "_state": "ON"
         },
-        "package": "Firefly.devices.test_device",
-        "type": "TYPE_DEVICE"
-    },
-    {
-        "alias": "Test Device2",
-        "device_id": "f917a699-1aa3-4d71-b5b8-cbc8ff2c52a6",
-        "initial_values": {
-            "_state": "OFF"
-        },
-        "package": "Firefly.devices.test_device",
+        "package": "Firefly.components.virtual_devices.switch",
         "type": "TYPE_DEVICE"
     }
 ]
