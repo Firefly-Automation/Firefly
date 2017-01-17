@@ -14,7 +14,7 @@ class Event(object):
   def __init__(self, source: str, event_type: str, event_action: str = '', **kwargs):
     self._source = source
     self._event_type = event_type
-    self._event_action = event_action
+    self._event_action = event_action if type(event_action) == list else [event_action]
     self._kwargs = kwargs
 
   def __str__(self):

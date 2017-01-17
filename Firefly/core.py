@@ -12,7 +12,7 @@ from Firefly import logging
 from Firefly import aliases
 from Firefly import scheduler
 from Firefly.helpers.location import Location
-from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE, EVENT_ACTION_ANY, SOURCE_LOCATION, TYPE_DEVICE)
+from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE, EVENT_ACTION_ANY, SOURCE_LOCATION, TYPE_DEVICE, EVENT_ACTION_LEVEL)
 import importlib
 
 import os
@@ -44,6 +44,8 @@ class Firefly(object):
     from Firefly.automation.triggers import Trigger
     self._devices['test_routine'] = Routine(self, 'test_routine')
     self._devices['test_routine'].add_trigger(Trigger('66fdff0a-1fa5-4234-91bc-465c72aafb23',EVENT_ACTION_ANY))
+    self._devices['test_routine'].add_trigger(Trigger('3b11cea9-a148-49d5-9467-bddb9f4ad937', EVENT_ACTION_LEVEL))
+    self._devices['test_routine'].add_trigger(Trigger('3b11cea9-a148-49d5-9467-bddb9f4ad937', EVENT_ACTION_ANY))
     self._devices['test_routine'].add_trigger(Trigger(SOURCE_LOCATION, EVENT_ACTION_ANY))
 
 

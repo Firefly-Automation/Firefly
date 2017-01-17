@@ -101,6 +101,8 @@ class Device(object):
     """
     state_before = self.__dict__.copy()
     logging.debug('%s: Got Command: %s' % (self.id, command.command))
+    print(command.args)
+    print(self.command_map)
     if command.command in self.command_map.keys():
       event_action = self.command_map[command.command](**command.args)
       if not event_action:
