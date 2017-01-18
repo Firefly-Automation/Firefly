@@ -96,7 +96,7 @@ Make a SmartApp in the SmartThings IDE
                POST: "postColor"
            ]
        }
-       path("/devices") {
+       path("/components") {
            action: [
                GET: "getDevices"
            ]

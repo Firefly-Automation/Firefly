@@ -5,7 +5,7 @@ sumblime_Firefly*
 .c9/*
 .c9.log
 *.pyc
-Firefly/config/devices.json
+Firefly/config/components.json
 design_notes
 Firefly/web_ui/certs/*
 *.sublime-*

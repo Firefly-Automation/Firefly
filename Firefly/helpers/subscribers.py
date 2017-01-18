@@ -19,7 +19,7 @@ class Subscriptions(object):
   def get_subscribers(self, subscriber_id: str, event_action: List[str] = [EVENT_ACTION_ANY]) -> List[str]:
     """Gets a list of subscribers.
 
-    Returns a list subscriber IDs that are subscribed to the device passed in for the event types that are pass and any
+    Returns a list subscriber IDs that are subscribed to the ff_id passed in for the event types that are pass and any
     subscriber that is listening to the EVENT_ACTION_ANY.
 
     Args:
@@ -54,7 +54,7 @@ class Subscriptions(object):
 
     Args:
       subscriber_id (str): subscriber id.
-      subscribe_to_id (str): id of device listening to.
+      subscribe_to_id (str): id of ff_id listening to.
       event_action (list): The event types to listen to.
     """
     if type(event_action) == str:

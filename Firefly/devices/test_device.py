@@ -6,7 +6,7 @@ from Firefly.helpers.device import Device
 
 TITLE = 'Test Light Device'
 AUTHOR = 'Zachary Priddy - me@zpriddy.com'
-# Writing install package to device instead of metadata package so reinstall scripts will function correctly.
+# Writing install package to ff_id instead of metadata package so reinstall scripts will function correctly.
 PACKAGE = 'TestDevice'
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE]
 REQUESTS = [STATE]

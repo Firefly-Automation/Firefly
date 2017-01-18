@@ -1,3 +1,5 @@
+import asyncio
+
 from Firefly import logging
 from Firefly.helpers.events import Event, Command, Request
 from Firefly.const import EVENT_TYPE_BROADCAST, TYPE_DEVICE,API_INFO_REQUEST
@@ -32,7 +34,7 @@ class Device(object):
       if aliases.get_alias(device_id):
         alias = aliases.get_alias(device_id)
 
-    # If no device ID given -> generate random ID.
+    # If no ff_id ID given -> generate random ID.
     if not device_id:
       device_id = str(uuid.uuid4())
 
@@ -46,13 +48,13 @@ class Device(object):
   def export(self, current_values: bool = True) -> dict:
 
     """
-    Export device config with options current values to a dictionary.
+    Export ff_id config with options current values to a dictionary.
 
     Args:
       current_values (bool): Include current values as new initial values.
 
     Returns:
-      (dict): A dict of the device config.
+      (dict): A dict of the ff_id config.
     """
     export_data = {
       'package':   self._package,
@@ -72,7 +74,7 @@ class Device(object):
 
   def add_command(self, command: str, function: Callable) -> None:
     """
-    Adds a command to the list of supported device commands.
+    Adds a command to the list of supported ff_id commands.
 
     Args:
       command (str): The string of the command
@@ -82,7 +84,7 @@ class Device(object):
 
   def add_request(self, request: str, function: Callable) -> None:
     """
-    Adds a request to the list of supported device requests.
+    Adds a request to the list of supported ff_id requests.
 
     Args:
       request (str): The string of the request
@@ -90,9 +92,10 @@ class Device(object):
     """
     self._request_mapping[request] = function
 
+  @asyncio.coroutine
   def command(self, command: Command) -> bool:
     """
-    Function that is called to send a command to a device.
+    Function that is called to send a command to a ff_id.
     Args:
       command (Command): The command to be sent in a Command object
 
@@ -101,8 +104,6 @@ class Device(object):
     """
     state_before = self.__dict__.copy()
     logging.debug('%s: Got Command: %s' % (self.id, command.command))
-    print(command.args)
-    print(self.command_map)
     if command.command in self.command_map.keys():
       event_action = self.command_map[command.command](**command.args)
       if not event_action:
@@ -120,7 +121,7 @@ class Device(object):
 
   def request(self, request: Request) -> Any:
     """
-    Function to request data from the device. The returned data can be in any format. Common formats should be:
+    Function to request data from the ff_id. The returned data can be in any format. Common formats should be:
       str, int, dict
 
     Args:

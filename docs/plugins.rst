@@ -10,7 +10,7 @@ Plugins have a small set of required functions and libraries in order to functio
 
 **NOTE: We do suggest using treq instead of requests to keep things running faster.**
 
-Difference between device plugin and app plugin:
+Difference between ff_id plugin and app plugin:
 
 Device Plugin:
    - Can reviece commands
@@ -18,25 +18,25 @@ Device Plugin:
 
 App Plugin:
    - Can receive events. (ie triggers)
-   - Can subscribe to events from devices
+   - Can subscribe to events from components
 
 ----------------
 Device Plugin
 ----------------
 
-There are two parts to the device plugins:
-   1. The device its self
-   2. The device installer script
+There are two parts to the ff_id plugins:
+   1. The ff_id its self
+   2. The ff_id installer script
 
-Device installer scripts can be used to install more than just one device. i.e: SmartThings installer script installs various device types using a common smartthings libary. By doing this the installer script sets up a refresh loop to refresh all devices that it installed.  
+Device installer scripts can be used to install more than just one ff_id. i.e: SmartThings installer script installs various ff_id types using a common smartthings libary. By doing this the installer script sets up a refresh loop to refresh all components that it installed.
 
 Device Template
 ----------------
-**NOTE: It is suggested to keep a 'getValue' function as shown in the sample device blow, But it is not required.**
+**NOTE: It is suggested to keep a 'getValue' function as shown in the sample ff_id blow, But it is not required.**
 
 .. code-block :: python
 
-  from core.models.device import Device
+  from core.models.ff_id import Device
   import logging
 
   class Device(Device):
@@ -66,7 +66,7 @@ Sample Device
 ---------------
 .. code-block :: python
 
-  from core.models.device import Device
+  from core.models.ff_id import Device
   import logging
 
   class Device(Device):
@@ -123,7 +123,7 @@ Part 1: Installer
    
 Part 2: Background High Speed Refresh
 #####################################
-Most devices will not need something like this. This was an example of a high speed refresher polling form an external API every two seconds for changes. 
+Most components will not need something like this. This was an example of a high speed refresher polling form an external API every two seconds for changes.
 
 .. code-block :: python
 

@@ -30,13 +30,13 @@ class Alias(object):
     if alias in self.aliases.values():
       device_id_list = [a for a in self.aliases if self.aliases[a] == alias]
       if len(device_id_list) != 1:
-        logging.error('More than one device matching alias')
+        logging.error('More than one ff_id matching alias')
         return None
       return device_id_list[0]
     if alias in self.aliases.keys():
       logging.debug('Seems like device_id was given, not alias')
       return alias
-    logging.error('Unknown error getting device ID.')
+    logging.error('Unknown error getting ff_id ID.')
     return None
 
   @property

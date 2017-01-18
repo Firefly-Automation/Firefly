@@ -8,7 +8,7 @@ COMMAND_TYPE = TypeVar('COMMAND', dict, str)
 
 class Event(object):
   """
-  Events are messages sent between apps and devices. Events can carry requests, commands, or updates.
+  Events are messages sent between apps and components. Events can carry requests, commands, or updates.
   """
 
   def __init__(self, source: str, event_type: str, event_action: str = '', **kwargs):
@@ -38,11 +38,11 @@ class Command(Event):
   Class for holding a command.
   """
 
-  def __init__(self, device, source: str, command: COMMAND_TYPE, command_action: str = '', force=False, **kwargs):
+  def __init__(self, ff_id, source: str, command: COMMAND_TYPE, command_action: str = '', force=False, **kwargs):
     Event.__init__(self, source, EVENT_TYPE_COMMAND)
     self._command = command
     self._command_action = command_action
-    self._device = aliases.get_device_id(device)
+    self._device = aliases.get_device_id(ff_id)
     self._force = force
     self._args = kwargs
     self._simple_command = True if type(command) == str else False
@@ -80,7 +80,7 @@ class Command(Event):
       (dict): Exported command data
     """
     export_data = {
-      'device':         self.device,
+      'ff_id':         self.device,
       'source':         self.source,
       'command':        self.command,
       'command_action': self._command_action,
@@ -115,14 +115,14 @@ class Command(Event):
 
 
 class Request(Event):
-  def __init__(self, device, source: str, request, **kwargs):
+  def __init__(self, ff_id, source: str, request, **kwargs):
     Event.__init__(self, source, EVENT_TYPE_REQUEST)
-    self._device = aliases.get_device_id(device)
+    self._device = aliases.get_device_id(ff_id)
     self._request = request
     self._args = kwargs
 
   def __str__(self):
-    return '<FIREFLY REQUEST - DEVICE: %s | SOURCE: %s | REQUEST: %s >' % (self.device, self.source, self.request)
+    return '<FIREFLY REQUEST - DEVICE: %s | SOURCE: %s | REQUEST: %s >' % (self.ff_id, self.source, self.request)
 
   @property
   def request(self):
@@ -133,5 +133,5 @@ class Request(Event):
     return self._args
 
   @property
-  def device(self):
+  def ff_id(self):
     return self._device

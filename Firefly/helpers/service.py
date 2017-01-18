@@ -18,7 +18,7 @@ class Service(object):
   # TODO: The following were copied from Device. Verify They work right
   def add_command(self, command: str, function: Callable) -> None:
     """
-    Adds a command to the list of supported device commands.
+    Adds a command to the list of supported ff_id commands.
 
     Args:
       command (str): The string of the command
@@ -28,7 +28,7 @@ class Service(object):
 
   def add_request(self, request: str, function: Callable) -> None:
     """
-    Adds a request to the list of supported device requests.
+    Adds a request to the list of supported ff_id requests.
 
     Args:
       request (str): The string of the request
@@ -38,7 +38,7 @@ class Service(object):
 
   def command(self, command: Command) -> bool:
     """
-    Function that is called to send a command to a device.
+    Function that is called to send a command to a ff_id.
     Args:
       command (Command): The command to be sent in a Command object
 
@@ -64,7 +64,7 @@ class Service(object):
 
   def request(self, request: Request) -> Any:
     """
-    Function to request data from the device. The returned data can be in any format. Common formats should be:
+    Function to request data from the ff_id. The returned data can be in any format. Common formats should be:
       str, int, dict
 
     Args:

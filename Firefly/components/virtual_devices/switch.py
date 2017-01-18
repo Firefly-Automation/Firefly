@@ -16,7 +16,7 @@ def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   new_switch = VirtualSwitch(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
-  firefly.devices[new_switch.id] = new_switch
+  firefly.components[new_switch.id] = new_switch
 
 class VirtualSwitch(Device):
   def __init__(self, firefly, package, **kwargs):

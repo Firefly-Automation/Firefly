@@ -2,7 +2,7 @@
 
 ## What is Firefly? 
 
-Firefly is an opensource home automation system. It is light weight and can run off of a rasberryPi. The python based framework allows for easy development of apps and new devices. Using this advanced framework Firefly is able to do complex actions in different scenarios.
+Firefly is an opensource home automation system. It is light weight and can run off of a rasberryPi. The python based framework allows for easy development of apps and new components. Using this advanced framework Firefly is able to do complex actions in different scenarios.
 
 Actions can be based off of time of day, if the sun is up, who is home, sensor state and anything else you can imagine!
 

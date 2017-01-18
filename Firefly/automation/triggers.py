@@ -1,5 +1,4 @@
 from Firefly import logging
-from Firefly.core import Firefly
 from Firefly.helpers.events import Request, Event
 from Firefly.const import SOURCE_TRIGGER, EVENT_ACTION_ANY
 
@@ -109,7 +108,7 @@ TriggerType = TypeVar('TriggerType', Trigger, List[Trigger])
 
 
 class Triggers(object):
-  def __init__(self, firefly: Firefly, source_id):
+  def __init__(self, firefly, source_id):
     """
     Args:
       firefly (firefly): Firefly object
@@ -241,7 +240,7 @@ class Triggers(object):
     If only matching on one trigger, then trigger_request and trigger_verify will be ignored in place of check the event
     source and event action.
 
-    If checking against a list of triggers then requests will be made to each device to see if it matched the required
+    If checking against a list of triggers then requests will be made to each ff_id to see if it matched the required
     verify before returning True.
 
     The device_id and event_type from the event will need to match the trigger for it to return true. This can be

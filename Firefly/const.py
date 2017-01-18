@@ -10,6 +10,10 @@ CONFIG_FILE = 'dev_config/firefly.config'
 
 ALIAS_FILE = 'dev_config/device_alias.json'
 DEVICE_FILE = 'dev_config/devices.json'
+AUTOMATION_FILE = 'dev_config/automation.json'
+
+
+
 
 # #### EVENT TYPES ####
 EVENT_TYPE_ANY = 'ANY'
@@ -81,4 +85,13 @@ IS_NOT_MODE = 'IS_NOT_MODE'
 IS_TIME_RANGE = 'TIME_RANGE'
 IS_NOT_TIME_RANGE = 'NOT_TIME_RANGE'
 
-
+COMPONENT_MAP = [
+  {
+    'type': TYPE_AUTOMATION,
+    'file': AUTOMATION_FILE
+  },
+  {
+    'type': TYPE_DEVICE,
+    'file': DEVICE_FILE
+  }
+]
