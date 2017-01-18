@@ -10,7 +10,7 @@ design_notes
 Firefly/web_ui/certs/*
 *.sublime-*
 config/modules.confg
-
+*services.config
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
