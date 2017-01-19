@@ -54,7 +54,7 @@ class Firefly(object):
 
     #self.install_package('Firefly.automation.routine', alias='Test Routines', ff_id='test_routine')
     #self.components['test_routine'].add_trigger(Trigger('66fdff0a-1fa5-4234-91bc-465c72aafb23',EVENT_ACTION_ANY))
-
+    self.install_package('Firefly.services.darksky', alias='Test Routines')
 
 
 

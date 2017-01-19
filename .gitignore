@@ -74,3 +74,5 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+dev_config/services.config

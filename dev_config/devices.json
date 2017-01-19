@@ -3,7 +3,7 @@
         "alias": "Test Switch",
         "ff_id": "66fdff0a-1fa5-4234-91bc-465c72aafb23",
         "initial_values": {
-            "_state": "OFF"
+            "_state": "ON"
         },
         "package": "Firefly.components.virtual_devices.switch",
         "type": "TYPE_DEVICE"
@@ -13,7 +13,7 @@
         "ff_id": "3b11cea9-a148-49d5-9467-bddb9f4ad937",
         "initial_values": {
             "_level": 1,
-            "_state": "ON"
+            "_state": "OFF"
         },
         "package": "Firefly.components.virtual_devices.dimmer",
         "type": "TYPE_DEVICE"

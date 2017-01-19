@@ -1,8 +1,10 @@
-from FIrefly import logging
+from Firefly import logging
 from Firefly.helpers.events import Event, Command, Request
+from typing import Callable, Any
+from Firefly.const import TYPE_SERVICE, EVENT_TYPE_BROADCAST
 
 class Service(object):
-  def __init__(self, firefly, service_id, title, author, package, commands, requests):
+  def __init__(self, firefly, service_id, package, title, author, commands, requests):
     self._firefly = firefly
     self._title = title
     self._author = author
@@ -11,6 +13,9 @@ class Service(object):
     self._requests = requests
     self._command_mapping = {}
     self._request_mapping = {}
+
+    # service_id should be set by the service and should be something like service_<NAME>
+    self._service_id = service_id
 
     # TODO: Alias mapping for service.
 
@@ -54,6 +59,7 @@ class Service(object):
       if state_before == self.__dict__:
         return True
       logging.info('Change detected: %s' % self)
+      # TODO: I dont think we should be broadcasting from a service.
       # TODO: If change detected then send broadcast event
       broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=event_action)
       yield from self._firefly.send_event(broadcast)
@@ -81,3 +87,19 @@ class Service(object):
 
   def event(self, event: Event) -> None:
     logging.error('Devices currently dont support events')
+
+  @property
+  def id(self):
+    return self._service_id
+
+  @property
+  def command_map(self):
+    return self._command_mapping
+
+  @property
+  def request_map(self):
+    return self._request_mapping
+
+  @property
+  def type(self):
+    return TYPE_SERVICE

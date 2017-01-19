@@ -8,6 +8,8 @@ CONFIG_HOST = 'host'
 CONFIG_DEFAULT_HOST = 'localhost'
 CONFIG_FILE = 'dev_config/firefly.config'
 
+SERVICE_CONFIG_FILE = 'dev_config/services.config'
+
 ALIAS_FILE = 'dev_config/device_alias.json'
 DEVICE_FILE = 'dev_config/devices.json'
 AUTOMATION_FILE = 'dev_config/automation.json'
@@ -34,6 +36,7 @@ EVENT_ACTION_LEVEL = 'LEVEL'
 
 TYPE_AUTOMATION = 'TYPE_AUTOMATION'
 TYPE_DEVICE = 'TYPE_DEVICE'
+TYPE_SERVICE = 'TYPE_SERVICE'
 
 API_INFO_REQUEST = 'API_INFO_REQUEST'
 
