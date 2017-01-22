@@ -38,6 +38,9 @@ class Firefly(object):
 
     for c in COMPONENT_MAP:
       self.import_devices(c['file'])
+
+
+    # TODO: MOST OF WHATS BELOW IS FOR TESTING
     #self.install_package('Firefly.components.virtual_devices.switch', alias='Test Device', initial_values={'_state': 'UNKNOWN'})
 
     #for _, ff_id in self._devices.items():
@@ -54,7 +57,11 @@ class Firefly(object):
 
     #self.install_package('Firefly.automation.routine', alias='Test Routines', ff_id='test_routine')
     #self.components['test_routine'].add_trigger(Trigger('66fdff0a-1fa5-4234-91bc-465c72aafb23',EVENT_ACTION_ANY))
-    self.install_package('Firefly.services.darksky', alias='Test Routines')
+
+    # Install service
+    self.install_package('Firefly.services.darksky', alias='service Dark Sky')
+    # Install openzwave
+    self.install_package('Firefly.services.zwave', alias='service zwave')
 
 
 
@@ -158,7 +165,7 @@ class Firefly(object):
     package = importlib.import_module(module)
     if kwargs.get('package'):
       kwargs.pop('package')
-    package.Setup(self, module, **kwargs)
+    return package.Setup(self, module, **kwargs)
 
   @asyncio.coroutine
   def send_event(self, event: Event) -> None:

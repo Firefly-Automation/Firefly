@@ -5,12 +5,14 @@ import configparser
 from forecastiopy import ForecastIO, FIOCurrently, FIOAlerts
 from Firefly import scheduler
 
+
 TITLE = 'Dark Sky Service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
 SERVICE_ID = 'service_darksky'
 COMMANDS = ['refresh']
 REQUESTS = ['current']
 
+SECTION = 'DARKSKY'
 
 # TODO: Setup function should get the config from the service config file. If the
 # required params are not in the config file then it should log and error message
@@ -19,8 +21,11 @@ REQUESTS = ['current']
 def Setup(firefly, package, **kwargs):
   config = configparser.ConfigParser()
   config.read(SERVICE_CONFIG_FILE)
-  api_key = config.get('DARKSKY','api_key',fallback=None)
-  refresh = config.getint('DARKSKY','refresh',fallback=30)
+  enable = config.getboolean(SECTION, 'enable', fallback=False)
+  if enable is False:
+    return False
+  api_key = config.get(SECTION,'api_key',fallback=None)
+  refresh = config.getint(SECTION,'refresh',fallback=30)
   if api_key is None:
     logging.error('DarkSky API key missing')
     return False
