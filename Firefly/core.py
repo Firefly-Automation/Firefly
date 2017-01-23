@@ -25,6 +25,7 @@ class Firefly(object):
   ''' Core running loop and scheduler of Firefly'''
 
   def __init__(self, settings):
+    logging.Startup(self)
     logging.message('Initializing Firefly')
     self.settings = settings
     self.loop = asyncio.get_event_loop()
@@ -61,7 +62,13 @@ class Firefly(object):
     # Install service
     self.install_package('Firefly.services.darksky', alias='service Dark Sky')
     # Install openzwave
-    self.install_package('Firefly.services.zwave', alias='service zwave')
+    #self.install_package('Firefly.services.zwave', alias='service zwave')
+
+    # Start Notification service
+    self.install_package('Firefly.services.notification')
+
+    # Add Pushover
+    
 
 
 

@@ -12,8 +12,8 @@
         "alias": "Test Dimmer",
         "ff_id": "3b11cea9-a148-49d5-9467-bddb9f4ad937",
         "initial_values": {
-            "_level": 1,
-            "_state": "OFF"
+            "_level": 100,
+            "_state": "ON"
         },
         "package": "Firefly.components.virtual_devices.dimmer",
         "type": "TYPE_DEVICE"

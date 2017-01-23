@@ -1,7 +1,7 @@
 import configparser
 from Firefly import scheduler
 
-import openzwave
+
 import asyncio
 from openzwave.network import ZWaveNetwork, ZWaveNode, dispatcher
 from openzwave.option import ZWaveOption

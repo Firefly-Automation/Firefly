@@ -19,10 +19,21 @@ class FireflyLogging(object):
   '''
 
   def __init__(self, filename=None, level='debug'):
+    self.firefly = None
     if filename:
       logging.basicConfig(filename=filename)
     logging.basicConfig(level=LOGGING_LEVEL[level], format='%(asctime)s\t%(levelname)s:\t%(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
+
+  def Startup(self, firefly):
+    """
+    Startup adds the firefly object. This allows us to use the notification service.
+
+    Run this after firefly is initialized.
+    Args:
+      firefly (firefly): Firefly object
+    """
+    self.firefly = firefly
 
   def debug(self, message):
     func = inspect.currentframe().f_back.f_code

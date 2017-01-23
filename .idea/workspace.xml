@@ -5,15 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="782782d9-fe62-4a15-82e4-766d0b64b7c3" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Firefly/components/zwave/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Firefly/components/zwave/zwave_switch.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/requirements.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/Firefly.iml" afterPath="$PROJECT_DIR$/.idea/Firefly.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Firefly/components/notification/__init__.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Firefly/components/notification/pushover.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Firefly/services/notification.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Firefly/const.py" afterPath="$PROJECT_DIR$/Firefly/const.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Firefly/core.py" afterPath="$PROJECT_DIR$/Firefly/core.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Firefly/services/darksky.py" afterPath="$PROJECT_DIR$/Firefly/services/darksky.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Firefly/helpers/logging.py" afterPath="$PROJECT_DIR$/Firefly/helpers/logging.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Firefly/services/zwave.py" afterPath="$PROJECT_DIR$/Firefly/services/zwave.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dev_config/devices.json" afterPath="$PROJECT_DIR$/dev_config/devices.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dev_config/services.config" afterPath="$PROJECT_DIR$/dev_config/services.config" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -27,7 +27,7 @@
     <SUITE FILE_PATH="coverage/Firefly$Unittests_in_tests.coverage" NAME="Unittests in tests Coverage Results" MODIFIED="1484454923982" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/Firefly$Unittests_in_test_subscribers.coverage" NAME="Unittests in test_subscribers Coverage Results" MODIFIED="1484207995761" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Firefly$Run_on_PI_DEV.coverage" NAME="Run on PI-DEV Coverage Results" MODIFIED="1485077715101" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Firefly$Unnamed.coverage" NAME="Unnamed Coverage Results" MODIFIED="1485074027085" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Firefly$Unnamed.coverage" NAME="Unnamed Coverage Results" MODIFIED="1485146754864" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Firefly$main.coverage" NAME="main Coverage Results" MODIFIED="1484246527581" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Firefly$Unittests_in_tests__1_.coverage" NAME="Unittests in tests (1) Coverage Results" MODIFIED="1484636958669" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Firefly$Unittests_in_test_events.coverage" NAME="Unittests in test_events Coverage Results" MODIFIED="1484289989087" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -43,17 +43,27 @@
     <splitter split-orientation="horizontal" split-proportion="0.46671492">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="core.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="core.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/Firefly/core.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="303">
-                  <caret line="167" column="11" lean-forward="false" selection-start-line="167" selection-start-column="11" selection-end-line="167" selection-end-column="11" />
+                <state relative-caret-position="375">
+                  <caret line="70" column="4" lean-forward="false" selection-start-line="70" selection-start-column="4" selection-end-line="70" selection-end-column="4" />
                   <folding>
-                    <element signature="e#2948#2981#1" expanded="true" />
-                    <element signature="e#3994#4084#1" expanded="true" />
-                    <element signature="e#4701#4906#1" expanded="true" />
-                    <element signature="e#5336#5671#1" expanded="true" />
+                    <element signature="e#3092#3125#1" expanded="true" />
+                    <element signature="e#4138#4228#1" expanded="true" />
+                    <element signature="e#4845#5050#1" expanded="true" />
+                    <element signature="e#5480#5815#1" expanded="true" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="const.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Firefly/const.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="300">
+                  <caret line="20" column="19" lean-forward="false" selection-start-line="20" selection-start-column="19" selection-end-line="20" selection-end-column="19" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -61,108 +71,88 @@
           <file leaf-file-name="zwave.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Firefly/services/zwave.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="145">
-                  <caret line="153" column="94" lean-forward="false" selection-start-line="153" selection-start-column="94" selection-end-line="153" selection-end-column="94" />
+                <state relative-caret-position="105">
+                  <caret line="147" column="19" lean-forward="false" selection-start-line="147" selection-start-column="6" selection-end-line="147" selection-end-column="19" />
                   <folding>
-                    <element signature="e#370#981#1" expanded="true" />
-                    <element signature="e#5370#5428#1" expanded="true" />
-                    <element signature="e#5470#5534#1" expanded="true" />
-                    <element signature="e#5575#5660#1" expanded="true" />
-                    <element signature="e#5699#5895#1" expanded="true" />
-                    <element signature="e#5933#6023#1" expanded="true" />
-                    <element signature="e#6063#6156#1" expanded="true" />
+                    <element signature="e#354#965#1" expanded="true" />
+                    <element signature="e#5354#5412#1" expanded="true" />
+                    <element signature="e#5454#5518#1" expanded="true" />
+                    <element signature="e#5559#5644#1" expanded="true" />
+                    <element signature="e#5683#5879#1" expanded="true" />
+                    <element signature="e#5917#6007#1" expanded="true" />
+                    <element signature="e#6047#6140#1" expanded="true" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="zwave_switch.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="zwave_switch.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Firefly/components/zwave/zwave_switch.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="780">
+                <state relative-caret-position="900">
                   <caret line="60" column="46" lean-forward="false" selection-start-line="60" selection-start-column="46" selection-end-line="60" selection-end-column="46" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="device_alias.json" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/dev_config/device_alias.json">
+          <file leaf-file-name="notification.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Firefly/services/notification.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="45">
-                  <caret line="3" column="41" lean-forward="false" selection-start-line="3" selection-start-column="29" selection-end-line="3" selection-end-column="41" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="node.py" pinned="false" current-in-tab="false">
-            <entry file="file://$USER_HOME$/Library/Caches/PyCharm2016.3/remote_sources/1006964235/132372521/openzwave/node.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="60">
-                  <caret line="27" column="18" lean-forward="false" selection-start-line="27" selection-start-column="18" selection-end-line="27" selection-end-column="18" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="value.py" pinned="false" current-in-tab="false">
-            <entry file="file://$USER_HOME$/Library/Caches/PyCharm2016.3/remote_sources/1006964235/132372521/openzwave/value.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="278">
-                  <caret line="223" column="41" lean-forward="true" selection-start-line="223" selection-start-column="41" selection-end-line="223" selection-end-column="41" />
+                <state relative-caret-position="-225">
+                  <caret line="3" column="95" lean-forward="false" selection-start-line="3" selection-start-column="95" selection-end-line="3" selection-end-column="95" />
                   <folding>
-                    <element signature="e#24#942#1" expanded="true" />
+                    <element signature="e#212#298#1" expanded="true" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="libopenzwave.py" pinned="false" current-in-tab="false">
-            <entry file="file://$USER_HOME$/Library/Caches/PyCharm2016.3/python_stubs/-1155797905/libopenzwave.py">
+          <file leaf-file-name="pushover.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Firefly/components/notification/pushover.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="183">
-                  <caret line="2034" column="63" lean-forward="false" selection-start-line="2034" selection-start-column="61" selection-end-line="2034" selection-end-column="63" />
-                  <folding>
-                    <element signature="e#72687#73195#1" expanded="true" />
-                    <element signature="e#135705#135972#1" expanded="true" />
-                  </folding>
+                <state relative-caret-position="120">
+                  <caret line="32" column="23" lean-forward="true" selection-start-line="32" selection-start-column="23" selection-end-line="32" selection-end-column="23" />
+                  <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="command.py" pinned="false" current-in-tab="false">
-            <entry file="file://$USER_HOME$/Library/Caches/PyCharm2016.3/remote_sources/1006964235/132372521/openzwave/command.py">
+          <file leaf-file-name="logging.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Firefly/helpers/logging.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="332">
+                  <caret line="33" column="39" lean-forward="false" selection-start-line="33" selection-start-column="39" selection-end-line="33" selection-end-column="39" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="routine.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Firefly/automation/routine.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="98">
+                  <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="automation.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Firefly/automation/automation.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="-1102">
+                  <caret line="32" column="17" lean-forward="false" selection-start-line="32" selection-start-column="8" selection-end-line="32" selection-end-column="17" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="darksky.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Firefly/services/darksky.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="375">
-                  <caret line="25" column="20" lean-forward="false" selection-start-line="25" selection-start-column="20" selection-end-line="25" selection-end-column="20" />
-                  <folding>
-                    <element signature="e#24#949#1" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="network.py" pinned="false" current-in-tab="false">
-            <entry file="file://$USER_HOME$/Library/Caches/PyCharm2016.3/remote_sources/1006964235/132372521/openzwave/network.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="183">
-                  <caret line="637" column="14" lean-forward="false" selection-start-line="637" selection-start-column="8" selection-end-line="637" selection-end-column="14" />
-                  <folding>
-                    <element signature="e#15838#16094#1" expanded="true" />
-                    <marker date="1485072772000" expanded="true" signature="14135:14158" ph="SELECT SQLIT... " />
-                    <marker date="1485072772000" expanded="true" signature="15178:15238" ph="SELECT name sqlite_master" />
-                    <marker date="1485072772000" expanded="true" signature="15343:15395" ph="CREATE TABLE... missing_value" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="devices.json" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/dev_config/devices.json">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="60">
-                  <caret line="4" column="24" lean-forward="false" selection-start-line="4" selection-start-column="24" selection-end-line="4" selection-end-column="24" />
+                  <caret line="25" column="16" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -182,11 +172,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="device.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="device.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Firefly/helpers/device.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="446">
-                  <caret line="169" column="6" lean-forward="false" selection-start-line="169" selection-start-column="6" selection-end-line="169" selection-end-column="6" />
+                <state relative-caret-position="271">
+                  <caret line="22" column="21" lean-forward="false" selection-start-line="22" selection-start-column="9" selection-end-line="22" selection-end-column="21" />
                   <folding>
                     <element signature="e#1491#1713#1" expanded="true" />
                     <element signature="e#3681#3911#1" expanded="true" />
@@ -195,11 +185,21 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="dimmer.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="services.config" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/dev_config/services.config">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="120">
+                  <caret line="8" column="0" lean-forward="true" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="dimmer.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/Firefly/components/virtual_devices/dimmer.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="810">
-                  <caret line="63" column="24" lean-forward="false" selection-start-line="63" selection-start-column="24" selection-end-line="63" selection-end-column="24" />
+                <state relative-caret-position="-187">
+                  <caret line="19" column="35" lean-forward="true" selection-start-line="19" selection-start-column="2" selection-end-line="19" selection-end-column="35" />
                   <folding />
                 </state>
               </provider>
@@ -228,7 +228,7 @@
           <file leaf-file-name="triggers.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Firefly/automation/triggers.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-1928">
+                <state relative-caret-position="1650">
                   <caret line="110" column="28" lean-forward="false" selection-start-line="110" selection-start-column="28" selection-end-line="110" selection-end-column="28" />
                   <folding>
                     <element signature="e#172#1648#1" expanded="true" />
@@ -287,11 +287,9 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>send_command</find>
       <find>device</find>
       <find>seems</find>
       <find>request</find>
-      <find>print</find>
       <find>enc</find>
       <find>SIGNAL_NODE_EVENT</find>
       <find>_handle_node_event</find>
@@ -311,12 +309,14 @@
       <find>device_typedevice_type</find>
       <find>type</find>
       <find>device_type</find>
-      <find>zwa</find>
       <find>switch</find>
       <find>get_sw</find>
-      <find>install_pa</find>
       <find>isValueSet_</find>
       <find>motion</find>
+      <find>print</find>
+      <find>zwa</find>
+      <find>_device_type</find>
+      <find>install_pa</find>
     </findStrings>
     <replaceStrings>
       <replace>('%s [%s - %s]' % (message,  function_name, file_name))</replace>
@@ -336,7 +336,6 @@
         <option value="$PROJECT_DIR$/tests/test_events.py" />
         <option value="$PROJECT_DIR$/Firefly/helpers/scheduler.py" />
         <option value="$PROJECT_DIR$/Firefly/automation/routines.py" />
-        <option value="$PROJECT_DIR$/Firefly/helpers/logging.py" />
         <option value="$PROJECT_DIR$/tests/test_conditions.py" />
         <option value="$PROJECT_DIR$/Firefly/util/conditions.py" />
         <option value="$PROJECT_DIR$/Firefly/helpers/subscribers.py" />
@@ -355,17 +354,20 @@
         <option value="$PROJECT_DIR$/Firefly/helpers/device.py" />
         <option value="$PROJECT_DIR$/Firefly/automation/routine.py" />
         <option value="$PROJECT_DIR$/Firefly/helpers/events.py" />
-        <option value="$PROJECT_DIR$/Firefly/const.py" />
         <option value="$PROJECT_DIR$/Firefly/helpers/service.py" />
         <option value="$PROJECT_DIR$/dev_config/automation.json" />
         <option value="$PROJECT_DIR$/Firefly/__init__.py" />
         <option value="$PROJECT_DIR$/Firefly/api.py" />
-        <option value="$PROJECT_DIR$/dev_config/services.config" />
         <option value="$PROJECT_DIR$/Firefly/services/darksky.py" />
         <option value="$PROJECT_DIR$/requirements.txt" />
-        <option value="$PROJECT_DIR$/Firefly/core.py" />
-        <option value="$PROJECT_DIR$/Firefly/services/zwave.py" />
         <option value="$PROJECT_DIR$/Firefly/components/zwave/zwave_switch.py" />
+        <option value="$PROJECT_DIR$/dev_config/services.config" />
+        <option value="$PROJECT_DIR$/Firefly/services/zwave.py" />
+        <option value="$PROJECT_DIR$/Firefly/helpers/logging.py" />
+        <option value="$PROJECT_DIR$/Firefly/services/notification.py" />
+        <option value="$PROJECT_DIR$/Firefly/const.py" />
+        <option value="$PROJECT_DIR$/Firefly/components/notification/pushover.py" />
+        <option value="$PROJECT_DIR$/Firefly/core.py" />
       </list>
     </option>
   </component>
@@ -510,6 +512,24 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="helpers" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Firefly" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Firefly" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Firefly" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="components" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -558,6 +578,46 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Firefly" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Firefly" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Firefly" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="components" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="notification" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Firefly" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Firefly" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Firefly" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="automation" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
       <pane id="Scratches" />
@@ -581,7 +641,7 @@
       <recent name="$PROJECT_DIR$/dev_config" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.Run on PI-DEV">
+  <component name="RunManager" selected="Python.Unnamed">
     <configuration default="false" name="Unittests in test_conditions" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -1066,7 +1126,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20722134" sideWeight="0.15626839" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32918552" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296617" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3280543" sideWeight="0.4896215" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26244345" sideWeight="0.4896215" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.29864255" sideWeight="0.8437316" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32918552" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
@@ -1132,30 +1192,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/apscheduler/executors/asyncio.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="6" lean-forward="false" selection-start-line="14" selection-start-column="6" selection-end-line="14" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/helpers/scheduler.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="32" lean-forward="true" selection-start-line="2" selection-start-column="32" selection-end-line="2" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/apscheduler/schedulers/asyncio.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="19" column="15" lean-forward="true" selection-start-line="19" selection-start-column="15" selection-end-line="19" selection-end-column="44" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/test_conditions.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1365">
@@ -1193,18 +1229,6 @@
         <state relative-caret-position="45">
           <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/automation/triggers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1928">
-          <caret line="110" column="28" lean-forward="false" selection-start-line="110" selection-start-column="28" selection-end-line="110" selection-end-column="28" />
-          <folding>
-            <element signature="e#172#1648#1" expanded="true" />
-            <element signature="e#3040#3207#1" expanded="true" />
-            <element signature="e#7530#8246#1" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1248,22 +1272,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/automation/automation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="32" column="17" lean-forward="false" selection-start-line="32" selection-start-column="8" selection-end-line="32" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/automation/routine.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Firefly/helpers/alias.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
@@ -1280,40 +1288,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/helpers/location.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="27" column="18" lean-forward="false" selection-start-line="27" selection-start-column="9" selection-end-line="27" selection-end-column="18" />
-          <folding>
-            <element signature="e#3037#3399#1" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Firefly/helpers/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dev_config/firefly.config">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/const.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="19" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="19" />
-          <folding>
-            <marker date="1484810032000" expanded="true" signature="1899:2023" ph="..." />
-            <marker date="1484810032000" expanded="true" signature="1903:1963" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1329,14 +1308,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
           <caret line="6" column="22" lean-forward="false" selection-start-line="6" selection-start-column="12" selection-end-line="6" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/components/virtual_devices/dimmer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="810">
-          <caret line="63" column="24" lean-forward="false" selection-start-line="63" selection-start-column="24" selection-end-line="63" selection-end-column="24" />
           <folding />
         </state>
       </provider>
@@ -1381,22 +1352,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dev_config/services.config">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="12" lean-forward="false" selection-start-line="1" selection-start-column="12" selection-end-line="1" selection-end-column="12" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/services/darksky.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="25" column="16" lean-forward="false" selection-start-line="25" selection-start-column="16" selection-end-line="25" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Firefly/api.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1432,18 +1387,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/helpers/service.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="27" column="9" lean-forward="false" selection-start-line="27" selection-start-column="9" selection-end-line="27" selection-end-column="9" />
-          <folding>
-            <element signature="e#1134#1319#1" expanded="true" />
-            <element signature="e#1418#1613#1" expanded="true" />
-            <element signature="e#2399#2629#1" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/dev_config/devices.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
@@ -1460,60 +1403,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/helpers/device.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="446">
-          <caret line="169" column="6" lean-forward="false" selection-start-line="169" selection-start-column="6" selection-end-line="169" selection-end-column="6" />
-          <folding>
-            <element signature="e#1491#1713#1" expanded="true" />
-            <element signature="e#3681#3911#1" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dev_config/device_alias.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="41" lean-forward="false" selection-start-line="3" selection-start-column="29" selection-end-line="3" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/core.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="303">
-          <caret line="167" column="11" lean-forward="false" selection-start-line="167" selection-start-column="11" selection-end-line="167" selection-end-column="11" />
-          <folding>
-            <element signature="e#2948#2981#1" expanded="true" />
-            <element signature="e#3994#4084#1" expanded="true" />
-            <element signature="e#4701#4906#1" expanded="true" />
-            <element signature="e#5336#5671#1" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Firefly/services/zwave.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="145">
-          <caret line="153" column="94" lean-forward="false" selection-start-line="153" selection-start-column="94" selection-end-line="153" selection-end-column="94" />
-          <folding>
-            <element signature="e#370#981#1" expanded="true" />
-            <element signature="e#5370#5428#1" expanded="true" />
-            <element signature="e#5470#5534#1" expanded="true" />
-            <element signature="e#5575#5660#1" expanded="true" />
-            <element signature="e#5699#5895#1" expanded="true" />
-            <element signature="e#5933#6023#1" expanded="true" />
-            <element signature="e#6063#6156#1" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Library/Caches/PyCharm2016.3/remote_sources/1006964235/132372521/openzwave/network.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="183">
           <caret line="637" column="14" lean-forward="false" selection-start-line="637" selection-start-column="8" selection-end-line="637" selection-end-column="14" />
           <folding>
-            <element signature="e#15838#16094#1" expanded="true" />
+            <element signature="e#15838#16094#1" expanded="false" />
             <marker date="1485072772000" expanded="true" signature="14135:14158" ph="SELECT SQLIT... " />
             <marker date="1485072772000" expanded="true" signature="15178:15238" ph="SELECT name sqlite_master" />
             <marker date="1485072772000" expanded="true" signature="15343:15395" ph="CREATE TABLE... missing_value" />
@@ -1534,7 +1429,7 @@
         <state relative-caret-position="375">
           <caret line="25" column="20" lean-forward="false" selection-start-line="25" selection-start-column="20" selection-end-line="25" selection-end-column="20" />
           <folding>
-            <element signature="e#24#949#1" expanded="true" />
+            <element signature="e#24#949#1" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1566,7 +1461,7 @@
         <state relative-caret-position="278">
           <caret line="223" column="41" lean-forward="true" selection-start-line="223" selection-start-column="41" selection-end-line="223" selection-end-column="41" />
           <folding>
-            <element signature="e#24#942#1" expanded="true" />
+            <element signature="e#24#942#1" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1576,17 +1471,179 @@
         <state relative-caret-position="183">
           <caret line="2034" column="63" lean-forward="false" selection-start-line="2034" selection-start-column="61" selection-end-line="2034" selection-end-column="63" />
           <folding>
-            <element signature="e#72687#73195#1" expanded="true" />
-            <element signature="e#135705#135972#1" expanded="true" />
+            <element signature="e#72687#73195#1" expanded="false" />
+            <element signature="e#135705#135972#1" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dev_config/firefly.config">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/helpers/location.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" column="4" lean-forward="false" selection-start-line="22" selection-start-column="4" selection-end-line="22" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dev_config/device_alias.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="1" lean-forward="false" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/services/zwave.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="147" column="19" lean-forward="false" selection-start-line="147" selection-start-column="6" selection-end-line="147" selection-end-column="19" />
+          <folding>
+            <element signature="e#354#965#1" expanded="true" />
+            <element signature="e#5354#5412#1" expanded="true" />
+            <element signature="e#5454#5518#1" expanded="true" />
+            <element signature="e#5559#5644#1" expanded="true" />
+            <element signature="e#5683#5879#1" expanded="true" />
+            <element signature="e#5917#6007#1" expanded="true" />
+            <element signature="e#6047#6140#1" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dev_config/services.config">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="0" lean-forward="true" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/automation/routine.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="98">
+          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Firefly/components/zwave/zwave_switch.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="780">
+        <state relative-caret-position="900">
           <caret line="60" column="46" lean-forward="false" selection-start-line="60" selection-start-column="46" selection-end-line="60" selection-end-column="46" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/services/darksky.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="25" column="16" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/automation/automation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1102">
+          <caret line="32" column="17" lean-forward="false" selection-start-line="32" selection-start-column="8" selection-end-line="32" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/automation/triggers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1650">
+          <caret line="110" column="28" lean-forward="false" selection-start-line="110" selection-start-column="28" selection-end-line="110" selection-end-column="28" />
+          <folding>
+            <element signature="e#172#1648#1" expanded="true" />
+            <element signature="e#3040#3207#1" expanded="true" />
+            <element signature="e#7530#8246#1" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/helpers/service.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="27" column="9" lean-forward="false" selection-start-line="27" selection-start-column="9" selection-end-line="27" selection-end-column="9" />
+          <folding>
+            <element signature="e#1134#1319#1" expanded="true" />
+            <element signature="e#1418#1613#1" expanded="true" />
+            <element signature="e#2399#2629#1" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/helpers/device.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="271">
+          <caret line="22" column="21" lean-forward="false" selection-start-line="22" selection-start-column="9" selection-end-line="22" selection-end-column="21" />
+          <folding>
+            <element signature="e#1491#1713#1" expanded="true" />
+            <element signature="e#3681#3911#1" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/components/virtual_devices/dimmer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-187">
+          <caret line="19" column="35" lean-forward="true" selection-start-line="19" selection-start-column="2" selection-end-line="19" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/helpers/logging.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="332">
+          <caret line="33" column="39" lean-forward="false" selection-start-line="33" selection-start-column="39" selection-end-line="33" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/const.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="20" column="19" lean-forward="false" selection-start-line="20" selection-start-column="19" selection-end-line="20" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/services/notification.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-225">
+          <caret line="3" column="95" lean-forward="false" selection-start-line="3" selection-start-column="95" selection-end-line="3" selection-end-column="95" />
+          <folding>
+            <element signature="e#212#298#1" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/components/notification/pushover.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="32" column="23" lean-forward="true" selection-start-line="32" selection-start-column="23" selection-end-line="32" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Firefly/core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="70" column="4" lean-forward="false" selection-start-line="70" selection-start-column="4" selection-end-line="70" selection-end-column="4" />
+          <folding>
+            <element signature="e#3092#3125#1" expanded="true" />
+            <element signature="e#4138#4228#1" expanded="true" />
+            <element signature="e#4845#5050#1" expanded="true" />
+            <element signature="e#5480#5815#1" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
