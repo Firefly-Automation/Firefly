@@ -1,3 +1,5 @@
+import asyncio
+
 from Firefly import logging
 from Firefly.helpers.events import Event, Command, Request
 from typing import Callable, Any
@@ -41,7 +43,8 @@ class Service(object):
     """
     self._request_mapping[request] = function
 
-  def command(self, command: Command) -> bool:
+
+  def command(self, command: Command, **kwargs) -> bool:
     """
     Function that is called to send a command to a ff_id.
     Args:
@@ -50,23 +53,12 @@ class Service(object):
     Returns:
       (bool): Command successful.
     """
-    state_before = self.__dict__.copy()
+    #state_before = self.__dict__.copy()
     logging.debug('%s: Got Command: %s' % (self.id, command.command))
     if command.command in self.command_map.keys():
-      event_action = self.command_map[command.command](**command.args)
-      if not event_action:
-        return True
-      if state_before == self.__dict__:
-        return True
-      logging.info('Change detected: %s' % self)
-      # TODO: I dont think we should be broadcasting from a service.
-      # TODO: If change detected then send broadcast event
-      broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=event_action)
-      yield from self._firefly.send_event(broadcast)
-      logging.info(broadcast)
-      # TODO: END
-      return True
-    return False
+      event_action =  self.command_map[command.command](**command.args)
+      return event_action
+
 
   def request(self, request: Request) -> Any:
     """

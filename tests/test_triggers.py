@@ -1,7 +1,8 @@
 import unittest
 from unittest.mock import patch, PropertyMock
 from Firefly.automation.triggers import Trigger, Triggers
-from Firefly.const import EVENT_ACTION_CLOSE, STATE, STATE_CLOSED, STATE_ON, EVENT_TYPE_BROADCAST, EVENT_ACTION_ANY, EVENT_ACTION_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, STATE_OFF
+from Firefly.const import EVENT_ACTION_CLOSE, STATE, STATE_CLOSED, STATE_ON, EVENT_TYPE_BROADCAST, EVENT_ACTION_ANY, \
+  EVENT_ACTION_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, STATE_OFF
 from Firefly.helpers.subscribers import Subscriptions
 from Firefly.helpers.events import Event
 
@@ -20,13 +21,15 @@ class TestTriggers(unittest.TestCase):
     self.assertEqual(trigger.request_verify, STATE_CLOSED)
 
     trigger_export = trigger.export()
-    self.assertEqual(trigger_export, {'listen_id':      'listen_device', 'listen_action': 'CLOSE', 'request': 'STATE',
-                                      'request_verify': 'CLOSED', 'source': 'SOURCE_TRIGGER'})
+    self.assertEqual(trigger_export,
+                     {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
+                      'request_verify': STATE_CLOSED, 'source': 'SOURCE_TRIGGER'})
 
     trigger2 = Trigger(**trigger_export)
     trigger_export = trigger2.export()
-    self.assertEqual(trigger_export, {'listen_id':      'listen_device', 'listen_action': 'CLOSE', 'request': 'STATE',
-                                      'request_verify': 'CLOSED', 'source': 'SOURCE_TRIGGER'})
+    self.assertEqual(trigger_export,
+                     {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
+                      'request_verify': STATE_CLOSED, 'source': 'SOURCE_TRIGGER'})
     # trigger1 and trigger2 should be equal to each other
     self.assertEqual(trigger, trigger2)
 
@@ -110,15 +113,19 @@ class TestTriggers(unittest.TestCase):
 
     export_data = triggers.export()
     expected_data = [
-      {'listen_id': 'listen_device', 'listen_action': 'CLOSE', 'request': 'STATE', 'request_verify': 'CLOSED',
-       'source':    'SOURCE_TRIGGER'},
-      {'listen_id': 'listen_device2', 'listen_action': 'CLOSE', 'request': 'STATE', 'request_verify': 'CLOSED',
-       'source':    'SOURCE_TRIGGER'},
+      {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
+       'request_verify': STATE_CLOSED,
+       'source':         'SOURCE_TRIGGER'},
+      {'listen_id':      'listen_device2', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
+       'request_verify': STATE_CLOSED,
+       'source':         'SOURCE_TRIGGER'},
       [
-        {'listen_id': 'listen_device', 'listen_action': 'CLOSE', 'request': 'STATE', 'request_verify': 'CLOSED',
-         'source':    'SOURCE_TRIGGER'},
-        {'listen_id': 'listen_device2', 'listen_action': 'CLOSE', 'request': 'STATE', 'request_verify': 'ON',
-         'source':    'SOURCE_TRIGGER'}
+        {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
+         'request_verify': STATE_CLOSED,
+         'source':         'SOURCE_TRIGGER'},
+        {'listen_id':      'listen_device2', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
+         'request_verify': STATE_ON,
+         'source':         'SOURCE_TRIGGER'}
       ]
     ]
 
@@ -127,11 +134,13 @@ class TestTriggers(unittest.TestCase):
   def test_import_triggers(self):
     triggers = Triggers(self.firefly, 'test_device')
 
-    import_data =  [
-          {'listen_id': 'listen_device', 'listen_action': 'CLOSE', 'request': 'STATE', 'request_verify': 'CLOSED',
-           'source':    'SOURCE_TRIGGER'},
-          {'listen_id': 'listen_device2', 'listen_action': 'CLOSE', 'request': 'STATE', 'request_verify': 'CLOSED',
-           'source':    'SOURCE_TRIGGER'}
+    import_data = [
+      {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
+       'request_verify': STATE_CLOSED,
+       'source':         'SOURCE_TRIGGER'},
+      {'listen_id':      'listen_device2', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
+       'request_verify': STATE_CLOSED,
+       'source':         'SOURCE_TRIGGER'}
     ]
 
     import_count = triggers.import_triggers(import_data)
@@ -146,24 +155,26 @@ class TestTriggers(unittest.TestCase):
     self.assertEqual(triggers.export(), import_data)
 
     import_data = [
-        {'listen_id': 'listen_device', 'listen_action': 'CLOSE', 'request': 'STATE', 'request_verify': 'CLOSED',
-         'source':    'SOURCE_TRIGGER'},
-        {'listen_id': 'listen_device2', 'listen_action': 'CLOSE', 'request': 'STATE', 'request_verify': 'CLOSED',
-         'source':    'SOURCE_TRIGGER'},
-        [
-          {'listen_id': 'listen_device', 'listen_action': 'CLOSE', 'request': 'STATE', 'request_verify': 'CLOSED',
-           'source':    'SOURCE_TRIGGER'},
-          {'listen_id': 'listen_device2', 'listen_action': 'CLOSE', 'request': 'STATE', 'request_verify': 'ON',
-           'source':    'SOURCE_TRIGGER'}
-        ]
+      {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
+       'request_verify': STATE_CLOSED,
+       'source':         'SOURCE_TRIGGER'},
+      {'listen_id':      'listen_device2', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
+       'request_verify': STATE_CLOSED,
+       'source':         'SOURCE_TRIGGER'},
+      [
+        {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
+         'request_verify': STATE_CLOSED,
+         'source':         'SOURCE_TRIGGER'},
+        {'listen_id':      'listen_device2', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
+         'request_verify': STATE_ON,
+         'source':         'SOURCE_TRIGGER'}
       ]
+    ]
 
     import_count = triggers.import_triggers(import_data)
     self.assertEqual(import_count, 1)
     self.assertEqual(len(triggers.triggers), 3)
     self.assertEqual(triggers.export(), import_data)
-
-
 
   def test_check_trigger_one_simple(self):
     with patch('Firefly.core.Firefly.send_request') as mock:
@@ -191,7 +202,6 @@ class TestTriggers(unittest.TestCase):
       valid = triggers.check_triggers(event)
       self.assertTrue(valid)
 
-
   def test_check_trigger_one_with_request(self):
     with patch('Firefly.core.Firefly.send_request') as mock:
       mock.return_value = STATE_ON
@@ -218,7 +228,6 @@ class TestTriggers(unittest.TestCase):
       valid = triggers.check_triggers(event)
       self.assertTrue(valid)
 
-
   def test_check_two_single_triggers(self):
     with patch('Firefly.core.Firefly.send_request') as mock:
       mock.return_value = STATE_ON
@@ -239,7 +248,6 @@ class TestTriggers(unittest.TestCase):
       valid = triggers.check_triggers(event)
       self.assertTrue(valid)
 
-
   def test_check_triggers_multiple(self):
     with patch('Firefly.core.Firefly.send_request') as mock:
       mock.return_value = STATE_ON
@@ -247,7 +255,8 @@ class TestTriggers(unittest.TestCase):
       self.firefly.send_request = mock
 
       triggers = Triggers(self.firefly, 'test_device')
-      trigger = [Trigger('test_device2', EVENT_ACTION_ON, STATE, STATE_ON), Trigger('test_device1', EVENT_ACTION_ON, STATE, STATE_OFF)]
+      trigger = [Trigger('test_device2', EVENT_ACTION_ON, STATE, STATE_ON),
+                 Trigger('test_device1', EVENT_ACTION_ON, STATE, STATE_OFF)]
       triggers.add_trigger(trigger)
 
       event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
@@ -279,6 +288,3 @@ class TestTriggers(unittest.TestCase):
       event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
       valid = triggers.check_triggers(event)
       self.assertFalse(valid)
-
-
-

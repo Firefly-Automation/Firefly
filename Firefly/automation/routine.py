@@ -51,7 +51,7 @@ class Routine(Automation):
       command = Command(**a.get('command'))
       conditions = a.get('conditions')
       if check_conditions(self._firefly, conditions):
-        r &= yield from self._firefly.send_command(command)
+        r &= self._firefly.send_command(command)
     print(r)
     return r
 

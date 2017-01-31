@@ -1,6 +1,10 @@
 import logging
 import inspect
 import os
+import asyncio
+
+
+from Firefly.const import COMMAND_NOTIFY, SERVICE_NOTIFICATION
 
 LOGGING_LEVEL = {
   'debug':    logging.DEBUG,
@@ -34,6 +38,16 @@ class FireflyLogging(object):
       firefly (firefly): Firefly object
     """
     self.firefly = firefly
+
+
+  def notify(self, message):
+    if self.firefly is None:
+      return
+    from Firefly.helpers.events import Command
+    notify = Command(SERVICE_NOTIFICATION,'LOGGING', COMMAND_NOTIFY, message=message)
+    # TODO: Uncomment when you want notifications
+    s = self.firefly.send_command(notify)
+
 
   def debug(self, message):
     func = inspect.currentframe().f_back.f_code

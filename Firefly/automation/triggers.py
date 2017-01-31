@@ -1,7 +1,7 @@
 from Firefly import logging
 from Firefly.helpers.events import Request, Event
 from Firefly.const import SOURCE_TRIGGER, EVENT_ACTION_ANY
-
+import asyncio
 from typing import TypeVar, List
 
 """
@@ -232,7 +232,7 @@ class Triggers(object):
     return import_count
 
 
-
+  #@asyncio.coroutine
   def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
     """
     Check triggers should be called when an event is received.
@@ -259,9 +259,9 @@ class Triggers(object):
         valid &= (trigger.listen_action in event.event_action  or trigger.listen_action == EVENT_ACTION_ANY)
 
         if (trigger.request_property != '' and trigger.request_verify != '' and trigger.request_verify != EVENT_ACTION_ANY) and not ignore_event:
+          # TODO: If i have issues change this to response = yield from firefly.async_send_request and fix in automation.py....
           response = self._firefly.send_request(trigger.request)
           valid &= response == trigger.request_verify
-
         # If a single trigger is valid then it should respond as true.
         if valid:
           return True
@@ -275,7 +275,7 @@ class Triggers(object):
           # If trigger is not type Trigger then it fails
           if not type(t) == Trigger:
             valid = False
-          if (event.source == t.listen_id) and (trigger.listen_action in event.event_action or t.listen_action == EVENT_ACTION_ANY):
+          if (event.source == t.listen_id) and (t.listen_action in event.event_action or t.listen_action == EVENT_ACTION_ANY):
             valid_event = True
           if (t.request_property != '' and t.request_verify != '' and t.request_verify != EVENT_ACTION_ANY) and not ignore_event:
             response = self._firefly.send_request(t.request)

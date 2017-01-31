@@ -88,6 +88,7 @@ class Automation(object):
     logging.info('[AUTOMATION] %s - Receiving event: %s' % (self.id, event))
     valid = True
     valid &= check_conditions(self._firefly, self.conditions)
+    # TODO: If i have issues change this to valid &= yield from and fix in triggers.py....
     valid &= self.triggers.check_triggers(event)
     if valid:
       return self.get_event_handler(event, **kwargs)

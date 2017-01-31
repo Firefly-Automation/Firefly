@@ -92,7 +92,6 @@ class Device(object):
     """
     self._request_mapping[request] = function
 
-  @asyncio.coroutine
   def command(self, command: Command) -> bool:
     """
     Function that is called to send a command to a ff_id.
@@ -105,7 +104,7 @@ class Device(object):
     state_before = self.__dict__.copy()
     logging.debug('%s: Got Command: %s' % (self.id, command.command))
     if command.command in self.command_map.keys():
-      event_action = self.command_map[command.command](**command.args)
+      event_action =  self.command_map[command.command](**command.args)
       if not event_action:
         return True
       if state_before == self.__dict__:
@@ -113,7 +112,7 @@ class Device(object):
       logging.info('Change detected: %s' % self)
       # TODO: If change detected then send broadcast event
       broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=event_action)
-      yield from self._firefly.send_event(broadcast)
+      self._firefly.send_event(broadcast)
       logging.info(broadcast)
       # TODO: END
       return True
@@ -140,6 +139,7 @@ class Device(object):
 
   def event(self, event: Event) -> None:
     logging.error('Devices currently dont support events')
+
 
   def get_api_info(self):
     return_data = {}

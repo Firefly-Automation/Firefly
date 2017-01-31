@@ -72,8 +72,8 @@ STATE = 'STATE'
 LEVEL = 'LEVEL'
 PRESENCE = 'PRESENCE'
 
-STATE_OFF = 'OFF'
-STATE_ON = 'ON'
+STATE_OFF = False
+STATE_ON = True
 STATE_CLOSED = 'CLOSED'
 
 
@@ -83,6 +83,7 @@ DEVICE_TYPE_DIMMER = 'DIMMER'
 DEVICE_TYPE_COLOR_LIGHT = 'COLOR_LIGHT'
 DEVICE_TYPE_THERMOSTAT = 'THERMOSTAT'
 DEVICE_TYPE_NOTIFICATION = 'NOTIFICATION'
+DEVICE_TYPE_MOTION = 'MOTION'
 
 
 SOURCE_LOCATION = 'LOCATION'
@@ -107,3 +108,19 @@ COMPONENT_MAP = [
     'file': DEVICE_FILE
   }
 ]
+
+# TODO: This may not be needed
+SENSORS = {
+  'Energy': 'ENERGY',
+  'Previous Reading': 'PREVIOUS READING',
+  'Interval': 'INTERVAL',
+  'Power': 'POWER',
+  'Voltage': 'VOLTAGE',
+  'Current': 'CURRENT',
+  'Exporting': 'EXPORTING',
+  'Sensor': 'SENSOR',
+  'Temperature': 'TEMPERATURE',
+  'Luminance': 'LUMINANCE',
+  'Relative Humidity': 'RELATIVE HUMIDITY',
+  'Ultraviolet': 'ULTRAVIOLET'
+}

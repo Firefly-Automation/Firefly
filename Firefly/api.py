@@ -18,7 +18,8 @@ class FireflyCoreAPI:
       {'method': 'GET', 'path': '/test', 'function': self.test},
       {'method': 'GET', 'path': '/api/rest/components', 'function': self.devices},
       {'method': 'GET', 'path': '/api/rest/ff_id/{ff_id}', 'function': self.device},
-      {'method': 'GET', 'path': '/api/rest/ff_id/{ff_id}/action', 'function': self.action}
+      {'method': 'GET', 'path': '/api/rest/ff_id/{ff_id}/action', 'function': self.action},
+      {'method': 'GET', 'path': '/api/rest/ff_id/{ff_id}/sensors', 'function': self.sensors}
     ]
 
   async def hello_world(self, request):
@@ -53,15 +54,15 @@ class FireflyCoreAPI:
     ff_id = request.match_info['ff_id']
     if 'command' in request.GET:
       my_command = Command(ff_id,'web_api', **request.GET)
-      yield from self.firefly.send_command(my_command)
+      yield from self.firefly.async_send_command(my_command)
       device_request = Request(ff_id, 'web_api', API_INFO_REQUEST)
-      data = yield from self.firefly.send_request(device_request)
+      data = yield from self.firefly.async_send_request(device_request)
       data['rest_url'] = 'http://%s/api/rest/ff_id/%s' % (request.host, ff_id)
       return web.json_response(data)
 
     if 'request' in request.GET:
       my_request = Request(ff_id, 'web_api', **request.GET)
-      result = yield from self.firefly._send_request(my_request)
+      result = yield from self.firefly.async_send_request(my_request)
       return web.Response(text=result, content_type='application/json')
 
 
@@ -69,9 +70,20 @@ class FireflyCoreAPI:
   def device(self, request):
     ff_id = request.match_info['ff_id']
     device_request = Request(ff_id, 'web_api', API_INFO_REQUEST)
-    data = yield from self.firefly.send_request(device_request)
+    data = yield from self.firefly.async_send_request(device_request)
+    print('data :%s' % data)
     data['rest_url'] = 'http://%s/api/rest/ff_id/%s' % (request.host, ff_id)
     return web.json_response(data)
+
+
+  @asyncio.coroutine
+  def sensors(self, request):
+    ff_id = request.match_info['ff_id']
+    device_request = Request(ff_id, 'web_api', 'SENSORS', **request.GET)
+    data = yield from self.firefly.async_send_request(device_request)
+    return web.json_response(data)
+
+
 
 
   @asyncio.coroutine

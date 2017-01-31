@@ -21,7 +21,7 @@ def Setup(firefly, package, **kwargs):
   if api_key is None or user_key is None:
     return False
 
-  pushover = Pushover(firefly, package, api_key=api_key, user_key=user_key, **kwargs)
+  pushover = Pushover(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
   firefly.components[pushover.id] = pushover
 
@@ -61,4 +61,6 @@ class Pushover(Device):
       post_data['device'] = device
 
     # TODO: handel response and emergency types of notifications
-    requests.post('https://api.pushover.net/1/messages.json', data=post_data)
+    r = requests.post('https://api.pushover.net/1/messages.json', data=post_data)
+
+    return True if r.status_code == 200 else False

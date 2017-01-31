@@ -42,7 +42,7 @@ class Command(Event):
     Event.__init__(self, source, EVENT_TYPE_COMMAND)
     self._command = command
     self._command_action = command_action
-    self._device = aliases.get_device_id(ff_id)
+    self._device = ff_id #aliases.get_device_id(ff_id)
     self._force = force
     self._args = kwargs
     self._simple_command = True if type(command) == str else False

@@ -3,6 +3,8 @@ from Firefly.helpers.service import Service
 from Firefly.helpers.events import Command
 from Firefly.const import COMMAND_NOTIFY, SERVICE_NOTIFICATION, NOTIFY_DEFAULT, PRIORITY_NORMAL
 
+from Firefly.util.get_from_kwargs import get_kwargs_value
+import asyncio
 '''
 Notification service may have its own config file to save device mappings into
 '''
@@ -11,12 +13,12 @@ Notification service may have its own config file to save device mappings into
 TITLE = 'Notification Service Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
 SERVICE_ID = SERVICE_NOTIFICATION
-COMMANDS = ['send', 'add_default', 'remove_default', ] # TODO: Add actions like cancel for pushover
+COMMANDS = [COMMAND_NOTIFY, 'add_default', 'remove_default', ] # TODO: Add actions like cancel for pushover
 REQUESTS = ['default_list']
 
 
 def Setup(firefly, package, **kwargs):
-  notify = Notify(firefly, package)
+  notify = Notify(firefly, package, **kwargs)
   firefly.components[SERVICE_ID] = notify
   return True
 
@@ -29,21 +31,30 @@ class Notify(Service):
     self._default = []
     self._devices = []
 
-    self.add_command('send', self.send)
+    self.add_command(COMMAND_NOTIFY, self.send)
     self.add_command('add_default', self.add_default)
     self.add_command('remove_default', self.remove_default)
 
     self.add_request('default_list', self.get_default_list)
 
 
-  def send(self, message, device=NOTIFY_DEFAULT, priority=PRIORITY_NORMAL, **kwargs):
+  def send(self, **kwargs):
+    message = kwargs.get('message')
+    device =  get_kwargs_value(kwargs,'device', NOTIFY_DEFAULT)
+    priority = get_kwargs_value(kwargs, 'priority', PRIORITY_NORMAL)
+    if message is None:
+      return False
+
     if device == NOTIFY_DEFAULT:
-      device = self._default
+      device = self._default if len(self._default) > 0 else self._devices
     if type(device) is str:
       device = [device]
+
     for d in device:
       notify_command = Command(d, SERVICE_ID, COMMAND_NOTIFY, priority=priority, **kwargs)
       self._firefly.send_command(notify_command)
+    return True
+
 
   def add_default(self, ff_id, **kwargs):
     self._default.append(ff_id)
@@ -59,6 +70,7 @@ class Notify(Service):
     return self._default
 
   def link_device(self, ff_id, **kwargs):
+    print('link device %s' % ff_id)
     self._devices.append(ff_id)
 
 

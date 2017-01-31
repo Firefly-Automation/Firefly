@@ -67,10 +67,13 @@ class Darksky(Service):
       # Or access attributes directly
       #print(currently.temperature)
       #print(currently.humidity)
-      for a in alerts.alerts:
-        print(a)
-      self._currently = currently.currently
-      self._alerts = alerts.alerts
+      if self._darksky.has_alerts() is True:
+        for a in alerts.alerts:
+          print(a)
+        self._currently = currently.currently
+        self._alerts = alerts.alerts
+      else:
+        print('No Alert data')
     else:
       print('No Currently data')
 
