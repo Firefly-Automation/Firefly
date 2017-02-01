@@ -1,8 +1,11 @@
 import asyncio
+
 import json
 from typing import Any
 
 from aiohttp import web
+
+from concurrent.futures import ThreadPoolExecutor
 
 from Firefly.helpers.events import (Event, Command, Request)
 
@@ -12,7 +15,7 @@ from Firefly import logging
 from Firefly import aliases
 from Firefly import scheduler
 from Firefly.helpers.location import Location
-from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE, EVENT_ACTION_ANY, SOURCE_LOCATION, TYPE_DEVICE, EVENT_ACTION_LEVEL, TYPE_AUTOMATION, COMPONENT_MAP)
+from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE, EVENT_ACTION_ANY, SOURCE_LOCATION, TYPE_DEVICE, EVENT_ACTION_LEVEL, TYPE_AUTOMATION, COMPONENT_MAP, SERVICE_NOTIFICATION, COMMAND_NOTIFY)
 import importlib
 from Firefly.automation import Trigger
 
@@ -29,6 +32,11 @@ class Firefly(object):
     logging.message('Initializing Firefly')
     self.settings = settings
     self.loop = asyncio.get_event_loop()
+
+    self.executor = ThreadPoolExecutor(max_workers=10)
+    self.loop.set_default_executor(self.executor)
+
+
     self._subscriptions = Subscriptions()
     self.location = Location(self, "95110", ['HOME'])
     self._components = {}
@@ -65,10 +73,17 @@ class Firefly(object):
     #self.install_package('Firefly.services.zwave', alias='service zwave')
 
     # Start Notification service
-    self.install_package('Firefly.services.notification')
+    self.install_package('Firefly.services.notification', alias='service notificaion')
 
     # Add Pushover
-    
+
+    c = Command(SERVICE_NOTIFICATION, 'test', COMMAND_NOTIFY, message='test')
+    #print(c.args)
+    #s = self.components[c.device].command(c)
+    #print(s)
+    #self.send_command(c)
+
+    logging.notify('Firefly is starting up')
 
 
 
@@ -89,7 +104,8 @@ class Firefly(object):
     """
     # TODO: Import current state of components on boot.
 
-    logging.message('Starting Firefly')
+    #r = logging.notify('Starting Firefly')
+    #print('########### %s ' % r)
 
     try:
       web.run_app(app, host=self.settings.firefly_host, port=self.settings.firefly_port)
@@ -104,6 +120,11 @@ class Firefly(object):
     Shutdown process should export the current state of all components so it can be imported on reboot and startup.
     '''
     # TODO: Export current state of components on shutdown
+
+    try:
+      self.components['service_zwave'].stop()
+    except:
+      pass
 
     logging.message('Stopping Firefly')
     self.export_all_components()
@@ -174,62 +195,71 @@ class Firefly(object):
       kwargs.pop('package')
     return package.Setup(self, module, **kwargs)
 
-  @asyncio.coroutine
-  def send_event(self, event: Event) -> None:
-    yield from self.add_task(self._send_event(event))
 
   @asyncio.coroutine
-  def _send_event(self, event: Event) -> None:
+  def async_send_event(self, event):
+    s = True
+    fut = asyncio.Future(loop=self.loop)
     send_to = self._subscriptions.get_subscribers(event.source, event_action=event.event_action)
-    logging.debug('Sending Event: %s -> %s' % (event, str(send_to)))
     for s in send_to:
-      yield from self.__send_event(s, event)
+      s &= yield from self._send_event(event, s, fut)
+    return s
+
+
+  def send_event(self, event: Event) -> Any:
+    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    s = True
+    fut = asyncio.Future(loop=self.loop)
+    send_to = self._subscriptions.get_subscribers(event.source, event_action=event.event_action)
+    for s in send_to:
+      print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! %s ' % s)
+      s = asyncio.ensure_future(self._send_event(event, s, fut), loop=self.loop)
+    return True
+
 
   @asyncio.coroutine
-  def __send_event(self, send_to: str, event: Event) -> None:
-    r = yield from self.components[send_to].event(event)
+  def _send_event(self, event, ff_id, fut):
+    result = self.components[ff_id].event(event)
+    #fut.set_result(result)
+    return result
+
+  @asyncio.coroutine
+  def async_send_request(self, request):
+    fut = asyncio.Future(loop=self.loop)
+    r = yield from self._send_request(request, fut)
     return r
 
-  @asyncio.coroutine
   def send_request(self, request: Request) -> Any:
-    """
-    Send a request to a ff_id or app.
+    fut = asyncio.Future(loop=self.loop)
+    result = asyncio.ensure_future(self._send_request(request, fut),loop=self.loop)
+    return result
 
-    Args:
-      request (Request): Request to be sent
 
-    Returns:
-      Requested data.
-    """
-    result = yield from self.add_task(self._send_request(request))
-    #result =  yield from self.loop.create_task(self._send_request(request))
+  @asyncio.coroutine
+  def _send_request(self, request, fut):
+    result = self.components[request.ff_id].request(request)
+    fut.set_result(result)
+    return result
+
+
+  def send_command(self, command):
+    fut = asyncio.Future(loop=self.loop)
+    result = asyncio.ensure_future(self._send_command(command, fut), loop=self.loop)
+    # TODO: Figure out how to wait for result
+    return True
+
+  @asyncio.coroutine
+  def async_send_command(self, command):
+    fut = asyncio.Future(loop=self.loop)
+    result = yield from asyncio.ensure_future(self._send_command(command, fut), loop=self.loop)
     return result
 
   @asyncio.coroutine
-  def _send_request(self, request: Request) -> Any:
-    if request.ff_id not in self.components.keys():
-      return False
-    return self.components[request.ff_id].request(request)
-
-  @asyncio.coroutine
-  def send_command(self, command: Command) -> bool:
-    """
-    Send a command to a ff_id or app.
-
-    Args:
-      command (Command):
-
-    Returns:
-      (bool): Command successfully sent.
-    """
-    result = yield from self.add_task(self._send_command(command))
+  def _send_command(self, command, fut):
+    result =  self.components[command.device].command(command)
+    fut.set_result(result)
     return result
 
-  @asyncio.coroutine
-  def _send_command(self, command: Command) -> bool:
-    if command.device not in self.components.keys():
-      return False
-    return self.components[command.device].command(command)
 
   def add_route(self, route, method, handler):
     app.router.add_route(method, route, handler)
