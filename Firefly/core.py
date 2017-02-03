@@ -41,6 +41,9 @@ class Firefly(object):
     self.location = Location(self, "95110", ['HOME'])
     self._components = {}
 
+    # Start Notification service
+    self.install_package('Firefly.services.notification', alias='service notificaion')
+
     # TODO: POC of passing initial values. These values would comve from the export of the current state.
     # self.install_package('Firefly.components.test_device', alias='Test Device', initial_values={'_state': 'UNKNOWN'})
     #self.import_devices()
@@ -72,10 +75,6 @@ class Firefly(object):
     # Install openzwave
     #self.install_package('Firefly.services.zwave', alias='service zwave')
 
-    # Start Notification service
-    self.install_package('Firefly.services.notification', alias='service notificaion')
-
-    # Add Pushover
 
     c = Command(SERVICE_NOTIFICATION, 'test', COMMAND_NOTIFY, message='test')
     #print(c.args)

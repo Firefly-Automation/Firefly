@@ -64,3 +64,12 @@ class Pushover(Device):
     r = requests.post('https://api.pushover.net/1/messages.json', data=post_data)
 
     return True if r.status_code == 200 else False
+
+  def export(self, current_values: bool = True, api_view: bool = False):
+    data = super().export(current_values)
+
+    # Dont export this info to the API View, only to export to file
+    if api_view is False:
+      data['api_key'] = self._api_key
+      data['user_key'] = self._user_key
+    return data

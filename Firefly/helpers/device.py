@@ -45,7 +45,7 @@ class Device(object):
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
 
-  def export(self, current_values: bool = True) -> dict:
+  def export(self, current_values: bool = True, api_view: bool = False) -> dict:
 
     """
     Export ff_id config with options current values to a dictionary.
@@ -146,7 +146,7 @@ class Device(object):
     return_data['commands'] = self._commands
     return_data['requests'] = self._requests
     return_data['device_type'] = self._device_type
-    return_data.update(self.export())
+    return_data.update(self.export(api_view=True))
     return_data['current_values'] = return_data['initial_values']
     return_data.pop('initial_values')
     return_data['request_values'] = {}
