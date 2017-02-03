@@ -2,7 +2,7 @@ from Firefly import logging
 from Firefly.const import SERVICE_CONFIG_FILE
 from Firefly.helpers.service import Service
 import configparser
-from forecastiopy import ForecastIO, FIOCurrently, FIOAlerts
+from forecastiopy import ForecastIO, FIOCurrently, FIOAlerts, FIODaily
 from Firefly import scheduler
 
 
@@ -17,6 +17,8 @@ SECTION = 'DARKSKY'
 # TODO: Setup function should get the config from the service config file. If the
 # required params are not in the config file then it should log and error message
 # and abort install
+
+# TODO: push this data to location weather info.. this could be useful
 
 def Setup(firefly, package, **kwargs):
   config = configparser.ConfigParser()
@@ -61,6 +63,10 @@ class Darksky(Service):
     if self._darksky.has_currently() is True:
       currently = FIOCurrently.FIOCurrently(self._darksky)
       alerts = FIOAlerts.FIOAlerts(self._darksky)
+
+      #TODO: Fix this in FIODaily.has_daily()
+      daily = FIODaily.FIODaily(self._darksky)
+
       print('Currently')
       for item in currently.get().keys():
         print(item + ' : ' + str(currently.get()[item]))
@@ -74,6 +80,12 @@ class Darksky(Service):
         self._alerts = alerts.alerts
       else:
         print('No Alert data')
+
+      if self._darksky.has_daily():
+        for d in range(0,daily.days()):
+          print(daily.get(d))
+
+
     else:
       print('No Currently data')
 

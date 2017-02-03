@@ -21,6 +21,7 @@ class Device(object):
     self._commands = commands
     self._requests = requests
     self._device_type = device_type
+    self._export_ui = True
     self._initial_values = kwargs.get('initial_values')
     self._command_mapping = {}
     self._request_mapping = {}
@@ -143,6 +144,7 @@ class Device(object):
 
   def get_api_info(self):
     return_data = {}
+    return_data['export_ui'] = self._export_ui
     return_data['commands'] = self._commands
     return_data['requests'] = self._requests
     return_data['device_type'] = self._device_type

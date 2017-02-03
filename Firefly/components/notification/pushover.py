@@ -36,6 +36,7 @@ class Pushover(Device):
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
     self.__dict__.update(kwargs['initial_values'])
 
+    self._export_ui = False
     self._api_key = kwargs.get('api_key')
     self._user_key = kwargs.get('user_key')
 
