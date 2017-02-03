@@ -129,5 +129,5 @@ class Location(object):
     return self._city
 
   @property
-  def now(self):
+  def now(self) -> datetime:
     return datetime.now(self._city.tz)

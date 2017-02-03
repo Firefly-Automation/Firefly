@@ -276,5 +276,3 @@ class Firefly(object):
     return self._subscriptions
 
 
-def myTestFunction():
-  print('Running Test Function')
