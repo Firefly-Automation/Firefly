@@ -9,6 +9,13 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="VBox-Dev">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/Firefly" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
     </serverData>
   </component>
 </project>

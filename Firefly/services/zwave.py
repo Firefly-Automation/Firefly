@@ -65,6 +65,9 @@ class Zwave(Service):
     self._network = None
     self._installed_nodes = {}
 
+    # TODO: Enable zwave security
+    self._security_enable = False
+
     self.add_command('send_command', self.send_command)
     self.add_command('stop', self.stop)
 
@@ -211,7 +214,17 @@ class Zwave(Service):
     Returns:
 
     '''
-    pass
+    return self._network.controller.add_node(doSecurity=self._security_enable)
+
+  def cancel_command(self):
+    """
+    Cancels the zwave command (This is how you would stop pairing mode etc..) Maybe this should get called when a new node
+    notification is sent. This would make it so you can only add one device at a time.. Good thing?
+    Returns:
+
+    """
+    self._network.controller.cancel_command()
+    return True
 
   def remove_device(self):
     '''
