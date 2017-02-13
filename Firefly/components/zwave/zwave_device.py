@@ -18,12 +18,13 @@ class ZwaveDevice(Device):
 
     super().__init__(firefly, package, title, author, commands, requests, device_type, **kwargs)
 
-    self._node = get_kwargs_value(kwargs, 'node')
+    self._node:ZWaveNode = get_kwargs_value(kwargs, 'node')
 
     self._sensors = {}
     self._switches = {}
     self._config_params = {}
     self._raw_values = {}
+    self._config_updated = False
 
 
     self.add_command('ZWAVE_CONFIG', self.zwave_config)
@@ -31,6 +32,9 @@ class ZwaveDevice(Device):
     self.add_request('SENSORS', self.get_sensors)
     self.add_request('PARAMS', self.get_params)
     self.add_request('RAW_VALUES', self.get_raw_values)
+
+  def update_device_config(self, **kwargs):
+    self._config_updated = True
 
 
   def zwave_config(self, **kwargs):
@@ -87,10 +91,15 @@ class ZwaveDevice(Device):
     Returns:
 
     '''
-    print('*******************************************')
-    print(node)
+
+    # Return if no valid node object.
     if node is None:
       return
+
+    # Update config if device config has not been updated.
+    if not self._config_updated:
+      self.update_device_config()
+
 
     # This will set the node on the first update once zwave boots
     self._node = node
@@ -120,3 +129,8 @@ class ZwaveDevice(Device):
     #self._firefly.send_event(broadcast)
     #logging.info(broadcast)
     #return True
+
+
+  @property
+  def node(self):
+    return self._node

@@ -15,7 +15,7 @@ DEVICE_TYPE = DEVICE_TYPE_MOTION
 AUTHOR = 'Zachary Priddy'
 COMMANDS = []
 REQUESTS = [STATE]
-INITIAL_VALUES = {'_state': False}
+INITIAL_VALUES = {'_state': False, '_sensitivity': 4}
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
@@ -32,6 +32,31 @@ class ZwaveAeotecMulti(ZwaveDevice):
     self.__dict__.update(kwargs['initial_values'])
 
     self.add_request(STATE, self.get_state)
+
+
+  def update_device_config(self, **kwargs):
+    # TODO: Pull these out into config values
+    """
+    Updated the devices to the desired config params. This will be useful to make new default devices configs.
+
+    For example when there is a gen6 multisensor I want it to always report every 5 minutes and timeout to be 30 seconds.
+    Args:
+      **kwargs ():
+    """
+    # TODO: self._sensitivity ??
+    sensitivity = 4 # index 4
+    timeout = 30 # index 8
+    scale = 2 # index 64
+    group1 = 241 # index 101
+    interval = 300 #index 111
+
+    self.node.set_config_param(4, sensitivity)
+    self.node.set_config_param(8, timeout)
+    self.node.set_config_param(64, scale)
+    self.node.set_config_param(101, group1)
+    self.node.set_config_param(111, interval)
+
+    self._config_updated = True
 
   def update_from_zwave(self, node: ZWaveNode, **kwargs):
     sensor_before = self.state

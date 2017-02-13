@@ -62,7 +62,7 @@ class Zwave(Service):
     self._path =  '/home/firefly/firefly_dev/python-openzwave-0.3.1/openzwave/config'
     self._enable = kwargs.get('enable')
     self._zwave_option = None
-    self._network = None
+    self._network:ZWaveNetwork = None
     self._installed_nodes = {}
 
     # TODO: Enable zwave security
@@ -196,7 +196,6 @@ class Zwave(Service):
 
 
   def add_child_nodes(self, node):
-    print('**************&&****************')
     print(node.device_type)
     if node.device_type == 'On/Off Power Switch':
       device_id = self._firefly.install_package('Firefly.components.zwave.zwave_switch', alias='zwave_switch', node=node)
