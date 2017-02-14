@@ -18,7 +18,7 @@ serenity_config = config[SERENITY_CONFIG]
 
 serenity_host = serenity_config.get('host', '0.0.0.0')
 serenity_port = serenity_config.getint('port', 8080)
-serenity_debug = serenity_config.getbool('debug', False)
+serenity_debug = serenity_config.getboolean('debug', False)
 
 
 
