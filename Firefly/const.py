@@ -9,6 +9,9 @@ CONFIG_HOST = 'host'
 CONFIG_DEFAULT_HOST = 'localhost'
 CONFIG_FILE = 'dev_config/firefly.config'
 
+SERENITY_CONFIG_FILE = 'dev_config/serenity.config'
+SERENITY_CONFIG = 'SERENITY'
+
 SERVICE_CONFIG_FILE = 'dev_config/services.config'
 
 ALIAS_FILE = 'dev_config/device_alias.json'
