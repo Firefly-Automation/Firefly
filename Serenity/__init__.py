@@ -27,7 +27,7 @@ firefly_port = firefly_config.getint('port', 6002)
 firefly_simulate = firefly_config.getboolean('simulate', False)
 
 
-# DATABSE LINK FOR USERS
+# DATABASE LINK FOR USERS
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Serenity_Sample.db'
 
 # Let flask-security use username not email
@@ -57,8 +57,8 @@ if firefly_simulate:
   }
 
 
-from Serenity.models import *
-from Serenity.views import *
+import  Serenity.models
+import Serenity.views
 
 
 

@@ -1,6 +1,6 @@
 from Serenity import app, API_PATHS
 from Serenity.serenity import firefly_get_request
-from flask.ext.security import login_required
+from flask.ext.security import login_required, current_user
 import json
 
 @app.route('/')
@@ -14,4 +14,7 @@ def api_status():
   return json.dumps(firefly_get_request(API_PATHS['STATUS']), indent=4, sort_keys=True)
 
 
-
+@app.route('/who')
+@login_required
+def who():
+  return current_user.username
