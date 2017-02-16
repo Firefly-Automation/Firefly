@@ -6,7 +6,7 @@ from werkzeug.contrib.fixers import ProxyFix
 
 from Firefly.const import SERENITY_CONFIG_SECTION, FIREFLY_CONFIG_SECTION, SERENITY_CONFIG_FILE
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 
 # This is a fix for https redirects
 app.wsgi_app = ProxyFix(app.wsgi_app)

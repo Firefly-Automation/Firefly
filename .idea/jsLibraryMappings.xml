@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JavaScriptLibraryMappings">
+    <file url="file://$PROJECT_DIR$/Serenity" libraries="{HTML, HTML5 / EcmaScript 5, angular-DefinitelyTyped, angular-material-DefinitelyTyped}" />
+    <file url="PROJECT" libraries="{HTML, HTML5 / EcmaScript 5, angular-DefinitelyTyped, angular-material-DefinitelyTyped}" />
+  </component>
+</project>

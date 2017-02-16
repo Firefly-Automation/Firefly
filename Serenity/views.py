@@ -1,11 +1,22 @@
 from Serenity import app, API_PATHS
 from Serenity.serenity import firefly_get_request
 from flask.ext.security import login_required, current_user
+from flask import render_template, send_from_directory
 import json
+
+
+@app.route('/js/<path:path>')
+def send_js(path):
+    return send_from_directory('js', path)
 
 @app.route('/')
 def root_page():
   return 'Hello World'
+
+@app.route('/base')
+@login_required
+def base():
+  return render_template('base.html')
 
 
 @app.route('/API/status')
