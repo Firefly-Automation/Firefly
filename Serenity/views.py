@@ -13,6 +13,22 @@ def root_page():
 def api_status():
   return json.dumps(firefly_get_request(API_PATHS['STATUS']), indent=4, sort_keys=True)
 
+@app.route('/API/mode')
+@login_required
+def api_mode():
+  mode = firefly_get_request(API_PATHS['STATUS']).get('mode')
+  if mode is None:
+    return 'ERROR'
+  return mode
+
+@app.route('/API/time')
+@login_required
+def api_time():
+  time = firefly_get_request(API_PATHS['STATUS']).get('time')
+  if time is None:
+    return 'ERROR'
+  return time.get('str')
+
 
 @app.route('/who')
 @login_required

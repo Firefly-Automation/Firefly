@@ -1,29 +1,26 @@
-from Serenity import app
-
 import logging
-
-from flask import request
-from flask.ext.security.decorators import _get_unauthorized_response
-from flask_security import current_user
-from flask_security.utils import encrypt_password
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.security import Security, SQLAlchemyUserDatastore, \
-    UserMixin, RoleMixin, login_required, auth_token_required
 from functools import wraps
 from hashlib import sha256
 from os import urandom
 
+from flask import request
+from flask.ext.security import RoleMixin, SQLAlchemyUserDatastore, Security, UserMixin
+from flask.ext.security.decorators import _get_unauthorized_response
 from flask.ext.security.forms import LoginForm
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask_security import current_user
+from flask_security.utils import encrypt_password
 from wtforms import StringField
 from wtforms.validators import InputRequired
 
+from Serenity import app
 
 # Create database connection object
 db = SQLAlchemy(app)
 
 # Define models
 roles_users = db.Table('roles_users',
-                       db.Column('user_id', db.Integer(),db.ForeignKey('user.id')),
+                       db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
                        db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
 
 
@@ -48,6 +45,7 @@ class User(db.Model, UserMixin):
   roles = db.relationship('Role', secondary=roles_users,
                           backref=db.backref('users', lazy='dynamic'))
 
+
 class ExtendedLoginForm(LoginForm):
   email = StringField('Username', [InputRequired()])
 
@@ -56,7 +54,6 @@ class ExtendedLoginForm(LoginForm):
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore,
                     login_form=ExtendedLoginForm)
-
 
 
 # Auth Token Check
@@ -74,7 +71,9 @@ def auth_token_required(fn):
         logging.debug(token.user_id)
         return fn(*args, **kwargs)
     return _get_unauthorized_response()
+
   return decorated
+
 
 # Create a user to test with
 
