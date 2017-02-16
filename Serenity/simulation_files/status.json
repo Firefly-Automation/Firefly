@@ -1,0 +1,64 @@
+{
+  "devices": [
+    {
+      "alias": "Test Switch",
+      "commands": [
+        "OFF",
+        "ON",
+        "TOGGLE"
+      ],
+      "current_values": {
+        "_state": true
+      },
+      "device_type": "SWITCH",
+      "export_ui": true,
+      "ff_id": "66fdff0a-1fa5-4234-91bc-465c72aafb23",
+      "package": "Firefly.components.virtual_devices.switch",
+      "request_values": {
+        "STATE": true
+      },
+      "requests": [
+        "STATE"
+      ],
+      "type": "TYPE_DEVICE"
+    },
+    {
+      "alias": "Test Dimmer",
+      "commands": [
+        "OFF",
+        "ON",
+        "TOGGLE",
+        "LEVEL"
+      ],
+      "current_values": {
+        "_level": 100,
+        "_state": false
+      },
+      "device_type": "DIMMER",
+      "export_ui": true,
+      "ff_id": "3b11cea9-a148-49d5-9467-bddb9f4ad937",
+      "package": "Firefly.components.virtual_devices.dimmer",
+      "request_values": {
+        "LEVEL": 100,
+        "STATE": false
+      },
+      "requests": [
+        "STATE",
+        "LEVEL"
+      ],
+      "type": "TYPE_DEVICE"
+    }
+  ],
+  "is_dark": true,
+  "last_mode": "HOME",
+  "mode": "HOME",
+  "time": {
+    "day": 15,
+    "epoch": 1487222225.475952,
+    "hour": 21,
+    "minute": 17,
+    "month": 2,
+    "str": "2017-02-15 21:17:05.475952-08:00",
+    "year": 2017
+  }
+}
