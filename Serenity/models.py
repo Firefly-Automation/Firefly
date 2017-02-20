@@ -42,6 +42,7 @@ class User(db.Model, UserMixin):
   password = db.Column(db.String(255))
   active = db.Column(db.Boolean())
   confirmed_at = db.Column(db.DateTime())
+  theme = db.Column(db.String(255))
   roles = db.relationship('Role', secondary=roles_users,
                           backref=db.backref('users', lazy='dynamic'))
 
@@ -125,6 +126,12 @@ def add_token(app_name):
   db.session.add(AuthToken(user_id=str(current_user.id), token=token, app_name=app_name))
   db.session.commit()
   return token
+
+def set_user_theme(theme):
+  user = db.session.query(User).get(current_user.id)
+  print(user)
+  user.theme = theme
+  db.session.commit()
 
 
 def remove_token(token):

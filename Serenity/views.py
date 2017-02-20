@@ -1,7 +1,9 @@
 from Serenity import app, API_PATHS
 from Serenity.serenity import firefly_get_request
 from flask.ext.security import login_required, current_user
-from flask import render_template, send_from_directory
+from flask import render_template, send_from_directory, redirect
+
+from Serenity.models import set_user_theme
 import json
 
 
@@ -44,4 +46,24 @@ def api_time():
 @app.route('/who')
 @login_required
 def who():
-  return current_user.username
+  theme = current_user.theme
+  if theme is None:
+    theme = 'default'
+  return current_user.username + '\n' + theme
+
+@app.route('/theme')
+@login_required
+def get_theme():
+  theme = current_user.theme
+  if theme is None:
+    theme = 'default'
+  return theme
+
+
+@app.route('/theme/<path:path>')
+@login_required
+def set_theme(path):
+  set_user_theme(path)
+  return path
+
+

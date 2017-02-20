@@ -9,17 +9,38 @@
             //    .backgroundPalette('grey',{'default': '900'})
             //                .dark();
             $mdThemingProvider.theme('altTheme').warnPalette('blue').dark(true);
+            $mdThemingProvider.theme('orange').primaryPalette('orange').accentPalette('grey',{'default':'400'});
+            $mdThemingProvider.theme('orange-dark').primaryPalette('orange').accentPalette('grey',{'default':'600'}).dark(true);
+
+            $mdThemingProvider.theme('blue').primaryPalette('blue');
+            $mdThemingProvider.theme('blue-dark').primaryPalette('blue').dark(true);
+
+            $mdThemingProvider.theme('cyan').primaryPalette('cyan');
+            $mdThemingProvider.theme('cyan-dark').primaryPalette('cyan').dark(true);
+
+            $mdThemingProvider.theme('light-green').primaryPalette('light-green');
+            $mdThemingProvider.theme('light-green-dark').primaryPalette('light-green').dark(true);
+
+            $mdThemingProvider.theme('pink').primaryPalette('pink');
+            $mdThemingProvider.theme('pink-dark').primaryPalette('pink').dark(true);
 
             //$mdThemingProvider.setDefaultTheme('altTheme');
             $mdThemingProvider.alwaysWatchTheme(true);
         })
 
-        .controller('SerenityCtrl', function ($scope, $timeout, $mdSidenav, $log) {
+        .controller('SerenityCtrl', function ($scope, $timeout, $mdSidenav, $log, $http) {
         $scope.toggleLeft = buildDelayedToggler('left');
         $scope.toggleRight = buildToggler('right');
         $scope.isOpenRight = function(){
           return $mdSidenav('right').isOpen();
         };
+
+        $http.get('/theme', {timeout:5000})
+                .then(function(res)
+                {
+                  $scope.theme = res.data;
+                  console.log($scope.theme)
+                });
 
         /**
          * Supplies a function that will continue to operate until the
