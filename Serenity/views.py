@@ -55,7 +55,7 @@ def who():
 @login_required
 def get_theme():
   theme = current_user.theme
-  if theme is None:
+  if theme is None or theme == 'undefined':
     theme = 'default'
   return theme
 

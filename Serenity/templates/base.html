@@ -21,11 +21,9 @@
         <h1 class="md-toolbar-tools">Header</h1>
         <div >
             <md-input-container>
-          <md-select ng-controller="ThemeCtrl" ng-model="selectedTheme" md-selected-text="getTheme()">
-              <md-optgroup label="items">
-                          <md-option ng-value="item" ng-repeat="item in themes" ng-click="setTheme(item)">{{item}}</md-option>
-                        </md-optgroup>
-          </md-select>
+                <md-select ng-model="selectedTheme" placeholder="Select a theme">
+                          <md-option ng-value="themeName" ng-repeat="themeName in themes" ng-selected="themeName == theme">{{ themeName }}</md-option>
+                        </md-select>
             </md-input-container>
         </div>
        <md-button ng-click="dynamicTheme = 'default'">Default</md-button>
