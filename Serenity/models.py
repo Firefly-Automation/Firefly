@@ -129,7 +129,6 @@ def add_token(app_name):
 
 def set_user_theme(theme):
   user = db.session.query(User).get(current_user.id)
-  print(user)
   user.theme = theme
   db.session.commit()
 
