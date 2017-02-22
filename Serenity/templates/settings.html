@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<form name="settingsForm">
+    <md-input-container>
+        <label>First Name</label>
+        <input name="firstName" ng-model="firstName">
+    </md-input-container><br/>
+    <md-input-container>
+        <label>Last Name</label>
+        <input name="lastName" ng-model="lastName">
+    </md-input-container><br/>
+    <md-input-container>
+        <label>Password</label>
+        <input name="password" ng-model="password" type="password">
+    </md-input-container><br/>
+    <md-input-container>
+    {% raw %}
+        <md-select ng-model="selectedTheme" placeholder="Select a theme">
+          <md-option ng-value="themeName" ng-repeat="themeName in themes" ng-selected="themeName == theme">{{ themeName }}</md-option>
+        </md-select>
+    {% endraw %}
+    </md-input-container>
+</form>
+{% endblock %}

@@ -1,4 +1,3 @@
-{% raw %}
 <html lang="en" >
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -7,121 +6,27 @@
     <link rel="stylesheet"
           href="https://cdn.gitcdn.link/cdn/angular/bower-material/v1.1.0-rc2/angular-material.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body >
-<div ng-app="SerenityApp" ng-controller="SerenityCtrl"  md-theme="{{theme}}" md-theme-watch="true" layout="column" style="height:100%;" ng-cloak="" class="sidenavdemoBasicUsage">
-
-
-  <div layout="column" flex="">
-  <div>
-
-
-
-    <md-toolbar md-whiteframe="8"layout="row">
-        <h1 class="md-toolbar-tools">Header</h1>
-        <div >
-            <md-input-container>
-                <md-select ng-model="selectedTheme" placeholder="Select a theme">
-                          <md-option ng-value="themeName" ng-repeat="themeName in themes" ng-selected="themeName == theme">{{ themeName }}</md-option>
-                        </md-select>
-            </md-input-container>
-        </div>
-
-      </md-toolbar>
-    </div>
-  <section layout="row" flex="">
-
-    <md-sidenav class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop="" md-whiteframe="4">
-
-      <md-toolbar class="md-accent">
-        <h1 class="md-toolbar-tools">Sidenav Left</h1>
-      </md-toolbar>
-      <md-content layout-padding="" ng-controller="LeftCtrl">
-        <md-button ng-click="close()" class="md-primary" hide-gt-md="">
-          Close Sidenav Left
-        </md-button>
-
-
-
-
-        <p hide-md="" show-gt-md="">
-          This sidenav is locked open on your device. To go back to the default behavior,
-          narrow your display.
-        </p>
-      </md-content>
-
-    </md-sidenav>
-
-    <md-content flex="" layout-padding="">
-
-      <div layout="column" layout-align="top center">
-        <md-button ng-click="toggleRight()" ng-hide="isOpenRight()" class="md-primary md-raised">
-            Toggle right
-          </md-button>
-        <md-button ng-click="toggleLeft()" class="md-primary" hide-gt-md="">
-            Toggle left
-          </md-button>
-
-        <h4>Standard date-picker</h4>
-    <md-datepicker ng-model="myDate" md-placeholder="Enter date"></md-datepicker>
-
-          <md-checkbox ng-model="ctrl.noCache">Disable caching of queries?</md-checkbox>
-          <md-checkbox ng-model="ctrl.isDisabled">Disable the input?</md-checkbox>
-
-        <section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
-      <md-button class="md-raised">Button</md-button>
-      <md-button class="md-raised md-primary">Primary</md-button>
-      <md-button ng-disabled="true" class="md-raised md-primary">Disabled</md-button>
-      <md-button class="md-raised md-warn">Warn</md-button>
-      <div class="label">Raised</div>
-
-    </section>
-
-        <p>
-        The left sidenav will 'lock open' on a medium (>=960px wide) device.
-        </p>
-        <p>
-        The right sidenav will focus on a specific child element.
-        </p>
-
-        <div>
-
-        </div>
-
-        <div>
-
-        </div>
-      </div>
-
-      <div flex=""></div>
-
+{% raw %}
+<div ng-app="SerenityApp" ng-controller="SerenityCtrl"  md-theme="{{theme}}" md-theme-watch="true" layout="column" ng-cloak="">
+{% endraw %}
+    <md-content>
+        <md-toolbar md-whiteframe="8"layout="row">
+            <h1 class="md-toolbar-tools">{% block title %}{% endblock %}</h1>
+            <div id="settings-icon">
+                <a href="/settings"><md-icon ng-bind="'settings'"></md-icon></a>
+            </div>
+        </md-toolbar>
+        <!--<md-nav-bar md-selected-nav-item="page1" nav-bar-aria-label="navigation links">
+            <md-nav-item md-nav-click="goto('page1')" name="page1">Dashboard</md-nav-item>
+            <md-nav-item md-nav-click="goto('page2')" name="page2">Devices</md-nav-item>
+            <md-nav-item md-nav-click="goto('page3')" name="page3">Routines</md-nav-item>
+        </md-nav-bar>-->
+        <div class="container">{% block content %}{% endblock %}</div>
     </md-content>
-
-    <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
-
-      <md-toolbar class="md-theme-light">
-        <h1 class="md-toolbar-tools">Sidenav Right</h1>
-      </md-toolbar>
-      <md-content ng-controller="RightCtrl" layout-padding="">
-        <form>
-          <md-input-container>
-            <label for="testInput">Test input</label>
-            <input type="text" id="testInput" ng-model="data" md-autofocus="">
-          </md-input-container>
-        </form>
-        <md-button ng-click="close()" class="md-primary">
-          Close Sidenav Right
-        </md-button>
-      </md-content>
-
-    </md-sidenav>
-
-  </section>
-  </div>
 </div>
-
-
-
 
 
 
@@ -139,4 +44,3 @@
 
 </body>
 </html>
-{% endraw %}

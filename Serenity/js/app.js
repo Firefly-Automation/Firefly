@@ -2,26 +2,26 @@
 
     var app = angular.module('SerenityApp', ['ngMaterial', 'ngMessages', 'material.svgAssetsCache']);
     app.config(function ($mdThemingProvider) {
-        $mdThemingProvider.theme('default');
+        $mdThemingProvider.theme('default').accentPalette('lime');
 
         //$mdThemingProvider.theme('altTheme')
         //    .backgroundPalette('grey',{'default': '900'})
         //                .dark();
-        $mdThemingProvider.theme('default-dark').dark(true);
+        $mdThemingProvider.theme('default-dark').accentPalette('lime').dark(true);
         $mdThemingProvider.theme('orange').primaryPalette('orange').accentPalette('grey', {'default': '400'});
         $mdThemingProvider.theme('orange-dark').primaryPalette('orange').accentPalette('grey', {'default': '600'}).dark(true);
 
-        $mdThemingProvider.theme('blue').primaryPalette('blue');
-        $mdThemingProvider.theme('blue-dark').primaryPalette('blue').dark(true);
+        $mdThemingProvider.theme('blue').primaryPalette('blue').accentPalette('amber');
+        $mdThemingProvider.theme('blue-dark').primaryPalette('blue').accentPalette('amber').dark(true);
 
-        $mdThemingProvider.theme('cyan').primaryPalette('cyan');
-        $mdThemingProvider.theme('cyan-dark').primaryPalette('cyan').dark(true);
+        $mdThemingProvider.theme('cyan').primaryPalette('cyan').accentPalette('deep-purple');
+        $mdThemingProvider.theme('cyan-dark').primaryPalette('cyan').accentPalette('deep-purple').dark(true);
 
-        $mdThemingProvider.theme('green').primaryPalette('light-green');
-        $mdThemingProvider.theme('green-dark').primaryPalette('light-green').dark(true);
+        $mdThemingProvider.theme('green').primaryPalette('light-green').accentPalette('yellow');
+        $mdThemingProvider.theme('green-dark').primaryPalette('light-green').accentPalette('yellow').dark(true);
 
-        $mdThemingProvider.theme('pink').primaryPalette('pink');
-        $mdThemingProvider.theme('pink-dark').primaryPalette('pink').dark(true);
+        $mdThemingProvider.theme('red').primaryPalette('red').accentPalette('light-blue');
+        $mdThemingProvider.theme('red-dark').primaryPalette('red').accentPalette('light-blue').dark(true);
 
         //$mdThemingProvider.setDefaultTheme('altTheme');
         $mdThemingProvider.alwaysWatchTheme(true);
@@ -41,7 +41,7 @@
             });
 
         $scope.themes = ['default', 'default-dark', 'orange', 'orange-dark', 'blue', 'blue-dark', 'cyan', 'cyan-dark',
-            'green', 'green-dark', 'pink', 'pink-dark'];
+            'green', 'green-dark', 'red', 'red-dark'];
 
         $scope.$watch('selectedTheme', function (value) {
             if (value != undefined) {

@@ -15,11 +15,10 @@ def send_js(path):
 def root_page():
   return 'Hello World'
 
-@app.route('/base')
+@app.route('/settings')
 @login_required
-def base():
-  return render_template('base.html')
-
+def settings():
+  return render_template('settings.html')
 
 @app.route('/API/status')
 @login_required
