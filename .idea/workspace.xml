@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="782782d9-fe62-4a15-82e4-766d0b64b7c3" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Serenity/js/app.js" afterPath="$PROJECT_DIR$/Serenity/js/app.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Serenity/templates/base.html" afterPath="$PROJECT_DIR$/Serenity/templates/base.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Serenity/templates/settings.html" afterPath="$PROJECT_DIR$/Serenity/templates/settings.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Serenity/views.py" afterPath="$PROJECT_DIR$/Serenity/views.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -70,24 +68,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="settings.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="settings.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Serenity/templates/settings.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="25" column="0" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+            <state relative-caret-position="150">
+              <caret line="10" column="29" lean-forward="true" selection-start-line="10" selection-start-column="29" selection-end-line="10" selection-end-column="29" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Serenity/js/app.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="435">
-              <caret line="140" column="33" lean-forward="true" selection-start-line="140" selection-start-column="33" selection-end-line="140" selection-end-column="33" />
+              <caret line="140" column="33" lean-forward="false" selection-start-line="140" selection-start-column="33" selection-end-line="140" selection-end-column="33" />
               <folding>
-                <element signature="e#3203#3312#0" expanded="true" />
-                <element signature="e#3771#3900#0" expanded="true" />
+                <element signature="e#3196#3305#0" expanded="true" />
+                <element signature="e#3764#3893#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -250,8 +248,8 @@
         <option value="$PROJECT_DIR$/Serenity/templates/sample.html" />
         <option value="$PROJECT_DIR$/Serenity/templates/base.html" />
         <option value="$PROJECT_DIR$/Serenity/views.py" />
-        <option value="$PROJECT_DIR$/Serenity/js/app.js" />
         <option value="$PROJECT_DIR$/Serenity/templates/settings.html" />
+        <option value="$PROJECT_DIR$/Serenity/js/app.js" />
       </list>
     </option>
   </component>
@@ -1351,22 +1349,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Serenity/js/app.js">
+    <entry file="file://$PROJECT_DIR$/Serenity/templates/settings.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="140" column="33" lean-forward="true" selection-start-line="140" selection-start-column="33" selection-end-line="140" selection-end-column="33" />
-          <folding>
-            <element signature="e#3203#3312#0" expanded="true" />
-            <element signature="e#3771#3900#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="150">
+          <caret line="10" column="29" lean-forward="true" selection-start-line="10" selection-start-column="29" selection-end-line="10" selection-end-column="29" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Serenity/templates/settings.html">
+    <entry file="file://$PROJECT_DIR$/Serenity/js/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="25" column="0" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="435">
+          <caret line="140" column="33" lean-forward="false" selection-start-line="140" selection-start-column="33" selection-end-line="140" selection-end-column="33" />
+          <folding>
+            <element signature="e#3196#3305#0" expanded="true" />
+            <element signature="e#3764#3893#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

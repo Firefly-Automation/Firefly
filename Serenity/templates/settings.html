@@ -1,26 +1,28 @@
-
 <ui-view>
-<form name="settingsForm">
-    <md-input-container>
-        <label>First Name</label>
-        <input name="firstName" ng-model="firstName">
-    </md-input-container><br/>
-    <md-input-container>
-        <label>Last Name</label>
-        <input name="lastName" ng-model="lastName">
-    </md-input-container><br/>
-    <md-input-container>
-        <label>Password</label>
-        <input name="password" ng-model="password" type="password">
-    </md-input-container><br/>
-    <md-input-container ng-controller="SerenityCtrl">
+    <form name="settingsForm">
+        <md-input-container>
+            <label>First Name</label>
+            <input name="firstName" ng-model="firstName">
+        </md-input-container>
+        <br/>
+        <md-input-container>
+            <label>Last Name</label>
+            <input name="lastName" ng-model="lastName">
+        </md-input-container>
+        <br/>
+        <md-input-container>
+            <label>Password</label>
+            <input name="password" ng-model="password" type="password">
+        </md-input-container>
+        <br/>
+        <md-input-container ng-controller="SerenityCtrl">
 
-                            <md-select ng-model="selectedTheme" placeholder="Select a theme">
-                                <md-option ng-value="themeName" ng-repeat="themeName in themes"
-                                           ng-selected="themeName == theme" onClick="window.location.reload()">{{ themeName }}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-</form>
+            <md-select ng-model="selectedTheme" placeholder="Select a theme">
+                <md-option ng-value="themeName" ng-repeat="themeName in themes"
+                           ng-selected="themeName == theme" onClick="window.location.reload()">{{ themeName }}
+                </md-option>
+            </md-select>
+        </md-input-container>
+    </form>
 </ui-view>
 

@@ -37,9 +37,9 @@
 
         $scope.menuItems = [
             {
-              link: '/',
-              title: 'Dashboard',
-              icon: 'dashboard'
+                link: '/',
+                title: 'Dashboard',
+                icon: 'dashboard'
             }
         ];
         $scope.adminItems = [
@@ -50,10 +50,10 @@
             }
         ];
 
-        $scope.changeLocation = function(location) {
-                console.log('Chnage Location')
-                $location.path(location)
-              };
+        $scope.changeLocation = function (location) {
+            console.log('Chnage Location')
+            $location.path(location)
+        };
 
         $http.get('/theme', {timeout: 5000})
             .then(function (res) {
@@ -139,15 +139,15 @@
     });
 
     app.config(['$routeProvider',
-            function ($routeProvider) {
-                $routeProvider.when('/', {
-                    templateUrl: '/tpl/sample.html',
-                }).when('/settings', {
-                    templateUrl: '/tpl/settings.html',
-                }).otherwise({
-                    redirectTo: '/'
-                });
-            }])
+        function ($routeProvider) {
+            $routeProvider.when('/', {
+                templateUrl: '/tpl/sample.html',
+            }).when('/settings', {
+                templateUrl: '/tpl/settings.html',
+            }).otherwise({
+                redirectTo: '/'
+            });
+        }])
 
 
 })();
