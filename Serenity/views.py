@@ -11,6 +11,10 @@ import json
 def send_js(path):
     return send_from_directory('js', path)
 
+@app.route('/tpl/<path:path>')
+def send_tpl(path):
+    return send_from_directory('templates', path)
+
 @app.route('/')
 @login_required
 def root_page():

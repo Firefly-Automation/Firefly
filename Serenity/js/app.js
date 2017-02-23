@@ -141,17 +141,9 @@
     app.config(['$routeProvider',
             function ($routeProvider) {
                 $routeProvider.when('/', {
-                    templateUrl: '/sample',
-                }).when('/devices', {
-                    templateUrl: '/d',
-                }).when('/users', {
-                    templateUrl: '/users',
-                }).when('/tokens', {
-                    templateUrl: '/tokens',
+                    templateUrl: '/tpl/sample.html',
                 }).when('/settings', {
-                    templateUrl: '/settings',
-                }).when('/routines', {
-                    templateUrl: '/routines',
+                    templateUrl: '/tpl/settings.html',
                 }).otherwise({
                     redirectTo: '/'
                 });

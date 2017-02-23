@@ -24,7 +24,6 @@
                 <h1 class="md-toolbar-tools">Header</h1>
                 <div>
                     <md-input-container>
-
                         <md-select ng-model="selectedTheme" placeholder="Select a theme">
                             <md-option ng-value="themeName" ng-repeat="themeName in themes"
                                        ng-selected="themeName == theme">{{ themeName }}
@@ -38,6 +37,9 @@
         <section layout="row" flex="">
 
             <div ng-controller="LeftCtrl" ng-click="close()" md-theme="{{theme}}">
+
+                <!-- START OF SIDEBAR -->
+
                 <md-sidenav class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')"
                             md-disable-backdrop="" md-whiteframe="4">
 
@@ -75,16 +77,16 @@
                             </md-item>
                         </div>
                     </md-list>
-
-
                 </md-sidenav>
             </div>
 
+            <!-- END OF SIDEBAR -->
+
+            <!-- This is the content of the page -->
             <md-content flex="" layout-padding="">
                 <ng-view layout="column" flex=100></ng-view>
-
-
             </md-content>
+            <!-- End of content -->
 
             <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
 
