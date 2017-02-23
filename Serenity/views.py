@@ -12,8 +12,15 @@ def send_js(path):
     return send_from_directory('js', path)
 
 @app.route('/')
+@login_required
 def root_page():
-  return 'Hello World'
+  return render_template('base.html')
+
+@app.route('/sample')
+@login_required
+def sample_page():
+  return render_template('sample.html')
+
 
 @app.route('/settings')
 @login_required

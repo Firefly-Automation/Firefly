@@ -1,6 +1,6 @@
 (function () {
 
-    var app = angular.module('SerenityApp', ['ngMaterial', 'ngMessages', 'material.svgAssetsCache']);
+    var app = angular.module('SerenityApp', ['ngMaterial', 'ngMessages', 'material.svgAssetsCache', 'ngRoute', 'ngMdIcons']);
     app.config(function ($mdThemingProvider) {
         $mdThemingProvider.theme('default').accentPalette('lime');
 
@@ -27,12 +27,33 @@
         $mdThemingProvider.alwaysWatchTheme(true);
     });
 
-    app.controller('SerenityCtrl', function ($scope, $timeout, $mdSidenav, $log, $http) {
+    app.controller('SerenityCtrl', function ($scope, $timeout, $mdSidenav, $log, $http, $location) {
         $scope.toggleLeft = buildDelayedToggler('left');
         $scope.toggleRight = buildToggler('right');
         $scope.isOpenRight = function () {
             return $mdSidenav('right').isOpen();
         };
+
+
+        $scope.menuItems = [
+            {
+              link: '/',
+              title: 'Dashboard',
+              icon: 'dashboard'
+            }
+        ];
+        $scope.adminItems = [
+            {
+                link: '/settings',
+                title: 'Settings',
+                icon: 'settings'
+            }
+        ];
+
+        $scope.changeLocation = function(location) {
+                console.log('Chnage Location')
+                $location.path(location)
+              };
 
         $http.get('/theme', {timeout: 5000})
             .then(function (res) {
@@ -116,6 +137,25 @@
                 });
         };
     });
+
+    app.config(['$routeProvider',
+            function ($routeProvider) {
+                $routeProvider.when('/', {
+                    templateUrl: '/sample',
+                }).when('/devices', {
+                    templateUrl: '/d',
+                }).when('/users', {
+                    templateUrl: '/users',
+                }).when('/tokens', {
+                    templateUrl: '/tokens',
+                }).when('/settings', {
+                    templateUrl: '/settings',
+                }).when('/routines', {
+                    templateUrl: '/routines',
+                }).otherwise({
+                    redirectTo: '/'
+                });
+            }])
 
 
 })();

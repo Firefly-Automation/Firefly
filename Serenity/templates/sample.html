@@ -1,0 +1,42 @@
+<ui-view>
+    <div layout="column" layout-align="top center">
+        <md-button ng-click="toggleRight()" ng-hide="isOpenRight()" class="md-primary md-raised">
+            Toggle right
+        </md-button>
+        <md-button ng-click="toggleLeft()" class="md-primary" hide-gt-md="">
+            Toggle left
+        </md-button>
+
+        <h4>Standard date-picker</h4>
+        <md-datepicker ng-model="myDate" md-placeholder="Enter date"></md-datepicker>
+
+        <md-checkbox ng-model="ctrl.noCache">Disable caching of queries?</md-checkbox>
+        <md-checkbox ng-model="ctrl.isDisabled">Disable the input?</md-checkbox>
+
+        <section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+            <md-button class="md-raised">Button</md-button>
+            <md-button class="md-raised md-primary">Primary</md-button>
+            <md-button ng-disabled="true" class="md-raised md-primary">Disabled</md-button>
+            <md-button class="md-raised md-warn">Warn</md-button>
+            <div class="label">Raised</div>
+
+        </section>
+
+        <p>
+            The left sidenav will 'lock open' on a medium (>=960px wide) device.
+        </p>
+        <p>
+            The right sidenav will focus on a specific child element.
+        </p>
+
+        <div>
+
+        </div>
+
+        <div>
+
+        </div>
+    </div>
+
+    <div flex=""></div>
+</ui-view>
