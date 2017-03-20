@@ -1,8 +1,9 @@
 from Firefly import logging
+from Firefly.helpers.events import Event, Command, Request
 from Firefly import scheduler
 from Firefly.const import (ACTION_PRESENT, ACTION_NOT_PRESENT, PRESENT, NOT_PRESENT, DEVICE_TYPE_PRESENCE,
                            ACTION_PRESENT_BEACON, ACTION_NOT_PRESENT_BEACON, ACTION_ENABLE_BEACON, PRESENCE,
-                           BEACON_ENABLED, ENABLED, NOT_ENABLED, ACTION_SET_DELAY)
+                           BEACON_ENABLED, ENABLED, NOT_ENABLED, ACTION_SET_DELAY, EVENT_TYPE_BROADCAST)
 from Firefly.components.virtual_devices import AUTHOR
 from Firefly.helpers.device import Device
 
@@ -71,21 +72,29 @@ class VirtualPresence(Device):
 
   def set_present(self, **kwargs):
     self._presence = PRESENT
+    return PRESENT
 
   def set_not_present(self, **kwargs):
     scheduler.runInS(self._delay, self._set_not_present)
 
   def set_beacon_present(self, **kwargs):
     self._beacon_presence = PRESENT
+    return PRESENT
 
   def set_beacon_not_present(self, **kwargs):
     scheduler.runInS(self._delay, self._set_beacon_not_present)
 
   def _set_beacon_not_present(self, **kwargs):
     self._beacon_presence = NOT_PRESENT
+    # Because of delayed call, need to broadcast here.
+    broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=NOT_PRESENT)
+    self._firefly.send_event(broadcast)
 
   def _set_not_present(self, **kwargs):
     self._presence = NOT_PRESENT
+    # Because of delayed call, need to broadcast here.
+    broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=NOT_PRESENT)
+    self._firefly.send_event(broadcast)
 
   def set_beacon_enabled(self, **kwargs):
     enabled = kwargs.get('ENABLED', False)
