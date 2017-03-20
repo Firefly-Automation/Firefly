@@ -1,7 +1,8 @@
 from Firefly import logging
+from Firefly import scheduler
 from Firefly.const import (ACTION_PRESENT, ACTION_NOT_PRESENT, PRESENT, NOT_PRESENT, DEVICE_TYPE_PRESENCE,
                            ACTION_PRESENT_BEACON, ACTION_NOT_PRESENT_BEACON, ACTION_ENABLE_BEACON, PRESENCE,
-                           BEACON_ENABLED, ENABLED, NOT_ENABLED)
+                           BEACON_ENABLED, ENABLED, NOT_ENABLED, ACTION_SET_DELAY)
 from Firefly.components.virtual_devices import AUTHOR
 from Firefly.helpers.device import Device
 
@@ -11,9 +12,10 @@ TITLE = 'Firefly Virtual Presence Device'
 DEVICE_TYPE = DEVICE_TYPE_PRESENCE
 AUTHOR = AUTHOR
 COMMANDS = [ACTION_PRESENT, ACTION_NOT_PRESENT, ACTION_PRESENT_BEACON, ACTION_NOT_PRESENT_BEACON, ACTION_ENABLE_BEACON,
-            PRESENCE]
+            PRESENCE, ACTION_SET_DELAY]
 REQUESTS = [PRESENCE, BEACON_ENABLED]
 INITIAL_VALUES = {
+  '_delay':           5,
   '_presence':        NOT_PRESENT,
   '_beacon_enabled':  NOT_ENABLED,
   '_beacon_presence': NOT_PRESENT
@@ -39,6 +41,7 @@ class VirtualPresence(Device):
     self.add_command(ACTION_PRESENT_BEACON, self.set_beacon_present)
     self.add_command(ACTION_NOT_PRESENT_BEACON, self.set_beacon_not_present)
     self.add_command(ACTION_ENABLE_BEACON, self.set_beacon_enabled)
+    self.add_command(ACTION_SET_DELAY, self.set_delay)
 
     self.add_request(PRESENCE, self.get_presence)
     self.add_request(BEACON_ENABLED, self.get_beacon_enabled)
@@ -52,21 +55,37 @@ class VirtualPresence(Device):
     presence = kwargs.get('PRESENCE', False)
     presence = True if presence.lower() == 'true' else False
     if kwargs.get('TYPE') == 'BEACON':
-      self._beacon_presence = presence
+      if presence:
+        self._beacon_presence = presence
+      else:
+        scheduler.runInS(self._delay, self._set_beacon_not_present)
     else:
-      self._presence = presence
+      if presence:
+        self._presence = presence
+      else:
+        scheduler.runInS(self._delay, self._set_not_present)
+
+  def set_delay(self, **kwargs):
+    delay = int(kwargs.get('DELAY', 5))
+    self._delay = delay
 
   def set_present(self, **kwargs):
     self._presence = PRESENT
 
   def set_not_present(self, **kwargs):
-    self._presence = NOT_PRESENT
+    scheduler.runInS(self._delay, self._set_not_present)
 
   def set_beacon_present(self, **kwargs):
     self._beacon_presence = PRESENT
 
   def set_beacon_not_present(self, **kwargs):
+    scheduler.runInS(self._delay, self._set_beacon_not_present)
+
+  def _set_beacon_not_present(self, **kwargs):
     self._beacon_presence = NOT_PRESENT
+
+  def _set_not_present(self, **kwargs):
+    self._presence = NOT_PRESENT
 
   def set_beacon_enabled(self, **kwargs):
     enabled = kwargs.get('ENABLED', False)
