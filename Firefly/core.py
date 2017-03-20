@@ -57,6 +57,8 @@ class Firefly(object):
     # TODO: MOST OF WHATS BELOW IS FOR TESTING
     #self.install_package('Firefly.components.virtual_devices.switch', alias='Test Device', initial_values={'_state': 'UNKNOWN'})
 
+    #self.install_package('Firefly.components.virtual_devices.presence', alias='Test Presence')
+
     #for _, ff_id in self._devices.items():
     #  print(ff_id.export())
 
@@ -76,6 +78,8 @@ class Firefly(object):
     self.install_package('Firefly.services.darksky', alias='service Dark Sky')
     # Install openzwave
     #self.install_package('Firefly.services.zwave', alias='service zwave')
+
+
 
 
     c = Command(SERVICE_NOTIFICATION, 'test', COMMAND_NOTIFY, message='test')
