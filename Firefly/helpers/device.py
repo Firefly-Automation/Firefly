@@ -127,20 +127,26 @@ class Device(object):
     Returns:
       (bool): Command successful.
     """
-    state_before = self.__dict__.copy()
+    state_before = self.get_all_request_values()
     logging.debug('%s: Got Command: %s' % (self.id, command.command))
     if command.command in self.command_map.keys():
-      event_action = self.command_map[command.command](**command.args)
-      if not event_action:
+      self.command_map[command.command](**command.args)
+      state_after = self.get_all_request_values()
+      if state_before == state_after:
+        logging.info('No change detected. %s' % self)
         return True
-      if state_before == self.__dict__:
-        return True
-      logging.info('Change detected: %s' % self)
-      # TODO: If change detected then send broadcast event
-      broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=event_action)
-      self._firefly.send_event(broadcast)
+      logging.info('Change detected. %s' % self)
+      changed = {}
+      for item, val in state_after.items():
+        if state_after.get(item) != state_before.get(item):
+          changed[item] = state_after.get(item)
+
+      logging.info("Items changed: %s %s" % (str(changed), self))
+
+      # TODO: After updating broadcast change this to use the dict not list.
+      changed = [a for a in changed]
+      broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=changed)
       logging.info(broadcast)
-      # TODO: END
       return True
     return False
 
@@ -181,6 +187,12 @@ class Device(object):
     for r in self._requests:
       return_data['request_values'][r] = self.request_map[r]()
     return return_data
+
+  def get_all_request_values(self):
+    request_values = {}
+    for r in self._requests:
+      request_values[r] = self.request_map[r]()
+    return request_values
 
   @property
   def id(self):
