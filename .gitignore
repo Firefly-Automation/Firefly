@@ -76,3 +76,5 @@ target/
 .ipynb_checkpoints
 
 dev_config/services.config
+
+dev_config/devices.json

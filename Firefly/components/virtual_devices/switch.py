@@ -4,6 +4,8 @@ from Firefly.const import (STATE_OFF, STATE_ON, ACTION_OFF, ACTION_ON, STATE, EV
 from Firefly.components.virtual_devices import AUTHOR
 from Firefly.helpers.device import Device
 
+from Firefly.helpers.metadata import metaSwitch
+
 
 TITLE = 'Firefly Virtual Switch'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
@@ -29,6 +31,12 @@ class VirtualSwitch(Device):
     self.add_command(ACTION_TOGGLE, self.toggle)
 
     self.add_request(STATE, self.get_state)
+
+    self.add_action(STATE, metaSwitch())
+
+    # TODO: Make HOMEKIT CONST
+    self.add_homekit_export('HOMEKIT_SWITCH', STATE)
+
 
   def off(self, **kwargs):
     self._state = STATE_OFF

@@ -42,11 +42,13 @@ class Firefly(object):
     self._components = {}
 
     # Start Notification service
-    self.install_package('Firefly.services.notification', alias='service notificaion')
+    self.install_package('Firefly.services.notification', alias='service notification')
 
     # TODO: POC of passing initial values. These values would comve from the export of the current state.
     # self.install_package('Firefly.components.test_device', alias='Test Device', initial_values={'_state': 'UNKNOWN'})
     #self.import_devices()
+
+    #self.install_package('Firefly.components.notification.pushover', alias='Pushover', api_key='KEY', user_key='KEY')
 
     for c in COMPONENT_MAP:
       self.import_devices(c['file'])

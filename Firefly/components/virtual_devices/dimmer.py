@@ -3,6 +3,7 @@ from Firefly.const import (STATE_OFF, STATE_ON, ACTION_OFF, ACTION_ON, STATE, EV
                            ACTION_TOGGLE, DEVICE_TYPE_DIMMER, ACTION_LEVEL, LEVEL, EVENT_ACTION_LEVEL)
 from Firefly.components.virtual_devices import AUTHOR
 from Firefly.helpers.device import Device
+from Firefly.helpers.metadata import metaDimmer, metaSwitch
 
 
 TITLE = 'Firefly Virtual Dimmer'
@@ -32,6 +33,12 @@ class VirtualSwitch(Device):
 
     self.add_request(STATE, self.get_state)
     self.add_request(LEVEL, self.get_level)
+
+    self.add_action(LEVEL, metaDimmer())
+    self.add_action(STATE, metaSwitch())
+
+    # TODO: Make HOMEKIT CONST
+    self.add_homekit_export('HOMEKIT_DIMMER', LEVEL)
 
   def off(self, **kwargs):
     self._state = STATE_OFF

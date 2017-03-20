@@ -25,6 +25,12 @@ class Device(object):
     self._initial_values = kwargs.get('initial_values')
     self._command_mapping = {}
     self._request_mapping = {}
+    self._metadata = {
+      'title':   self._title,
+      'author':  self._author,
+      'package': self._package,
+      'actions': {}
+    }
 
     # If alias given but no ID look at config files for ID.
     if not device_id and alias:
@@ -43,6 +49,13 @@ class Device(object):
     self._alias = alias if alias else device_id
     aliases.set_alias(self._id, self._alias)
 
+    self._habridge_export = kwargs.get('habridge_export', True)
+    self._habridge_alias = kwargs.get('habridge_alias', self._alias)
+
+    self._homekit_export = kwargs.get('homekit_export', True)
+    self._homekit_alias = kwargs.get('homekit_alias', self._alias)
+    self._homekit_types = {}
+
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
 
@@ -58,10 +71,16 @@ class Device(object):
       (dict): A dict of the ff_id config.
     """
     export_data = {
-      'package':   self._package,
-      'ff_id': self.id,
-      'alias':     self._alias,
-      'type': self.type
+      'package':         self._package,
+      'ff_id':           self.id,
+      'alias':           self._alias,
+      'type':            self.type,
+      'homekit_export':  self._homekit_export,
+      'homekit_alias':   self._homekit_alias,
+      'homekit_types': self._homekit_types,
+      'habridge_export': self._habridge_export,
+      'habridge_alias':  self._habridge_alias,
+      'export_ui':       self._export_ui,
     }
 
     if current_values:
@@ -93,6 +112,12 @@ class Device(object):
     """
     self._request_mapping[request] = function
 
+  def add_action(self, action, action_meta):
+    self._metadata['actions'][action] = action_meta
+
+  def add_homekit_export(self, homekit_type, action):
+    self._homekit_types[homekit_type] = action
+
   def command(self, command: Command) -> bool:
     """
     Function that is called to send a command to a ff_id.
@@ -105,7 +130,7 @@ class Device(object):
     state_before = self.__dict__.copy()
     logging.debug('%s: Got Command: %s' % (self.id, command.command))
     if command.command in self.command_map.keys():
-      event_action =  self.command_map[command.command](**command.args)
+      event_action = self.command_map[command.command](**command.args)
       if not event_action:
         return True
       if state_before == self.__dict__:
@@ -141,17 +166,18 @@ class Device(object):
   def event(self, event: Event) -> None:
     logging.error('Devices currently dont support events')
 
-
   def get_api_info(self):
     return_data = {}
-    return_data['export_ui'] = self._export_ui
+    return_data.update(self.export(api_view=True))
     return_data['commands'] = self._commands
     return_data['requests'] = self._requests
     return_data['device_type'] = self._device_type
-    return_data.update(self.export(api_view=True))
+    return_data['metadata'] = self._metadata
+
     return_data['current_values'] = return_data['initial_values']
     return_data.pop('initial_values')
     return_data['request_values'] = {}
+    return_data
     for r in self._requests:
       return_data['request_values'][r] = self.request_map[r]()
     return return_data

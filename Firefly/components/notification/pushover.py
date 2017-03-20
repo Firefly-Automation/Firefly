@@ -37,6 +37,8 @@ class Pushover(Device):
     self.__dict__.update(kwargs['initial_values'])
 
     self._export_ui = False
+    self._homekit_export = False
+    self._habridge_export = False
     self._api_key = kwargs.get('api_key')
     self._user_key = kwargs.get('user_key')
 
