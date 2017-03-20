@@ -1,12 +1,9 @@
-from Firefly import logging
-from Firefly.helpers.events import Event, Command, Request
-from Firefly import scheduler
-from Firefly.const import (ACTION_PRESENT, ACTION_NOT_PRESENT, PRESENT, NOT_PRESENT, DEVICE_TYPE_PRESENCE,
-                           ACTION_PRESENT_BEACON, ACTION_NOT_PRESENT_BEACON, ACTION_ENABLE_BEACON, PRESENCE,
-                           BEACON_ENABLED, ENABLED, NOT_ENABLED, ACTION_SET_DELAY, EVENT_TYPE_BROADCAST)
+from Firefly import logging, scheduler
 from Firefly.components.virtual_devices import AUTHOR
+from Firefly.const import ACTION_ENABLE_BEACON, ACTION_NOT_PRESENT, ACTION_NOT_PRESENT_BEACON, ACTION_PRESENT, \
+  ACTION_PRESENT_BEACON, ACTION_SET_DELAY, BEACON_ENABLED, DEVICE_TYPE_PRESENCE, ENABLED, NOT_ENABLED, NOT_PRESENT, \
+  PRESENCE, PRESENT
 from Firefly.helpers.device import Device
-
 from Firefly.helpers.metadata import metaPresence
 
 TITLE = 'Firefly Virtual Presence Device'
@@ -86,7 +83,6 @@ class VirtualPresence(Device):
 
   def _set_beacon_not_present(self, **kwargs):
     self.member_set('_beacon_presence', NOT_PRESENT)
-    
 
   def _set_not_present(self, **kwargs):
     self.member_set('_presence', NOT_PRESENT)

@@ -1,12 +1,9 @@
-import asyncio
-
-from Firefly import logging
-from Firefly.helpers.events import Event, Command, Request
-from Firefly.const import EVENT_TYPE_BROADCAST, TYPE_DEVICE,API_INFO_REQUEST
-from typing import Callable, Any
 import uuid
-from Firefly.const import STATE
-from Firefly import aliases
+from typing import Any, Callable
+
+from Firefly import aliases, logging
+from Firefly.const import API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE
+from Firefly.helpers.events import Command, Event, Request
 
 
 class Device(object):
@@ -76,7 +73,7 @@ class Device(object):
       'type':            self.type,
       'homekit_export':  self._homekit_export,
       'homekit_alias':   self._homekit_alias,
-      'homekit_types': self._homekit_types,
+      'homekit_types':   self._homekit_types,
       'habridge_export': self._habridge_export,
       'habridge_alias':  self._habridge_alias,
       'export_ui':       self._export_ui,
@@ -135,20 +132,25 @@ class Device(object):
       return True
     return False
 
-  def broadcast_changes(self, before, after):
+  def broadcast_changes(self, before: dict, after: dict) -> None:
+    """Find changes from before and after states and broadcast the changes.
+
+    Args:
+      before (dict): before state.
+      after (dict): after state.
+
+    Returns:
+
+    """
     if before == after:
       logging.info('No change detected. %s' % self)
       return False
     logging.info('Change detected. %s' % self)
-    print(before)
-    print(after)
     changed = {}
     for item, val in after.items():
       if after.get(item) != before.get(item):
         changed[item] = before.get(item)
-
     logging.info("Items changed: %s %s" % (str(changed), self))
-
     # TODO: After updating broadcast change this to use the dict not list.
     changed = [a for a in changed]
     broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=changed)
@@ -191,11 +193,9 @@ class Device(object):
     return_data['requests'] = self._requests
     return_data['device_type'] = self._device_type
     return_data['metadata'] = self._metadata
-
     return_data['current_values'] = return_data['initial_values']
     return_data.pop('initial_values')
     return_data['request_values'] = {}
-    return_data
     for r in self._requests:
       return_data['request_values'][r] = self.request_map[r]()
     return return_data
@@ -223,12 +223,11 @@ class Device(object):
     Returns:
 
     """
-    logging.info("Setting %s to %s" %(key, val))
+    logging.info("Setting %s to %s" % (key, val))
     state_before = self.get_all_request_values()
     self.__setattr__(key, val)
     state_after = self.get_all_request_values()
     self.broadcast_changes(state_before, state_after)
-
 
   @property
   def id(self):
@@ -245,4 +244,3 @@ class Device(object):
   @property
   def type(self):
     return TYPE_DEVICE
-
