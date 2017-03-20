@@ -60,7 +60,6 @@ class Device(object):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
 
   def export(self, current_values: bool = True, api_view: bool = False) -> dict:
-
     """
     Export ff_id config with options current values to a dictionary.
 
@@ -132,27 +131,34 @@ class Device(object):
     if command.command in self.command_map.keys():
       self.command_map[command.command](**command.args)
       state_after = self.get_all_request_values()
-      if state_before == state_after:
-        logging.info('No change detected. %s' % self)
-        return True
-      logging.info('Change detected. %s' % self)
-      changed = {}
-      for item, val in state_after.items():
-        if state_after.get(item) != state_before.get(item):
-          changed[item] = state_after.get(item)
-
-      logging.info("Items changed: %s %s" % (str(changed), self))
-
-      # TODO: After updating broadcast change this to use the dict not list.
-      changed = [a for a in changed]
-      broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=changed)
-      logging.info(broadcast)
+      self.broadcast_changes(state_before, state_after)
       return True
     return False
 
+  def broadcast_changes(self, before, after):
+    if before == after:
+      logging.info('No change detected. %s' % self)
+      return False
+    logging.info('Change detected. %s' % self)
+    print(before)
+    print(after)
+    changed = {}
+    for item, val in after.items():
+      if after.get(item) != before.get(item):
+        changed[item] = before.get(item)
+
+    logging.info("Items changed: %s %s" % (str(changed), self))
+
+    # TODO: After updating broadcast change this to use the dict not list.
+    changed = [a for a in changed]
+    broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=changed)
+    logging.info(broadcast)
+    return True
+
   def request(self, request: Request) -> Any:
-    """
-    Function to request data from the ff_id. The returned data can be in any format. Common formats should be:
+    """Function to request data from the ff_id.
+
+    The returned data can be in any format. Common formats should be:
       str, int, dict
 
     Args:
@@ -172,7 +178,13 @@ class Device(object):
   def event(self, event: Event) -> None:
     logging.error('Devices currently dont support events')
 
-  def get_api_info(self):
+  def get_api_info(self) -> dict:
+    """
+    Function to get view for API.
+
+    Returns (dict): JSON for API view.
+
+    """
     return_data = {}
     return_data.update(self.export(api_view=True))
     return_data['commands'] = self._commands
@@ -188,11 +200,35 @@ class Device(object):
       return_data['request_values'][r] = self.request_map[r]()
     return return_data
 
-  def get_all_request_values(self):
+  def get_all_request_values(self) -> dict:
+    """Function to get all requestable values.
+
+    Returns (dict): All requests and values.
+
+    """
     request_values = {}
     for r in self._requests:
       request_values[r] = self.request_map[r]()
     return request_values
+
+  def member_set(self, key: str, val: Any) -> None:
+    """Function for setting member values when you want it to be broadcasted.
+
+    This is mainly used for time delay functions and it similar to the builtin __setattr__.
+
+    Args:
+      key (string): Value to be changed.
+      val (Any): New value.
+
+    Returns:
+
+    """
+    logging.info("Setting %s to %s" %(key, val))
+    state_before = self.get_all_request_values()
+    self.__setattr__(key, val)
+    state_after = self.get_all_request_values()
+    self.broadcast_changes(state_before, state_after)
+
 
   @property
   def id(self):
@@ -209,3 +245,4 @@ class Device(object):
   @property
   def type(self):
     return TYPE_DEVICE
+

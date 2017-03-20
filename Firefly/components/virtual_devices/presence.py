@@ -85,16 +85,11 @@ class VirtualPresence(Device):
     scheduler.runInS(self._delay, self._set_beacon_not_present)
 
   def _set_beacon_not_present(self, **kwargs):
-    self._beacon_presence = NOT_PRESENT
-    # Because of delayed call, need to broadcast here.
-    broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=NOT_PRESENT)
-    self._firefly.send_event(broadcast)
+    self.member_set('_beacon_presence', NOT_PRESENT)
+    
 
   def _set_not_present(self, **kwargs):
-    self._presence = NOT_PRESENT
-    # Because of delayed call, need to broadcast here.
-    broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=NOT_PRESENT)
-    self._firefly.send_event(broadcast)
+    self.member_set('_presence', NOT_PRESENT)
 
   def set_beacon_enabled(self, **kwargs):
     enabled = kwargs.get('ENABLED', False)
