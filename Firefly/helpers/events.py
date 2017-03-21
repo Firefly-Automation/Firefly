@@ -1,4 +1,4 @@
-from Firefly.helpers import logging
+from Firefly import logging
 from Firefly import aliases
 from typing import TypeVar
 from Firefly.const import (EVENT_TYPE_COMMAND, COMMAND_NOTIFY, COMMAND_SPEECH, COMMAND_ROUTINE, EVENT_TYPE_REQUEST)
@@ -11,11 +11,16 @@ class Event(object):
   Events are messages sent between apps and components. Events can carry requests, commands, or updates.
   """
 
-  def __init__(self, source: str, event_type: str, event_action: str = '', **kwargs):
+  def __init__(self, source: str, event_type: str, event_action: dict = {}, **kwargs):
     self._source = source
     self._event_type = event_type
-    self._event_action = event_action if type(event_action) == list else [event_action]
+    #self._event_action = event_action if type(event_action) == list else [event_action]
     self._kwargs = kwargs
+    self._event_action = event_action
+    if type(self._event_action) is not dict:
+      logging.error('EVENT event_action is not type dict!')
+      self._event_action = {}
+
 
   def __str__(self):
     return '<FIREFLY EVENT - SOURCE: %s | TYPE: %s | ACTION: %s >' % (self.source, self.event_type, self.event_action)

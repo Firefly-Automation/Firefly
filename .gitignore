@@ -1,4 +1,7 @@
 #Mine
+.idea/*
+.idea/
+
 *.sqlite
 OZW_Log.txt
 sumblime_Firefly*

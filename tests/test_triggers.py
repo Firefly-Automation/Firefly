@@ -36,7 +36,7 @@ class TestTriggers(unittest.TestCase):
     self.assertNotEqual(trigger, Trigger('unknown'))
 
   def test_triggers(self):
-    # with patch('Firefly.helpers.subscribers.Subscriptions.add_subscriber') as mock:
+    #with patch('Firefly.helpers.subscribers.Subscriptions.add_subscriber') as mock:
     # TODO: Get mock working to verify that add_subscriber is called
 
     triggers = Triggers(self.firefly, 'test_device')
@@ -191,7 +191,7 @@ class TestTriggers(unittest.TestCase):
       self.assertTrue(valid)
 
       event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_OPEN)
-      valid = triggers.check_triggers(event)
+      valid = yield from triggers.check_triggers(event)
       self.assertFalse(valid)
 
       triggers = Triggers(self.firefly, 'test_device')
@@ -213,19 +213,19 @@ class TestTriggers(unittest.TestCase):
       triggers.add_trigger(trigger)
 
       event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
-      valid = triggers.check_triggers(event)
+      valid = yield from triggers.check_triggers(event)
       self.assertTrue(valid)
 
       event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_OFF)
-      valid = triggers.check_triggers(event)
+      valid = yield from triggers.check_triggers(event)
       self.assertFalse(valid)
 
       triggers = Triggers(self.firefly, 'test_device')
-      trigger = Trigger('test_device2', EVENT_ACTION_ANY, STATE, STATE_ON)
+      trigger = yield from Trigger('test_device2', EVENT_ACTION_ANY, STATE, STATE_ON)
       triggers.add_trigger(trigger)
 
       event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_OFF)
-      valid = triggers.check_triggers(event)
+      valid = yield from triggers.check_triggers(event)
       self.assertTrue(valid)
 
   def test_check_two_single_triggers(self):
@@ -241,11 +241,11 @@ class TestTriggers(unittest.TestCase):
       triggers.add_trigger(trigger)
 
       event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
-      valid = triggers.check_triggers(event)
+      valid = yield from triggers.check_triggers(event)
       self.assertTrue(valid)
 
       event = Event('test_device1', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
-      valid = triggers.check_triggers(event)
+      valid = yield from triggers.check_triggers(event)
       self.assertTrue(valid)
 
   def test_check_triggers_multiple(self):
@@ -268,7 +268,7 @@ class TestTriggers(unittest.TestCase):
       self.assertFalse(valid)
 
       event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_OFF)
-      valid = triggers.check_triggers(event)
+      valid = yield from triggers.check_triggers(event)
       self.assertFalse(valid)
 
       triggers = Triggers(self.firefly, 'test_device')

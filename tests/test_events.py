@@ -7,8 +7,24 @@ from unittest.mock import patch
 
 class EventTest(unittest.TestCase):
   def test_new_event(self):
-    e = Event('event_source', EVENT_TYPE_UPDATE, EVENT_ACTION_ACTIVE)
-    self.assertAlmostEqual(e.source, 'event_source')
+    event_source = 'event_source'
+    event_type = EVENT_TYPE_UPDATE
+    event_action = {EVENT_ACTION_ACTIVE:'ACTIVE'}
+    e = Event(event_source, event_type, event_action)
+    self.assertEquals(e.source, event_source)
+    self.assertEquals(e.event_type, event_type)
+    self.assertEquals(e.event_action, event_action)
+
+  def test_bad_event(self):
+    event_source = 'event_source'
+    event_type = EVENT_TYPE_UPDATE
+    event_action = 'MY NON DICT'
+    e = Event(event_source, event_type, event_action)
+    self.assertEquals(e.source, event_source)
+    self.assertEquals(e.event_type, event_type)
+    self.assertNotEqual(e.event_action, event_action)
+    self.assertEquals(e.event_action, {})
+
 
 class CommandTest(unittest.TestCase):
   def test_new_command(self):
