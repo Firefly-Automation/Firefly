@@ -1,5 +1,5 @@
 from Firefly import logging
-from Firefly.const import (STATE_OFF, STATE_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
+from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
                            ACTION_TOGGLE, DEVICE_TYPE_DIMMER, ACTION_LEVEL, LEVEL, EVENT_ACTION_LEVEL)
 from Firefly.components.virtual_devices import AUTHOR
 from Firefly.helpers.device import Device
@@ -11,7 +11,7 @@ DEVICE_TYPE = DEVICE_TYPE_DIMMER
 AUTHOR = AUTHOR
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ACTION_LEVEL]
 REQUESTS = [STATE, LEVEL]
-INITIAL_VALUES = {'_state': STATE_OFF,
+INITIAL_VALUES = {'_state': EVENT_ACTION_OFF,
                   '_level': 100}
 
 def Setup(firefly, package, **kwargs):
@@ -41,15 +41,15 @@ class VirtualSwitch(Device):
     self.add_homekit_export('HOMEKIT_DIMMER', LEVEL)
 
   def off(self, **kwargs):
-    self._state = STATE_OFF
+    self._state = EVENT_ACTION_OFF
     return EVENT_ACTION_OFF
 
   def on(self, **kwargs):
-    self._state = STATE_ON
+    self._state = EVENT_ACTION_ON
     return EVENT_ACTION_ON
 
   def toggle(self, **kwargs):
-    if self.state == STATE_ON:
+    if self.state == EVENT_ACTION_ON:
       return self.off()
     return self.on()
 
@@ -60,10 +60,10 @@ class VirtualSwitch(Device):
       return False
     if level > 100:
       level = 100
-    if level == 0 and self.state == STATE_ON:
+    if level == 0 and self.state == EVENT_ACTION_ON:
       self.off()
       event_actions.append(EVENT_ACTION_OFF)
-    if level > 0 and self.state == STATE_OFF:
+    if level > 0 and self.state == EVENT_ACTION_OFF:
       self.on()
       event_actions.append(EVENT_ACTION_ON)
 

@@ -1,6 +1,10 @@
 #Mine
 .idea/*
 .idea/
+*.idea*
+workspace.xml
+misc.xml
+Firefly.iml
 
 *.sqlite
 OZW_Log.txt

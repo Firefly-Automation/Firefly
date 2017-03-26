@@ -6,7 +6,7 @@ import json
 
 from Firefly import logging
 
-from Firefly.const import (STATE_OFF, STATE_ON, TYPE_DEVICE, ACTION_OFF, ACTION_ON, STATE, API_INFO_REQUEST)
+from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, TYPE_DEVICE, ACTION_OFF, ACTION_ON, STATE, API_INFO_REQUEST)
 from Firefly.helpers.events import Command, Request
 
 class FireflyCoreAPI:

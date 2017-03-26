@@ -25,6 +25,9 @@ class Event(object):
   def __str__(self):
     return '<FIREFLY EVENT - SOURCE: %s | TYPE: %s | ACTION: %s >' % (self.source, self.event_type, self.event_action)
 
+  def __eq__(self, other):
+    return self.__dict__ == other.__dict__
+
   @property
   def source(self):
     return self._source

@@ -6,7 +6,7 @@ from Firefly.helpers.events import Event
 import asyncio
 from openzwave.network import ZWaveNode
 from Firefly import logging
-from Firefly.const import (STATE_OFF, STATE_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
+from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
                            ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SENSORS, DEVICE_TYPE_MOTION, EVENT_TYPE_BROADCAST)
 
 

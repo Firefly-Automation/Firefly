@@ -4,7 +4,7 @@ from Firefly.util.get_from_kwargs import get_kwargs_value
 
 from openzwave.network import ZWaveNode
 from Firefly import logging
-from Firefly.const import (STATE_OFF, STATE_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
+from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
                            ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SENSORS)
 
 
@@ -14,7 +14,7 @@ DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = 'Zachary Priddy'
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, 'ZWAVE_CONFIG']
 REQUESTS = [STATE, 'SENSORS', 'PARAMS', 'DEVICE_VALUES']
-INITIAL_VALUES = {'_state': STATE_OFF}
+INITIAL_VALUES = {'_state': EVENT_ACTION_OFF}
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
@@ -50,13 +50,13 @@ class ZwaveSwitch(Device):
 
 
   def off(self, **kwargs):
-    self._state = STATE_OFF
+    self._state = EVENT_ACTION_OFF
     print(self._switches)
     self._node.set_switch(self._switches[0], 0)
     return EVENT_ACTION_OFF
 
   def on(self, **kwargs):
-    self._state = STATE_ON
+    self._state = EVENT_ACTION_ON
     self._node.set_switch(self._switches[0], 1)
     return EVENT_ACTION_ON
 
@@ -86,7 +86,7 @@ class ZwaveSwitch(Device):
 
 
   def toggle(self, **kwargs):
-    if self.state == STATE_ON:
+    if self.state == EVENT_ACTION_ON:
       return self.off()
     return self.on()
 
@@ -104,9 +104,9 @@ class ZwaveSwitch(Device):
         self._device_values[i.label.upper()] = {'value': i.data, 'id': i.index, 'class': i.command_class}
 
     if node.get_switch_state(self._switches[0]):
-      self._state = STATE_ON
+      self._state = EVENT_ACTION_ON
     else:
-      self._state = STATE_OFF
+      self._state = EVENT_ACTION_OFF
 
     self._node = node.get
 

@@ -42,15 +42,17 @@ class Location(object):
       scheduler.runAt(day_event_time, self.DayEventHandler, day_event=e, job_id=e)
       #scheduler.runAt(self.now + timedelta(seconds=3), self.DayEventHandler, day_event=e, job_id=e)
 
-    # TODO: Remove this
-    #event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action='STARTUP')
+    # TODO: Remove this (maybe)
+    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={'LOCATION':'STARTUP'})
+    self._firefly.send_event(event)
     #scheduler.runInS(0, self._firefly.send_event, event=event)
 
   @asyncio.coroutine
   def DayEventHandler(self, day_event):
     logging.info('day event handler - event: {}'.format(day_event))
+    logging.notify('day event handler - event: {}'.format(day_event))
     event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action=day_event)
-    yield from self._firefly.send_event(event)
+    self._firefly.send_event(event)
     # TODO: Remove
     # scheduler.runInS(0, self._firefly.send_event, event=event)
     next_day_event_time = self.getNextDayEvent(day_event)
@@ -73,9 +75,11 @@ class Location(object):
   def mode(self, mode):
     mode = str(mode)
     if mode in self.modes:
+      self._last_mode = self._mode
       self._mode = mode
       # ffEvent('location', {'mode': self.mode})
-      event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, 'EVENT_ACTION_MODE')
+      event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, {'EVENT_ACTION_MODE':mode})
+      self._firefly.send_event(event)
       return True
     return False
 

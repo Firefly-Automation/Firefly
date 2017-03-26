@@ -28,6 +28,7 @@ class Firefly(object):
   ''' Core running loop and scheduler of Firefly'''
 
   def __init__(self, settings):
+    # TODO: Most of this should be in startup not init.
     logging.Startup(self)
     logging.message('Initializing Firefly')
     self.settings = settings
@@ -38,6 +39,7 @@ class Firefly(object):
 
 
     self._subscriptions = Subscriptions()
+    # TODO: This should be done after importing devices and automation.
     self.location = Location(self, "95110", ['HOME'])
     self._components = {}
 
@@ -79,26 +81,7 @@ class Firefly(object):
     # Install openzwave
     #self.install_package('Firefly.services.zwave', alias='service zwave')
 
-
-
-
-    c = Command(SERVICE_NOTIFICATION, 'test', COMMAND_NOTIFY, message='test')
-    #print(c.args)
-    #s = self.components[c.device].command(c)
-    #print(s)
-    #self.send_command(c)
-
     logging.notify('Firefly is starting up')
-
-
-
-
-    # TODO: Remove this. This is a POC for scheduler.
-    c = Command('Test Device', 'web_api', ACTION_TOGGLE)
-    print(c.export())
-    d_args = c.export()
-    d = Command(**d_args)
-    scheduler.runEveryH(1, self.send_command, command=d)
 
     # TODO: Leave In.
     scheduler.runEveryH(1, self.export_all_components)
@@ -125,18 +108,15 @@ class Firefly(object):
     Shutdown process should export the current state of all components so it can be imported on reboot and startup.
     '''
     # TODO: Export current state of components on shutdown
-
+    logging.message('Stopping Firefly')
     try:
+      logging.message('Stopping zwave service')
       self.components['service_zwave'].stop()
     except:
       pass
 
-    logging.message('Stopping Firefly')
+    # TODO: export automation.
     self.export_all_components()
-
-    # TODO: Remove this once exporting works
-    for device in self.components:
-      print(self.components[device].__dict__)
 
     self.loop.close()
 
@@ -203,6 +183,7 @@ class Firefly(object):
 
   @asyncio.coroutine
   def async_send_event(self, event):
+    logging.info('Received event: %s' % event)
     s = True
     fut = asyncio.Future(loop=self.loop)
     send_to = self._subscriptions.get_subscribers(event.source, event_action=event.event_action)
@@ -212,12 +193,10 @@ class Firefly(object):
 
 
   def send_event(self, event: Event) -> Any:
-    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    s = True
+    logging.info('Received event: %s' % event)
     fut = asyncio.Future(loop=self.loop)
     send_to = self._subscriptions.get_subscribers(event.source, event_action=event.event_action)
     for s in send_to:
-      print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! %s ' % s)
       s = asyncio.ensure_future(self._send_event(event, s, fut), loop=self.loop)
     return True
 
@@ -261,9 +240,12 @@ class Firefly(object):
 
   @asyncio.coroutine
   def _send_command(self, command, fut):
-    result =  self.components[command.device].command(command)
-    fut.set_result(result)
-    return result
+    if command.device in self.components:
+      result =  self.components[command.device].command(command)
+      fut.set_result(result)
+      return result
+    logging.error('[_send_command] Device not found: %s' % command.device)
+    return None
 
 
   def add_route(self, route, method, handler):
