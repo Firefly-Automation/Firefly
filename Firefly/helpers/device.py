@@ -151,10 +151,9 @@ class Device(object):
       if after.get(item) != before.get(item):
         changed[item] = before.get(item)
     logging.info("Items changed: %s %s" % (str(changed), self))
-    # TODO: After updating broadcast change this to use the dict not list.
-    changed = [a for a in changed]
     broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=changed)
     logging.info(broadcast)
+    self._firefly.send_event(broadcast)
     return True
 
   def request(self, request: Request) -> Any:

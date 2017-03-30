@@ -1,9 +1,6 @@
 from Firefly import logging
-from Firefly.const import (EVENT_ACTION_ANY, EVENT_PROPERTY_ANY)
+from Firefly.const import (EVENT_ACTION_ANY, EVENT_ACTON_TYPE)
 from typing import List
-from typing import TypeVar
-
-EVENT_ACTON_TYPE = TypeVar('EVENT_ACTION', dict, str, list)
 
 
 class Subscriptions(object):
@@ -96,10 +93,10 @@ class Subscriptions(object):
         if ea == EVENT_ACTION_ANY:
           if EVENT_ACTION_ANY not in subscriptions:
             subscriptions[EVENT_ACTION_ANY] = {}
-          if EVENT_ACTION_ANY not in subscriptions[EVENT_ACTION_ANY]:
-            subscriptions[EVENT_ACTION_ANY][EVENT_ACTION_ANY] = []
-          if subscriber_id not in subscriptions[EVENT_ACTION_ANY][EVENT_ACTION_ANY]:
-            subscriptions[EVENT_ACTION_ANY][EVENT_ACTION_ANY].append(subscriber_id)
+          if event_action[ea] not in subscriptions[EVENT_ACTION_ANY]:
+            subscriptions[EVENT_ACTION_ANY][event_action[ea]] = []
+          if subscriber_id not in subscriptions[EVENT_ACTION_ANY][event_action[ea]]:
+            subscriptions[EVENT_ACTION_ANY][event_action[ea]].append(subscriber_id)
 
         else:
           logging.warn('Got string to event_action making it {%s : ANY}' % event_action)
@@ -110,11 +107,17 @@ class Subscriptions(object):
         for evt, act in ea.items():
           if evt not in subscriptions:
             subscriptions[evt] = {}
-          for a in act:
-            if a not in subscriptions.get(evt):
-              subscriptions[evt][a] = []
-            if subscriber_id not in subscriptions[evt][a]:
-              subscriptions[evt][a].append(subscriber_id)
+          if type(act) is list:
+            for a in act:
+              if a not in subscriptions[evt].keys():
+                subscriptions[evt][a] = []
+              if subscriber_id not in subscriptions[evt][a]:
+                subscriptions[evt][a].append(subscriber_id)
+          else:
+            if act not in subscriptions[evt].keys():
+              subscriptions[evt][act] = []
+            if subscriber_id not in subscriptions[evt][act]:
+              subscriptions[evt][act].append(subscriber_id)
 
   def get_all_subscribers(self, subscribe_to_id: str) -> list:
     """Get a list of all subscribers to a component.
@@ -196,6 +199,24 @@ class Subscriptions(object):
     """
 
     return self.delete_replace_subscriber(subscriber_id, subscribe_to_id, event_action, delete_all)
+
+
+  def delete_all_subscriptions(self, subscriber_id: str) -> int:
+    """Delete all subscriptions from all devices from subscriber.
+    
+    Args:
+      subscriber_id (str): The subscriber ID to be deleted
+
+    Returns:
+      (int): The number of subscriptions deleted
+
+    """
+    total_deletions = 0
+    for sub in self.subscriptions.keys():
+      total_deletions += self.delete_subscriber(subscriber_id, sub, delete_all=True)
+    return total_deletions
+
+
 
   def delete_replace_subscriber(self, subscriber_id: str, subscribe_to_id: str,
                                 event_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY,
@@ -331,20 +352,27 @@ def verify_event_action(event_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY, get_s
     return [verify_event_action_dict(event_action)]
 
   if event_action == EVENT_ACTION_ANY:
-    return [event_action]
+    return [{EVENT_ACTION_ANY:[EVENT_ACTION_ANY]}]
 
   if type(event_action) is list:
-    new_event_actions = []
+    new_event_actions = {}
     for ea in event_action:
       # Verify when not coming from get_subscribers
       if not get_subscribers:
         if type(ea) is not dict and ea != EVENT_ACTION_ANY:
           logging.error('event_action: %s is not type dict! Making ANY listener [ERROR CODE: SUB.DEL.9]' % event_action)
-          new_event_actions.append({EVENT_ACTION_ANY: [ea]})
+          if EVENT_ACTION_ANY in new_event_actions.keys():
+            new_event_actions[EVENT_ACTION_ANY].append(ea)
+          else:
+            new_event_actions[EVENT_ACTION_ANY] = [ea]
         elif type(ea) is dict:
-          new_event_actions.append(verify_event_action_dict(ea))
+          new_event_actions.update(verify_event_action_dict(ea))
         elif ea == EVENT_ACTION_ANY:
-          new_event_actions.append(EVENT_ACTION_ANY)
+          if EVENT_ACTION_ANY in new_event_actions.keys():
+            new_event_actions[EVENT_ACTION_ANY].append(EVENT_ACTION_ANY)
+          else:
+            new_event_actions[EVENT_ACTION_ANY] = [EVENT_ACTION_ANY]
+
 
       # Verify when coming from get_subscribers
       if get_subscribers:
@@ -353,7 +381,7 @@ def verify_event_action(event_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY, get_s
         if type(ea) is list:
           new_event_actions.extend(ea)
 
-    return new_event_actions
+    return [new_event_actions]
 
   logging.error("EVENT ACTION NOT VERIFIED [ERROR CODE: SUB.DEL.8]")
   return event_action

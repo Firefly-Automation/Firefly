@@ -22,7 +22,7 @@ def metaSwitch(command=True, request=True, primary=False):
     'request': request,
     'primary': primary,
     'context': 'Change dimmer level.',
-    'type':    'boolean',
+    'type':    'select',
     'options': {
       "On":  EVENT_ACTION_ON,
       "Off": EVENT_ACTION_OFF
@@ -36,7 +36,7 @@ def metaPresence(command=True, request=True, primary=False):
     'request': request,
     'primary': primary,
     'context': 'Set the presence of a device.',
-    'type':    'boolean',
+    'type':    'select',
     'options': {
       "Present":  PRESENT,
       "Not Present": NOT_PRESENT

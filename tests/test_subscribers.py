@@ -10,12 +10,12 @@ class VerifyEventActions(unittest.TestCase):
   def test_any_string(self):
     event_action = EVENT_ACTION_ANY
     verify = verify_event_action(event_action)
-    self.assertEquals(verify, [EVENT_ACTION_ANY])
+    self.assertEquals(verify, [{EVENT_ACTION_ANY:[EVENT_ACTION_ANY]}])
 
   def test_any_list(self):
     event_action = [EVENT_ACTION_ANY]
     verify = verify_event_action(event_action)
-    self.assertEquals(verify, [EVENT_ACTION_ANY])
+    self.assertEquals(verify, [{EVENT_ACTION_ANY:[EVENT_ACTION_ANY]}])
 
   def test_single_event_action(self):
     event_action = {STATE: EVENT_ACTION_OFF}
@@ -198,6 +198,17 @@ class SubscribersTest(unittest.TestCase):
     delete_count = s.delete_subscriber(self.app, self.device, delete_all=True)
     self.assertEqual(delete_count, 0)
     self.assertDictEqual(s.subscriptions, {self.device: {STATE: {EVENT_ACTION_ON: [], EVENT_ACTION_OFF: []}}})
+
+  def test_delete_all_subscription(self):
+    s = Subscriptions()
+    s.add_subscriber(self.app, self.device, event_action={STATE: [EVENT_ACTION_ON, EVENT_ACTION_OFF]})
+    s.add_subscriber(self.app, self.device_b, event_action={STATE: [EVENT_ACTION_ON, EVENT_ACTION_OFF]})
+    s.add_subscriber(self.app_b, self.device, event_action={STATE: [EVENT_ACTION_ON, EVENT_ACTION_OFF]})
+    delete_count = s.delete_all_subscriptions(self.app)
+    self.assertEquals(delete_count, 4)
+    self.assertDictEqual(s.subscriptions,
+                         {self.device:   {STATE: {EVENT_ACTION_ON: [self.app_b], EVENT_ACTION_OFF: [self.app_b]}},
+                          self.device_b: {STATE: {EVENT_ACTION_ON: [], EVENT_ACTION_OFF: []}}})
 
   def test_change_parent_id(self):
     s = Subscriptions()

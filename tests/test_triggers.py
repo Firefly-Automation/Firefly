@@ -1,7 +1,8 @@
 import unittest
-from unittest.mock import patch, PropertyMock
+from unittest.mock import patch, PropertyMock, MagicMock
 from Firefly.automation.triggers import Trigger, Triggers
-from Firefly.const import EVENT_ACTION_CLOSE, STATE, STATE_CLOSED, EVENT_ACTION_ON, EVENT_TYPE_BROADCAST, EVENT_ACTION_ANY, \
+from Firefly.const import EVENT_ACTION_CLOSE, STATE, STATE_CLOSED, EVENT_ACTION_ON, EVENT_TYPE_BROADCAST, \
+  EVENT_ACTION_ANY, \
   EVENT_ACTION_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, EVENT_ACTION_OFF
 from Firefly.helpers.subscribers import Subscriptions
 from Firefly.helpers.events import Event
@@ -11,280 +12,605 @@ class TestTriggers(unittest.TestCase):
   @patch('Firefly.core.Firefly')
   def setUp(self, firefly):
     self.firefly = firefly
-    self.firefly._subscriptions = Subscriptions()
+    self.firefly.subscriptions = Subscriptions()
+    self.device = 'fake_device'
+    self.device_b = 'fake_device_b'
+    self.app = 'subscriber_app'
+    self.app_b = 'subscriber_app_b'
+    self.trigger_id = 'test_automation_trigger'
 
-  def test_building_trigger(self):
-    trigger = Trigger('listen_device', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED)
-    self.assertEqual(trigger.listen_id, 'listen_device')
-    self.assertEqual(trigger.listen_action, EVENT_ACTION_CLOSE)
-    self.assertEqual(trigger.request_property, STATE)
-    self.assertEqual(trigger.request_verify, STATE_CLOSED)
+  def test_trigger_simple(self):
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    self.assertListEqual(trigger.listen_action, [{STATE: [EVENT_ACTION_ON]}])
+    self.assertEquals(trigger.listen_id, self.device)
 
-    trigger_export = trigger.export()
-    self.assertEqual(trigger_export,
-                     {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
-                      'request_verify': STATE_CLOSED, 'source': 'SOURCE_TRIGGER'})
+  def test_trigger_any(self):
+    trigger = Trigger(self.device)
+    self.assertListEqual(trigger.listen_action, [{EVENT_ACTION_ANY: [EVENT_ACTION_ANY]}])
+    self.assertEquals(trigger.listen_id, self.device)
 
-    trigger2 = Trigger(**trigger_export)
-    trigger_export = trigger2.export()
-    self.assertEqual(trigger_export,
-                     {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
-                      'request_verify': STATE_CLOSED, 'source': 'SOURCE_TRIGGER'})
-    # trigger1 and trigger2 should be equal to each other
-    self.assertEqual(trigger, trigger2)
+  def test_trigger_any_property(self):
+    trigger = Trigger(self.device, {EVENT_ACTION_ANY: [EVENT_ACTION_ON]})
+    self.assertListEqual(trigger.listen_action, [{EVENT_ACTION_ANY: [EVENT_ACTION_ON]}])
+    self.assertEquals(trigger.listen_id, self.device)
 
-    self.assertNotEqual(trigger, Trigger('unknown'))
+  def test_trigger_any_source(self):
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    self.assertListEqual(trigger.listen_action, [{STATE: [EVENT_ACTION_ON]}])
+    self.assertEquals(trigger.listen_id, self.device)
 
-  def test_triggers(self):
-    #with patch('Firefly.helpers.subscribers.Subscriptions.add_subscriber') as mock:
-    # TODO: Get mock working to verify that add_subscriber is called
+  def test_add_one_trigger(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    self.assertListEqual(triggers.triggers,
+                         [[{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}],
+                            '_source':    'SOURCE_TRIGGER'}]])
 
-    triggers = Triggers(self.firefly, 'test_device')
-    trigger = Trigger('listen_device', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED)
-    added = triggers.add_trigger(trigger)
-    self.assertTrue(added)
-    self.assertEqual(triggers.triggers[0], trigger)
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions,
+                         {self.device: {STATE: {EVENT_ACTION_ON: [self.trigger_id]}}})
+    self.assertSetEqual(triggers.trigger_sources, {self.device})
 
-    added = triggers.add_trigger(trigger)
-    self.assertFalse(added)
+  def test_add_one_trigger_twice(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertFalse(trigger_added)
+    self.assertListEqual(triggers.triggers,
+                         [[{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}],
+                            '_source':    'SOURCE_TRIGGER'}]])
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions,
+                         {self.device: {STATE: {EVENT_ACTION_ON: [self.trigger_id]}}})
+    self.assertSetEqual(triggers.trigger_sources, {self.device})
 
+  def test_add_one_trigger_list(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger2 = Trigger(self.device_b, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger([trigger, trigger2])
+    self.assertTrue(trigger_added)
+    self.assertListEqual(triggers.triggers,
+                         [[{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}],
+                            '_source':    'SOURCE_TRIGGER'},
+                           {'_listen_id': self.device_b, '_listen_action': [{STATE: [EVENT_ACTION_ON]}],
+                            '_source':    'SOURCE_TRIGGER'}]])
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions,
+                         {self.device:   {STATE: {EVENT_ACTION_ON: [self.trigger_id]}},
+                          self.device_b: {STATE: {EVENT_ACTION_ON: [self.trigger_id]}}})
+    self.assertSetEqual(triggers.trigger_sources, {self.device, self.device_b})
+
+  def test_add_one_trigger_list_twice(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger2 = Trigger(self.device_b, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger([trigger, trigger2])
+    self.assertTrue(trigger_added)
+    trigger_added = triggers.add_trigger([trigger, trigger2])
+    self.assertFalse(trigger_added)
+    self.assertListEqual(triggers.triggers,
+                         [[{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}],
+                            '_source':    'SOURCE_TRIGGER'},
+                           {'_listen_id': self.device_b, '_listen_action': [{STATE: [EVENT_ACTION_ON]}],
+                            '_source':    'SOURCE_TRIGGER'}]])
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions,
+                         {self.device:   {STATE: {EVENT_ACTION_ON: [self.trigger_id]}},
+                          self.device_b: {STATE: {EVENT_ACTION_ON: [self.trigger_id]}}})
+    self.assertSetEqual(triggers.trigger_sources, {self.device, self.device_b})
+
+  def test_add_one_trigger_list_twice_reorder(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger2 = Trigger(self.device_b, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger([trigger, trigger2])
+    self.assertTrue(trigger_added)
+    trigger_added = triggers.add_trigger([trigger2, trigger])
+    self.assertFalse(trigger_added)
+    self.assertListEqual(triggers.triggers,
+                         [[{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}],
+                            '_source':    'SOURCE_TRIGGER'},
+                           {'_listen_id': self.device_b, '_listen_action': [{STATE: [EVENT_ACTION_ON]}],
+                            '_source':    'SOURCE_TRIGGER'}]])
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions,
+                         {self.device:   {STATE: {EVENT_ACTION_ON: [self.trigger_id]}},
+                          self.device_b: {STATE: {EVENT_ACTION_ON: [self.trigger_id]}}})
+
+  def test_add_one_trigger_case_1(self):
+    '''
+    This test adding a trigger that's a subset of another trigger.
+    '''
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger2 = Trigger(self.device_b, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger([trigger, trigger2])
+    self.assertTrue(trigger_added)
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    self.assertListEqual(triggers.triggers,
+                         [[{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}],
+                            '_source':    'SOURCE_TRIGGER'},
+                           {'_listen_id': self.device_b, '_listen_action': [{STATE: [EVENT_ACTION_ON]}],
+                            '_source':    'SOURCE_TRIGGER'}],
+                          [{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}],
+                            '_source':    'SOURCE_TRIGGER'}]])
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions,
+                         {self.device:   {STATE: {EVENT_ACTION_ON: [self.trigger_id]}},
+                          self.device_b: {STATE: {EVENT_ACTION_ON: [self.trigger_id]}}})
+    self.assertSetEqual(triggers.trigger_sources, {self.device, self.device_b})
+
+  def test_add_any_trigger(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device)
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    self.assertListEqual(triggers.triggers,
+                         [[{'_listen_id': self.device, '_listen_action': [{EVENT_ACTION_ANY: [EVENT_ACTION_ANY]}],
+                            '_source':    'SOURCE_TRIGGER'}]])
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions,
+                         {self.device: {EVENT_ACTION_ANY: {EVENT_ACTION_ANY: [self.trigger_id]}}})
+    self.assertSetEqual(triggers.trigger_sources, {self.device})
+
+  def test_add_any_property_trigger(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ANY]})
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    self.assertListEqual(triggers.triggers,
+                         [[{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ANY]}],
+                            '_source':    'SOURCE_TRIGGER'}]])
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions,
+                         {self.device: {STATE: {EVENT_ACTION_ANY: [self.trigger_id]}}})
+    self.assertSetEqual(triggers.trigger_sources, {self.device})
+
+  def test_remove_trigger_one(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    removed = triggers.remove_trigger(trigger)
+    self.assertTrue(removed, 'Trigger not removed')
+    self.assertListEqual(triggers.triggers, [])
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions, {self.device: {STATE: {EVENT_ACTION_ON: []}}})
+    self.assertSetEqual(triggers.trigger_sources, set())
+
+  def test_remove_trigger_shared_subscriptions_case_1(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    trigger_a = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_b = Trigger(self.device_b, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger([trigger_a, trigger_b])
+    self.assertTrue(trigger_added)
+    self.assertListEqual(triggers.triggers, [
+      [{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}], '_source': 'SOURCE_TRIGGER'}],
+      [{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}], '_source': 'SOURCE_TRIGGER'},
+       {'_listen_id': self.device_b, '_listen_action': [{STATE: [EVENT_ACTION_ON]}], '_source': 'SOURCE_TRIGGER'}]])
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions,
+                         {self.device:   {STATE: {EVENT_ACTION_ON: [self.trigger_id]}},
+                          self.device_b: {STATE: {EVENT_ACTION_ON: [self.trigger_id]}}})
     removed = triggers.remove_trigger(trigger)
     self.assertTrue(removed)
+    self.assertListEqual(triggers.triggers, [
+      [{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}], '_source': 'SOURCE_TRIGGER'},
+       {'_listen_id': self.device_b, '_listen_action': [{STATE: [EVENT_ACTION_ON]}], '_source': 'SOURCE_TRIGGER'}]])
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions,
+                         {self.device:   {STATE: {EVENT_ACTION_ON: [self.trigger_id]}},
+                          self.device_b: {STATE: {EVENT_ACTION_ON: [self.trigger_id]}}})
+    self.assertSetEqual(triggers.trigger_sources, {self.device, self.device_b})
 
-    self.assertEqual(triggers.triggers, [])
+  def test_remove_trigger_shared_subscriptions_case_2(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    trigger_a = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_b = Trigger(self.device_b, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger([trigger_a, trigger_b])
+    self.assertTrue(trigger_added)
+    self.assertListEqual(triggers.triggers, [
+      [{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}], '_source': 'SOURCE_TRIGGER'}],
+      [{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}], '_source': 'SOURCE_TRIGGER'},
+       {'_listen_id': self.device_b, '_listen_action': [{STATE: [EVENT_ACTION_ON]}], '_source': 'SOURCE_TRIGGER'}]])
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions,
+                         {self.device:   {STATE: {EVENT_ACTION_ON: [self.trigger_id]}},
+                          self.device_b: {STATE: {EVENT_ACTION_ON: [self.trigger_id]}}})
+    removed = triggers.remove_trigger([trigger_a, trigger_b])
+    self.assertTrue(removed)
+    self.assertListEqual(triggers.triggers, [
+      [{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}], '_source': 'SOURCE_TRIGGER'}]])
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions,
+                         {self.device:   {STATE: {EVENT_ACTION_ON: [self.trigger_id]}},
+                          self.device_b: {STATE: {EVENT_ACTION_ON: []}}})
+    self.assertSetEqual(triggers.trigger_sources, {self.device})
 
-    trigger = Trigger('listen_device', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED)
+  def test_remove_trigger_non_existant(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    trigger_a = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_b = Trigger(self.device_b, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger([trigger_a, trigger_b])
+    self.assertTrue(trigger_added)
+    removed = triggers.remove_trigger(trigger_b)
+    self.assertFalse(removed)
+    self.assertListEqual(triggers.triggers, [
+      [{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}], '_source': 'SOURCE_TRIGGER'}],
+      [{'_listen_id': self.device, '_listen_action': [{STATE: [EVENT_ACTION_ON]}], '_source': 'SOURCE_TRIGGER'},
+       {'_listen_id': self.device_b, '_listen_action': [{STATE: [EVENT_ACTION_ON]}], '_source': 'SOURCE_TRIGGER'}]])
+    self.assertDictEqual(self.firefly.subscriptions.subscriptions,
+                         {self.device:   {STATE: {EVENT_ACTION_ON: [self.trigger_id]}},
+                          self.device_b: {STATE: {EVENT_ACTION_ON: [self.trigger_id]}}})
+    self.assertSetEqual(triggers.trigger_sources, {self.device, self.device_b})
+
+  def test_check_triggers_case_1(self):
+    """Valid Trigger"""
+    # Data returned for current_states
+    data = {self.device: {STATE: EVENT_ACTION_ON}}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_ON})
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
+
+  def test_check_triggers_case_2(self):
+    """Event not in triggers"""
+    # Data returned for current_states
+    data = {self.device: {STATE: EVENT_ACTION_ON}}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device_b, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_ON})
+    triggered = triggers.check_triggers(event)
+    self.assertFalse(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
+
+  def test_check_triggers_case_3(self):
+    """Trigger of two devices. Invalid Trigger"""
+    # Data returned for current_states
+    data = {self.device:   {STATE: EVENT_ACTION_ON},
+            self.device_b: {STATE: EVENT_ACTION_ON}}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_b = Trigger(self.device_b, {STATE: [EVENT_ACTION_OFF]})
+    trigger_added = triggers.add_trigger([trigger, trigger_b])
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_ON})
+    triggered = triggers.check_triggers(event)
+    self.assertFalse(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
+
+  def test_check_triggers_case_4(self):
+    """Trigger of two devices. Valid Trigger."""
+    # Data returned for current_states
+    data = {self.device:   {STATE: EVENT_ACTION_ON},
+            self.device_b: {STATE: EVENT_ACTION_OFF}}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_b = Trigger(self.device_b, {STATE: [EVENT_ACTION_OFF]})
+    trigger_added = triggers.add_trigger([trigger, trigger_b])
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_ON})
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
+
+  def test_check_triggers_case_5(self):
+    """2 Triggers of one devices. Valid Trigger."""
+    # Data returned for current_states
+    data = {self.device:   {STATE: EVENT_ACTION_ON},
+            self.device_b: {STATE: EVENT_ACTION_OFF}}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_b = Trigger(self.device_b, {STATE: [EVENT_ACTION_OFF]})
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    trigger_added = triggers.add_trigger([trigger_b])
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_ON})
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
+
+  def test_check_triggers_case_6(self):
+    """2 Triggers of one devices. Reordered Valid Trigger."""
+    # Data returned for current_states
+    data = {self.device:   {STATE: EVENT_ACTION_ON},
+            self.device_b: {STATE: EVENT_ACTION_OFF}}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_b = Trigger(self.device_b, {STATE: [EVENT_ACTION_OFF]})
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    trigger_added = triggers.add_trigger([trigger_b])
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device_b, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_OFF})
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
+
+  def test_check_triggers_case_7(self):
+    """2 Triggers of one devices. Invalid Trigger."""
+    # Data returned for current_states
+    data = {self.device:   {STATE: EVENT_ACTION_ON},
+            self.device_b: {STATE: EVENT_ACTION_ON}}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_b = Trigger(self.device_b, {STATE: [EVENT_ACTION_OFF]})
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    trigger_added = triggers.add_trigger([trigger_b])
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device_b, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_ON})
+    triggered = triggers.check_triggers(event)
+    self.assertFalse(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
+
+  def test_check_triggers_case_8(self):
+    """2 Triggers of one devices, overwrite current_states with trigger value. Valid Trigger."""
+    # Data returned for current_states
+    data = {self.device:   {STATE: EVENT_ACTION_ON},
+            self.device_b: {STATE: EVENT_ACTION_ON}}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_b = Trigger(self.device_b, {STATE: [EVENT_ACTION_OFF]})
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    trigger_added = triggers.add_trigger([trigger_b])
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device_b, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_OFF})
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
+
+  def test_check_triggers_case_9(self):
+    """2 Triggers of one devices, overwrite current_states with trigger value, but told to ignore event. Invalid Trigger."""
+    # Data returned for current_states
+    data = {self.device:   {STATE: EVENT_ACTION_ON},
+            self.device_b: {STATE: EVENT_ACTION_ON}}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_b = Trigger(self.device_b, {STATE: [EVENT_ACTION_OFF]})
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    trigger_added = triggers.add_trigger([trigger_b])
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device_b, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_OFF})
+    triggered = triggers.check_triggers(event, ignore_event=True)
+    self.assertFalse(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
+
+  def test_check_triggers_case_10(self):
+    """Test error of improper current_states"""
+    # Data returned for current_states
+    data = {self.device_b: {STATE: EVENT_ACTION_ON}}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_b = Trigger(self.device_b, {STATE: [EVENT_ACTION_OFF]})
+    trigger_added = triggers.add_trigger([trigger, trigger_b])
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device_b, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_ON})
+    triggered = triggers.check_triggers(event)
+    self.assertFalse(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
+
+  def test_check_triggers_case_11(self):
+    """Test trigger ANY. Valid Trigger"""
+    # Data returned for current_states
+    data = {}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device)
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_ON})
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
+
+  def test_check_triggers_case_12(self):
+    """Test trigger ANY. Valid Trigger"""
+    # Data returned for current_states
+    data = {}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {EVENT_ACTION_ANY: [EVENT_ACTION_ANY]})
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_ON})
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
+
+  def test_check_triggers_case_13(self):
+    """Test trigger ANY. Valid Trigger"""
+    # Data returned for current_states
+    data = {}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {EVENT_ACTION_ANY: [EVENT_ACTION_ANY], STATE: [EVENT_ACTION_ON]})
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_ON})
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
+
+  def test_check_triggers_case_14(self):
+    """Test trigger ANY. Valid Trigger"""
+    # Data returned for current_states
+    data = {}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ANY]})
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_ON})
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
+
+  def test_check_triggers_case_15(self):
+    """2 Triggers of one devices, overwrite current_states with trigger value, but told to ignore event. Invalid Trigger."""
+    # Data returned for current_states
+    data = {self.device:   {STATE: EVENT_ACTION_ON},
+            self.device_b: {STATE: EVENT_ACTION_OFF}}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ON]})
+    trigger_b = Trigger(self.device_b, {STATE: [EVENT_ACTION_OFF]})
+    trigger_added = triggers.add_trigger([trigger, trigger_b])
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {STATE: EVENT_ACTION_OFF})
+    triggered = triggers.check_triggers(event, ignore_event=True)
+    self.assertTrue(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
+
+  def test_check_triggers_case_16(self):
+    """Verify trigger any of property only"""
+    # Data returned for current_states
+    data = {self.device:   {STATE: EVENT_ACTION_ANY},
+            self.device_b: {STATE: EVENT_ACTION_OFF}}
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ANY]})
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {'MOTION': 'ACTIVE'})
+    triggered = triggers.check_triggers(event)
+    self.assertFalse(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
+
+  def test_export_trigger_case_1(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device)
     triggers.add_trigger(trigger)
-    trigger = Trigger('listen_device2', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED)
-    triggers.add_trigger(trigger)
-
-    self.assertEqual(len(triggers.triggers), 2)
-
-    trigger = [Trigger('listen_device', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED),
-               Trigger('listen_device2', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED)]
-    triggers.add_trigger(trigger)
-    self.assertEqual(len(triggers.triggers), 3)
-
-    triggers.add_trigger(trigger)
-    self.assertEqual(len(triggers.triggers), 3)
-
-    triggers.add_trigger(trigger)
-    self.assertEqual(len(triggers.triggers), 3)
-
-    trigger = [Trigger('listen_device', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED),
-               Trigger('listen_device2', EVENT_ACTION_CLOSE, STATE, EVENT_ACTION_ON)]
-
-    triggers.add_trigger(trigger)
-    self.assertEqual(len(triggers.triggers), 4)
-
-    trigger = [Trigger('listen_device2', EVENT_ACTION_CLOSE, STATE, EVENT_ACTION_ON),
-               Trigger('listen_device', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED)]
-
-    triggers.add_trigger(trigger)
-    self.assertEqual(len(triggers.triggers), 4)
-
-    triggers.remove_trigger(trigger)
-    self.assertEqual(len(triggers.triggers), 3)
-
-    trigger = [Trigger('listen_device', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED),
-               Trigger('listen_device2', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED)]
-    triggers.remove_trigger(trigger)
-    self.assertEqual(len(triggers.triggers), 2)
-
-  def test_export_triggers(self):
-    triggers = Triggers(self.firefly, 'test_device')
-    trigger = Trigger('listen_device', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED)
-    triggers.add_trigger(trigger)
-    trigger = Trigger('listen_device2', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED)
-    triggers.add_trigger(trigger)
-
     export_data = triggers.export()
-    expected_data = [
-      {'listen_id': 'listen_device', 'listen_action': 'CLOSE', 'request': 'STATE', 'request_verify': 'CLOSED',
-       'source':    'SOURCE_TRIGGER'},
-      {'listen_id': 'listen_device2', 'listen_action': 'CLOSE', 'request': 'STATE', 'request_verify': 'CLOSED',
-       'source':    'SOURCE_TRIGGER'}]
-    self.assertEqual(export_data, expected_data)
+    self.assertListEqual(export_data, [[{'event_action': [{EVENT_ACTION_ANY: [EVENT_ACTION_ANY]}],
+                                         'listen_id':    self.device, 'source': 'SOURCE_TRIGGER'}]])
 
-    trigger = [Trigger('listen_device', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED),
-               Trigger('listen_device2', EVENT_ACTION_CLOSE, STATE, EVENT_ACTION_ON)]
-
+  def test_export_trigger_case_2(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, [EVENT_ACTION_ON, EVENT_ACTION_OFF])
     triggers.add_trigger(trigger)
-
     export_data = triggers.export()
-    expected_data = [
-      {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
-       'request_verify': STATE_CLOSED,
-       'source':         'SOURCE_TRIGGER'},
-      {'listen_id':      'listen_device2', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
-       'request_verify': STATE_CLOSED,
-       'source':         'SOURCE_TRIGGER'},
-      [
-        {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
-         'request_verify': STATE_CLOSED,
-         'source':         'SOURCE_TRIGGER'},
-        {'listen_id':      'listen_device2', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
-         'request_verify': EVENT_ACTION_ON,
-         'source':         'SOURCE_TRIGGER'}
-      ]
-    ]
+    self.assertListEqual(export_data, [[{'event_action': [{EVENT_ACTION_ANY: [EVENT_ACTION_ON, EVENT_ACTION_OFF]}],
+                                         'listen_id':    self.device, 'source': 'SOURCE_TRIGGER'}]])
 
-    self.assertEqual(export_data, expected_data)
+  def test_export_trigger_case_3(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device)
+    trigger_b = Trigger(self.device_b)
+    triggers.add_trigger([trigger, trigger_b])
+    self.assertSetEqual(triggers.trigger_sources, {self.device, self.device_b})
+    export_data = triggers.export()
+    self.assertListEqual(export_data, [
+      [{'event_action': [{EVENT_ACTION_ANY: [EVENT_ACTION_ANY]}], 'listen_id': self.device, 'source': 'SOURCE_TRIGGER'},
+       {'event_action': [{EVENT_ACTION_ANY: [EVENT_ACTION_ANY]}], 'listen_id': self.device_b,
+        'source':       'SOURCE_TRIGGER'}]])
 
-  def test_import_triggers(self):
-    triggers = Triggers(self.firefly, 'test_device')
+  def test_export_trigger_case_4(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ANY]})
+    triggers.add_trigger(trigger)
+    export_data = triggers.export()
+    self.assertListEqual(export_data, [
+      [{'event_action': [{STATE: [EVENT_ACTION_ANY]}], 'listen_id': self.device, 'source': 'SOURCE_TRIGGER'}]])
 
+  def test_export_trigger_case_5(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {STATE: [EVENT_ACTION_ANY]})
+    trigger_b = Trigger(self.device_b, {STATE: [EVENT_ACTION_ANY]})
+    triggers.add_trigger(trigger)
+    triggers.add_trigger(trigger_b)
+    export_data = triggers.export()
+    self.assertListEqual(export_data, [
+      [{'event_action': [{STATE: [EVENT_ACTION_ANY]}], 'listen_id': self.device, 'source': 'SOURCE_TRIGGER'}],
+      [{'event_action': [{STATE: [EVENT_ACTION_ANY]}], 'listen_id': self.device_b, 'source': 'SOURCE_TRIGGER'}]])
+
+  def test_import_trigger_case_1(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    import_data = [[{'event_action': [{EVENT_ACTION_ANY: [EVENT_ACTION_ANY]}], 'listen_id': self.device,
+                     'source':       'SOURCE_TRIGGER'}]]
+    count = triggers.import_triggers(import_data)
+    self.assertEquals(count, 1)
+    self.assertSetEqual(triggers.trigger_sources, {self.device})
+    export_data = triggers.export()
+    self.assertListEqual(export_data, import_data)
+
+  def test_import_trigger_case_2(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    import_data = [[{'event_action': [{EVENT_ACTION_ANY: [EVENT_ACTION_ON, EVENT_ACTION_OFF]}],
+                     'listen_id':    self.device, 'source': 'SOURCE_TRIGGER'}]]
+    count = triggers.import_triggers(import_data)
+    self.assertEquals(count, 1)
+    self.assertSetEqual(triggers.trigger_sources, {self.device})
+    export_data = triggers.export()
+    self.assertListEqual(export_data, import_data)
+
+  def test_import_trigger_case_3(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
     import_data = [
-      {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
-       'request_verify': STATE_CLOSED,
-       'source':         'SOURCE_TRIGGER'},
-      {'listen_id':      'listen_device2', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
-       'request_verify': STATE_CLOSED,
-       'source':         'SOURCE_TRIGGER'}
-    ]
+      [{'event_action': [{EVENT_ACTION_ANY: [EVENT_ACTION_ANY]}], 'listen_id': self.device, 'source': 'SOURCE_TRIGGER'},
+       {'event_action': [{EVENT_ACTION_ANY: [EVENT_ACTION_ANY]}], 'listen_id': self.device_b,
+        'source':       'SOURCE_TRIGGER'}]]
+    count = triggers.import_triggers(import_data)
+    self.assertEquals(count, 1)
+    self.assertSetEqual(triggers.trigger_sources, {self.device, self.device_b})
+    export_data = triggers.export()
+    print(export_data)
+    self.assertListEqual(export_data, import_data)
 
-    import_count = triggers.import_triggers(import_data)
-    self.assertEqual(import_count, 2)
-    self.assertEqual(len(triggers.triggers), 2)
-    self.assertEqual(triggers.export(), import_data)
-
-    # Test reimporting data twice
-    import_count = triggers.import_triggers(import_data)
-    self.assertEqual(import_count, 0)
-    self.assertEqual(len(triggers.triggers), 2)
-    self.assertEqual(triggers.export(), import_data)
-
+  def test_import_trigger_case_4(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
     import_data = [
-      {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
-       'request_verify': STATE_CLOSED,
-       'source':         'SOURCE_TRIGGER'},
-      {'listen_id':      'listen_device2', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
-       'request_verify': STATE_CLOSED,
-       'source':         'SOURCE_TRIGGER'},
-      [
-        {'listen_id':      'listen_device', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
-         'request_verify': STATE_CLOSED,
-         'source':         'SOURCE_TRIGGER'},
-        {'listen_id':      'listen_device2', 'listen_action': EVENT_ACTION_CLOSE, 'request': STATE,
-         'request_verify': EVENT_ACTION_ON,
-         'source':         'SOURCE_TRIGGER'}
-      ]
-    ]
+      [{'event_action': [{STATE: [EVENT_ACTION_ANY]}], 'listen_id': self.device, 'source': 'SOURCE_TRIGGER'}]]
+    count = triggers.import_triggers(import_data)
+    self.assertEquals(count, 1)
+    self.assertSetEqual(triggers.trigger_sources, {self.device})
+    export_data = triggers.export()
+    self.assertListEqual(export_data, import_data)
 
-    import_count = triggers.import_triggers(import_data)
-    self.assertEqual(import_count, 1)
-    self.assertEqual(len(triggers.triggers), 3)
-    self.assertEqual(triggers.export(), import_data)
-
-  def test_check_trigger_one_simple(self):
-    with patch('Firefly.core.Firefly.send_request') as mock:
-      mock.return_value = EVENT_ACTION_ON
-
-      self.firefly.send_request = mock
-
-      triggers = Triggers(self.firefly, 'test_device')
-      trigger = Trigger('test_device2', EVENT_ACTION_CLOSE, STATE, STATE_CLOSED)
-      triggers.add_trigger(trigger)
-
-      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_CLOSE)
-      valid = triggers.check_triggers(event, ignore_event=True)
-      self.assertTrue(valid)
-
-      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_OPEN)
-      valid = yield from triggers.check_triggers(event)
-      self.assertFalse(valid)
-
-      triggers = Triggers(self.firefly, 'test_device')
-      trigger = Trigger('test_device2', EVENT_ACTION_CLOSE, STATE, EVENT_ACTION_ANY)
-      triggers.add_trigger(trigger)
-
-      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_CLOSE)
-      valid = triggers.check_triggers(event)
-      self.assertTrue(valid)
-
-  def test_check_trigger_one_with_request(self):
-    with patch('Firefly.core.Firefly.send_request') as mock:
-      mock.return_value = EVENT_ACTION_ON
-
-      self.firefly.send_request = mock
-
-      triggers = Triggers(self.firefly, 'test_device')
-      trigger = Trigger('test_device2', EVENT_ACTION_ON, STATE, EVENT_ACTION_ON)
-      triggers.add_trigger(trigger)
-
-      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
-      valid = yield from triggers.check_triggers(event)
-      self.assertTrue(valid)
-
-      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_OFF)
-      valid = yield from triggers.check_triggers(event)
-      self.assertFalse(valid)
-
-      triggers = Triggers(self.firefly, 'test_device')
-      trigger = yield from Trigger('test_device2', EVENT_ACTION_ANY, STATE, EVENT_ACTION_ON)
-      triggers.add_trigger(trigger)
-
-      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_OFF)
-      valid = yield from triggers.check_triggers(event)
-      self.assertTrue(valid)
-
-  def test_check_two_single_triggers(self):
-    with patch('Firefly.core.Firefly.send_request') as mock:
-      mock.return_value = EVENT_ACTION_ON
-
-      self.firefly.send_request = mock
-
-      triggers = Triggers(self.firefly, 'test_device')
-      trigger = Trigger('test_device2', EVENT_ACTION_ON, STATE, EVENT_ACTION_ON)
-      triggers.add_trigger(trigger)
-      trigger = Trigger('test_device1', EVENT_ACTION_ON, STATE, EVENT_ACTION_ON)
-      triggers.add_trigger(trigger)
-
-      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
-      valid = yield from triggers.check_triggers(event)
-      self.assertTrue(valid)
-
-      event = Event('test_device1', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
-      valid = yield from triggers.check_triggers(event)
-      self.assertTrue(valid)
-
-  def test_check_triggers_multiple(self):
-    with patch('Firefly.core.Firefly.send_request') as mock:
-      mock.return_value = EVENT_ACTION_ON
-
-      self.firefly.send_request = mock
-
-      triggers = Triggers(self.firefly, 'test_device')
-      trigger = [Trigger('test_device2', EVENT_ACTION_ON, STATE, EVENT_ACTION_ON),
-                 Trigger('test_device1', EVENT_ACTION_ON, STATE, EVENT_ACTION_OFF)]
-      triggers.add_trigger(trigger)
-
-      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
-      valid = triggers.check_triggers(event)
-      self.assertFalse(valid)
-
-      event = Event('test_device1', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
-      valid = triggers.check_triggers(event)
-      self.assertFalse(valid)
-
-      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_OFF)
-      valid = yield from triggers.check_triggers(event)
-      self.assertFalse(valid)
-
-      triggers = Triggers(self.firefly, 'test_device')
-      trigger = [Trigger('test_device2', EVENT_ACTION_ON, STATE, EVENT_ACTION_ON),
-                 Trigger('test_device1', EVENT_ACTION_ON, STATE, EVENT_ACTION_ON)]
-      triggers.add_trigger(trigger)
-
-      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
-      valid = triggers.check_triggers(event)
-      self.assertTrue(valid)
-
-      triggers = Triggers(self.firefly, 'test_device')
-      trigger = [Trigger('test_device2', EVENT_ACTION_ON, STATE, EVENT_ACTION_ON),
-                 Trigger('test_device1', EVENT_ACTION_ON, STATE, EVENT_ACTION_OFF)]
-      triggers.add_trigger(trigger)
-
-      event = Event('test_device2', EVENT_TYPE_BROADCAST, EVENT_ACTION_ON)
-      valid = triggers.check_triggers(event)
-      self.assertFalse(valid)
+  def test_import_trigger_case_5(self):
+    triggers = Triggers(self.firefly, self.trigger_id)
+    import_data = [
+      [{'event_action': [{STATE: [EVENT_ACTION_ANY]}], 'listen_id': self.device, 'source': 'SOURCE_TRIGGER'}],
+      [{'event_action': [{STATE: [EVENT_ACTION_ANY]}], 'listen_id': self.device_b, 'source': 'SOURCE_TRIGGER'}]]
+    count = triggers.import_triggers(import_data)
+    self.assertEquals(count, 2)
+    self.assertSetEqual(triggers.trigger_sources, {self.device, self.device_b})
+    export_data = triggers.export()
+    self.assertListEqual(export_data, import_data)

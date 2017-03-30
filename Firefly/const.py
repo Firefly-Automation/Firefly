@@ -1,3 +1,6 @@
+from typing import TypeVar
+
+EVENT_ACTON_TYPE = TypeVar('EVENT_ACTION', dict, str, list)
 
 AUTHOR = 'Zachary Priddy (me@zpriddy.com)'
 

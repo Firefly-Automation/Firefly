@@ -1,6 +1,7 @@
 from Firefly import logging
 from Firefly.helpers.events import Request, Event
-from Firefly.const import SOURCE_TRIGGER, EVENT_ACTION_ANY
+from Firefly.const import SOURCE_TRIGGER, EVENT_ACTION_ANY, EVENT_ACTON_TYPE
+from Firefly.helpers.subscribers import verify_event_action
 import asyncio
 from typing import TypeVar, List
 
@@ -56,26 +57,30 @@ Example Trigger:
 
 
 class Trigger(object):
-  def __init__(self, listen_id: str, listen_action: str = '', request: str = '', request_verify: str = '',
-               source: str = SOURCE_TRIGGER):
+  def __init__(self, listen_id: str, event_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY, source: str = SOURCE_TRIGGER):
     self._listen_id = listen_id
-    self._listen_action = listen_action if listen_action else EVENT_ACTION_ANY
-    self._request = request
-    self._value = request_verify
+    self._listen_action = verify_event_action(event_action)
     self._source = source
 
   def __str__(self):
     return '<FIREFLY TRIGGER - LISTEN TO: %s | LISTEN ACTION: %s >' % (self.listen_id, self.listen_action)
 
+  def __repr__(self):
+    return str(self.__dict__)
+
+  def __hash__(self):
+    return hash(str(self.__dict__))
+
   def __eq__(self, other):
-    return self.__dict__ == other.__dict__
+    if type(other) is not dict:
+      return self.__dict__ == other.__dict__
+    else:
+      return self.__dict__ == other
 
   def export(self):
     return {
       'listen_id':      self.listen_id,
-      'listen_action':  self.listen_action,
-      'request':        self.request_property,
-      'request_verify': self.request_verify,
+      'event_action':  self.listen_action,
       'source':         self.source
     }
 
@@ -88,24 +93,10 @@ class Trigger(object):
     return self._listen_action
 
   @property
-  def request_property(self):
-    return self._request
-
-  @property
-  def request_verify(self):
-    return self._value
-
-  @property
   def source(self):
     return self._source
 
-  @property
-  def request(self):
-    return Request(self.listen_id, self.source, self.request_property)
-
-
 TriggerType = TypeVar('TriggerType', Trigger, List[Trigger])
-
 
 class Triggers(object):
   def __init__(self, firefly, source_id):
@@ -117,179 +108,137 @@ class Triggers(object):
     self._firefly = firefly
     self._source_id = source_id
     self._triggers = []
+    self._trigger_sources = set()
 
   def add_trigger(self, trigger: TriggerType) -> bool:
     logging.info('Adding trigger: %s' % trigger)
-    if type(trigger) == Trigger:
-      if trigger in self.triggers:
-        logging.error('Trigger already in triggers: %s' % trigger)
-        return False
 
-    # TODO: See if this can be cleaned up
-    if type(trigger) == list:
-      # set existing to false until we know that there is a list
-      existing = False
-      # set to true before iterating through list just so its assigned.
-      existing_trig = True
-      # Go though all triggers.
-      for trig in self.triggers:
-        # See if trigger is list.
-        if type(trig) == list:
-          # If list, set existing and existing_trig to True.
-          existing = True
-          existing_trig = True
-          # For each trigger in the list, see if that trigger is in the new list of triggers. || that. If all triggers
-          # match then it should return true.
-          for t in trig:
-            existing_trig &= t in trigger
-        # Or the results of that with the existing results.
-        existing &= existing_trig
-        if existing:
-          logging.error('Trigger already in triggers %s' % trigger)
-          return False
+    if type(trigger) is not list:
+      trigger = [trigger]
+
+    if set(trigger) in [set(t) for t in self.triggers]:
+      logging.info('Trigger already in triggers: %s' % trigger)
+      return False
 
     self.triggers.append(trigger)
-    # Add subscribers.
-    # If single trigger then just add that subscriber.
-    if type(trigger) == Trigger:
-      logging.debug('Adding subscription: %s %s %s' % (self._source_id, trigger.listen_id, trigger.listen_action))
-      self._firefly.subscriptions.add_subscriber(self._source_id, trigger.listen_id, trigger.listen_action)
-      return True
-    # If a list of triggers that add the subscribers for each trigger.
-    if type(trigger) == list:
-      for t in trigger:
-        logging.debug('Adding subscription: %s %s %s' % (self._source_id, t.listen_id, t.listen_action))
-        self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, t.listen_action)
-      return True
 
-    return False
+    for t in trigger:
+      logging.debug('Adding subscription: %s %s %s' % (self._source_id, t.listen_id, t.listen_action))
+      self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, t.listen_action)
+      self._trigger_sources.add(t.listen_id)
+    return True
+
 
   def remove_trigger(self, trigger: TriggerType) -> bool:
     logging.info('Removing trigger: %s' % trigger)
-    if type(trigger) == Trigger:
-      if trigger not in self.triggers:
-        logging.error('Trigger not in triggers: %s' % trigger)
-        return False
-      self.triggers.remove(trigger)
-      return True
 
-    # TODO: See if this can be cleaned up
-    if type(trigger) == list:
-      # set existing to false until we know that there is a list
-      existing = False
-      # set to true before iterating through list just so its assigned.
-      existing_trig = True
-      # Go though all triggers.
-      index = 0
-      for trig in self.triggers:
-        # See if trigger is list.
-        if type(trig) == list:
-          # If list, set existing and existing_trig to True.
-          existing = True
-          existing_trig = True
-          # For each trigger in the list, see if that trigger is in the new list of triggers. || that. If all triggers
-          # match then it should return true.
-          for t in trig:
-            existing_trig &= t in trigger
-        # Or the results of that with the existing results.
-        existing &= existing_trig
-        if existing:
-          logging.error('Trigger not  in triggers %s' % trigger)
-          self.triggers.pop(index)
-          return True
-        index += 1
-    return False
+    if type(trigger) is not list:
+      trigger = [trigger]
+
+    if trigger not in self.triggers:
+      logging.info('trigger not in triggers. Can not remove.')
+      return False
+
+    try:
+      # Remove trigger from triggers
+      self.triggers.remove(trigger)
+      # Delete all subscriptions from trigger source
+      self._firefly.subscriptions.delete_all_subscriptions(self._source_id)
+      self._trigger_sources = set()
+      # Add all triggers back in
+      for trigs in self.triggers:
+        for t in trigs:
+          self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, t.listen_action)
+          self._trigger_sources.add(t.listen_id)
+    except:
+      logging.error('[FF.TRI.REM.001]: Unknown error removing trigger: %s' % trigger)
+      return False
+
+    return True
 
   def export(self):
     logging.info('Exporting triggers')
     export_data = []
 
     for trigger in self.triggers:
-      if type(trigger) == Trigger:
-        export_data.append(trigger.export())
-
-      if type(trigger) == list:
-        trigger_section = []
-        for t in trigger:
-          trigger_section.append(t.export())
-        export_data.append(trigger_section)
+      trigger_section = []
+      for t in trigger:
+        trigger_section.append(t.export())
+      export_data.append(trigger_section)
 
     return export_data
 
   def import_triggers(self, import_data: list) -> int:
     import_count = 0
     for trigger in import_data:
-      if type(trigger) == dict:
-        t = Trigger(**trigger)
-        import_count += 1 if self.add_trigger(t) else 0
+      triggers = []
+      for t in trigger:
+        triggers.append(Trigger(**t))
+        import_count += 1 if self.add_trigger(triggers) else 0
 
-      if type(trigger) == list:
-        triggers = []
-        for t in trigger:
-          triggers.append(Trigger(**t))
-          import_count += 1 if self.add_trigger(triggers) else 0
+    for trigs in self.triggers:
+      for t in trigs:
+        self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, t.listen_action)
+        self._trigger_sources.add(t.listen_id)
 
     return import_count
 
 
-  @asyncio.coroutine
   def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
     """
     Check triggers should be called when an event is received.
-
-    If only matching on one trigger, then trigger_request and trigger_verify will be ignored in place of check the event
-    source and event action.
-
-    If checking against a list of triggers then requests will be made to each ff_id to see if it matched the required
-    verify before returning True.
-
-    The device_id and event_type from the event will need to match the trigger for it to return true. This can be
-    overwritten by passing in ignore_event
 
     Args:
       ignore_event (bool): Ignore the device_id and action_type from the event and just see if trigger conditions are
                            met.
       **kwargs ():
     """
-    valid = len(self.triggers) > 0
+
+    devices = self.trigger_sources
+    current_states = self._firefly.get_device_states(devices)
+
     for trigger in self.triggers:
-      if type(trigger) == Trigger:
-        valid = True
-        valid &= (event.source == trigger.listen_id)
-        valid &= (trigger.listen_action in event.event_action  or trigger.listen_action == EVENT_ACTION_ANY)
-
-        if (trigger.request_property != '' and trigger.request_verify != '' and trigger.request_verify != EVENT_ACTION_ANY) and not ignore_event:
-          # TODO: If i have issues change this to response = yield from firefly.async_send_request and fix in automation.py....
-          response = yield from self._firefly.async_send_request(trigger.request)
-          print(response)
-          valid &= response == trigger.request_verify
-        # If a single trigger is valid then it should respond as true.
-        if valid:
-          return True
-
-      # TODO: rewrite this... This is from hell
-      if type(trigger) == list:
+      trigger_valid = True
+      trigger_devices = [t.listen_id for t in trigger]
+      if event.source in trigger_devices:
         for t in trigger:
-          valid_t = True
-          valid_event = False
-          no_request_count = 0
-          # If trigger is not type Trigger then it fails
-          if not type(t) == Trigger:
-            valid = False
-          if (event.source == t.listen_id) and (t.listen_action in event.event_action or t.listen_action == EVENT_ACTION_ANY):
-            valid_event = True
-          if (t.request_property != '' and t.request_verify != '' and t.request_verify != EVENT_ACTION_ANY) and not ignore_event:
-            response = yield from self._firefly.async_send_request(t.request)
-            valid_t &= response == t.request_verify
-          elif t.request_property == '' and t.request_verify == '':
-            no_request_count += 1
+          t_action = t.listen_action
+          t_source = t.listen_id
+          if EVENT_ACTION_ANY in t_action:
+            trigger_valid &= True
+            continue
+          for act in t_action:
+            for prop, vals in act.items():
+              try:
+                if prop not in event.event_action.keys() and EVENT_ACTION_ANY not in act.keys():
+                  trigger_valid = False
+                  break
+                # If ANY then continue
+                if EVENT_ACTION_ANY in vals:
+                  trigger_valid &= True
+                  continue
+                # If the trigger value is in the event, use the event value unless ignore event.
+                if prop in event.event_action.keys() and event.source == t_source and not ignore_event:
+                  if event.event_action[prop] in vals or EVENT_ACTION_ANY in vals:
+                    trigger_valid &= True
+                    continue
+                  else:
+                    trigger_valid = False
+                    break
+                else:
+                  if current_states[t_source][prop] in vals:
+                    trigger_valid &= True
+                    continue
+                  else:
+                    trigger_valid = False
+                    break
+              except:
+                logging.error('[FF.TRI.CHE.001] Cant find device or property in current status.')
+                trigger_valid = False
+              if not trigger_valid:
+                break
 
-          if valid_t or ((no_request_count <= 1 and valid_event) or ignore_event):
-            valid_t &= True
-          else:
-            valid_t &= False
-          valid &= valid_t
-        if valid:
+        if trigger_valid:
           return True
 
     return False
@@ -298,3 +247,7 @@ class Triggers(object):
   @property
   def triggers(self):
     return self._triggers
+
+  @property
+  def trigger_sources(self):
+    return self._trigger_sources

@@ -88,7 +88,7 @@ class TestCheckConditions(unittest.TestCase):
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
 
-  def text_multiple_conditions(self):
+  def test_multiple_conditions(self):
     type(self.firefly.location).isDark = PropertyMock(return_value=True)
     type(self.firefly.location).isLight = PropertyMock(return_value=False)
     type(self.firefly.location).mode = PropertyMock(return_value='Home')

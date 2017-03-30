@@ -83,13 +83,13 @@ class Automation(object):
     if action not in self.actions:
       self.actions.append(action)
 
-  @asyncio.coroutine
+  #@asyncio.coroutine
   def event(self, event, **kwargs):
     logging.info('[AUTOMATION] %s - Receiving event: %s' % (self.id, event))
     valid = True
     valid &= check_conditions(self._firefly, self.conditions)
     # TODO: If i have issues change this to valid &= yield from and fix in triggers.py....
-    valid &= yield from self.triggers.check_triggers(event)
+    valid &= self.triggers.check_triggers(event)
     if valid:
       return self.get_event_handler(event, **kwargs)
 
@@ -126,6 +126,7 @@ class Automation(object):
   def command_map(self):
     return self._command_mapping
 
+  # TODO: See why actions are missing
   @property
   def actions(self):
     return self._actions
