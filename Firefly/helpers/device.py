@@ -149,7 +149,7 @@ class Device(object):
     changed = {}
     for item, val in after.items():
       if after.get(item) != before.get(item):
-        changed[item] = before.get(item)
+        changed[item] = after.get(item)
     logging.info("Items changed: %s %s" % (str(changed), self))
     broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=changed)
     logging.info(broadcast)

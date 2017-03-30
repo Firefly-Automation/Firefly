@@ -21,8 +21,8 @@
                 {
                     "event_action": [
                         {
-                            "ANY": [
-                                "ANY"
+                            "STATE": [
+                                true
                             ]
                         }
                     ],

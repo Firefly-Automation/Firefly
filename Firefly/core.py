@@ -254,13 +254,10 @@ class Firefly(object):
   def add_get(self, route, handler, *args):
     app.router.add_get(route, handler)
 
-  # TODO Decide how I want to do this? Make requests to all devices or to keep a current state of all devices as a readonly map
-  # TODO This is for mocking right now as I know the data I want to be returned
   def get_device_states(self, devices: set) -> dict:
     current_state = {}
     for device in devices:
       current_state[device] = self.components[device].get_all_request_values()
-    print(current_state)
     return current_state
 
   @property

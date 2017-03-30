@@ -16,7 +16,7 @@ class Subscriptions(object):
     self.subscriptions = {}
     # TODO: Add functionality to import subscriptions from json file.
 
-  def get_subscribers(self, subscribe_to_id: str, event_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY) -> List[str]:
+  def get_subscribers(self, subscribe_to_id: str, event_action: dict = {EVENT_ACTION_ANY:EVENT_ACTION_ANY}) -> List[str]:
     """Gets a list of subscribers.
 
     Returns a list subscriber IDs that are subscribed to the ff_id passed in for the event types that are pass and any
@@ -29,7 +29,9 @@ class Subscriptions(object):
     Returns:
       list: List of subscriber IDs
     """
-    event_action = verify_event_action(event_action, get_subscribers=True)
+
+    _event_action = event_action.copy()
+    _event_action = verify_event_action(_event_action, get_subscribers=True)
 
     try:
       subscriptions = self.subscriptions[subscribe_to_id]
@@ -46,7 +48,7 @@ class Subscriptions(object):
     subscribers_prop_any = set()
     subscribers = set()
 
-    for ea in event_action:
+    for ea in _event_action:
       if type(ea) is not dict:
         logging.error('[get_subscribers] Event action is not type dict: %s [ERROR CODE: SUB.DEL.11]' % str(ea))
         continue
@@ -377,9 +379,9 @@ def verify_event_action(event_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY, get_s
       # Verify when coming from get_subscribers
       if get_subscribers:
         if type(ea) is not list:
-          new_event_actions.append(ea)
+          new_event_actions.update(ea)
         if type(ea) is list:
-          new_event_actions.extend(ea)
+          new_event_actions.update(ea)
 
     return [new_event_actions]
 
