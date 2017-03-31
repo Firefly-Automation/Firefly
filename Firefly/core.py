@@ -55,6 +55,8 @@ class Firefly(object):
     for c in COMPONENT_MAP:
       self.import_devices(c['file'])
 
+    scheduler.runInS(5, self.install_services)
+
 
     # TODO: MOST OF WHATS BELOW IS FOR TESTING
     #self.install_package('Firefly.components.virtual_devices.switch', alias='Test Device', initial_values={'_state': 'UNKNOWN'})
@@ -77,14 +79,27 @@ class Firefly(object):
     #self.components['test_routine'].add_trigger(Trigger('66fdff0a-1fa5-4234-91bc-465c72aafb23',EVENT_ACTION_ANY))
 
     # Install service
-    self.install_package('Firefly.services.darksky', alias='service Dark Sky')
+    #self.install_package('Firefly.services.darksky', alias='service Dark Sky')
     # Install openzwave
     #self.install_package('Firefly.services.zwave', alias='service zwave')
+
+    # Test install Hue
+    #self.install_package('Firefly.services.hue', alias='hue_service')
 
     logging.notify('Firefly is starting up')
 
     # TODO: Leave In.
     scheduler.runEveryH(1, self.export_all_components)
+
+
+  def install_services(self) -> None:
+    # Install service
+    self.install_package('Firefly.services.darksky', alias='service Dark Sky')
+    # Install openzwave
+    # self.install_package('Firefly.services.zwave', alias='service zwave')
+
+    # Test install Hue
+    self.install_package('Firefly.services.hue', alias='hue_service')
 
   def start(self) -> None:
     """

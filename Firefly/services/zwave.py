@@ -10,9 +10,6 @@ from Firefly import logging
 from Firefly.const import SERVICE_CONFIG_FILE
 from Firefly.helpers.service import Service
 
-from time import sleep
-
-#from pydispatch import dispatcher
 
 '''
 The ZWAVE service is the background service for zwave.
@@ -38,7 +35,7 @@ SECTION = 'ZWAVE'
 STARTUP_TIMEOUT = 10
 
 def Setup(firefly, package, **kwargs):
-  logging.message('Setting up zwave service')
+  logging.message('Setting up %s service' % SERVICE_ID)
   config = configparser.ConfigParser()
   config.read(SERVICE_CONFIG_FILE)
 

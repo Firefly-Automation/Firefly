@@ -28,6 +28,8 @@ class Device(object):
       'package': self._package,
       'actions': {}
     }
+    self._last_command_source = 'none'
+    self._last_update_time = self.firefly.location.now
 
     # If alias given but no ID look at config files for ID.
     if not device_id and alias:
@@ -48,7 +50,6 @@ class Device(object):
 
     self._habridge_export = kwargs.get('habridge_export', True)
     self._habridge_alias = kwargs.get('habridge_alias', self._alias)
-
     self._homekit_export = kwargs.get('homekit_export', True)
     self._homekit_alias = kwargs.get('homekit_alias', self._alias)
     self._homekit_types = {}
@@ -126,6 +127,8 @@ class Device(object):
     state_before = self.get_all_request_values()
     logging.debug('%s: Got Command: %s' % (self.id, command.command))
     if command.command in self.command_map.keys():
+      self._last_command_source = command.source
+      self._last_update_time = self.firefly.location.now
       self.command_map[command.command](**command.args)
       state_after = self.get_all_request_values()
       self.broadcast_changes(state_before, state_after)
@@ -193,6 +196,8 @@ class Device(object):
     return_data['device_type'] = self._device_type
     return_data['metadata'] = self._metadata
     return_data['current_values'] = return_data['initial_values']
+    return_data['last_update_time'] = str(self._last_update_time)
+    return_data['last_command_source'] = self._last_command_source
     return_data.pop('initial_values')
     return_data['request_values'] = {}
     for r in self._requests:
@@ -228,9 +233,15 @@ class Device(object):
     state_after = self.get_all_request_values()
     self.broadcast_changes(state_before, state_after)
 
+  # TODO: Add runInX functions to devices. These functions have to be similar to member_set and should be able to replace it.
+
   @property
   def id(self):
     return self._id
+
+  @property
+  def firefly(self):
+    return self._firefly
 
   @property
   def command_map(self):
