@@ -146,18 +146,18 @@ class Device(object):
 
     """
     if before == after:
-      logging.info('No change detected. %s' % self)
-      return False
-    logging.info('Change detected. %s' % self)
+      logging.debug('No change detected. %s' % self)
+      return
+    logging.debug('Change detected. %s' % self)
     changed = {}
     for item, val in after.items():
       if after.get(item) != before.get(item):
         changed[item] = after.get(item)
-    logging.info("Items changed: %s %s" % (str(changed), self))
+    logging.debug("Items changed: %s %s" % (str(changed), self))
     broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=changed)
     logging.info(broadcast)
     self._firefly.send_event(broadcast)
-    return True
+    return
 
   def request(self, request: Request) -> Any:
     """Function to request data from the ff_id.

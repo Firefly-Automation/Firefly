@@ -1,7 +1,7 @@
 from Firefly import logging
 from Firefly.helpers.events import Request, Event
-from Firefly.const import SOURCE_TRIGGER, EVENT_ACTION_ANY, EVENT_ACTON_TYPE
-from Firefly.helpers.subscribers import verify_event_action
+from Firefly.const import SOURCE_TRIGGER, EVENT_ACTION_ANY, EVENT_ACTON_TYPE, TIME
+from Firefly.helpers.subscribers import verify_event_action, verify_event_action_time
 import asyncio
 from typing import TypeVar, List
 
@@ -59,7 +59,10 @@ Example Trigger:
 class Trigger(object):
   def __init__(self, listen_id: str, event_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY, source: str = SOURCE_TRIGGER):
     self._listen_id = listen_id
-    self._listen_action = verify_event_action(event_action)
+    if listen_id == TIME:
+      self._listen_action = verify_event_action_time(event_action)
+    else:
+      self._listen_action = verify_event_action(event_action)
     self._source = source
 
   def __str__(self):
@@ -123,9 +126,13 @@ class Triggers(object):
     self.triggers.append(trigger)
 
     for t in trigger:
-      logging.debug('Adding subscription: %s %s %s' % (self._source_id, t.listen_id, t.listen_action))
-      self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, t.listen_action)
-      self._trigger_sources.add(t.listen_id)
+      if t.listen_id != TIME:
+        logging.debug('Adding subscription: %s %s %s' % (self._source_id, t.listen_id, t.listen_action))
+        self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, t.listen_action)
+        self._trigger_sources.add(t.listen_id)
+      else:
+        self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, EVENT_ACTION_ANY)
+        self._trigger_sources.add(t.listen_id)
     return True
 
 
@@ -174,14 +181,20 @@ class Triggers(object):
       triggers = []
       for t in trigger:
         triggers.append(Trigger(**t))
-        import_count += 1 if self.add_trigger(triggers) else 0
+      import_count += 1 if self.add_trigger(triggers) else 0
 
     for trigs in self.triggers:
       for t in trigs:
-        self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, t.listen_action)
-        self._trigger_sources.add(t.listen_id)
+        if t.listen_id != TIME:
+          logging.debug('Adding subscription: %s %s %s' % (self._source_id, t.listen_id, t.listen_action))
+          self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, t.listen_action)
+          self._trigger_sources.add(t.listen_id)
+        else:
+          self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, EVENT_ACTION_ANY)
+          self._trigger_sources.add(t.listen_id)
 
     return import_count
+
 
 
   def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
@@ -195,39 +208,51 @@ class Triggers(object):
     """
 
     devices = self.trigger_sources
-    current_states = self._firefly.get_device_states(devices)
+    current_states = self._firefly.get_device_states(devices.copy())
+
+    if event.source not in devices and not ignore_event:
+      return False
 
     for trigger in self.triggers:
       trigger_valid = True
+      event_valid = False
       trigger_devices = [t.listen_id for t in trigger]
       if event.source in trigger_devices:
         for t in trigger:
           t_action = t.listen_action
           t_source = t.listen_id
+          if t_source == TIME:
+            trigger_valid &= self.check_time_trigger(event, t)
+            event_valid = True
+            continue
           if EVENT_ACTION_ANY in t_action:
-            trigger_valid &= True
+            trigger_valid = True
+            event_valid = True
             continue
           for act in t_action:
             for prop, vals in act.items():
               try:
-                if prop not in event.event_action.keys() and EVENT_ACTION_ANY not in act.keys():
+                if prop not in act.keys() and EVENT_ACTION_ANY not in act.keys():
                   trigger_valid = False
                   break
                 # If ANY then continue
                 if EVENT_ACTION_ANY in vals:
-                  trigger_valid &= True
+                  trigger_valid = True
+                  if prop in event.event_action.keys() or prop == EVENT_ACTION_ANY:
+                    event_valid = True
                   continue
                 # If the trigger value is in the event, use the event value unless ignore event.
                 if prop in event.event_action.keys() and event.source == t_source and not ignore_event:
                   if event.event_action[prop] in vals or EVENT_ACTION_ANY in vals:
-                    trigger_valid &= True
+                    trigger_valid = True
+                    event_valid = True
                     continue
                   else:
                     trigger_valid = False
                     break
                 else:
                   if current_states[t_source][prop] in vals:
-                    trigger_valid &= True
+                    trigger_valid = True
                     continue
                   else:
                     trigger_valid = False
@@ -239,9 +264,30 @@ class Triggers(object):
                 break
 
         if trigger_valid:
-          return True
+          if ignore_event:
+            return True
+          return trigger_valid & event_valid
 
     return False
+
+
+  def check_time_trigger(self, event: Event, trigger: Trigger) -> bool:
+    # If the event source is not time then it cant match any.
+    if event.source != TIME:
+      return False
+    # If any time trigger in list of times matches return True.
+    for t in trigger.listen_action:
+      if t.get('day'):
+        if event.event_action['day'] != t['day']:
+          continue
+      if t.get('month'):
+        if event.event_action['month'] != t['month']:
+          continue
+      if event.event_action['hour'] == t['hour'] and event.event_action['minute'] == t['minute'] and event.event_action['weekday'] in t['weekdays']:
+        return True
+
+    return False
+
 
 
   @property

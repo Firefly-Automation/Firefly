@@ -1,5 +1,5 @@
 from Firefly import logging
-from Firefly.const import (EVENT_ACTION_ANY, EVENT_ACTON_TYPE)
+from Firefly.const import (EVENT_ACTION_ANY, EVENT_ACTON_TYPE, TIME)
 from typing import List
 
 
@@ -350,6 +350,7 @@ def verify_event_action(event_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY, get_s
   Returns:
     list: list of event_action dict
   """
+
   if type(event_action) is dict:
     return [verify_event_action_dict(event_action)]
 
@@ -394,3 +395,38 @@ def verify_event_action_dict(event_action: dict) -> dict:
     if type(act) is not list:
       event_action[evt] = [act]
   return event_action
+
+def verify_event_action_time(event_action: EVENT_ACTON_TYPE) -> list:
+  if type(event_action) is dict:
+    event_action = [event_action]
+
+  for ea in event_action:
+    # Check for missing items
+    if 'hour' not in ea.keys():
+      logging.error('hour not in time action')
+      ea = {}
+      continue
+    if 'minute' not in ea.keys():
+      logging.error('minute not in time action')
+      ea = {}
+      continue
+    if 'weekdays' not in ea.keys():
+      logging.error('weekdays not in time action. Setting to everyday.')
+      ea['weekdays'] = [1,2,3,4,5,6,7]
+
+    # Verify time ranges
+    if ea['hour'] < 0 or ea['hour'] > 24:
+      logging.error('hour is out of range')
+      ea ={}
+      continue
+    if ea['minute'] < 0 or ea['minute'] > 60:
+      logging.error('minute is out of range')
+      ea ={}
+      continue
+    if max(ea['weekdays']) > 7 or min(ea['weekdays']) < 1:
+      logging.error('weekdays is out of range')
+      ea = {}
+      continue
+
+  return event_action
+

@@ -4,7 +4,7 @@ from astral import GoogleGeocoder
 from datetime import datetime
 from datetime import timedelta
 
-from Firefly.const import (SOURCE_LOCATION, EVENT_TYPE_BROADCAST, DAY_EVENTS)
+from Firefly.const import (SOURCE_LOCATION, EVENT_TYPE_BROADCAST, DAY_EVENTS, TIME)
 
 from Firefly.helpers.events import Event
 
@@ -46,6 +46,21 @@ class Location(object):
     event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={'LOCATION':'STARTUP'})
     self._firefly.send_event(event)
     #scheduler.runInS(0, self._firefly.send_event, event=event)
+
+    # Setup Time Broadcast to start at the next minute
+    now = self.now
+    if now.second < 50:
+      strat_at = now + timedelta(minutes=1) - timedelta(seconds=now.second)
+    else:
+      strat_at = now + timedelta(minutes=2) - timedelta(seconds=now.second)
+    scheduler.runAt(strat_at, self.setup_time_broadcast)
+
+
+  def setup_time_broadcast(self):
+    # Setup Time Broadcast
+    scheduler.runEveryM(1, self.broadcast_time)
+    self.broadcast_time()
+    logging.notify('Scheduler has started.')
 
   @asyncio.coroutine
   def DayEventHandler(self, day_event):
@@ -120,12 +135,18 @@ class Location(object):
         return False
     return not self.isDark
 
+
+  def broadcast_time(self) -> None:
+    now = self.now
+    event = Event(TIME, EVENT_TYPE_BROADCAST, {'epoch': now.timestamp(), 'day': now.day, 'month': now.month, 'year': now.year, 'hour':  now.hour, 'minute': now.minute, 'weekday': now.isoweekday()})
+    self.firefly.send_event(event)
+
   @property
-  def longitude(self):
+  def longitude(self) -> int:
     return self._longitude
 
   @property
-  def latitude(self):
+  def latitude(self) -> int:
     return self._latitude
 
   @property
@@ -135,3 +156,7 @@ class Location(object):
   @property
   def now(self) -> datetime:
     return datetime.now(self._city.tz)
+
+  @property
+  def firefly(self):
+    return self._firefly

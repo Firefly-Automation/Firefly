@@ -1,5 +1,6 @@
 from Firefly import logging
 from Firefly.helpers.device import Device
+from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.util.get_from_kwargs import get_kwargs_value
 
 from openzwave.network import ZWaveNode
@@ -12,8 +13,8 @@ from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION
 TITLE = 'Firefly Zwave Switch'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = 'Zachary Priddy'
-COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, 'ZWAVE_CONFIG']
-REQUESTS = [STATE, 'SENSORS', 'PARAMS', 'DEVICE_VALUES']
+COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE]
+REQUESTS = [STATE]
 INITIAL_VALUES = {'_state': EVENT_ACTION_OFF}
 
 def Setup(firefly, package, **kwargs):
@@ -24,29 +25,48 @@ def Setup(firefly, package, **kwargs):
   return new_switch.id
 
 
-class ZwaveSwitch(Device):
+class ZwaveSwitch(ZwaveDevice):
   def __init__(self, firefly, package, **kwargs):
     kwargs['initial_values'] = INITIAL_VALUES if not kwargs.get('initial_values') else kwargs.get('initial_values')
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
     self.__dict__.update(kwargs['initial_values'])
 
-    self._sensors = {}
-    self._config_params = {}
-    self._device_values = {}
-
-    self._node = kwargs.get('node')
     if self._node:
       self._switches = list(self._node.get_switches().keys())
 
     self.add_command(ACTION_OFF, self.off)
     self.add_command(ACTION_ON, self.on)
     self.add_command(ACTION_TOGGLE, self.toggle)
-    self.add_command('ZWAVE_CONFIG', self.zwave_config)
 
     self.add_request(STATE, self.get_state)
-    self.add_request('SENSORS', self.get_sensors)
-    self.add_request('PARAMS', self.get_params)
-    self.add_request('DEVICE_VALUES', self.get_device_values)
+
+  def update_device_config(self, **kwargs):
+    # TODO: Pull these out into config values
+    """
+    Updated the devices to the desired config params. This will be useful to make new default devices configs.
+
+    For example when there is a gen6 multisensor I want it to always report every 5 minutes and timeout to be 30 seconds.
+    Args:
+      **kwargs ():
+    """
+    # TODO: self._sensitivity ??
+    report = 1 # 1=hail 2=basic
+
+    self.node.set_config_param(80, report)
+    self.node.set_config_param(102, 15)
+    self._config_updated = True
+
+  def update_from_zwave(self, node: ZWaveNode, **kwargs):
+    state_before = self.get_all_request_values()
+    super().update_from_zwave(node, **kwargs, ignore_update=True)
+
+    if node.get_switch_state(self._switches[0]):
+      self._state = EVENT_ACTION_ON
+    else:
+      self._state = EVENT_ACTION_OFF
+
+    state_after = self.get_all_request_values()
+    self.broadcast_changes(state_before, state_after)
 
 
   def off(self, **kwargs):
@@ -60,30 +80,6 @@ class ZwaveSwitch(Device):
     self._node.set_switch(self._switches[0], 1)
     return EVENT_ACTION_ON
 
-  def zwave_config(self, **kwargs):
-    param = int(get_kwargs_value(kwargs, 'id'))
-    value = int(get_kwargs_value(kwargs, 'value'))
-    self._node.set_config_param(param, value)
-
-  def get_sensors(self, **kwargs):
-    print(kwargs)
-    sensor = get_kwargs_value(kwargs, 'SENSOR')
-    if sensor:
-      s = self._sensors.get(sensor)
-      return s
-    return self._sensors
-
-  def get_params(self, **kwargs):
-    print(kwargs)
-    values = get_kwargs_value(kwargs, 'VALUE')
-    if values:
-      s = self._config_params.get(values)
-      return s
-    return self._config_params
-
-  def get_device_values(self, **kwargs):
-    return self._device_values
-
 
   def toggle(self, **kwargs):
     if self.state == EVENT_ACTION_ON:
@@ -92,23 +88,6 @@ class ZwaveSwitch(Device):
 
   def get_state(self, **kwargs):
     return self.state
-
-  def update_from_zwave(self, node: ZWaveNode, **kwargs):
-    for s, i in node.get_sensors().items():
-      self._sensors[SENSORS.get(i.label)] = i.data
-
-    for s, i in node.get_values().items():
-      if i.command_class == 112:
-        self._config_params[i.label.upper()] = {'value': i.data, 'id': i.index}
-      else:
-        self._device_values[i.label.upper()] = {'value': i.data, 'id': i.index, 'class': i.command_class}
-
-    if node.get_switch_state(self._switches[0]):
-      self._state = EVENT_ACTION_ON
-    else:
-      self._state = EVENT_ACTION_OFF
-
-    self._node = node.get
 
   @property
   def state(self):

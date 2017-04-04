@@ -34,10 +34,10 @@ class ZwaveMotionSensor(ZwaveDevice):
 
     self.add_request(STATE, self.get_state)
 
-  #@asyncio.coroutine
+
   def update_from_zwave(self, node: ZWaveNode, **kwargs):
-    sensor_before = self.state
-    super().update_from_zwave(node, **kwargs)
+    state_before = self.get_all_request_values()
+    super().update_from_zwave(node, **kwargs, ignore_update=True)
 
     #self._state = get_kwargs_value(self._sensors, 'SENSOR', False)
     b = self._raw_values.get('BURGLAR')
@@ -49,11 +49,8 @@ class ZwaveMotionSensor(ZwaveDevice):
 
     #self._state = self._raw_values.get('BURGLAR')
 
-    if self.state != sensor_before:
-      broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action='UPDATE')
-      s = self._firefly.send_event(broadcast)
-      logging.info(s)
-      logging.info(broadcast)
+    state_after = self.get_all_request_values()
+    self.broadcast_changes(state_before, state_after)
 
 
 
@@ -62,5 +59,5 @@ class ZwaveMotionSensor(ZwaveDevice):
 
   @property
   def state(self):
-    #self._state =  self._sensors.get('SENSOR')
+    self._state =  self._sensors.get('SENSOR')
     return self._state

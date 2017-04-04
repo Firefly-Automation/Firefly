@@ -82,7 +82,7 @@ class ZwaveDevice(Device):
       return s
     return self._raw_values
 
-  def update_from_zwave(self, node: ZWaveNode, **kwargs):
+  def update_from_zwave(self, node: ZWaveNode, ignore_update=False, **kwargs):
     '''
     Currently the update command is not in the COMMANDS -> THis is because it acts differently right now.. This may change in the near future.
     Args:
@@ -91,6 +91,9 @@ class ZwaveDevice(Device):
     Returns:
 
     '''
+    if not ignore_update:
+      state_before = self.get_all_request_values()
+      logging.debug('Updating ZWave Values')
 
     # Return if no valid node object.
     if node is None:
@@ -124,11 +127,11 @@ class ZwaveDevice(Device):
     #  self._node.refresh_info()
     #  self._node.request_state()
 
-    # TODO: Figure out how to send the broadcast event, have to find what types of values changed.
-    #broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action='UPDATE')
-    #self._firefly.send_event(broadcast)
-    #logging.info(broadcast)
-    #return True
+
+    if not ignore_update:
+      state_after = self.get_all_request_values()
+      self.broadcast_changes(state_before, state_after)
+
 
 
   @property

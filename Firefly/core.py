@@ -15,7 +15,7 @@ from Firefly import logging
 from Firefly import aliases
 from Firefly import scheduler
 from Firefly.helpers.location import Location
-from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE, EVENT_ACTION_ANY, SOURCE_LOCATION, TYPE_DEVICE, EVENT_ACTION_LEVEL, TYPE_AUTOMATION, COMPONENT_MAP, SERVICE_NOTIFICATION, COMMAND_NOTIFY)
+from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE, EVENT_ACTION_ANY, SOURCE_LOCATION, TYPE_DEVICE, EVENT_ACTION_LEVEL, TYPE_AUTOMATION, COMPONENT_MAP, SERVICE_NOTIFICATION, COMMAND_NOTIFY, TIME)
 import importlib
 from Firefly.automation import Trigger
 
@@ -55,7 +55,6 @@ class Firefly(object):
     for c in COMPONENT_MAP:
       self.import_devices(c['file'])
 
-    scheduler.runInS(5, self.install_services)
 
 
     # TODO: MOST OF WHATS BELOW IS FOR TESTING
@@ -88,18 +87,31 @@ class Firefly(object):
 
     logging.notify('Firefly is starting up')
 
+    self.install_services()
+
     # TODO: Leave In.
     scheduler.runEveryH(1, self.export_all_components)
 
 
   def install_services(self) -> None:
+    logging.notify('Installing Services')
     # Install service
-    self.install_package('Firefly.services.darksky', alias='service Dark Sky')
+    #try:
+    #  self.install_package('Firefly.services.darksky', alias='service Dark Sky')
+    #except Exception as e:
+    #  logging.notify('Error installing Dark Sky: %s' % e)
     # Install openzwave
-    # self.install_package('Firefly.services.zwave', alias='service zwave')
+    try:
+      self.install_package('Firefly.services.zwave', alias='service zwave')
+    except Exception as e:
+      logging.notify('Error installing ZWave: %s' % e)
 
     # Test install Hue
-    self.install_package('Firefly.services.hue', alias='hue_service')
+    try:
+      self.install_package('Firefly.services.hue', alias='hue_service')
+    except Exception as e:
+      logging.notify('Error installing Hue: %s' % e)
+
 
   def start(self) -> None:
     """
@@ -271,6 +283,8 @@ class Firefly(object):
 
   def get_device_states(self, devices: set) -> dict:
     current_state = {}
+    if TIME in devices:
+      devices.remove(TIME)
     for device in devices:
       current_state[device] = self.components[device].get_all_request_values()
     return current_state

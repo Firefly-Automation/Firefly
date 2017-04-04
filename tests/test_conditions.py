@@ -124,3 +124,27 @@ class TestCheckConditions(unittest.TestCase):
     condition = {IS_MODE: 'Home', IS_NOT_MODE: 'Away', IS_DARK: True, IS_LIGHT: True}
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
+
+
+from Firefly.helpers.conditions import Conditions
+class TestNewConditions(unittest.TestCase):
+  @patch('Firefly.core.Firefly', new_callable=PropertyMock)
+  def setUp(self, firefly):
+    self.firefly = firefly
+
+  def test_export_conditions(self):
+    c = Conditions(is_dark=True, is_mode=['home'], is_not_mode=['away'])
+    export_data = c.export()
+    self.assertDictEqual(export_data, {'is_dark': True, 'is_mode': ['home'], 'is_not_mode': ['away']})
+
+  def test_condisitions_case_1(self):
+    type(self.firefly.location).isDark = PropertyMock(return_value=True)
+    c = Conditions(is_dark=True)
+    trigger = c.check_conditions(self.firefly)
+    self.assertTrue(trigger)
+
+  def test_condisitions_case_2(self):
+    type(self.firefly.location).isDark = PropertyMock(return_value=True)
+    c = Conditions(is_dark=False)
+    trigger = c.check_conditions(self.firefly)
+    self.assertFalse(trigger)

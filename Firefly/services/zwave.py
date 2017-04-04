@@ -109,8 +109,8 @@ class Zwave(Service):
     #dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_OFF)
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_ON)
-    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
-    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
+    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
+    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
     #dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
     #dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE)
     #dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_ALL_NODES_QUERIED)
@@ -199,7 +199,7 @@ class Zwave(Service):
       self._installed_nodes[node.node_id] = device_id
 
     if node.device_type == 'Home Security Sensor':
-      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_motion', alias='multi_sensor', node=node)
+      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_aeotec_multi_6', alias='multi_sensor', node=node)
       self._installed_nodes[node.node_id] = device_id
 
 

@@ -45,7 +45,7 @@ class ZwaveAeotecMulti(ZwaveDevice):
     """
     # TODO: self._sensitivity ??
     sensitivity = 4 # index 4
-    timeout = 30 # index 8
+    timeout = 10 # index 8
     scale = 2 # index 64
     group1 = 241 # index 101
     interval = 300 #index 111
@@ -55,12 +55,13 @@ class ZwaveAeotecMulti(ZwaveDevice):
     self.node.set_config_param(64, scale)
     self.node.set_config_param(101, group1)
     self.node.set_config_param(111, interval)
+    self.node.set_config_param(5, 1)
 
     self._config_updated = True
 
   def update_from_zwave(self, node: ZWaveNode, **kwargs):
-    sensor_before = self.state
-    super().update_from_zwave(node, **kwargs)
+    state_before = self.get_all_request_values()
+    super().update_from_zwave(node, **kwargs, ignore_update=True)
 
     #self._state = get_kwargs_value(self._sensors, 'SENSOR', False)
     b = self._raw_values.get('BURGLAR')
@@ -72,11 +73,8 @@ class ZwaveAeotecMulti(ZwaveDevice):
 
     #self._state = self._raw_values.get('BURGLAR')
 
-    if self.state != sensor_before:
-      broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action='UPDATE')
-      s = self._firefly.send_event(broadcast)
-      logging.info(s)
-      logging.info(broadcast)
+    state_after = self.get_all_request_values()
+    self.broadcast_changes(state_before, state_after)
 
 
 
@@ -85,5 +83,5 @@ class ZwaveAeotecMulti(ZwaveDevice):
 
   @property
   def state(self):
-    #self._state =  self._sensors.get('SENSOR')
+    self._state =  self._sensors.get('SENSOR')
     return self._state
