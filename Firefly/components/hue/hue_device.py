@@ -37,12 +37,15 @@ INITIAL_VALUES = {'_state':            EVENT_ACTION_OFF,
 
 class HueDevice(Device):
   def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
-    self._alias = kwargs.get('name')
     if not kwargs.get('initial_values'):
       kwargs['initial_values'] = INITIAL_VALUES
     super().__init__(firefly, package, title, author, commands, requests, device_type, **kwargs)
 
     self.__dict__.update(kwargs['initial_values'])
+
+    if self._alias == self.id:
+      self._alias = kwargs.get('name')
+
 
     # TODO: Remove hue_bridge?
     self._hue_bridge = kwargs.get('hue_bridge')
@@ -137,7 +140,7 @@ class HueDevice(Device):
 
   def set_level(self, **kwargs):
     try:
-      level = int(kwargs.get('level'))
+      level = int(kwargs.get(LEVEL))
     except:
       logging.error('UNKNOWN VALUE PASSED FOR LEVEL')
       return False

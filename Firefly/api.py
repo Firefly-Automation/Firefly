@@ -3,6 +3,8 @@ from aiohttp.web_reqrep import Request as webRequest
 from datetime import datetime
 import asyncio
 import json
+from Firefly.services.api_ai import process_api_ai_request
+from Firefly.services.alexa import process_alexa_request
 
 from Firefly import logging
 
@@ -22,7 +24,9 @@ class FireflyCoreAPI:
       {'method': 'GET', 'path': '/api/rest/ff_id/{ff_id}/action', 'function': self.action},
       {'method': 'GET', 'path': '/api/rest/ff_id/{ff_id}/sensors', 'function': self.sensors},
       {'method': 'GET', 'path': '/api/status/all_components', 'function': self.api_all_components},
-      {'method': 'GET', 'path': '/api/status', 'function': self.api_status}
+      {'method': 'GET', 'path': '/api/status', 'function': self.api_status},
+      {'method': 'POST', 'path': '/api/api_ai', 'function': self.process_api_ai_request},
+      {'method': 'POST', 'path': '/api/alexa', 'function': self.process_alexa_request}
     ]
 
   async def hello_world(self, request):
@@ -134,6 +138,19 @@ class FireflyCoreAPI:
     return web.Response(text=data, content_type='application/json')
 
 
+  @asyncio.coroutine
+  def process_api_ai_request(self, request):
+    request_data = yield from request.json()
+    r = process_api_ai_request(self.firefly, request_data)
+    data = json.dumps(r)
+    return web.Response(text=data, content_type='application/json')
+
+  @asyncio.coroutine
+  def process_alexa_request(self, request):
+    request_data = yield from request.json()
+    r = process_alexa_request(self.firefly, request_data)
+    data = json.dumps(r)
+    return web.Response(text=data, content_type='application/json')
 
   def setup_api(self):
     for function in self.api_functions:

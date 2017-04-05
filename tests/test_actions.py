@@ -17,17 +17,17 @@ class TestCheckConditions(unittest.TestCase):
     c = Conditions(is_dark=True)
     action = Action('test_device', ACTION_TOGGLE, 'test_source', c)
     export_data = action.export()
-    self.assertDictEqual(export_data, {'ff_id': 'test_device', 'command': 'TOGGLE', 'force': False, 'conditions': {'is_dark': True}, 'source':'test_source'})
+    self.assertDictEqual(export_data, {'ff_id': 'test_device', 'command': ACTION_TOGGLE, 'force': False, 'conditions': {'is_dark': True}, 'source':'test_source'})
 
   def test_make_action_kwargs(self):
     c = Conditions(is_dark=True)
     action = Action('test_device', ACTION_TOGGLE, 'test_source', c, test='this is a test value')
     export_data = action.export()
-    self.assertDictEqual(export_data, {'ff_id': 'test_device', 'command': 'TOGGLE', 'force': False, 'conditions': {'is_dark': True}, 'test': 'this is a test value', 'source':'test_source'})
+    self.assertDictEqual(export_data, {'ff_id': 'test_device', 'command': ACTION_TOGGLE, 'force': False, 'conditions': {'is_dark': True}, 'test': 'this is a test value', 'source':'test_source'})
 
   def test_import_action(self):
-    import_data = {'ff_id': 'test_device', 'command': 'TOGGLE', 'force': False, 'conditions': {'is_dark': True}, 'test': 'this is a test value', 'source':'test_source'}
+    import_data = {'ff_id': 'test_device', 'command': ACTION_TOGGLE, 'force': False, 'conditions': {'is_dark': True}, 'test': 'this is a test value', 'source':'test_source'}
     action = Action(**import_data)
     export_data = action.export()
-    self.assertDictEqual(export_data, {'ff_id': 'test_device', 'command': 'TOGGLE', 'force': False, 'conditions': {'is_dark': True}, 'test': 'this is a test value', 'source': 'test_source'})
+    self.assertDictEqual(export_data, {'ff_id': 'test_device', 'command': ACTION_TOGGLE, 'force': False, 'conditions': {'is_dark': True}, 'test': 'this is a test value', 'source': 'test_source'})
 

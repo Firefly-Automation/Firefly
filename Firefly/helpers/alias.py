@@ -42,3 +42,7 @@ class Alias(object):
   @property
   def aliases(self):
     return self._aliases
+
+  @property
+  def alias_list(self):
+    return self._aliases.values()
