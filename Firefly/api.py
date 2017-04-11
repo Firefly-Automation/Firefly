@@ -1,5 +1,5 @@
 from aiohttp import web
-from aiohttp.web_reqrep import Request as webRequest
+from aiohttp.web_request import Request as webRequest
 from datetime import datetime
 import asyncio
 import json
@@ -8,7 +8,7 @@ from Firefly.services.alexa import process_alexa_request
 
 from Firefly import logging
 
-from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, TYPE_DEVICE, ACTION_OFF, ACTION_ON, STATE, API_INFO_REQUEST)
+from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, TYPE_DEVICE, ACTION_OFF, ACTION_ON, STATE, API_INFO_REQUEST, TYPE_AUTOMATION)
 from Firefly.helpers.events import Command, Request
 
 class FireflyCoreAPI:
@@ -20,6 +20,8 @@ class FireflyCoreAPI:
       {'method': 'GET', 'path': '/stop', 'function': self.stop_firefly},
       {'method': 'GET', 'path': '/test', 'function': self.test},
       {'method': 'GET', 'path': '/api/rest/components', 'function': self.devices},
+      {'method': 'GET', 'path': '/api/rest/rooms', 'function': self.rooms},
+      {'method': 'GET', 'path': '/api/rest/routines', 'function': self.routines},
       {'method': 'GET', 'path': '/api/rest/ff_id/{ff_id}', 'function': self.device},
       {'method': 'GET', 'path': '/api/rest/ff_id/{ff_id}/action', 'function': self.action},
       {'method': 'GET', 'path': '/api/rest/ff_id/{ff_id}/sensors', 'function': self.sensors},
@@ -45,6 +47,34 @@ class FireflyCoreAPI:
     devices = []
     for ff_id, d in self.firefly.components.items():
       if d.type == TYPE_DEVICE:
+        devices.append({
+          'alias': d._alias,
+          'title': d._title,
+          'ff_id': ff_id,
+          'rest_url': 'http://%s/api/rest/ff_id/%s' % (request.host, ff_id)
+        })
+
+    data = json.dumps(devices, indent=4, sort_keys=True)
+    return web.Response(text=data, content_type='application/json')
+
+
+  async def rooms(self, request):
+    devices = []
+    for ff_id, d in self.firefly.components.items():
+      if d.type == "ROOM":
+        devices.append({
+          'alias': d._alias,
+          'ff_id': ff_id,
+          'rest_url': 'http://%s/api/rest/ff_id/%s' % (request.host, ff_id)
+        })
+
+    data = json.dumps(devices, indent=4, sort_keys=True)
+    return web.Response(text=data, content_type='application/json')
+
+  async def routines(self, request):
+    devices = []
+    for ff_id, d in self.firefly.components.items():
+      if d.type == TYPE_AUTOMATION and 'routine' in d._package:
         devices.append({
           'alias': d._alias,
           'title': d._title,

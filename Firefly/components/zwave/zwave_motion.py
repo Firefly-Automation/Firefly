@@ -7,7 +7,7 @@ import asyncio
 from openzwave.network import ZWaveNode
 from Firefly import logging
 from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SENSORS, DEVICE_TYPE_MOTION, EVENT_TYPE_BROADCAST)
+                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SENSORS, DEVICE_TYPE_MOTION, EVENT_TYPE_BROADCAST, MOTION, MOTION_ACTIVE, MOTION_INACTIVE)
 
 
 
@@ -33,14 +33,15 @@ class ZwaveMotionSensor(ZwaveDevice):
     self.__dict__.update(kwargs['initial_values'])
 
     self.add_request(STATE, self.get_state)
+    self.add_request(MOTION, self.get_motion)
 
 
-  def update_from_zwave(self, node: ZWaveNode, **kwargs):
+  def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     state_before = self.get_all_request_values()
     super().update_from_zwave(node, **kwargs, ignore_update=True)
 
     #self._state = get_kwargs_value(self._sensors, 'SENSOR', False)
-    b = self._raw_values.get('BURGLAR')
+    b = self._raw_values.get('burglar')
     print(b)
     if b:
       self._state = b.get('value') == 8
@@ -57,7 +58,10 @@ class ZwaveMotionSensor(ZwaveDevice):
   def get_state(self, **kwargs):
     return self.state
 
+  def get_motion(self, **kwargs):
+    return MOTION_ACTIVE if self.state else MOTION_INACTIVE
+
   @property
   def state(self):
-    self._state =  self._sensors.get('SENSOR')
+    self._state =  self._sensors.get('sensor')
     return self._state

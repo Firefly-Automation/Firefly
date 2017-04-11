@@ -21,17 +21,22 @@ class Routine(Automation):
     self.add_command('ADD_ACTION', self.add_action)
     self.add_command('EXECUTE', self.event_handler)
     self._message = kwargs.get('message')
+    self._set_mode = kwargs.get('mode')
 
   def export(self, **kwargs):
     export_data = super().export()
     if self._message:
       export_data['message'] = self._message
+      export_data['mode'] = self._set_mode
     return export_data
 
-  def event_handler(self, event, **kwargs):
+  def event_handler(self, event=None, **kwargs):
     if self._message:
       notify = Command(SERVICE_NOTIFICATION, self.id, COMMAND_NOTIFY, message=self._message)
       self._firefly.send_command(notify)
+
+    if self._set_mode:
+      self._firefly.location.mode = self._set_mode
 
     for a in self.actions:
       a.execute_action(self._firefly)

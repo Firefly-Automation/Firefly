@@ -1,14 +1,14 @@
 from Firefly import logging
 from Firefly.automation.triggers import Trigger, Triggers
-from Firefly.const import TYPE_AUTOMATION
+from Firefly.const import TYPE_AUTOMATION, API_INFO_REQUEST
 import asyncio
 from Firefly import aliases
 import uuid
-from Firefly.helpers.events import Command
+from Firefly.helpers.events import Request
 from Firefly.helpers.conditions import Conditions
 from Firefly.helpers.action import Action
 
-from typing import Callable, List
+from typing import Callable, List, Any
 
 # TODO: move this to automation
 from Firefly.util.conditions import check_conditions
@@ -63,6 +63,36 @@ class Automation(object):
         self._actions.append(Action(**action))
 
 
+  def request(self, request: Request) -> Any:
+    """Function to request data from the ff_id.
+
+    The returned data can be in any format. Common formats should be:
+      str, int, dict
+
+    Args:
+      request (Request): Request object
+
+    Returns:
+      Requested Data
+
+    """
+    logging.debug('%s: Got Request %s' % (self.id, request))
+    if request.request == API_INFO_REQUEST:
+      return self.get_api_info()
+    return None
+
+
+  def get_api_info(self) -> dict:
+    """
+    Function to get view for API.
+
+    Returns (dict): JSON for API view.
+
+    """
+    return_data = {}
+    return_data.update(self.export(api_view=True))
+    return return_data
+
   def import_triggers(self, triggers):
     logging.info('Importing triggers into %s - %s' % (self.id, triggers))
     self.triggers.import_triggers(triggers)
@@ -82,6 +112,7 @@ class Automation(object):
       action = Action(**action)
     if action not in self.actions:
       self.actions.append(action)
+
 
   def event(self, event, **kwargs):
     logging.info('[AUTOMATION] %s - Receiving event: %s' % (self.id, event))

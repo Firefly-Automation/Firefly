@@ -6,41 +6,37 @@ from Firefly.util.get_from_kwargs import get_kwargs_value
 from openzwave.network import ZWaveNode
 from Firefly import logging
 from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SENSORS)
+                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SENSORS, CONTACT, CONTACT_CLOSED, CONTACT_OPEN)
 
 
 
-TITLE = 'Firefly Zwave Switch'
+TITLE = 'Aeotec Zwave Window Door Sensor Gen5'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = 'Zachary Priddy'
-COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE]
-REQUESTS = [STATE]
+COMMANDS = []
+REQUESTS = [STATE, CONTACT, 'alarm']
 INITIAL_VALUES = {'_state': EVENT_ACTION_OFF}
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
-  new_switch = ZwaveSwitch(firefly, package, **kwargs)
+  sensor = ZwaveAeotecDoorWindow5(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[new_switch.id] = new_switch
-  return new_switch.id
+  firefly.components[sensor.id] = sensor
+  return sensor.id
 
 
-class ZwaveSwitch(ZwaveDevice):
+class ZwaveAeotecDoorWindow5(ZwaveDevice):
   def __init__(self, firefly, package, **kwargs):
     kwargs['initial_values'] = INITIAL_VALUES if not kwargs.get('initial_values') else kwargs.get('initial_values')
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
     self.__dict__.update(kwargs['initial_values'])
 
-    if self._node:
-      self._switches = list(self._node.get_switches().keys())
-    else:
-      self._switches = None
-
-    self.add_command(ACTION_OFF, self.off)
-    self.add_command(ACTION_ON, self.on)
-    self.add_command(ACTION_TOGGLE, self.toggle)
+    self._state = CONTACT_CLOSED
+    self._alarm = False
 
     self.add_request(STATE, self.get_state)
+    self.add_request(CONTACT, self.get_state)
+    self.add_request('alarm', self.get_alarm)
 
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
@@ -51,24 +47,23 @@ class ZwaveSwitch(ZwaveDevice):
     Args:
       **kwargs ():
     """
+    self.node.refresh_info()
     if self._update_try_count >= 30:
       self._config_updated = True
       return
 
 
     # TODO: self._sensitivity ??
-    #report = 2 # 1=hail 2=basic
-    #self.node.set_config_param(110, 1)
-    #self.node.set_config_param(100, 1)
-    #self.node.set_config_param(80, report)
-    #self.node.set_config_param(102, 15)
-    #self.node.set_config_param(111, 30)
+    # https://github.com/OpenZWave/open-zwave/blob/master/config/aeotec/zw120.xml
+    self.node.set_config_param(2, 0) # Disable 10 min wake up time
+    self.node.set_config_param(121, 17) # ensor Binary and Battery Report
+
 
     successful = True
-    #successful &= self.node.request_config_param(80) == report
-    #successful &= self.node.request_config_param(102) == 15
+    successful &= self.node.request_config_param(2) == 0
+    successful &= self.node.request_config_param(121) == 17
 
-    #self._update_try_count += 1
+    self._update_try_count += 1
     self._config_updated = successful
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
@@ -89,37 +84,25 @@ class ZwaveSwitch(ZwaveDevice):
       self.broadcast_changes(state_before, state_after)
       return
 
-    if self._switches is None:
-      self._switches = list(self._node.get_switches().keys())
-
-    if node.get_switch_state(self._switches[0]):
-      self._state = EVENT_ACTION_ON
+    # self._state = get_kwargs_value(self._sensors, 'SENSOR', False)
+    b = self._raw_values.get('burglar')
+    print(b)
+    if b:
+      self._alarm = b.get('value') == 3
     else:
-      self._state = EVENT_ACTION_OFF
+      self._alarm = False
+
+    self._state = CONTACT_OPEN if self.get_sensors(sensor='sensor') is True else CONTACT_CLOSED
 
     state_after = self.get_all_request_values()
     self.broadcast_changes(state_before, state_after)
 
 
-  def off(self, **kwargs):
-    self._state = EVENT_ACTION_OFF
-    print(self._switches)
-    self._node.set_switch(self._switches[0], 0)
-    return EVENT_ACTION_OFF
-
-  def on(self, **kwargs):
-    self._state = EVENT_ACTION_ON
-    self._node.set_switch(self._switches[0], 1)
-    return EVENT_ACTION_ON
-
-
-  def toggle(self, **kwargs):
-    if self.state == EVENT_ACTION_ON:
-      return self.off()
-    return self.on()
-
   def get_state(self, **kwargs):
     return self.state
+
+  def get_alarm(self, **kwargs):
+    return self._alarm
 
   @property
   def state(self):

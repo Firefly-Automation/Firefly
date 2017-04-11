@@ -2,10 +2,11 @@ from Firefly import logging
 from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF,
                            EVENT_ACTION_ON,
                            ACTION_TOGGLE, DEVICE_TYPE_SWITCH, DEVICE_TYPE_COLOR_LIGHT, COMMAND_UPDATE, ACTION_LEVEL,
-                           LEVEL)
+                           LEVEL, COMMAND_SET_LIGHT, SWITCH)
 from Firefly.components.virtual_devices import AUTHOR
 from Firefly.helpers.device import Device
 # from rgb_cie import Converter
+from Firefly.components.hue.ct_fade import CTFade
 from Firefly.helpers.events import Command
 
 from Firefly.helpers.metadata import metaSwitch, metaDimmer
@@ -13,7 +14,7 @@ from Firefly.helpers.metadata import metaSwitch, metaDimmer
 TITLE = 'Firefly Hue Device'
 DEVICE_TYPE = DEVICE_TYPE_COLOR_LIGHT
 AUTHOR = AUTHOR
-COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ACTION_LEVEL]
+COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ACTION_LEVEL, COMMAND_SET_LIGHT, 'ct_fade']
 INITIAL_VALUES = {'_state':            EVENT_ACTION_OFF,
                   '_uniqueid':         '-1',
                   '_manufacturername': 'unknown',
@@ -39,6 +40,10 @@ class HueDevice(Device):
   def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
     if not kwargs.get('initial_values'):
       kwargs['initial_values'] = INITIAL_VALUES
+    if commands:
+      c = set(commands)
+      c.update(COMMANDS)
+      commands = list(c)
     super().__init__(firefly, package, title, author, commands, requests, device_type, **kwargs)
 
     self.__dict__.update(kwargs['initial_values'])
@@ -56,11 +61,14 @@ class HueDevice(Device):
     self.add_command(ACTION_TOGGLE, self.toggle)
     self.add_command(COMMAND_UPDATE, self.update)
     self.add_command(ACTION_LEVEL, self.set_level)
+    self.add_command(COMMAND_SET_LIGHT, self.setLight)
+    self.add_command('ct_fade', self.set_ct_fade)
 
     self.add_request(STATE, self.get_state)
     self.add_request(LEVEL, self.get_level)
 
     self.add_request(STATE, self.get_state)
+    self.add_request(SWITCH, self.get_state)
 
     self.add_action(STATE, metaSwitch())
     self.add_action(LEVEL, metaDimmer())
@@ -82,6 +90,7 @@ class HueDevice(Device):
     self._swversion = kwargs.get('swversion')
     self._modelid = kwargs.get('modelid')
     self._bri = 0
+    self._ct_fade = None
 
     if kwargs.get(self.hue_noun):
       self._on = kwargs.get(self.hue_noun).get('on')
@@ -120,11 +129,11 @@ class HueDevice(Device):
     self._level = int(self._bri / 255.0 * 100.0)
 
   def off(self, **kwargs):
-    self.setLight({'on': False})
+    self.setLight(on=False)
     return EVENT_ACTION_OFF
 
   def on(self, **kwargs):
-    self.setLight({'on': True})
+    self.setLight(on=True)
     return EVENT_ACTION_ON
 
   def toggle(self, **kwargs):
@@ -133,7 +142,7 @@ class HueDevice(Device):
     return self.on()
 
   def get_state(self, **kwargs):
-    return self._on
+    return self.state
 
   def get_level(self, **kwargs):
     return self._level
@@ -146,23 +155,26 @@ class HueDevice(Device):
       return False
     if level is None:
       return False
-    return self.setLight({'level': level})
+    return self.setLight(level=level)
 
   @property
   def state(self):
-    return self._on
+    return EVENT_ACTION_ON if self._on else EVENT_ACTION_OFF
 
   @property
   def hue_noun(self):
     return self._hue_noun
 
-  def setLight(self, value):
+  def setLight(self, **kwargs):
+    value = kwargs
     hue_value = {}
 
     ## END FADE IF SET COMMAND IS GIVEN
-    # if value.get('ctfade') is None:
-    #  global ctFade
-    #  ctFade.endRun()
+    if not value.get('ct_fade', False):
+      print('^^^^^^^^^^^^^^^ STOP CT FADE ^^^^^^^^^^^^^^^^^^^')
+      if self._ct_fade is not None:
+        self._ct_fade.endRun()
+      self._ct_fade = None
 
     # XY
     xy = value.get('xy')
@@ -179,6 +191,10 @@ class HueDevice(Device):
     # TRANS TIME
     transitiontime = value.get('transitiontime')
     if transitiontime:
+      try:
+        transitiontime = int(transitiontime)
+      except:
+        transitiontime = 40
       hue_value.update({'transitiontime': transitiontime})
 
     ## NAME COLOR
@@ -200,6 +216,11 @@ class HueDevice(Device):
     # SET FOR LEVEL
     level = value.get('level')
     if level:
+      try:
+        level = int(level)
+      except:
+        level = 100
+
       if level > 0:
         if level > 100:
           level = 100
@@ -233,14 +254,7 @@ class HueDevice(Device):
     # SET CT:
     ct = value.get('ct')
     if ct:
-      if 'K' in ct.upper():
-        ct = int(ct.upper().replace('K', ''))
-        ct = int(1000000 / ct)
-      if ct > 500:
-        ct = 500
-      if ct < 153:
-        ct = 153
-
+      ct = check_ct(ct)
       hue_value.update({'ct': ct})
       self._ct = ct
 
@@ -274,16 +288,38 @@ class HueDevice(Device):
     return value
 
   # TODO: Bringe CT Fade back in
-  # def ctFade(self, args={}):
-  #  global ctFade
-  #  ctFade = CTFade(str(self._id), args.get('startK'), args.get('endK'), args.get('fadeS'), args.get('startL'),
-  #                  args.get('endL'))
+  def set_ct_fade(self, **kwargs):
+    start_k = kwargs.get('start_k')
+    end_k = kwargs.get('end_k')
+    start_level = kwargs.get('start_level')
+    end_level = kwargs.get('end_level')
+
+    try:
+      if 'K' in start_k.upper():
+        start_k = int(start_k.upper().replace('K', ''))
+      if 'K' in end_k.upper():
+        end_k = int(end_k.upper().replace('K', ''))
+      start_k = min(start_k, 6500)
+      start_k = max(start_k, 2000)
+      end_k = min(end_k, 6500)
+      end_k = max(end_k, 2000)
+
+      fade_sec = int(kwargs.get('fade_sec', 1500))
+      if start_level:
+        start_level = int(start_level)
+      if end_level:
+        end_level = int(end_level)
+    except:
+      logging.error('[hue_device] error parsing ct_fade.')
+      return
+    print(start_k, end_k, fade_sec)
+    self._ct_fade = CTFade(self._firefly, str(self.id), start_k, end_k, fade_sec, start_level, end_level)
 
   def switch(self, value):
     if value == 'on':
-      self.setLight({'on': True})
+      self.setLight(on=True)
     elif value == 'off':
-      self.setLight({'on': False})
+      self.setLight(on=False)
 
   def set_hue_device(self, value):
     path = '%ss/%s/%s' % (self._hue_type, self._hue_number, self._hue_noun)
@@ -298,3 +334,23 @@ class HueDevice(Device):
       return colorHex
       #  return {'xy': converter.hexToCIE1931(colorHex, lightType='LST')}
       # return {'xy': converter.hexToCIE1931(colorHex)}
+
+def check_ct(ct) -> int:
+  if 'K' in ct.upper():
+    try:
+      ct = int(ct.upper().replace('K', ''))
+    except:
+      ct = 2700
+    ct = 1000000.0 / ct
+  else:
+    try:
+      ct = int(ct)
+    except:
+      ct = 1000000.0/2700.0
+
+  if ct > 500:
+    ct = 500
+  if ct < 153:
+    ct = 153
+
+  return int(ct)

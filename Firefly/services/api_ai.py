@@ -7,6 +7,7 @@ from Firefly.const import TYPE_DEVICE, LEVEL
 def process_api_ai_request(firefly, request):
   a = APIaiRequest(request)
   devices = [device._alias for _, device in firefly.components.items() if device.type == TYPE_DEVICE]
+  rooms = [device._alias for _, device in firefly.components.items() if device.type == 'ROOM']
 
 
   if a.intent == 'firefly.simple_action':
@@ -22,7 +23,7 @@ def process_api_ai_request(firefly, request):
     return make_response(all='Ok')
 
   if a.intent == 'firefly.list_devices':
-    device_list = 'n'.join(list(devices))
+    device_list = '\n'.join(list(devices))
     return make_response(text=device_list, slack=device_list, speech='Ok')
 
   if a.intent == 'firefly.dim_lights':
@@ -37,6 +38,18 @@ def process_api_ai_request(firefly, request):
       c = Command(ff_id, 'api_ai', LEVEL, **{LEVEL:a.parameters.level})
       print(c)
       firefly.send_command(c)
+    return make_response(all='Ok')
+
+  if a.intent == 'firefly.room_simple':
+    room = a.parameters.room
+    r = get_close_matches(room, rooms)
+    if len(r) == 0:
+      error = 'No room found matching name %s' % room
+      return make_response(all=error)
+    r = r[0]
+    ff_id = aliases.get_device_id(r)
+    c = Command(ff_id, 'api_ai', a.parameters.command, tags=a.parameters.tags)
+    firefly.send_command(c)
     return make_response(all='Ok')
 
   return make_response(all='Unsupported Command')
@@ -88,6 +101,14 @@ class APIaiParameters(object):
   @property
   def command_type(self):
     return self.action.get('action_type')
+
+  @property
+  def room(self):
+    return self._parameters.get('room')
+
+  @property
+  def tags(self):
+    return self._parameters.get('tags')
 
   @property
   def devices(self):

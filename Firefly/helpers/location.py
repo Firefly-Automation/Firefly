@@ -33,19 +33,15 @@ class Location(object):
 
     self.setupScheduler()
 
-  #@asyncio.coroutine
+
   def setupScheduler(self):
-    logging.debug('******* SETUP LOCATION *************')
     for e in DAY_EVENTS:
       day_event_time = self.getNextDayEvent(e)
       logging.info('Day Event: {} Time: {}'.format(e, str(day_event_time)))
       scheduler.runAt(day_event_time, self.DayEventHandler, day_event=e, job_id=e)
-      #scheduler.runAt(self.now + timedelta(seconds=3), self.DayEventHandler, day_event=e, job_id=e)
 
-    # TODO: Remove this (maybe)
-    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={'LOCATION':'STARTUP'})
+    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={SOURCE_LOCATION:'STARTUP'})
     self._firefly.send_event(event)
-    #scheduler.runInS(0, self._firefly.send_event, event=event)
 
     # Setup Time Broadcast to start at the next minute
     now = self.now
@@ -65,11 +61,10 @@ class Location(object):
   @asyncio.coroutine
   def DayEventHandler(self, day_event):
     logging.info('day event handler - event: {}'.format(day_event))
+    # TODO: Remove this logging.notify
     logging.notify('day event handler - event: {}'.format(day_event))
-    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action=day_event)
+    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={SOURCE_LOCATION: day_event})
     self._firefly.send_event(event)
-    # TODO: Remove
-    # scheduler.runInS(0, self._firefly.send_event, event=event)
     next_day_event_time = self.getNextDayEvent(day_event)
     scheduler.runAt(next_day_event_time, self.DayEventHandler, day_event=day_event, job_id=day_event)
 
@@ -92,11 +87,8 @@ class Location(object):
     if mode in self.modes:
       self._last_mode = self._mode
       self._mode = mode
-      # ffEvent('location', {'mode': self.mode})
       event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, {'EVENT_ACTION_MODE':mode})
       self._firefly.send_event(event)
-      return True
-    return False
 
   @property
   def modes(self):

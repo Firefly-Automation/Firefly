@@ -17,8 +17,21 @@ class Alias(object):
     with open(self._alias_file, 'w') as file:
       json.dump(self.aliases, file, indent=4, sort_keys=True)
 
-  def set_alias(self, device_id, alias):
+  def set_alias(self, device_id, alias) -> str:
+    if alias in self.aliases.values():
+      if device_id not in self.aliases or self.aliases[str(device_id)] != alias:
+        try:
+          alias_base = '-'.join(alias.split('-')[:-1])
+          alias_number = int(alias.split('-')[-1])
+        except:
+          alias_number = 0
+          alias_base = alias
+          logging.error('Unknown error')
+        alias_number += 1
+        alias = str(alias_base + '-' + str(alias_number))
+        return self.set_alias(device_id, alias)
     self.aliases[str(device_id)] = str(alias)
+    return alias
 
   def get_alias(self, device_id):
     if device_id in self.aliases.keys():

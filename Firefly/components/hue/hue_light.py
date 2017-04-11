@@ -1,6 +1,6 @@
 from Firefly import logging
 from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, LEVEL, ACTION_LEVEL)
+                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, LEVEL, ACTION_LEVEL, SWITCH)
 from Firefly.components.virtual_devices import AUTHOR
 from Firefly.helpers.device import Device
 from Firefly.components.hue.hue_device import HueDevice
@@ -11,7 +11,7 @@ TITLE = 'Firefly Hue Light'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = AUTHOR
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ACTION_LEVEL]
-REQUESTS = [STATE, LEVEL]
+REQUESTS = [STATE, LEVEL, SWITCH]
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)

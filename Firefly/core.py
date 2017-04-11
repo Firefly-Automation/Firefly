@@ -15,9 +15,10 @@ from Firefly import logging
 from Firefly import aliases
 from Firefly import scheduler
 from Firefly.helpers.location import Location
-from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE, EVENT_ACTION_ANY, SOURCE_LOCATION, TYPE_DEVICE, EVENT_ACTION_LEVEL, TYPE_AUTOMATION, COMPONENT_MAP, SERVICE_NOTIFICATION, COMMAND_NOTIFY, TIME)
+from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE, EVENT_ACTION_ANY, SOURCE_LOCATION, TYPE_DEVICE, EVENT_ACTION_LEVEL, TYPE_AUTOMATION, COMPONENT_MAP, SERVICE_NOTIFICATION, COMMAND_NOTIFY, TIME, TYPE_ZWAVE_SERVICE)
 import importlib
 from Firefly.automation import Trigger
+from Firefly.helpers.room import Rooms
 
 import os
 
@@ -40,7 +41,7 @@ class Firefly(object):
 
     self._subscriptions = Subscriptions()
     # TODO: This should be done after importing devices and automation.
-    self.location = Location(self, "95110", ['HOME'])
+    self.location = Location(self, "95110", ['home', 'away', 'morning'])
     self._components = {}
 
     # Start Notification service
@@ -54,6 +55,11 @@ class Firefly(object):
 
     for c in COMPONENT_MAP:
       self.import_devices(c['file'])
+
+
+    # TODO: Building rooms will have to happen whenever a devices is added
+    self._rooms = Rooms(self)
+    self._rooms.build_rooms()
 
 
 
@@ -125,7 +131,7 @@ class Firefly(object):
     try:
       web.run_app(app, host=self.settings.firefly_host, port=self.settings.firefly_port)
     except KeyboardInterrupt:
-      pass
+      self.export_all_components()
     finally:
       self.stop()
 
@@ -136,14 +142,15 @@ class Firefly(object):
     '''
     # TODO: Export current state of components on shutdown
     logging.message('Stopping Firefly')
+
+    # TODO: export automation.
+    self.export_all_components()
+
     try:
       logging.message('Stopping zwave service')
       self.components['service_zwave'].stop()
     except:
       pass
-
-    # TODO: export automation.
-    self.export_all_components()
 
     self.loop.close()
 
@@ -186,7 +193,7 @@ class Firefly(object):
     components = []
     for _, device in self.components.items():
       if device.type == component_type:
-        components.append(device.export(current_values=current_values))
+          components.append(device.export(current_values=current_values))
 
     with open(config_file, 'w') as file:
       json.dump(components, file, indent=4, sort_keys=True)
@@ -224,7 +231,9 @@ class Firefly(object):
     fut = asyncio.Future(loop=self.loop)
     send_to = self._subscriptions.get_subscribers(event.source, event_action=event.event_action)
     for s in send_to:
-      s = asyncio.ensure_future(self._send_event(event, s, fut), loop=self.loop)
+      #asyncio.ensure_future(self._send_event(event, s, fut), loop=self.loop)
+      self.components[s].event(event)
+      #self.loop.run_in_executor(None,self.components[s].event, event)
     return True
 
 
@@ -255,7 +264,8 @@ class Firefly(object):
 
   def send_command(self, command):
     fut = asyncio.Future(loop=self.loop)
-    result = asyncio.ensure_future(self._send_command(command, fut), loop=self.loop)
+    #result = asyncio.ensure_future(self._send_command(command, fut), loop=self.loop)
+    self.loop.run_in_executor(None, self.components[command.device].command, command)
     # TODO: Figure out how to wait for result
     return True
 

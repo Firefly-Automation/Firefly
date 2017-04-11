@@ -26,4 +26,3 @@ virtualenv
 yarl
 typing
 asyncio
-pydispach

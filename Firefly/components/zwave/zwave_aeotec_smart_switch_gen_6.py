@@ -10,7 +10,7 @@ from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION
 
 
 
-TITLE = 'Firefly Zwave Switch'
+TITLE = 'Firefly Aeotec SmartSwitch Gen6'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = 'Zachary Priddy'
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE]
@@ -57,18 +57,18 @@ class ZwaveSwitch(ZwaveDevice):
 
 
     # TODO: self._sensitivity ??
-    #report = 2 # 1=hail 2=basic
-    #self.node.set_config_param(110, 1)
-    #self.node.set_config_param(100, 1)
-    #self.node.set_config_param(80, report)
-    #self.node.set_config_param(102, 15)
-    #self.node.set_config_param(111, 30)
+    report = 2 # 1=hail 2=basic
+    self.node.set_config_param(110, 1)
+    self.node.set_config_param(100, 1)
+    self.node.set_config_param(80, report)
+    self.node.set_config_param(102, 15)
+    self.node.set_config_param(111, 30)
 
     successful = True
-    #successful &= self.node.request_config_param(80) == report
-    #successful &= self.node.request_config_param(102) == 15
+    successful &= self.node.request_config_param(80) == report
+    successful &= self.node.request_config_param(102) == 15
 
-    #self._update_try_count += 1
+    self._update_try_count += 1
     self._config_updated = successful
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
@@ -77,6 +77,7 @@ class ZwaveSwitch(ZwaveDevice):
 
     state_before = self.get_all_request_values()
     super().update_from_zwave(node, **kwargs, ignore_update=True)
+
 
     values = kwargs.get('values')
     if values is  None:

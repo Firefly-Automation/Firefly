@@ -30,7 +30,7 @@ def metaSwitch(command=True, request=True, primary=False):
   }
   return meta
 
-def metaPresence(command=True, request=True, primary=False):
+def metaPresence(command=False, request=True, primary=False):
   meta = {
     'command': command,
     'request': request,

@@ -11,6 +11,7 @@ class ZwaveDevice(Device):
   def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
 
     commands.append('ZWAVE_CONFIG')
+    commands.append('ZWAVE_UPDATE')
 
     requests.append('SENSORS')
     requests.append('PARAMS')
@@ -25,15 +26,19 @@ class ZwaveDevice(Device):
     self._config_params = {}
     self._raw_values = {}
     self._config_updated = False
+    self._update_try_count = 0
+    self._node_id = kwargs.get('node_id')
 
 
     self.add_command('ZWAVE_CONFIG', self.zwave_config)
+    self.add_command('ZWAVE_UPDATE', self.update_from_zwave)
 
     self.add_request('SENSORS', self.get_sensors)
     self.add_request('PARAMS', self.get_params)
     self.add_request('RAW_VALUES', self.get_raw_values)
 
   def update_device_config(self, **kwargs):
+    self.node.refresh_info()
     self._config_updated = True
 
 
@@ -53,14 +58,16 @@ class ZwaveDevice(Device):
       value = int(value)
       self._node.set_config_param(param, value, size=size)
 
-    self._node.refresh_info()
-    self._node.request_state()
-
     return True
+
+  def export(self, current_values: bool = True, api_view: bool = False) -> dict:
+    export_data = super().export(current_values, api_view)
+    export_data['node_id'] = self._node_id
+    return export_data
 
 
   def get_sensors(self, **kwargs):
-    sensor = get_kwargs_value(kwargs, 'SENSOR')
+    sensor = kwargs.get('sensor')
     if sensor:
       s = self._sensors.get(sensor)
       return s
@@ -82,7 +89,7 @@ class ZwaveDevice(Device):
       return s
     return self._raw_values
 
-  def update_from_zwave(self, node: ZWaveNode, ignore_update=False, **kwargs):
+  def update_from_zwave(self, node: ZWaveNode=None, ignore_update=False, **kwargs):
     '''
     Currently the update command is not in the COMMANDS -> THis is because it acts differently right now.. This may change in the near future.
     Args:
@@ -99,28 +106,49 @@ class ZwaveDevice(Device):
     if node is None:
       return
 
-    # Update config if device config has not been updated.
-    if not self._config_updated:
-      self.update_device_config()
+    values = kwargs.get('values')
+    #print('************** VALUES ************ %s' %values)
+    genre = ''
+    if values is not None:
+      genre = values.genre
 
+    #print('************** GENRE ************ %s' % genre)
+    #print('************** DATA ************ %s' % values.data)
+    #print('************** INDEX ************ %s' % values.index)
+    #print('************** COMMAND CLASS ************ %s' % values.command_class)
+    #print('************** LABEL ************ %s' % values.label)
 
     # This will set the node on the first update once zwave boots
     self._node = node
+    self._node_id = node.node_id
+
+    # Update config if device config has not been updated.
+    if not self._config_updated:
+      for s, i in node.get_values().items():
+        if i.command_class == 112:
+          self._config_params[i.label.lower()] = {'value': i.data, 'id': i.index}
+        else:
+          self._raw_values[i.label.lower()] = {'value': i.data, 'id': i.index, 'class': i.command_class}
+      self.update_device_config()
 
     # When security data changes sometimes you need to send a request to update the sensor value
-    old_security_data = [b for a, b in self._raw_values.items() if b.get('class') == 113]
-
-    for s, i in node.get_sensors().items():
-      self._sensors[i.label.upper()] = i.data
-
-    for s, i in node.get_values().items():
-      if i.command_class == 112:
-        self._config_params[i.label.upper()] = {'value': i.data, 'id': i.index}
-
-      self._raw_values[i.label.upper()] = {'value': i.data, 'id': i.index, 'class': i.command_class}
+    # old_security_data = [b for a, b in self._raw_values.items() if b.get('class') == 113]
 
 
-    new_security_data = [b for a, b in self._raw_values.items() if b.get('class') == 113]
+
+    #for s, i in node.get_values().items():
+    if genre == 'Config' or genre == 'System':
+      if values.command_class == 112:
+        self._config_params[values.label.lower()] = {'value': values.data, 'id': values.index}
+
+    if genre == 'User':
+      self._raw_values[values.label.lower()] = {'value': values.data, 'id': values.index, 'class': values.command_class}
+
+      for s, i in node.get_sensors().items():
+        self._sensors[i.label.lower()] = i.data
+
+
+    # new_security_data = [b for a, b in self._raw_values.items() if b.get('class') == 113]
 
     # If any of the security values change issue update command
     #if old_security_data != new_security_data:

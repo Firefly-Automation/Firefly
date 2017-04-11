@@ -6,7 +6,7 @@ from Firefly.util.get_from_kwargs import get_kwargs_value
 from openzwave.network import ZWaveNode
 from Firefly import logging
 from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SENSORS)
+                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SENSORS, SWITCH)
 
 
 
@@ -14,7 +14,7 @@ TITLE = 'Firefly Zwave Switch'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = 'Zachary Priddy'
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE]
-REQUESTS = [STATE]
+REQUESTS = [STATE, SWITCH]
 INITIAL_VALUES = {'_state': EVENT_ACTION_OFF}
 
 def Setup(firefly, package, **kwargs):
@@ -41,6 +41,7 @@ class ZwaveSwitch(ZwaveDevice):
     self.add_command(ACTION_TOGGLE, self.toggle)
 
     self.add_request(STATE, self.get_state)
+    self.add_request(SWITCH, self.get_state)
 
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
@@ -57,18 +58,18 @@ class ZwaveSwitch(ZwaveDevice):
 
 
     # TODO: self._sensitivity ??
-    #report = 2 # 1=hail 2=basic
+    report = 2 # 1=hail 2=basic
     #self.node.set_config_param(110, 1)
     #self.node.set_config_param(100, 1)
-    #self.node.set_config_param(80, report)
+    self.node.set_config_param(80, report)
     #self.node.set_config_param(102, 15)
     #self.node.set_config_param(111, 30)
 
     successful = True
-    #successful &= self.node.request_config_param(80) == report
+    successful &= self.node.request_config_param(80) == report
     #successful &= self.node.request_config_param(102) == 15
 
-    #self._update_try_count += 1
+    self._update_try_count += 1
     self._config_updated = successful
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
@@ -103,7 +104,6 @@ class ZwaveSwitch(ZwaveDevice):
 
   def off(self, **kwargs):
     self._state = EVENT_ACTION_OFF
-    print(self._switches)
     self._node.set_switch(self._switches[0], 0)
     return EVENT_ACTION_OFF
 

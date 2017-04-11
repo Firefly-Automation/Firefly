@@ -4,7 +4,7 @@ from typing import Any, Callable
 from Firefly import aliases, logging
 from Firefly.const import API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE
 from Firefly.helpers.events import Command, Event, Request
-
+import asyncio
 
 class Device(object):
   def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
@@ -15,6 +15,7 @@ class Device(object):
     self._title = title
     self._author = author
     self._package = package
+    # TODO: Change commands and requests to set
     self._commands = commands
     self._requests = requests
     self._device_type = device_type
@@ -35,6 +36,8 @@ class Device(object):
     if not device_id and alias:
       if aliases.get_device_id(alias):
         device_id = aliases.get_device_id(alias)
+        if device_id in self.firefly.components:
+          device_id = None
 
     elif device_id and not alias:
       if aliases.get_alias(device_id):
@@ -46,13 +49,15 @@ class Device(object):
 
     self._id = device_id
     self._alias = alias if alias else device_id
-    aliases.set_alias(self._id, self._alias)
+    self._alias = aliases.set_alias(self._id, self._alias)
 
     self._habridge_export = kwargs.get('habridge_export', True)
     self._habridge_alias = kwargs.get('habridge_alias', self._alias)
     self._homekit_export = kwargs.get('homekit_export', True)
     self._homekit_alias = kwargs.get('homekit_alias', self._alias)
     self._homekit_types = {}
+    self._room = kwargs.get('room', '')
+    self._tags = kwargs.get('tags', [])
 
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
@@ -78,6 +83,8 @@ class Device(object):
       'habridge_export': self._habridge_export,
       'habridge_alias':  self._habridge_alias,
       'export_ui':       self._export_ui,
+      'tags': self._tags,
+      'room': self._room
     }
 
     if current_values:
@@ -129,7 +136,10 @@ class Device(object):
     if command.command in self.command_map.keys():
       self._last_command_source = command.source
       self._last_update_time = self.firefly.location.now
-      self.command_map[command.command](**command.args)
+      try:
+        self.command_map[command.command](**command.args)
+      except:
+        return False
       state_after = self.get_all_request_values()
       self.broadcast_changes(state_before, state_after)
       return True
@@ -250,6 +260,14 @@ class Device(object):
   @property
   def request_map(self):
     return self._request_mapping
+
+  @property
+  def tags(self):
+    return self._tags
+
+  @property
+  def room(self):
+    return self._room
 
   @property
   def type(self):

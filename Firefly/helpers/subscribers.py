@@ -100,9 +100,6 @@ class Subscriptions(object):
           if subscriber_id not in subscriptions[EVENT_ACTION_ANY][event_action[ea]]:
             subscriptions[EVENT_ACTION_ANY][event_action[ea]].append(subscriber_id)
 
-        else:
-          logging.warn('Got string to event_action making it {%s : ANY}' % event_action)
-          event_action = {event_action: EVENT_ACTION_ANY}
 
       # Deal with a dict of event actions.
       if type(ea) is dict:
