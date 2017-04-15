@@ -57,13 +57,15 @@ class ZwaveAeotecMulti(ZwaveDevice):
     group1 = 241 # index 101
     interval = 300 #index 111
 
+
     self.node.set_config_param(4, sensitivity)
     self.node.set_config_param(3, timeout)
     self.node.set_config_param(8, 30) # broadcast rate sec
-    self.node.set_config_param(64, scale)
+    #self.node.set_config_param(64, scale)  # THIS BROKE THINGS
     self.node.set_config_param(101, group1)
     self.node.set_config_param(111, interval)
     self.node.set_config_param(5, 1)
+
 
     successful = True
     successful &= self.node.request_config_param(4) == sensitivity

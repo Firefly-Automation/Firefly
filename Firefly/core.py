@@ -100,6 +100,7 @@ class Firefly(object):
 
 
   def install_services(self) -> None:
+    # TODO: This should read the services file
     logging.notify('Installing Services')
     # Install service
     #try:
@@ -265,7 +266,12 @@ class Firefly(object):
   def send_command(self, command):
     fut = asyncio.Future(loop=self.loop)
     #result = asyncio.ensure_future(self._send_command(command, fut), loop=self.loop)
-    self.loop.run_in_executor(None, self.components[command.device].command, command)
+    if command.device not in self.components:
+      return False
+    try:
+      self.loop.run_in_executor(None, self.components[command.device].command, command)
+    except:
+      logging.error('[send_command] error sending command')
     # TODO: Figure out how to wait for result
     return True
 

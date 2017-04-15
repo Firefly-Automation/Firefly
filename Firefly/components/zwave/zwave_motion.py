@@ -1,15 +1,8 @@
+from openzwave.network import ZWaveNode
+
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.helpers.device import Device
-from Firefly.util.get_from_kwargs import get_kwargs_value
-from Firefly.helpers.events import Event
-import asyncio
-from openzwave.network import ZWaveNode
-from Firefly import logging
-from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SENSORS, DEVICE_TYPE_MOTION, EVENT_TYPE_BROADCAST, MOTION, MOTION_ACTIVE, MOTION_INACTIVE)
-
-
+from Firefly.const import (STATE, DEVICE_TYPE_MOTION, MOTION, MOTION_ACTIVE, MOTION_INACTIVE)
 
 TITLE = 'Firefly Zwave Motion Sensor'
 DEVICE_TYPE = DEVICE_TYPE_MOTION
@@ -17,6 +10,7 @@ AUTHOR = 'Zachary Priddy'
 COMMANDS = []
 REQUESTS = [STATE]
 INITIAL_VALUES = {'_state': False}
+
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
@@ -35,12 +29,11 @@ class ZwaveMotionSensor(ZwaveDevice):
     self.add_request(STATE, self.get_state)
     self.add_request(MOTION, self.get_motion)
 
-
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     state_before = self.get_all_request_values()
     super().update_from_zwave(node, **kwargs, ignore_update=True)
 
-    #self._state = get_kwargs_value(self._sensors, 'SENSOR', False)
+    # self._state = get_kwargs_value(self._sensors, 'SENSOR', False)
     b = self._raw_values.get('burglar')
     print(b)
     if b:
@@ -48,12 +41,10 @@ class ZwaveMotionSensor(ZwaveDevice):
     else:
       self._state = False
 
-    #self._state = self._raw_values.get('BURGLAR')
+    # self._state = self._raw_values.get('BURGLAR')
 
     state_after = self.get_all_request_values()
     self.broadcast_changes(state_before, state_after)
-
-
 
   def get_state(self, **kwargs):
     return self.state
@@ -63,5 +54,5 @@ class ZwaveMotionSensor(ZwaveDevice):
 
   @property
   def state(self):
-    self._state =  self._sensors.get('sensor')
+    self._state = self._sensors.get('sensor')
     return self._state

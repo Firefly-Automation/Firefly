@@ -1,14 +1,9 @@
-from Firefly import logging
-from Firefly.helpers.device import Device
-from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.util.get_from_kwargs import get_kwargs_value
-
 from openzwave.network import ZWaveNode
+
 from Firefly import logging
-from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SENSORS)
-
-
+from Firefly.components.zwave.zwave_device import ZwaveDevice
+from Firefly.const import (ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_TOGGLE,
+                           DEVICE_TYPE_SWITCH)
 
 TITLE = 'Firefly Aeotec SmartSwitch Gen6'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
@@ -16,6 +11,7 @@ AUTHOR = 'Zachary Priddy'
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE]
 REQUESTS = [STATE]
 INITIAL_VALUES = {'_state': EVENT_ACTION_OFF}
+
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
@@ -55,9 +51,8 @@ class ZwaveSwitch(ZwaveDevice):
       self._config_updated = True
       return
 
-
     # TODO: self._sensitivity ??
-    report = 2 # 1=hail 2=basic
+    report = 2  # 1=hail 2=basic
     self.node.set_config_param(110, 1)
     self.node.set_config_param(100, 1)
     self.node.set_config_param(80, report)
@@ -78,9 +73,8 @@ class ZwaveSwitch(ZwaveDevice):
     state_before = self.get_all_request_values()
     super().update_from_zwave(node, **kwargs, ignore_update=True)
 
-
     values = kwargs.get('values')
-    if values is  None:
+    if values is None:
       state_after = self.get_all_request_values()
       self.broadcast_changes(state_before, state_after)
       return
@@ -101,7 +95,6 @@ class ZwaveSwitch(ZwaveDevice):
     state_after = self.get_all_request_values()
     self.broadcast_changes(state_before, state_after)
 
-
   def off(self, **kwargs):
     self._state = EVENT_ACTION_OFF
     print(self._switches)
@@ -112,7 +105,6 @@ class ZwaveSwitch(ZwaveDevice):
     self._state = EVENT_ACTION_ON
     self._node.set_switch(self._switches[0], 1)
     return EVENT_ACTION_ON
-
 
   def toggle(self, **kwargs):
     if self.state == EVENT_ACTION_ON:

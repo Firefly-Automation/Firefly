@@ -1,14 +1,8 @@
-from Firefly import logging
-from Firefly.helpers.device import Device
-from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.util.get_from_kwargs import get_kwargs_value
-
 from openzwave.network import ZWaveNode
+
 from Firefly import logging
-from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SENSORS, CONTACT, CONTACT_CLOSED, CONTACT_OPEN)
-
-
+from Firefly.components.zwave.zwave_device import ZwaveDevice
+from Firefly.const import (STATE, EVENT_ACTION_OFF, DEVICE_TYPE_SWITCH, CONTACT, CONTACT_CLOSED, CONTACT_OPEN)
 
 TITLE = 'Aeotec Zwave Window Door Sensor Gen5'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
@@ -16,6 +10,7 @@ AUTHOR = 'Zachary Priddy'
 COMMANDS = []
 REQUESTS = [STATE, CONTACT, 'alarm']
 INITIAL_VALUES = {'_state': EVENT_ACTION_OFF}
+
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
@@ -52,12 +47,10 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
       self._config_updated = True
       return
 
-
     # TODO: self._sensitivity ??
     # https://github.com/OpenZWave/open-zwave/blob/master/config/aeotec/zw120.xml
-    self.node.set_config_param(2, 0) # Disable 10 min wake up time
-    self.node.set_config_param(121, 17) # ensor Binary and Battery Report
-
+    self.node.set_config_param(2, 0)  # Disable 10 min wake up time
+    self.node.set_config_param(121, 17)  # ensor Binary and Battery Report
 
     successful = True
     successful &= self.node.request_config_param(2) == 0
@@ -74,7 +67,7 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     super().update_from_zwave(node, **kwargs, ignore_update=True)
 
     values = kwargs.get('values')
-    if values is  None:
+    if values is None:
       state_after = self.get_all_request_values()
       self.broadcast_changes(state_before, state_after)
       return
@@ -84,7 +77,6 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
       self.broadcast_changes(state_before, state_after)
       return
 
-    # self._state = get_kwargs_value(self._sensors, 'SENSOR', False)
     b = self._raw_values.get('burglar')
     print(b)
     if b:
@@ -96,7 +88,6 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
 
     state_after = self.get_all_request_values()
     self.broadcast_changes(state_before, state_after)
-
 
   def get_state(self, **kwargs):
     return self.state

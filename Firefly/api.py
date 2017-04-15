@@ -27,6 +27,7 @@ class FireflyCoreAPI:
       {'method': 'GET', 'path': '/api/rest/ff_id/{ff_id}/sensors', 'function': self.sensors},
       {'method': 'GET', 'path': '/api/status/all_components', 'function': self.api_all_components},
       {'method': 'GET', 'path': '/api/status', 'function': self.api_status},
+      {'method': 'GET', 'path': '/api/zwave', 'function': self.zwave},
       {'method': 'POST', 'path': '/api/api_ai', 'function': self.process_api_ai_request},
       {'method': 'POST', 'path': '/api/alexa', 'function': self.process_alexa_request}
     ]
@@ -100,6 +101,15 @@ class FireflyCoreAPI:
       my_request = Request(ff_id, 'web_api', **request.GET)
       result = yield from self.firefly.async_send_request(my_request)
       return web.Response(text=result, content_type='application/json')
+
+  @asyncio.coroutine
+  def zwave(self, request):
+    ff_id = 'service_zwave'
+    if 'command' in request.GET:
+      my_command = Command(ff_id, 'zwave_web', **request.GET)
+      yield from self.firefly.async_send_command(my_command)
+      return web.Response(text='Command Sent')
+    return web.Response(text='Error Sending Command')
 
 
   @asyncio.coroutine

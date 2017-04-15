@@ -41,6 +41,11 @@ class FireflyLogging(object):
 
 
   def notify(self, message):
+    func = inspect.currentframe().f_back.f_code
+    function_name = func.co_name
+    file_name = os.path.basename(func.co_filename)
+    logging.info('%-130s [%s - %s]' % (message, function_name, file_name))
+
     if self.firefly is None:
       return
     from Firefly.helpers.events import Command

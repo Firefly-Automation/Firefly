@@ -1,11 +1,9 @@
-from Firefly import logging
-from Firefly.util.get_from_kwargs import get_kwargs_value
-
-from Firefly.helpers.device import Device
-from Firefly.helpers.events import Event
 from openzwave.network import ZWaveNode
 
-from Firefly.const import SENSORS, EVENT_TYPE_BROADCAST
+from Firefly import logging
+from Firefly.helpers.device import Device
+from Firefly.util.get_from_kwargs import get_kwargs_value
+
 
 class ZwaveDevice(Device):
   def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
