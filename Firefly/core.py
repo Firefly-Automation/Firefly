@@ -1,26 +1,18 @@
 import asyncio
-
+import configparser
+import importlib
 import json
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 from aiohttp import web
 
-from concurrent.futures import ThreadPoolExecutor
-
-from Firefly.helpers.events import (Event, Command, Request)
-
-from Firefly.helpers.subscribers import Subscriptions
-from Firefly.helpers.alias import Alias
-from Firefly import logging
-from Firefly import aliases
-from Firefly import scheduler
+from Firefly import aliases, logging, scheduler
+from Firefly.const import COMPONENT_MAP, DEVICE_FILE, SERVICE_CONFIG_FILE, TIME
+from Firefly.helpers.events import (Event, Request)
 from Firefly.helpers.location import Location
-from Firefly.const import (ACTION_ON, DEVICE_FILE, ACTION_TOGGLE, EVENT_ACTION_ANY, SOURCE_LOCATION, TYPE_DEVICE, EVENT_ACTION_LEVEL, TYPE_AUTOMATION, COMPONENT_MAP, SERVICE_NOTIFICATION, COMMAND_NOTIFY, TIME, TYPE_ZWAVE_SERVICE)
-import importlib
-from Firefly.automation import Trigger
 from Firefly.helpers.room import Rooms
-
-import os
+from Firefly.helpers.subscribers import Subscriptions
 
 app = web.Application()
 
@@ -38,58 +30,45 @@ class Firefly(object):
     self.executor = ThreadPoolExecutor(max_workers=10)
     self.loop.set_default_executor(self.executor)
 
-
     self._subscriptions = Subscriptions()
-    # TODO: This should be done after importing devices and automation.
-    self.location = Location(self, "95110", ['home', 'away', 'morning'])
+
+    self.location = Location(self, self.settings.postal_code, self.settings.modes)
     self._components = {}
 
     # Start Notification service
     self.install_package('Firefly.services.notification', alias='service notification')
 
-    # TODO: POC of passing initial values. These values would comve from the export of the current state.
-    # self.install_package('Firefly.components.test_device', alias='Test Device', initial_values={'_state': 'UNKNOWN'})
-    #self.import_devices()
-
-    #self.install_package('Firefly.components.notification.pushover', alias='Pushover', api_key='KEY', user_key='KEY')
+    # self.install_package('Firefly.components.notification.pushover', alias='Pushover', api_key='KEY', user_key='KEY')
 
     for c in COMPONENT_MAP:
       self.import_devices(c['file'])
-
 
     # TODO: Building rooms will have to happen whenever a devices is added
     self._rooms = Rooms(self)
     self._rooms.build_rooms()
 
-
-
     # TODO: MOST OF WHATS BELOW IS FOR TESTING
-    #self.install_package('Firefly.components.virtual_devices.switch', alias='Test Device', initial_values={'_state': 'UNKNOWN'})
+    # self.install_package('Firefly.components.virtual_devices.switch', alias='Test Device', initial_values={
+    # '_state': 'UNKNOWN'})
 
-    #self.install_package('Firefly.components.virtual_devices.presence', alias='Test Presence')
+    # self.install_package('Firefly.components.virtual_devices.presence', alias='Ariel Presence')
+    # self.install_package('Firefly.components.virtual_devices.presence', alias='Zach Presence')
 
-    #for _, ff_id in self._devices.items():
+    # for _, ff_id in self._devices.items():
     #  print(ff_id.export())
 
     # TODO: Test of routines
-    #from Firefly.automation.routine import Routine
-    #from Firefly.automation.triggers import Trigger
-    #self._devices['test_routine'] = Routine(self, 'test_routine')
-    #self._devices['test_routine'].add_trigger(Trigger('66fdff0a-1fa5-4234-91bc-465c72aafb23',EVENT_ACTION_ANY))
-    #self._devices['test_routine'].add_trigger(Trigger('3b11cea9-a148-49d5-9467-bddb9f4ad937', EVENT_ACTION_LEVEL))
-    #self._devices['test_routine'].add_trigger(Trigger('3b11cea9-a148-49d5-9467-bddb9f4ad937', EVENT_ACTION_ANY))
-    #self._devices['test_routine'].add_trigger(Trigger(SOURCE_LOCATION, EVENT_ACTION_ANY))
+    # from Firefly.automation.routine import Routine
+    # from Firefly.automation.triggers import Trigger
+    # self._devices['test_routine'] = Routine(self, 'test_routine')
+    # self._devices['test_routine'].add_trigger(Trigger('66fdff0a-1fa5-4234-91bc-465c72aafb23',EVENT_ACTION_ANY))
+    # self._devices['test_routine'].add_trigger(Trigger('3b11cea9-a148-49d5-9467-bddb9f4ad937', EVENT_ACTION_LEVEL))
+    # self._devices['test_routine'].add_trigger(Trigger('3b11cea9-a148-49d5-9467-bddb9f4ad937', EVENT_ACTION_ANY))
+    # self._devices['test_routine'].add_trigger(Trigger(SOURCE_LOCATION, EVENT_ACTION_ANY))
 
-    #self.install_package('Firefly.automation.routine', alias='Test Routines', ff_id='test_routine')
-    #self.components['test_routine'].add_trigger(Trigger('66fdff0a-1fa5-4234-91bc-465c72aafb23',EVENT_ACTION_ANY))
+    # self.install_package('Firefly.automation.routine', alias='Test Routines', ff_id='test_routine')
+    # self.components['test_routine'].add_trigger(Trigger('66fdff0a-1fa5-4234-91bc-465c72aafb23',EVENT_ACTION_ANY))
 
-    # Install service
-    #self.install_package('Firefly.services.darksky', alias='service Dark Sky')
-    # Install openzwave
-    #self.install_package('Firefly.services.zwave', alias='service zwave')
-
-    # Test install Hue
-    #self.install_package('Firefly.services.hue', alias='hue_service')
 
     logging.notify('Firefly is starting up')
 
@@ -98,26 +77,23 @@ class Firefly(object):
     # TODO: Leave In.
     scheduler.runEveryH(1, self.export_all_components)
 
-
   def install_services(self) -> None:
-    # TODO: This should read the services file
     logging.notify('Installing Services')
-    # Install service
-    #try:
-    #  self.install_package('Firefly.services.darksky', alias='service Dark Sky')
-    #except Exception as e:
-    #  logging.notify('Error installing Dark Sky: %s' % e)
-    # Install openzwave
-    try:
-      self.install_package('Firefly.services.zwave', alias='service zwave')
-    except Exception as e:
-      logging.notify('Error installing ZWave: %s' % e)
+    config = configparser.ConfigParser()
+    config.read(SERVICE_CONFIG_FILE)
+    services = config.sections()
 
-    # Test install Hue
-    try:
-      self.install_package('Firefly.services.hue', alias='hue_service')
-    except Exception as e:
-      logging.notify('Error installing Hue: %s' % e)
+    for service in services:
+      package = config.get(service, 'package')
+      alias = ('service_%s' % service).lower()
+      enabled = config.getboolean(service, 'enabled', fallback=False)
+      if not enabled:
+        continue
+
+      try:
+        self.install_package(package, alias)
+      except Exception as e:
+        logging.notify('Error installing package %s: %s' % (service, e))
 
 
   def start(self) -> None:
@@ -126,8 +102,8 @@ class Firefly(object):
     """
     # TODO: Import current state of components on boot.
 
-    #r = logging.notify('Starting Firefly')
-    #print('########### %s ' % r)
+    # r = logging.notify('Starting Firefly')
+    # print('########### %s ' % r)
 
     try:
       web.run_app(app, host=self.settings.firefly_host, port=self.settings.firefly_port)
@@ -194,7 +170,7 @@ class Firefly(object):
     components = []
     for _, device in self.components.items():
       if device.type == component_type:
-          components.append(device.export(current_values=current_values))
+        components.append(device.export(current_values=current_values))
 
     with open(config_file, 'w') as file:
       json.dump(components, file, indent=4, sort_keys=True)
@@ -215,7 +191,6 @@ class Firefly(object):
       kwargs.pop('package')
     return package.Setup(self, module, **kwargs)
 
-
   @asyncio.coroutine
   def async_send_event(self, event):
     logging.info('Received event: %s' % event)
@@ -226,22 +201,20 @@ class Firefly(object):
       s &= yield from self._send_event(event, s, fut)
     return s
 
-
   def send_event(self, event: Event) -> Any:
     logging.info('Received event: %s' % event)
     fut = asyncio.Future(loop=self.loop)
     send_to = self._subscriptions.get_subscribers(event.source, event_action=event.event_action)
     for s in send_to:
-      #asyncio.ensure_future(self._send_event(event, s, fut), loop=self.loop)
+      # asyncio.ensure_future(self._send_event(event, s, fut), loop=self.loop)
       self.components[s].event(event)
-      #self.loop.run_in_executor(None,self.components[s].event, event)
+      # self.loop.run_in_executor(None,self.components[s].event, event)
     return True
-
 
   @asyncio.coroutine
   def _send_event(self, event, ff_id, fut):
     result = self.components[ff_id].event(event)
-    #fut.set_result(result)
+    # fut.set_result(result)
     return result
 
   @asyncio.coroutine
@@ -252,9 +225,8 @@ class Firefly(object):
 
   def send_request(self, request: Request) -> Any:
     fut = asyncio.Future(loop=self.loop)
-    result = asyncio.ensure_future(self._send_request(request, fut),loop=self.loop)
+    result = asyncio.ensure_future(self._send_request(request, fut), loop=self.loop)
     return result
-
 
   @asyncio.coroutine
   def _send_request(self, request, fut):
@@ -262,10 +234,9 @@ class Firefly(object):
     fut.set_result(result)
     return result
 
-
   def send_command(self, command):
     fut = asyncio.Future(loop=self.loop)
-    #result = asyncio.ensure_future(self._send_command(command, fut), loop=self.loop)
+    # result = asyncio.ensure_future(self._send_command(command, fut), loop=self.loop)
     if command.device not in self.components:
       return False
     try:
@@ -284,12 +255,11 @@ class Firefly(object):
   @asyncio.coroutine
   def _send_command(self, command, fut):
     if command.device in self.components:
-      result =  self.components[command.device].command(command)
+      result = self.components[command.device].command(command)
       fut.set_result(result)
       return result
     logging.error('[_send_command] Device not found: %s' % command.device)
     return None
-
 
   def add_route(self, route, method, handler):
     app.router.add_route(method, route, handler)
@@ -301,6 +271,8 @@ class Firefly(object):
     current_state = {}
     if TIME in devices:
       devices.remove(TIME)
+    if 'location' in devices:
+      devices.remove('location')
     for device in devices:
       current_state[device] = self.components[device].get_all_request_values()
     return current_state
@@ -312,5 +284,3 @@ class Firefly(object):
   @property
   def subscriptions(self):
     return self._subscriptions
-
-

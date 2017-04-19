@@ -10,6 +10,9 @@ CONFIG_PORT = 'port'
 CONFIG_DEFAULT_PORT = 6002
 CONFIG_HOST = 'host'
 CONFIG_DEFAULT_HOST = 'localhost'
+CONFIG_MODES = 'modes'
+CONFIG_MODES_DEFAULT = 'home, away, morning, night'
+CONFIG_POSTAL_CODE = 'postal_code'
 CONFIG_FILE = 'dev_config/firefly.config'
 
 SERVICE_CONFIG_FILE = 'dev_config/services.config'
@@ -117,8 +120,8 @@ MOTION_INACTIVE = EVENT_ACTION_INACTIVE
 
 
 # ### PRESENCE ####
-PRESENT = True
-NOT_PRESENT = False
+PRESENT = 'present'
+NOT_PRESENT = 'not_present'
 
 
 # #### DEVICE TYPES ####
@@ -128,10 +131,10 @@ DEVICE_TYPE_COLOR_LIGHT = 'COLOR_LIGHT'
 DEVICE_TYPE_THERMOSTAT = 'THERMOSTAT'
 DEVICE_TYPE_NOTIFICATION = 'NOTIFICATION'
 DEVICE_TYPE_MOTION = 'MOTION'
-DEVICE_TYPE_PRESENCE = 'PRESENCE'
+DEVICE_TYPE_PRESENCE = 'presence'
 
 
-SOURCE_LOCATION = 'LOCATION'
+SOURCE_LOCATION = 'location'
 SOURCE_TRIGGER = 'SOURCE_TRIGGER'
 
 COMMAND_UPDATE = 'UPDATE'
@@ -160,16 +163,16 @@ COMPONENT_MAP = [
 
 # TODO: This may not be needed
 SENSORS = {
-  'Energy': 'ENERGY',
-  'Previous Reading': 'PREVIOUS READING',
-  'Interval': 'INTERVAL',
-  'Power': 'POWER',
-  'Voltage': 'VOLTAGE',
-  'Current': 'CURRENT',
-  'Exporting': 'EXPORTING',
-  'Sensor': 'SENSOR',
-  'Temperature': 'TEMPERATURE',
-  'Luminance': 'LUMINANCE',
+  'Energy':            'ENERGY',
+  'Previous Reading':  'PREVIOUS READING',
+  'Interval':          'INTERVAL',
+  'Power':             'POWER',
+  'Voltage':           'VOLTAGE',
+  'Current':           'CURRENT',
+  'Exporting':         'EXPORTING',
+  'Sensor':            'SENSOR',
+  'Temperature':       'TEMPERATURE',
+  'Luminance':         'LUMINANCE',
   'Relative Humidity': 'RELATIVE HUMIDITY',
-  'Ultraviolet': 'ULTRAVIOLET'
+  'Ultraviolet':       'ULTRAVIOLET'
 }

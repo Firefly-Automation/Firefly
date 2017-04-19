@@ -14,7 +14,7 @@ import asyncio
 
 
 class Location(object):
-  def __init__(self, firefly, zipcode, modes):
+  def __init__(self, firefly, zipcode, modes, setup=True):
     logging.info('Setup Location')
     self._firefly = firefly
     self._modes = modes
@@ -22,16 +22,17 @@ class Location(object):
     self._isDark = True
     self._city = None
 
-    self._a = Astral(GoogleGeocoder)
-    self._a.solar_depression = 'civil'
-    self._city = self._a[self._zipcode]
-    self._latitude = self._city.latitude
-    self._longitude = self._city.longitude
-
     self._mode = self._modes[0]
     self._last_mode = self.mode
 
-    self.setupScheduler()
+
+    if setup:
+      self._a = Astral(GoogleGeocoder)
+      self._a.solar_depression = 'civil'
+      self._city = self._a[self._zipcode]
+      self._latitude = self._city.latitude
+      self._longitude = self._city.longitude
+      self.setupScheduler()
 
 
   def setupScheduler(self):
