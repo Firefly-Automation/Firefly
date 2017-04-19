@@ -2,7 +2,7 @@ from Firefly import logging
 from Firefly.helpers.events import Command
 from difflib import get_close_matches
 from Firefly import aliases
-from Firefly.const import TYPE_DEVICE, LEVEL
+from Firefly.const import TYPE_DEVICE, LEVEL, TYPE_AUTOMATION
 
 class AlexaRequest(object):
   def  __init__(self, request: dict):
@@ -62,6 +62,20 @@ def alexa_handler(firefly, request: AlexaRequest):
     ff_id = aliases.get_device_id(d)
     print(request.parameters)
     c = Command(ff_id, 'alexa', LEVEL, **{LEVEL: request.parameters['level'].value})
+    firefly.send_command(c)
+    return make_response('Ok', 'Ok')
+
+  if request.intent == 'ChangeMode':
+    routines = {}
+    for id, c in firefly.components.items():
+      if c.type == TYPE_AUTOMATION and 'routine' in c._package:
+        routines[c._alias] = id
+    r_alias = get_close_matches(request.parameters['mode'].value, routines.keys())
+    if len(r_alias) == 0:
+      return make_response('Routine not found', 'Routine not found')
+    r_alias = r_alias[0]
+    r = routines[r_alias]
+    c = Command(r, 'alex', 'execute')
     firefly.send_command(c)
     return make_response('Ok', 'Ok')
 

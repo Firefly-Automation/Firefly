@@ -46,14 +46,14 @@ class ZwaveAeotecMulti(ZwaveDevice):
       **kwargs ():
     """
 
-    if self._update_try_count >= 30:
+    if self._update_try_count >= 5:
       self._config_updated = True
       return
 
     # TODO: self._sensitivity ??
     sensitivity = 3 # index 4
     timeout = 10 # index 8
-    scale = 2 # index 64
+    scale = 1 # index 64
     group1 = 241 # index 101
     interval = 300 #index 111
 
@@ -61,7 +61,7 @@ class ZwaveAeotecMulti(ZwaveDevice):
     self.node.set_config_param(4, sensitivity)
     self.node.set_config_param(3, timeout)
     self.node.set_config_param(8, 30) # broadcast rate sec
-    #self.node.set_config_param(64, scale)  # THIS BROKE THINGS
+    self.node.set_config_param(64, scale, size=1)  # THIS BROKE THINGS
     self.node.set_config_param(101, group1)
     self.node.set_config_param(111, interval)
     self.node.set_config_param(5, 1)

@@ -27,6 +27,11 @@ class ZwaveDevice(Device):
     self._update_try_count = 0
     self._node_id = kwargs.get('node_id')
 
+    self._manufacturer_id = ''
+    self._manufacturer_name = ''
+    self._product_name = ''
+    self._product_type = ''
+
 
     self.add_command('ZWAVE_CONFIG', self.zwave_config)
     self.add_command('ZWAVE_UPDATE', self.update_from_zwave)
@@ -61,6 +66,10 @@ class ZwaveDevice(Device):
   def export(self, current_values: bool = True, api_view: bool = False) -> dict:
     export_data = super().export(current_values, api_view)
     export_data['node_id'] = self._node_id
+    export_data['manufacturer_id'] = self._manufacturer_id
+    export_data['manufacturer_name'] = self._manufacturer_name
+    export_data['product_name'] = self._product_name
+    export_data['product_type'] = self._product_type
     return export_data
 
 
@@ -104,17 +113,22 @@ class ZwaveDevice(Device):
     if node is None:
       return
 
+    try:
+      if not self._manufacturer_id:
+        self._manufacturer_id = node.manufacturer_id
+      if not self._manufacturer_name:
+        self._manufacturer_name = node.manufacturer_name
+      if not self._product_name:
+        self._product_name = node.product_name
+      if not self._product_type:
+        self._product_type = node.product_type
+    except:
+      pass
+
     values = kwargs.get('values')
-    #print('************** VALUES ************ %s' %values)
     genre = ''
     if values is not None:
       genre = values.genre
-
-    #print('************** GENRE ************ %s' % genre)
-    #print('************** DATA ************ %s' % values.data)
-    #print('************** INDEX ************ %s' % values.index)
-    #print('************** COMMAND CLASS ************ %s' % values.command_class)
-    #print('************** LABEL ************ %s' % values.label)
 
     # This will set the node on the first update once zwave boots
     self._node = node

@@ -50,9 +50,9 @@ class VirtualPresence(Device):
     self.add_homekit_export('HOMEKIT_PRESENCE', PRESENCE)
 
   def set_presence(self, **kwargs):
-    presence = kwargs.get('PRESENCE', False)
+    presence = kwargs.get('presence', False)
     presence = True if presence.lower() == 'true' else False
-    if kwargs.get('TYPE') == 'BEACON':
+    if kwargs.get('type') == 'beacon':
       if presence:
         self._beacon_presence = presence
       else:
@@ -64,7 +64,7 @@ class VirtualPresence(Device):
         scheduler.runInS(self._delay, self._set_not_present)
 
   def set_delay(self, **kwargs):
-    delay = int(kwargs.get('DELAY', 5))
+    delay = int(kwargs.get('delay', 5))
     self._delay = delay
 
   def set_present(self, **kwargs):
@@ -88,7 +88,7 @@ class VirtualPresence(Device):
     self.member_set('_presence', NOT_PRESENT)
 
   def set_beacon_enabled(self, **kwargs):
-    enabled = kwargs.get('ENABLED', False)
+    enabled = kwargs.get('enabled', False)
     enabled = ENABLED if enabled.lower() == 'true' else NOT_ENABLED
     self._beacon_enabled = enabled
 

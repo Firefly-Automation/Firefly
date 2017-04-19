@@ -4,23 +4,23 @@ from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import (STATE, EVENT_ACTION_OFF, DEVICE_TYPE_SWITCH, CONTACT, CONTACT_CLOSED, CONTACT_OPEN)
 
-TITLE = 'Aeotec Zwave Window Door Sensor Gen5'
+TITLE = 'Aeotec Zwave ZW097 Dry Conact'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = 'Zachary Priddy'
 COMMANDS = []
-REQUESTS = [STATE, CONTACT, 'alarm']
+REQUESTS = [STATE, CONTACT]
 INITIAL_VALUES = {'_state': EVENT_ACTION_OFF}
 
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
-  sensor = ZwaveAeotecDoorWindow5(firefly, package, **kwargs)
+  sensor = ZwaveAeotecDryContact(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
   firefly.components[sensor.id] = sensor
   return sensor.id
 
 
-class ZwaveAeotecDoorWindow5(ZwaveDevice):
+class ZwaveAeotecDryContact(ZwaveDevice):
   def __init__(self, firefly, package, **kwargs):
     kwargs['initial_values'] = INITIAL_VALUES if not kwargs.get('initial_values') else kwargs.get('initial_values')
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
@@ -31,7 +31,6 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
 
     self.add_request(STATE, self.get_state)
     self.add_request(CONTACT, self.get_state)
-    self.add_request('alarm', self.get_alarm)
 
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
@@ -48,13 +47,12 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
       return
 
     # TODO: self._sensitivity ??
-    # https://github.com/OpenZWave/open-zwave/blob/master/config/aeotec/zw120.xml
-    self.node.set_config_param(2, 0)  # Disable 10 min wake up time
-    self.node.set_config_param(121, 17)  # ensor Binary and Battery Report
+    # https://github.com/OpenZWave/open-zwave/blob/master/config/aeotec/zw097.xml
+    self.node.set_config_param(2, 0, size=1)  # Disable 10 min wakeup
 
     successful = True
     successful &= self.node.request_config_param(2) == 0
-    successful &= self.node.request_config_param(121) == 17
+
 
     self._update_try_count += 1
     self._config_updated = successful
@@ -72,28 +70,19 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
       self.broadcast_changes(state_before, state_after)
       return
     genre = values.genre
-    if genre != 'User':
+    if genre == 'Basic':
+      if values.label != 'Basic':
+        return
+      self._state = CONTACT_OPEN if values.data == 255 else CONTACT_CLOSED
       state_after = self.get_all_request_values()
       self.broadcast_changes(state_before, state_after)
       return
-
-    b = self._raw_values.get('burglar')
-    print(b)
-    if b:
-      self._alarm = b.get('value') == 3
-    else:
-      self._alarm = False
-
-    self._state = CONTACT_OPEN if self.get_sensors(sensor='sensor') is True else CONTACT_CLOSED
 
     state_after = self.get_all_request_values()
     self.broadcast_changes(state_before, state_after)
 
   def get_state(self, **kwargs):
     return self.state
-
-  def get_alarm(self, **kwargs):
-    return self._alarm
 
   @property
   def state(self):

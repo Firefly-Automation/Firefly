@@ -15,8 +15,16 @@ PACKAGE_MAPPING = {
   'ZW096 Smart Switch 6': 'zwave_aeotec_smart_switch_gen_6',
   'DSC06106 Smart Energy Switch': 'zwave_aeotec_dsc06106_smart_switch',
   'ZW100 MultiSensor 6': 'zwave_aeotec_multi_6',
-  'ZW120 Door Window Sensor Gen5': 'zwave_aeotec_door_window_gen_5'
+  'ZW120 Door Window Sensor Gen5': 'zwave_aeotec_door_window_gen_5',
+  'ZW097 Dry Contact Sensor Gen5': 'zwave_aeotec_zw097_dry_contact',
+  '12730 Fan Control Switch': 'zwave_ge_12724_dimmer',
+  '12729 3-Way Dimmer Switch': 'zwave_ge_12724_dimmer',
+  '12724 3-Way Dimmer Switch': 'zwave_ge_12724_dimmer'
 }
+CONFIG_MAPPING = {
+  'ge/12724-dimmer.xml': 'zwave_ge_12724_dimmer'
+}
+
 
 '''
 The ZWAVE service is the background service for zwave.
@@ -138,6 +146,7 @@ class Zwave(Service):
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_CONTROLLER_WAITING)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NOTIFICATION)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
+    dispatcher.connect(self.new_node, ZWaveNetwork.SIGNAL_NODE_ADDED)
 
     self._network.set_poll_interval(milliseconds=500)
 
@@ -164,8 +173,8 @@ class Zwave(Service):
       node = kwargs.get('node')
       try:
         self.add_child_nodes(node)
-      except:
-        logging.error('[zwave] error installing node %s' % node)
+      except Exception as e:
+        logging.error('[zwave] error installing node %s: %s' % (node, e))
 
     elif self._installed_nodes[node_id] not in self._firefly.components:
       self._installed_nodes.pop(node_id)
@@ -185,29 +194,54 @@ class Zwave(Service):
       command = Command(self._installed_nodes[node_id], SERVICE_ID, 'ZWAVE_UPDATE', node=node, values=values)
       try:
         self._firefly.send_command(command)
-      except:
-        logging.error('[zwave] Error sending command')
+      except Exception as e:
+        logging.error('[zwave] Error sending command: %s' % e)
         # self._firefly.components[self._installed_nodes[node_id]].update_from_zwave(node, values=values)
 
   def add_child_nodes(self, node):
     node_id = str(node.node_id)
     product_name = node.product_name
+    config = 'node.config'
+
+    print('******************************************')
+    print(node_id)
+    print(node.to_dict())
+    print(node.device_type)
+    print(product_name)
+    print(node.manufacturer_id)
+    print(node.manufacturer_name)
+    print('******************************************')
 
     if product_name in PACKAGE_MAPPING:
       package = 'Firefly.components.zwave.%s' % PACKAGE_MAPPING[product_name]
       device_id = self._firefly.install_package(package, alias=product_name, node=node)
       self._installed_nodes[node_id] = device_id
 
-    elif node.device_type == 'On/Off Power Switch':
-      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_switch', alias='zwave_switch',
-                                                node=node)
+    elif config in CONFIG_MAPPING:
+      package = 'Firefly.components.zwave.%s' % CONFIG_MAPPING[config]
+      device_id = self._firefly.install_package(package, alias=product_name, node=node)
+      self._installed_nodes[node_id] = device_id
+
+    elif 'On/Off Power Switch' in node.device_type  or 'On/Off Relay Switch' in node.device_type:
+      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_switch', alias=node.device_type, node=node)
+      self._installed_nodes[node_id] = device_id
+
+    elif 'On/Off Power Switch' in product_name  or 'On/Off Relay Switch' in product_name:
+      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_switch', alias=product_name, node=node)
+      self._installed_nodes[node_id] = device_id
+
+    elif 'Door/Window Sensor' in product_name:
+      device_id = self._firefly.install_package('Firefly.components.zwave.window_door_sensor', alias=product_name, node=node)
       self._installed_nodes[node_id] = device_id
 
     else:
       print('******************************************')
       print(node_id)
+      print(node.to_dict())
       print(node.device_type)
       print(product_name)
+      print(node.manufacturer_id)
+      print(node.manufacturer_name)
       print('******************************************')
 
     self.export()
@@ -216,13 +250,32 @@ class Zwave(Service):
     with open(ZWAVE_FILE, 'w') as f:
       json.dump({'installed_nodes': self._installed_nodes}, f, sort_keys=True, indent=4)
 
-  def add_device(self):
+  def new_node(self, *args, **kwargs):
+    logging.notify('New Node Added: %s' % kwargs)
+    pass
+
+  def add_device(self, **kwargs):
     '''
     Hope we can add pairing mode
     Returns:
 
     '''
-    return self._network.controller.add_node(doSecurity=self._security_enable)
+    from time import sleep
+    print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&& %s' % kwargs)
+    security = self._security_enable
+    if kwargs.get('security'):
+      security = True if kwargs.get('security') == 'true' else False
+    #tries = 0
+    #while self._network.controller.is_locked and tries < 30:
+    #  logging.info('sleeping while zwave is locked. security_enabled=%s' % security)
+    #  sleep(1)
+    #  tries += 1
+    #if tries >= 30:
+    #  logging.notify('error unlocking zwave. Try again.')
+    #  return
+    logging.notify('Ready to pair zwave device.')
+    logging.info('adding zwave: security: %s' % security)
+    return self._network.controller.add_node(doSecurity=security)
 
   def cancel_command(self):
     """
@@ -240,7 +293,7 @@ class Zwave(Service):
     Returns:
 
     '''
-    pass
+    self._network.controller.remove_node()
 
   def send_command(self):
     '''

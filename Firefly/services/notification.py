@@ -40,8 +40,8 @@ class Notify(Service):
 
   def send(self, **kwargs):
     message = kwargs.get('message')
-    device =  get_kwargs_value(kwargs,'device', NOTIFY_DEFAULT)
-    priority = get_kwargs_value(kwargs, 'priority', PRIORITY_NORMAL)
+    device = kwargs.get('device', NOTIFY_DEFAULT)
+    priority = kwargs.get('priority', PRIORITY_NORMAL)
     if message is None:
       return False
 

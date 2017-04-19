@@ -1,6 +1,7 @@
 from Firefly import logging
 from Firefly.helpers.conditions import Conditions
 from Firefly.helpers.events import Command
+from Firefly import scheduler
 
 
 class Action(object):
@@ -10,6 +11,8 @@ class Action(object):
     self._source = source
     self._kwargs = kwargs
     self._force = force
+    self._delay_s = kwargs.get('delay_s')
+    self._delay_m = kwargs.get('delay_m')
 
     if type(conditions) is Conditions:
       self._conditions = conditions
@@ -18,6 +21,15 @@ class Action(object):
 
 
   def execute_action(self, firefly):
+    if self._delay_s:
+      scheduler.runInS(self._delay_s,self.execute,firefly=firefly)
+    elif self._delay_m:
+      scheduler.runInM(self._delay_m,self.execute,firefly=firefly)
+    else:
+      self.execute(firefly)
+
+
+  def execute(self, firefly):
     if not self._force:
       if not self.conditions.check_conditions(firefly):
         return False

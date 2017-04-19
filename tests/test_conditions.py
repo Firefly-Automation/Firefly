@@ -20,19 +20,27 @@ class TestCheckConditions(unittest.TestCase):
     self.assertFalse(self.firefly.location.isLight)
 
     # Do Tests
-    condition = {IS_DARK: True}
+    condition = {
+      IS_DARK: True
+    }
     check = check_conditions(self.firefly, condition)
     self.assertTrue(check)
 
-    condition = {IS_DARK: False}
+    condition = {
+      IS_DARK: False
+    }
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
 
-    condition = {IS_LIGHT: False}
+    condition = {
+      IS_LIGHT: False
+    }
     check = check_conditions(self.firefly, condition)
     self.assertTrue(check)
 
-    condition = {IS_LIGHT: True}
+    condition = {
+      IS_LIGHT: True
+    }
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
 
@@ -43,19 +51,27 @@ class TestCheckConditions(unittest.TestCase):
     self.assertTrue(self.firefly.location.isLight)
 
     # Do Tests
-    condition = {IS_DARK: True}
+    condition = {
+      IS_DARK: True
+    }
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
 
-    condition = {IS_DARK: False}
+    condition = {
+      IS_DARK: False
+    }
     check = check_conditions(self.firefly, condition)
     self.assertTrue(check)
 
-    condition = {IS_LIGHT: False}
+    condition = {
+      IS_LIGHT: False
+    }
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
 
-    condition = {IS_LIGHT: True}
+    condition = {
+      IS_LIGHT: True
+    }
     check = check_conditions(self.firefly, condition)
     self.assertTrue(check)
 
@@ -64,27 +80,39 @@ class TestCheckConditions(unittest.TestCase):
     # Verify Mock
     self.assertEqual(self.firefly.location.mode, 'Home')
 
-    condition = {IS_MODE: ['Home']}
+    condition = {
+      IS_MODE: ['Home']
+    }
     check = check_conditions(self.firefly, condition)
     self.assertTrue(check)
 
-    condition = {IS_MODE: 'Home'}
+    condition = {
+      IS_MODE: 'Home'
+    }
     check = check_conditions(self.firefly, condition)
     self.assertTrue(check)
 
-    condition = {IS_MODE: ['Home', 'Away']}
+    condition = {
+      IS_MODE: ['Home', 'Away']
+    }
     check = check_conditions(self.firefly, condition)
     self.assertTrue(check)
 
-    condition = {IS_MODE: ['Away']}
+    condition = {
+      IS_MODE: ['Away']
+    }
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
 
-    condition = {IS_NOT_MODE: ['Away']}
+    condition = {
+      IS_NOT_MODE: ['Away']
+    }
     check = check_conditions(self.firefly, condition)
     self.assertTrue(check)
 
-    condition = {IS_NOT_MODE: ['Away', 'Home']}
+    condition = {
+      IS_NOT_MODE: ['Away', 'Home']
+    }
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
 
@@ -93,40 +121,80 @@ class TestCheckConditions(unittest.TestCase):
     type(self.firefly.location).isLight = PropertyMock(return_value=False)
     type(self.firefly.location).mode = PropertyMock(return_value='Home')
 
-    condition = {IS_MODE: 'Home', IS_DARK: True, IS_LIGHT: False}
+    condition = {
+      IS_MODE:  'Home',
+      IS_DARK:  True,
+      IS_LIGHT: False
+    }
     check = check_conditions(self.firefly, condition)
     self.assertTrue(check)
 
-    condition = {IS_MODE: 'Home', IS_DARK: False, IS_LIGHT: True}
+    condition = {
+      IS_MODE:  'Home',
+      IS_DARK:  False,
+      IS_LIGHT: True
+    }
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
 
-    condition = {IS_MODE: 'Home', IS_NOT_MODE: 'Away', IS_DARK: True, IS_LIGHT: False}
+    condition = {
+      IS_MODE:     'Home',
+      IS_NOT_MODE: 'Away',
+      IS_DARK:     True,
+      IS_LIGHT:    False
+    }
     check = check_conditions(self.firefly, condition)
     self.assertTrue(check)
 
-    condition = {IS_MODE: 'Away', IS_NOT_MODE: 'Home', IS_DARK: True, IS_LIGHT: False}
+    condition = {
+      IS_MODE:     'Away',
+      IS_NOT_MODE: 'Home',
+      IS_DARK:     True,
+      IS_LIGHT:    False
+    }
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
 
-    condition = {IS_MODE: 'Home', IS_NOT_MODE: 'Home', IS_DARK: True, IS_LIGHT: False}
+    condition = {
+      IS_MODE:     'Home',
+      IS_NOT_MODE: 'Home',
+      IS_DARK:     True,
+      IS_LIGHT:    False
+    }
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
 
-    condition = {IS_MODE: 'Home', IS_NOT_MODE: 'Away', IS_DARK: False, IS_LIGHT: False}
+    condition = {
+      IS_MODE:     'Home',
+      IS_NOT_MODE: 'Away',
+      IS_DARK:     False,
+      IS_LIGHT:    False
+    }
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
 
-    condition = {IS_MODE: 'Home', IS_NOT_MODE: 'Away', IS_DARK: False, IS_LIGHT: True}
+    condition = {
+      IS_MODE:     'Home',
+      IS_NOT_MODE: 'Away',
+      IS_DARK:     False,
+      IS_LIGHT:    True
+    }
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
 
-    condition = {IS_MODE: 'Home', IS_NOT_MODE: 'Away', IS_DARK: True, IS_LIGHT: True}
+    condition = {
+      IS_MODE:     'Home',
+      IS_NOT_MODE: 'Away',
+      IS_DARK:     True,
+      IS_LIGHT:    True
+    }
     check = check_conditions(self.firefly, condition)
     self.assertFalse(check)
 
 
 from Firefly.helpers.conditions import Conditions
+
+
 class TestNewConditions(unittest.TestCase):
   @patch('Firefly.core.Firefly', new_callable=PropertyMock)
   def setUp(self, firefly):
@@ -135,7 +203,11 @@ class TestNewConditions(unittest.TestCase):
   def test_export_conditions(self):
     c = Conditions(is_dark=True, is_mode=['home'], is_not_mode=['away'])
     export_data = c.export()
-    self.assertDictEqual(export_data, {'is_dark': True, 'is_mode': ['home'], 'is_not_mode': ['away']})
+    self.assertDictEqual(export_data, {
+      'is_dark':     True,
+      'is_mode':     ['home'],
+      'is_not_mode': ['away']
+    })
 
   def test_condisitions_case_1(self):
     type(self.firefly.location).isDark = PropertyMock(return_value=True)

@@ -16,8 +16,8 @@ class Device(object):
     self._author = author
     self._package = package
     # TODO: Change commands and requests to set
-    self._commands = commands
-    self._requests = requests
+    self._commands = list(set(commands))
+    self._requests = list(set(requests))
     self._device_type = device_type
     self._export_ui = True
     self._initial_values = kwargs.get('initial_values')

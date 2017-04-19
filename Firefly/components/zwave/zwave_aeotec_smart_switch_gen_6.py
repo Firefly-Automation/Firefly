@@ -47,7 +47,7 @@ class ZwaveSwitch(ZwaveDevice):
     Args:
       **kwargs ():
     """
-    if self._update_try_count >= 30:
+    if self._update_try_count >= 5:
       self._config_updated = True
       return
 

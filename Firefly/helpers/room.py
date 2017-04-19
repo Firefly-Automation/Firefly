@@ -1,40 +1,49 @@
-from Firefly import logging
 import uuid
-from Firefly import aliases
-from Firefly.helpers.events import Event, Command, Request
-from Firefly.const import TYPE_DEVICE, API_INFO_REQUEST, SWITCH, LEVEL, CONTACT, MOTION, LUX, SWITCH_OFF, SWITCH_ON, MOTION_INACTIVE, CONTACT_CLOSED, CONTACT_OPEN, MOTION_ACTIVE, EVENT_ACTION_ANY, EVENT_TYPE_BROADCAST
-import asyncio
-from typing import Any, Callable
 from time import sleep
+from typing import Any, Callable
 
-from Firefly import scheduler
+from Firefly import aliases, logging, scheduler
+from Firefly.const import (API_INFO_REQUEST, CONTACT, CONTACT_CLOSED, CONTACT_OPEN, EVENT_ACTION_ANY,
+                           EVENT_TYPE_BROADCAST, LEVEL, LUX, MOTION, MOTION_ACTIVE, MOTION_INACTIVE, SWITCH, SWITCH_OFF,
+                           SWITCH_ON, TYPE_DEVICE)
+from Firefly.helpers.events import Command, Event, Request
 
 # TODO: These should be moved into the const file
 # Tag Lookups are used to know what properties to look for
 TAG_LOOKUPS = {
   # SWITCH_OPEN SWITCH_CLOSED
-  'switch': SWITCH,
-  'light': SWITCH,
-  'dimmer': SWITCH,
-  'outlet': SWITCH,
-  'fan': SWITCH,
+  'switch':  SWITCH,
+  'light':   SWITCH,
+  'dimmer':  SWITCH,
+  'outlet':  SWITCH,
+  'fan':     SWITCH,
 
   # CONTACT_OPEN, CONTACT_CLOSED
-  'window': CONTACT,
-  'door': CONTACT,
+  'window':  CONTACT,
+  'door':    CONTACT,
   'contact': CONTACT,
 
   # MOTION_ACTIVE, MOTION_INACTIVE
-  'motion': MOTION,
+  'motion':  MOTION,
 
   # Take avg of all lux sensors
-  'lux': LUX
+  'lux':     LUX,
+  'water':   'water'
 }
 
 TAG_PROPS = {
-  SWITCH: {True: SWITCH_ON, False: SWITCH_OFF},
-  CONTACT: {True: CONTACT_OPEN, False: CONTACT_CLOSED},
-  MOTION: {True: MOTION_ACTIVE, False: MOTION_INACTIVE}
+  SWITCH:  {
+    True:  SWITCH_ON,
+    False: SWITCH_OFF
+  },
+  CONTACT: {
+    True:  CONTACT_OPEN,
+    False: CONTACT_CLOSED
+  },
+  MOTION:  {
+    True:  MOTION_ACTIVE,
+    False: MOTION_INACTIVE
+  }
 }
 
 REQUESTS = [SWITCH, LEVEL, CONTACT, MOTION, 'outlet']
@@ -114,17 +123,21 @@ class Room(object):
     scheduler.runEveryM(5, self.force_check_status, job_id='%s-force_check' % self.id)
 
   def add_device(self, ff_id, tags):
-    self._devices[ff_id] = {'tags': tags, 'state': {}}
+    self._devices[ff_id] = {
+      'tags':  tags,
+      'state': {}
+    }
     requests = set(TAG_LOOKUPS[t] for t in tags)
     for r in requests:
       try:
         request = Request(ff_id, self.id, r)
         self._devices[ff_id]['state'][r] = self.firefly.components[ff_id].request(request)
-        self.firefly.subscriptions.add_subscriber(self.id, ff_id, {r:EVENT_ACTION_ANY})
+        self.firefly.subscriptions.add_subscriber(self.id, ff_id, {
+          r: EVENT_ACTION_ANY
+        })
         self._tags.update(tags)
       except:
         logging.error('device %s does not have request %s' % (ff_id, r))
-
 
   def event(self, event: Event) -> None:
     logging.info('[ROOM] received event %s' % event)
@@ -145,8 +158,6 @@ class Room(object):
 
     state_after = self.get_all_request_values()
     self.broadcast_changes(state_before, state_after)
-
-
 
   def broadcast_changes(self, before: dict, after: dict) -> None:
     """Find changes from before and after states and broadcast the changes.
@@ -172,7 +183,6 @@ class Room(object):
     self.firefly.send_event(broadcast)
     return
 
-
   def get_all_request_values(self) -> dict:
     """Function to get all requestable values.
 
@@ -184,7 +194,6 @@ class Room(object):
       request_values[r] = self.request_map[r]()
     return request_values
 
-
   def check_states(self):
     for tag, prop in TAG_LOOKUPS.items():
       if prop not in TAG_PROPS.keys():
@@ -193,13 +202,11 @@ class Room(object):
         continue
       self.check_tag_status(tag, '_%s' % tag, TAG_PROPS[prop][True], TAG_PROPS[prop][False])
 
-
   def check_tag_status(self, tag, attr, true_state, false_state):
     value = False
     for d in set([d for d, t in self._devices.items() if tag in t['tags']]):
       value |= self._devices[d]['state'][TAG_LOOKUPS[tag]] == true_state
     self.__setattr__(attr, true_state if value else false_state)
-
 
   def force_check_status(self):
     for dev, vals in self._devices.items():
@@ -241,10 +248,10 @@ class Room(object):
     """
     self.check_states()
     return_data = {
-      'type': self.type,
-      'alias': self.alias,
-      'ff_id': self.id,
-      'devices': self._devices,
+      'type':           self.type,
+      'alias':          self.alias,
+      'ff_id':          self.id,
+      'devices':        self._devices,
       'request_values': {}
     }
     for r in self._requests:

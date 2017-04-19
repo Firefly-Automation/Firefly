@@ -4,7 +4,7 @@ from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import (STATE, EVENT_ACTION_OFF, DEVICE_TYPE_SWITCH, CONTACT, CONTACT_CLOSED, CONTACT_OPEN)
 
-TITLE = 'Aeotec Zwave Window Door Sensor Gen5'
+TITLE = 'Zwave Generic Window Door Sensor'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = 'Zachary Priddy'
 COMMANDS = []
@@ -33,31 +33,6 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     self.add_request(CONTACT, self.get_state)
     self.add_request('alarm', self.get_alarm)
 
-  def update_device_config(self, **kwargs):
-    # TODO: Pull these out into config values
-    """
-    Updated the devices to the desired config params. This will be useful to make new default devices configs.
-
-    For example when there is a gen6 multisensor I want it to always report every 5 minutes and timeout to be 30 seconds.
-    Args:
-      **kwargs ():
-    """
-    self.node.refresh_info()
-    if self._update_try_count >= 5:
-      self._config_updated = True
-      return
-
-    # TODO: self._sensitivity ??
-    # https://github.com/OpenZWave/open-zwave/blob/master/config/aeotec/zw120.xml
-    self.node.set_config_param(2, 0)  # Disable 10 min wake up time
-    self.node.set_config_param(121, 17)  # ensor Binary and Battery Report
-
-    successful = True
-    successful &= self.node.request_config_param(2) == 0
-    successful &= self.node.request_config_param(121) == 17
-
-    self._update_try_count += 1
-    self._config_updated = successful
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     if node is None:

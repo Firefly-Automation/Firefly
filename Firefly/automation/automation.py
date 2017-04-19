@@ -131,7 +131,8 @@ class Automation(object):
       'actions': self.actions_export,
       'conditions': self.conditions_export,
       'triggers': self.triggers.export(),
-      'initial_values': 'TODO INITIAL VALUES'
+      'initial_values': 'TODO INITIAL VALUES',
+      'alias': self._alias
     }
     return export_data
 
@@ -187,6 +188,10 @@ class Automation(object):
   @property
   def get_event_handler(self):
     return self._event_handler
+
+  @property
+  def alias(self):
+    return self._alias
 
   @property
   def type(self):

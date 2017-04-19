@@ -1,9 +1,9 @@
-import asyncio
+from typing import Any, Callable
 
 from Firefly import logging
-from Firefly.helpers.events import Event, Command, Request
-from typing import Callable, Any
-from Firefly.const import TYPE_SERVICE, EVENT_TYPE_BROADCAST
+from Firefly.const import TYPE_SERVICE
+from Firefly.helpers.events import Command, Event, Request
+
 
 class Service(object):
   def __init__(self, firefly, service_id, package, title, author, commands, requests):
@@ -20,7 +20,6 @@ class Service(object):
     self._service_id = service_id
 
     # TODO: Alias mapping for service.
-
 
   # TODO: The following were copied from Device. Verify They work right
   def add_command(self, command: str, function: Callable) -> None:
@@ -43,7 +42,6 @@ class Service(object):
     """
     self._request_mapping[request] = function
 
-
   def command(self, command: Command, **kwargs) -> bool:
     """
     Function that is called to send a command to a ff_id.
@@ -53,12 +51,11 @@ class Service(object):
     Returns:
       (bool): Command successful.
     """
-    #state_before = self.__dict__.copy()
+    # state_before = self.__dict__.copy()
     logging.debug('%s: Got Command: %s' % (self.id, command.command))
     if command.command in self.command_map.keys():
-      event_action =  self.command_map[command.command](**command.args)
+      event_action = self.command_map[command.command](**command.args)
       return event_action
-
 
   def request(self, request: Request) -> Any:
     """

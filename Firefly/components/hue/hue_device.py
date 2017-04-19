@@ -15,24 +15,24 @@ TITLE = 'Firefly Hue Device'
 DEVICE_TYPE = DEVICE_TYPE_COLOR_LIGHT
 AUTHOR = AUTHOR
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ACTION_LEVEL, COMMAND_SET_LIGHT, 'ct_fade']
-INITIAL_VALUES = {'_state':            EVENT_ACTION_OFF,
-                  '_uniqueid':         '-1',
+INITIAL_VALUES = {'_state': EVENT_ACTION_OFF,
+                  '_uniqueid': '-1',
                   '_manufacturername': 'unknown',
-                  '_on':               EVENT_ACTION_OFF,
-                  '_hue':              0,
-                  '_sat':              0,
-                  '_effect':           False,
-                  '_xy':               0,
-                  '_colormode':        'unknown',
-                  '_alert':            False,
-                  '_bri':              0,
-                  '_reachable':        False,
-                  '_type':             'unknown',
-                  '_ct':               0,
-                  '_level':            0,
-                  '_hue_noun':         'state',
-                  '_hue_service':      'service_hue',
-                  '_hue_number':       -1
+                  '_on': EVENT_ACTION_OFF,
+                  '_hue': 0,
+                  '_sat': 0,
+                  '_effect': False,
+                  '_xy': 0,
+                  '_colormode': 'unknown',
+                  '_alert': False,
+                  '_bri': 0,
+                  '_reachable': False,
+                  '_type': 'unknown',
+                  '_ct': 0,
+                  '_level': 0,
+                  '_hue_noun': 'state',
+                  '_hue_service': 'service_hue',
+                  '_hue_number': -1
                   }
 
 
@@ -50,7 +50,6 @@ class HueDevice(Device):
 
     if self._alias == self.id:
       self._alias = kwargs.get('name')
-
 
     # TODO: Remove hue_bridge?
     self._hue_bridge = kwargs.get('hue_bridge')
@@ -169,28 +168,27 @@ class HueDevice(Device):
     value = kwargs
     hue_value = {}
 
-    ## END FADE IF SET COMMAND IS GIVEN
+    # END FADE IF SET COMMAND IS GIVEN
     if not value.get('ct_fade', False):
-      print('^^^^^^^^^^^^^^^ STOP CT FADE ^^^^^^^^^^^^^^^^^^^')
       if self._ct_fade is not None:
         self._ct_fade.endRun()
       self._ct_fade = None
 
     # XY
     xy = value.get('xy')
-    if xy:
+    if xy is not None:
       hue_value.update({'xy': xy})
       self._xy = xy
 
     # HUE
     hue = value.get('hue')
-    if hue:
+    if hue is not None:
       hue_value.update({'hue': hue})
       self._hue = hue
 
     # TRANS TIME
     transitiontime = value.get('transitiontime')
-    if transitiontime:
+    if transitiontime is not None:
       try:
         transitiontime = int(transitiontime)
       except:
@@ -204,7 +202,7 @@ class HueDevice(Device):
 
     # HEX COLOR
     hexColor = value.get('hex')
-    if hexColor:
+    if hexColor is not None:
       hue_value.update(self.hexColor(hexColor))
 
     ## PRESET
@@ -215,21 +213,18 @@ class HueDevice(Device):
 
     # SET FOR LEVEL
     level = value.get('level')
-    if level:
+    if level is not None:
       try:
         level = int(level)
       except:
         level = 100
 
       if level > 0:
-        if level > 100:
-          level = 100
-        level = 100 if level >= 100 else level
+        level = min(level, 100)
         bri = int(255.0 / 100.0 * level)
         self._bri = bri
-        level = level
         hue_value.update({'bri': bri})
-      if level <= 0:
+      else:
         bri = 0
         level = 0
         self._on = False
@@ -239,15 +234,15 @@ class HueDevice(Device):
 
     # SET FOR BRI
     bri = value.get('bri')
-    if bri:
-      if bri > 255:
-        bri = 255
-        self._level = int(bri / 255.0 * 100.0)
+    if bri is not None:
+      bri = min(bri, 255)
       if bri <= 0:
         bri = 0
         self._level = 0
         self._on = False
         hue_value.update({'on': False})
+      else:
+        self._level = int(bri / 255.0 * 100.0)
       hue_value.update({'bri': bri})
       self._bri = bri
 
@@ -280,15 +275,27 @@ class HueDevice(Device):
       self._on = on
 
     # Turn lights on unless told not to or has already been set
-    if hue_value.get('on') is None and not value.get('onOn'):
+    if hue_value.get('on') is None and not value.get('no_on'):
       hue_value.update({'on': True})
       self._on = True
 
     self.set_hue_device(hue_value)
     return value
 
-  # TODO: Bringe CT Fade back in
   def set_ct_fade(self, **kwargs):
+    """
+    Set color temperature fade over time.
+    
+    Args:
+      start_k: (str) Start color temp in k (2700k)
+      end_k: (str) End color temp in k (2700k)
+      start_level: (int) Start level
+      end_level: (int) End Level
+
+    Returns:
+      None
+
+    """
     start_k = kwargs.get('start_k')
     end_k = kwargs.get('end_k')
     start_level = kwargs.get('start_level')
@@ -305,14 +312,14 @@ class HueDevice(Device):
       end_k = max(end_k, 2000)
 
       fade_sec = int(kwargs.get('fade_sec', 1500))
-      if start_level:
+      if start_level is not None and end_level is not None:
         start_level = int(start_level)
-      if end_level:
         end_level = int(end_level)
+
     except:
       logging.error('[hue_device] error parsing ct_fade.')
       return
-    print(start_k, end_k, fade_sec)
+
     self._ct_fade = CTFade(self._firefly, str(self.id), start_k, end_k, fade_sec, start_level, end_level)
 
   def switch(self, value):
@@ -335,6 +342,7 @@ class HueDevice(Device):
       #  return {'xy': converter.hexToCIE1931(colorHex, lightType='LST')}
       # return {'xy': converter.hexToCIE1931(colorHex)}
 
+
 def check_ct(ct) -> int:
   if 'K' in ct.upper():
     try:
@@ -346,7 +354,7 @@ def check_ct(ct) -> int:
     try:
       ct = int(ct)
     except:
-      ct = 1000000.0/2700.0
+      ct = 1000000.0 / 2700.0
 
   if ct > 500:
     ct = 500

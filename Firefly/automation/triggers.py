@@ -225,6 +225,9 @@ class Triggers(object):
             trigger_valid &= self.check_time_trigger(event, t)
             event_valid = True
             continue
+          # TODO: FIX THIS
+          if t_source == "location":
+            continue
           if EVENT_ACTION_ANY in t_action:
             trigger_valid = True
             event_valid = True

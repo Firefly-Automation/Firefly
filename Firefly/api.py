@@ -1,36 +1,80 @@
-from aiohttp import web
-from aiohttp.web_request import Request as webRequest
-from datetime import datetime
 import asyncio
 import json
-from Firefly.services.api_ai import process_api_ai_request
-from Firefly.services.alexa import process_alexa_request
+
+from aiohttp import web
+from aiohttp.web_request import Request as webRequest
 
 from Firefly import logging
-
-from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, TYPE_DEVICE, ACTION_OFF, ACTION_ON, STATE, API_INFO_REQUEST, TYPE_AUTOMATION)
+from Firefly.const import API_INFO_REQUEST, TYPE_AUTOMATION, TYPE_DEVICE
 from Firefly.helpers.events import Command, Request
+from Firefly.services.alexa import process_alexa_request
+from Firefly.services.api_ai import process_api_ai_request
+
 
 class FireflyCoreAPI:
   def __init__(self, firefly):
     self.firefly = firefly
-    self.api_functions = [
-      {'method': 'GET', 'path': '/', 'function': self.hello_world},
-      {'method': 'GET', 'path': '/status', 'function': self.get_status},
-      {'method': 'GET', 'path': '/stop', 'function': self.stop_firefly},
-      {'method': 'GET', 'path': '/test', 'function': self.test},
-      {'method': 'GET', 'path': '/api/rest/components', 'function': self.devices},
-      {'method': 'GET', 'path': '/api/rest/rooms', 'function': self.rooms},
-      {'method': 'GET', 'path': '/api/rest/routines', 'function': self.routines},
-      {'method': 'GET', 'path': '/api/rest/ff_id/{ff_id}', 'function': self.device},
-      {'method': 'GET', 'path': '/api/rest/ff_id/{ff_id}/action', 'function': self.action},
-      {'method': 'GET', 'path': '/api/rest/ff_id/{ff_id}/sensors', 'function': self.sensors},
-      {'method': 'GET', 'path': '/api/status/all_components', 'function': self.api_all_components},
-      {'method': 'GET', 'path': '/api/status', 'function': self.api_status},
-      {'method': 'GET', 'path': '/api/zwave', 'function': self.zwave},
-      {'method': 'POST', 'path': '/api/api_ai', 'function': self.process_api_ai_request},
-      {'method': 'POST', 'path': '/api/alexa', 'function': self.process_alexa_request}
-    ]
+    self.api_functions = [{
+      'method':   'GET',
+      'path':     '/',
+      'function': self.hello_world
+    }, {
+      'method':   'GET',
+      'path':     '/status',
+      'function': self.get_status
+    }, {
+      'method':   'GET',
+      'path':     '/stop',
+      'function': self.stop_firefly
+    }, {
+      'method':   'GET',
+      'path':     '/test',
+      'function': self.test
+    }, {
+      'method':   'GET',
+      'path':     '/api/rest/components',
+      'function': self.devices
+    }, {
+      'method':   'GET',
+      'path':     '/api/rest/rooms',
+      'function': self.rooms
+    }, {
+      'method':   'GET',
+      'path':     '/api/rest/routines',
+      'function': self.routines
+    }, {
+      'method':   'GET',
+      'path':     '/api/rest/ff_id/{ff_id}',
+      'function': self.device
+    }, {
+      'method':   'GET',
+      'path':     '/api/rest/ff_id/{ff_id}/action',
+      'function': self.action
+    }, {
+      'method':   'GET',
+      'path':     '/api/rest/ff_id/{ff_id}/sensors',
+      'function': self.sensors
+    }, {
+      'method':   'GET',
+      'path':     '/api/status/all_components',
+      'function': self.api_all_components
+    }, {
+      'method':   'GET',
+      'path':     '/api/status',
+      'function': self.api_status
+    }, {
+      'method':   'GET',
+      'path':     '/api/zwave',
+      'function': self.zwave
+    }, {
+      'method':   'POST',
+      'path':     '/api/api_ai',
+      'function': self.process_api_ai_request
+    }, {
+      'method':   'POST',
+      'path':     '/api/alexa',
+      'function': self.process_alexa_request
+    }]
 
   async def hello_world(self, request):
     logging.debug('Hello World')
@@ -49,23 +93,22 @@ class FireflyCoreAPI:
     for ff_id, d in self.firefly.components.items():
       if d.type == TYPE_DEVICE:
         devices.append({
-          'alias': d._alias,
-          'title': d._title,
-          'ff_id': ff_id,
+          'alias':    d._alias,
+          'title':    d._title,
+          'ff_id':    ff_id,
           'rest_url': 'http://%s/api/rest/ff_id/%s' % (request.host, ff_id)
         })
 
     data = json.dumps(devices, indent=4, sort_keys=True)
     return web.Response(text=data, content_type='application/json')
 
-
   async def rooms(self, request):
     devices = []
     for ff_id, d in self.firefly.components.items():
       if d.type == "ROOM":
         devices.append({
-          'alias': d._alias,
-          'ff_id': ff_id,
+          'alias':    d._alias,
+          'ff_id':    ff_id,
           'rest_url': 'http://%s/api/rest/ff_id/%s' % (request.host, ff_id)
         })
 
@@ -77,9 +120,9 @@ class FireflyCoreAPI:
     for ff_id, d in self.firefly.components.items():
       if d.type == TYPE_AUTOMATION and 'routine' in d._package:
         devices.append({
-          'alias': d._alias,
-          'title': d._title,
-          'ff_id': ff_id,
+          'alias':    d._alias,
+          'title':    d._title,
+          'ff_id':    ff_id,
           'rest_url': 'http://%s/api/rest/ff_id/%s' % (request.host, ff_id)
         })
 
@@ -90,7 +133,7 @@ class FireflyCoreAPI:
   def action(self, request):
     ff_id = request.match_info['ff_id']
     if 'command' in request.GET:
-      my_command = Command(ff_id,'web_api', **request.GET)
+      my_command = Command(ff_id, 'web_api', **request.GET)
       yield from self.firefly.async_send_command(my_command)
       device_request = Request(ff_id, 'web_api', API_INFO_REQUEST)
       data = yield from self.firefly.async_send_request(device_request)
@@ -111,7 +154,6 @@ class FireflyCoreAPI:
       return web.Response(text='Command Sent')
     return web.Response(text='Error Sending Command')
 
-
   @asyncio.coroutine
   def device(self, request):
     ff_id = request.match_info['ff_id']
@@ -121,7 +163,6 @@ class FireflyCoreAPI:
     data['rest_url'] = 'http://%s/api/rest/ff_id/%s' % (request.host, ff_id)
     return web.json_response(data)
 
-
   @asyncio.coroutine
   def sensors(self, request):
     ff_id = request.match_info['ff_id']
@@ -129,15 +170,15 @@ class FireflyCoreAPI:
     data = yield from self.firefly.async_send_request(device_request)
     return web.json_response(data)
 
-
-
-
   @asyncio.coroutine
   def test(self, request):
-    command = Command(**{'command':'TOGGLE', 'ff_id':'66fdff0a-1fa5-4234-91bc-465c72aafb23', 'source':'testing'})
+    command = Command(**{
+      'command': 'TOGGLE',
+      'ff_id':   '66fdff0a-1fa5-4234-91bc-465c72aafb23',
+      'source':  'testing'
+    })
     yield from self.firefly.send_command(command)
     return web.Response(text=str(command))
-
 
   @asyncio.coroutine
   def get_component_view(self, ff_id, source):
@@ -156,27 +197,33 @@ class FireflyCoreAPI:
         views.append(data)
     return views
 
-
   @asyncio.coroutine
   def api_all_components(self, request):
     return web.Response(text='api_all_components')
 
   @asyncio.coroutine
-  def api_status(self, request:webRequest):
+  def api_status(self, request: webRequest):
     source = request.rel_url.query.get('source')
     print(source)
     source = 'web_api' if source is None else source
     status_data = {}
     status_data['devices'] = yield from self.get_all_component_views(source, filter=TYPE_DEVICE)
     now = self.firefly.location.now
-    status_data['time'] = {'epoch':now.timestamp(), 'day':now.day, 'month':now.month, 'year':now.year, 'hour':now.hour, 'minute':now.minute, 'str':str(now)}
+    status_data['time'] = {
+      'epoch':  now.timestamp(),
+      'day':    now.day,
+      'month':  now.month,
+      'year':   now.year,
+      'hour':   now.hour,
+      'minute': now.minute,
+      'str':    str(now)
+    }
     status_data['is_dark'] = self.firefly.location.isDark
     status_data['mode'] = self.firefly.location.mode
     status_data['last_mode'] = self.firefly.location.lastMode
 
     data = json.dumps(status_data, indent=4, sort_keys=True)
     return web.Response(text=data, content_type='application/json')
-
 
   @asyncio.coroutine
   def process_api_ai_request(self, request):
@@ -195,4 +242,4 @@ class FireflyCoreAPI:
   def setup_api(self):
     for function in self.api_functions:
       print(function)
-      self.firefly.add_route(function.get('path'),function.get('method'), function.get('function'))
+      self.firefly.add_route(function.get('path'), function.get('method'), function.get('function'))
