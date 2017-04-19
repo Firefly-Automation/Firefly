@@ -91,8 +91,9 @@ class Firefly(object):
         continue
 
       try:
-        self.install_package(package, alias)
+        self.install_package(package, alias=alias)
       except Exception as e:
+        logging.error(code='FF.COR.INS.001', args=(service, e))  # error installing package %s: %s
         logging.notify('Error installing package %s: %s' % (service, e))
 
 
@@ -242,7 +243,7 @@ class Firefly(object):
     try:
       self.loop.run_in_executor(None, self.components[command.device].command, command)
     except:
-      logging.error('[send_command] error sending command')
+      logging.error(code='FF.COR.SEN.001') #unknown error sending command
     # TODO: Figure out how to wait for result
     return True
 
@@ -258,7 +259,7 @@ class Firefly(object):
       result = self.components[command.device].command(command)
       fut.set_result(result)
       return result
-    logging.error('[_send_command] Device not found: %s' % command.device)
+    logging.error(code='FF.COR._SE.001', args=(command.device))  # device not found %s
     return None
 
   def add_route(self, route, method, handler):

@@ -208,11 +208,11 @@ if __name__ == '__main__':
 
   file_name = args[0]
   function_name = args[1]
-  error_message = args[2]
+  error_message = args[2].lower()
 
   entry = error_codes.create_error_entry(project_code, file_name, function_name, error_message)
 
-  python_code = f'logging.error(code=\'{entry.error_code}\')'
+  python_code = f'logging.error(code=\'{entry.error_code}\') # {error_message}'
 
   print(f'\n{entry}')
   print("\nPut this where you want your error to be called:")

@@ -1,9 +1,23 @@
 {
-    "FF.DEV.EXP.001": {
-        "error_code": "FF.DEV.EXP.001",
-        "error_message": "[FF.DEV.EXP.001] error exporting device",
-        "file_name": "device.py",
-        "function_name": "export",
+    "FF.COR.INS.001": {
+        "error_code": "FF.COR.INS.001",
+        "error_message": "[FF.COR.INS.001] error installing package %s: %s",
+        "file_name": "core.py",
+        "function_name": "install_services",
+        "project_code": "FF"
+    },
+    "FF.COR.SEN.001": {
+        "error_code": "FF.COR.SEN.001",
+        "error_message": "[FF.COR.SEN.001] unknown error sending command",
+        "file_name": "core.py",
+        "function_name": "send_command",
+        "project_code": "FF"
+    },
+    "FF.COR._SE.001": {
+        "error_code": "FF.COR._SE.001",
+        "error_message": "[FF.COR._SE.001] device not found %s",
+        "file_name": "core.py",
+        "function_name": "_send_command",
         "project_code": "FF"
     }
 }

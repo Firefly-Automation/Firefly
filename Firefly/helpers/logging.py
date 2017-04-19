@@ -1,6 +1,7 @@
 import logging
 import inspect
 import os
+from Firefly import error_codes
 import asyncio
 
 
@@ -79,10 +80,15 @@ class FireflyLogging(object):
     file_name = os.path.basename(func.co_filename)
     logging.warning('%-130s [%s - %s]' % (message, function_name, file_name))
 
-  def error(self, message):
+  def error(self, message='', code: str=None, args: tuple=None):
     func = inspect.currentframe().f_back.f_code
     function_name = func.co_name
     file_name = os.path.basename(func.co_filename)
+    if code:
+      if args:
+        message = str(error_codes.get(code)) % args
+      else:
+        message = error_codes.get(code)
     logging.error('%-130s [%s - %s]' % (message, function_name, file_name))
 
   def critical(self, message):
