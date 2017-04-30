@@ -137,7 +137,7 @@ class Room(object):
         })
         self._tags.update(tags)
       except:
-        logging.error('device %s does not have request %s' % (ff_id, r))
+        logging.error(code='FF.ROO.ADD.001', args=(ff_id, r))  # device %s does not have request %s
 
   def event(self, event: Event) -> None:
     logging.info('[ROOM] received event %s' % event)
@@ -217,7 +217,7 @@ class Room(object):
           request = Request(dev, self.id, r)
           self._devices[dev]['state'][r] = self.firefly.components[dev].request(request)
         except:
-          logging.error('device %s does not have request %s' % (dev, r))
+          logging.error(code='FF.ROO.FOR.001', args=(dev, r))  # device %s does not have request %s
 
   def request(self, request: Request) -> Any:
     """Function to request data from the ff_id.

@@ -176,6 +176,7 @@ if __name__ == '__main__':
                     help='Save settings to settings files.', default=False)
   parser.add_option('-d', '--delete', dest='delete_error', type='string', help='Delete error code.')
   parser.add_option('-g', '--get', dest='get_error', type='string', help='Get error code')
+  parser.add_option('-a', '--args', dest='args', type='string', help='Args to pass into error message')
 
   (options, args) = parser.parse_args()
 
@@ -212,7 +213,10 @@ if __name__ == '__main__':
 
   entry = error_codes.create_error_entry(project_code, file_name, function_name, error_message)
 
-  python_code = f'logging.error(code=\'{entry.error_code}\') # {error_message}'
+  if options.args:
+    python_code = python_code = f'logging.error(code=\'{entry.error_code}\', args=({options.args})) # {error_message}'
+  else:
+    python_code = f'logging.error(code=\'{entry.error_code}\') # {error_message}'
 
   print(f'\n{entry}')
   print("\nPut this where you want your error to be called:")

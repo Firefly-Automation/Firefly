@@ -1,8 +1,6 @@
 from openzwave.network import ZWaveNode
-
 from Firefly import logging
 from Firefly.helpers.device import Device
-from Firefly.util.get_from_kwargs import get_kwargs_value
 
 
 class ZwaveDevice(Device):
@@ -17,7 +15,7 @@ class ZwaveDevice(Device):
 
     super().__init__(firefly, package, title, author, commands, requests, device_type, **kwargs)
 
-    self._node:ZWaveNode = get_kwargs_value(kwargs, 'node')
+    self._node:ZWaveNode = kwargs.get('node')
 
     self._sensors = {}
     self._switches = {}
@@ -49,9 +47,9 @@ class ZwaveDevice(Device):
     if self._node is None:
       logging.critical('FAILING TO UPDATE DEVICE')
       return False
-    param = get_kwargs_value(kwargs, 'id')
-    value = get_kwargs_value(kwargs, 'value')
-    size = get_kwargs_value(kwargs, 'size', 2)
+    param = kwargs.get('id')
+    value = kwargs.get('value')
+    size = kwargs.get('size', 2)
 
     if size:
       size = int(size)
@@ -82,7 +80,7 @@ class ZwaveDevice(Device):
 
 
   def get_params(self, **kwargs):
-    values = get_kwargs_value(kwargs, 'VALUE')
+    values = kwargs.get('VALUE')
     if values:
       s = self._config_params.get(values)
       return s
@@ -90,7 +88,7 @@ class ZwaveDevice(Device):
 
 
   def get_raw_values(self, **kwargs):
-    values = get_kwargs_value(kwargs, 'VALUE')
+    values = kwargs.get('VALUE')
     if values:
       s = self._raw_values.get(values)
       return s

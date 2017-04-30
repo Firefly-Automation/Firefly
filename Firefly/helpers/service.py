@@ -75,7 +75,7 @@ class Service(object):
     return None
 
   def event(self, event: Event) -> None:
-    logging.error('Devices currently dont support events')
+    logging.error(code='FF.SER.EVE.001')  # services currently dont support events
 
   @property
   def id(self):

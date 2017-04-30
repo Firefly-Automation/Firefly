@@ -1,7 +1,6 @@
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.helpers.device import Device
-from Firefly.util.get_from_kwargs import get_kwargs_value
 from Firefly.helpers.events import Event
 import asyncio
 from openzwave.network import ZWaveNode

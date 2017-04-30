@@ -29,7 +29,7 @@ def Setup(firefly, package, **kwargs):
   api_key = config.get(SECTION,'api_key',fallback=None)
   refresh = config.getint(SECTION,'refresh',fallback=30)
   if api_key is None:
-    logging.error('DarkSky API key missing')
+    logging.error(code='FF.DAR.SET.001')  # darksky api key missing
     return False
   darksky = Darksky(firefly, package, api_key=api_key, refresh=refresh)
   firefly.components[SERVICE_ID] = darksky

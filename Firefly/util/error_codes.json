@@ -1,4 +1,18 @@
 {
+    "FF.ALI.GET.001": {
+        "error_code": "FF.ALI.GET.001",
+        "error_message": "[FF.ALI.GET.001] unknown error getting ff_id id for %s",
+        "file_name": "alias.py",
+        "function_name": "get_device_id",
+        "project_code": "FF"
+    },
+    "FF.ALI.GET.002": {
+        "error_code": "FF.ALI.GET.002",
+        "error_message": "[FF.ALI.GET.002] more than one ff_id matching alias: %s",
+        "file_name": "alias.py",
+        "function_name": "get_device_id",
+        "project_code": "FF"
+    },
     "FF.COR.INS.001": {
         "error_code": "FF.COR.INS.001",
         "error_message": "[FF.COR.INS.001] error installing package %s: %s",
@@ -18,6 +32,230 @@
         "error_message": "[FF.COR._SE.001] device not found %s",
         "file_name": "core.py",
         "function_name": "_send_command",
+        "project_code": "FF"
+    },
+    "FF.DAR.SET.001": {
+        "error_code": "FF.DAR.SET.001",
+        "error_message": "[FF.DAR.SET.001] darksky api key missing",
+        "file_name": "darksky.py",
+        "function_name": "setup",
+        "project_code": "FF"
+    },
+    "FF.DEV.EVE.001": {
+        "error_code": "FF.DEV.EVE.001",
+        "error_message": "[FF.DEV.EVE.001] devices currently dont support events",
+        "file_name": "device.py",
+        "function_name": "event",
+        "project_code": "FF"
+    },
+    "FF.EVE.INI.001": {
+        "error_code": "FF.EVE.INI.001",
+        "error_message": "[FF.EVE.INI.001] event_action is not type dict",
+        "file_name": "events.py",
+        "function_name": "init",
+        "project_code": "FF"
+    },
+    "FF.HUE.GET.001": {
+        "error_code": "FF.HUE.GET.001",
+        "error_message": "[FF.HUE.GET.001] problem parsing ip address of bridge",
+        "file_name": "hue.py",
+        "function_name": "get_ip",
+        "project_code": "FF"
+    },
+    "FF.HUE.GET.002": {
+        "error_code": "FF.HUE.GET.002",
+        "error_message": "[FF.HUE.GET.002] problem parsing ip address of bridge",
+        "file_name": "hue.py",
+        "function_name": "get_ip",
+        "project_code": "FF"
+    },
+    "FF.HUE.SET.001": {
+        "error_code": "FF.HUE.SET.001",
+        "error_message": "[FF.HUE.SET.001] unknown value passed for level",
+        "file_name": "hue.py",
+        "function_name": "set_level",
+        "project_code": "FF"
+    },
+    "FF.HUE.SET.002": {
+        "error_code": "FF.HUE.SET.002",
+        "error_message": "[FF.HUE.SET.002] error parsing ct_fade",
+        "file_name": "hue.py",
+        "function_name": "set_ct_fade",
+        "project_code": "FF"
+    },
+    "FF.ROO.ADD.001": {
+        "error_code": "FF.ROO.ADD.001",
+        "error_message": "[FF.ROO.ADD.001] device %s does not have request %s",
+        "file_name": "room.py",
+        "function_name": "add_device",
+        "project_code": "FF"
+    },
+    "FF.ROO.FOR.001": {
+        "error_code": "FF.ROO.FOR.001",
+        "error_message": "[FF.ROO.FOR.001] device %s does not have request %s",
+        "file_name": "room.py",
+        "function_name": "force_check_status",
+        "project_code": "FF"
+    },
+    "FF.SER.EVE.001": {
+        "error_code": "FF.SER.EVE.001",
+        "error_message": "[FF.SER.EVE.001] services currently dont support events",
+        "file_name": "service.py",
+        "function_name": "event",
+        "project_code": "FF"
+    },
+    "FF.SUB.DEL.001": {
+        "error_code": "FF.SUB.DEL.001",
+        "error_message": "[FF.SUB.DEL.001] unknown error: %s",
+        "file_name": "subscribers.py",
+        "function_name": "delete_replace_subscriber",
+        "project_code": "FF"
+    },
+    "FF.SUB.DEL.002": {
+        "error_code": "FF.SUB.DEL.002",
+        "error_message": "[FF.SUB.DEL.002] subscribers are not type list",
+        "file_name": "subscribers.py",
+        "function_name": "delete_replace_subscriber",
+        "project_code": "FF"
+    },
+    "FF.SUB.DEL.003": {
+        "error_code": "FF.SUB.DEL.003",
+        "error_message": "[FF.SUB.DEL.003] subscriber not found in subscriptions [it should have been]",
+        "file_name": "subscribers.py",
+        "function_name": "delete_replace_subscriber",
+        "project_code": "FF"
+    },
+    "FF.SUB.DEL.004": {
+        "error_code": "FF.SUB.DEL.004",
+        "error_message": "[FF.SUB.DEL.004] unknown error: %s",
+        "file_name": "subscribers.py",
+        "function_name": "delete_replace_subscriber",
+        "project_code": "FF"
+    },
+    "FF.SUB.DEL.005": {
+        "error_code": "FF.SUB.DEL.005",
+        "error_message": "[FF.SUB.DEL.005] unknown error: %s",
+        "file_name": "subscribers.py",
+        "function_name": "delete_replace_subscriber",
+        "project_code": "FF"
+    },
+    "FF.SUB.DEL.006": {
+        "error_code": "FF.SUB.DEL.006",
+        "error_message": "[FF.SUB.DEL.006] subscriber not found in subscriptions [it should have been]",
+        "file_name": "subscribers.py",
+        "function_name": "delete_replace_subscriber",
+        "project_code": "FF"
+    },
+    "FF.SUB.DEL.007": {
+        "error_code": "FF.SUB.DEL.007",
+        "error_message": "[FF.SUB.DEL.007] subscriber not found in subscriptions [it should have been]",
+        "file_name": "subscribers.py",
+        "function_name": "delete_replace_subscriber",
+        "project_code": "FF"
+    },
+    "FF.SUB.GET.001": {
+        "error_code": "FF.SUB.GET.001",
+        "error_message": "[FF.SUB.GET.001] event action is not type dict: %s",
+        "file_name": "subscribers.py",
+        "function_name": "get_subscribers",
+        "project_code": "FF"
+    },
+    "FF.SUB.GET.002": {
+        "error_code": "FF.SUB.GET.002",
+        "error_message": "[FF.SUB.GET.002] unknown error",
+        "file_name": "subscribers.py",
+        "function_name": "get_all_subscribers",
+        "project_code": "FF"
+    },
+    "FF.SUB.VER.001": {
+        "error_code": "FF.SUB.VER.001",
+        "error_message": "[FF.SUB.VER.001] event_action: %s is not type dict. making any listener",
+        "file_name": "subscribers.py",
+        "function_name": "verify_event_action",
+        "project_code": "FF"
+    },
+    "FF.SUB.VER.002": {
+        "error_code": "FF.SUB.VER.002",
+        "error_message": "[FF.SUB.VER.002] event action not verified",
+        "file_name": "subscribers.py",
+        "function_name": "verify_event_action",
+        "project_code": "FF"
+    },
+    "FF.SUB.VER.003": {
+        "error_code": "FF.SUB.VER.003",
+        "error_message": "[FF.SUB.VER.003] hour not in time action",
+        "file_name": "subscribers.py",
+        "function_name": "verify_event_action_time",
+        "project_code": "FF"
+    },
+    "FF.SUB.VER.004": {
+        "error_code": "FF.SUB.VER.004",
+        "error_message": "[FF.SUB.VER.004] minute not in time action",
+        "file_name": "subscribers.py",
+        "function_name": "verify_event_action_time",
+        "project_code": "FF"
+    },
+    "FF.SUB.VER.005": {
+        "error_code": "FF.SUB.VER.005",
+        "error_message": "[FF.SUB.VER.005] weekdays not in time action. setting to everyday.",
+        "file_name": "subscribers.py",
+        "function_name": "verify_event_action_time",
+        "project_code": "FF"
+    },
+    "FF.SUB.VER.006": {
+        "error_code": "FF.SUB.VER.006",
+        "error_message": "[FF.SUB.VER.006] hour is out of range",
+        "file_name": "subscribers.py",
+        "function_name": "verify_event_action_time",
+        "project_code": "FF"
+    },
+    "FF.SUB.VER.007": {
+        "error_code": "FF.SUB.VER.007",
+        "error_message": "[FF.SUB.VER.007] minute is out of range",
+        "file_name": "subscribers.py",
+        "function_name": "verify_event_action_time",
+        "project_code": "FF"
+    },
+    "FF.SUB.VER.008": {
+        "error_code": "FF.SUB.VER.008",
+        "error_message": "[FF.SUB.VER.008] weekdays is out of range",
+        "file_name": "subscribers.py",
+        "function_name": "verify_event_action_time",
+        "project_code": "FF"
+    },
+    "FF.TRI.CHE.001": {
+        "error_code": "FF.TRI.CHE.001",
+        "error_message": "[FF.TRI.CHE.001] cant find device or property in current status",
+        "file_name": "triggers.py",
+        "function_name": "check_triggers",
+        "project_code": "FF"
+    },
+    "FF.TRI.REM.001": {
+        "error_code": "FF.TRI.REM.001",
+        "error_message": "[FF.TRI.REM.001] unknown error removing trigger: %s",
+        "file_name": "triggers.py",
+        "function_name": "remove_trigger",
+        "project_code": "FF"
+    },
+    "FF.ZWA.ZWA.001": {
+        "error_code": "FF.ZWA.ZWA.001",
+        "error_message": "[FF.ZWA.ZWA.001] error installing node %s: %s",
+        "file_name": "zwave.py",
+        "function_name": "zwave_handler",
+        "project_code": "FF"
+    },
+    "FF.ZWA.ZWA.002": {
+        "error_code": "FF.ZWA.ZWA.002",
+        "error_message": "[FF.ZWA.ZWA.002] error installing node %s",
+        "file_name": "zwave.py",
+        "function_name": "zwave_handler",
+        "project_code": "FF"
+    },
+    "FF.ZWA.ZWA.003": {
+        "error_code": "FF.ZWA.ZWA.003",
+        "error_message": "[FF.ZWA.ZWA.003] error sending command: %s",
+        "file_name": "zwave.py",
+        "function_name": "zwave_handler",
         "project_code": "FF"
     }
 }

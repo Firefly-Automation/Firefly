@@ -72,10 +72,10 @@ class Hue(Service):
     try:
       self._ip = data.json()[0]['internalipaddress']
     except:
-      logging.error('Problem parsing IP Address of Bridge')
+      logging.error(code='FF.HUE.GET.001')  # problem parsing ip address of bridge
       self._enable = False
     if not self._ip:
-      logging.error('Problem parsing IP Address of Bridge')
+      logging.error(code='FF.HUE.GET.002')  # problem parsing ip address of bridge
       self._enable = False
 
   def send_request(self, path=None, data=None, method='GET', return_json=True, no_username=False, **kwargs):

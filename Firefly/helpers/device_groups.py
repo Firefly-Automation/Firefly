@@ -1,5 +1,4 @@
 from Firefly import logging
-from Firefly.util import get_kwargs_value
 from typing import Dict
 
 GROUP = 'group'
@@ -146,7 +145,7 @@ class DeviceGroup(object):
   def __init__(self, id, alias, **kwargs):
     self._id = id
     self._alias = alias
-    self._group_type = get_kwargs_value(kwargs, 'group_type', GROUP)
+    self._group_type = kwargs.get('group_type', GROUP)
     self._devices = []
 
 

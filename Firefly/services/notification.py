@@ -2,8 +2,6 @@ from Firefly import logging
 from Firefly.helpers.service import Service
 from Firefly.helpers.events import Command
 from Firefly.const import COMMAND_NOTIFY, SERVICE_NOTIFICATION, NOTIFY_DEFAULT, PRIORITY_NORMAL
-
-from Firefly.util.get_from_kwargs import get_kwargs_value
 import asyncio
 '''
 Notification service may have its own config file to save device mappings into

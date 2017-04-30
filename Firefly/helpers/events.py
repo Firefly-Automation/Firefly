@@ -17,7 +17,7 @@ class Event(object):
     self._kwargs = kwargs
     self._event_action = event_action
     if type(self._event_action) is not dict:
-      logging.error('EVENT event_action is not type dict!')
+      logging.error(code='FF.EVE.INI.001')  # event_action is not type dict
       self._event_action = {}
 
 

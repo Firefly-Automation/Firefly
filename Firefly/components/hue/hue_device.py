@@ -150,7 +150,7 @@ class HueDevice(Device):
     try:
       level = int(kwargs.get(LEVEL))
     except:
-      logging.error('UNKNOWN VALUE PASSED FOR LEVEL')
+      logging.error(code='FF.HUE.SET.001')  # unknown value passed for level
       return False
     if level is None:
       return False
@@ -317,7 +317,7 @@ class HueDevice(Device):
         end_level = int(end_level)
 
     except:
-      logging.error('[hue_device] error parsing ct_fade.')
+      logging.error(code='FF.HUE.SET.002')  # error parsing ct_fade
       return
 
     self._ct_fade = CTFade(self._firefly, str(self.id), start_k, end_k, fade_sec, start_level, end_level)

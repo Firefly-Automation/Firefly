@@ -44,13 +44,13 @@ class Alias(object):
       print(self.aliases)
       device_id_list = [a for a in self.aliases if self.aliases[a] == alias]
       if len(device_id_list) != 1:
-        logging.error('More than one ff_id matching alias')
+        logging.error(code='FF.ALI.GET.002', args=(alias))  # more than one ff_id matching alias: %s
         return None
       return device_id_list[0]
     if alias in self.aliases.keys():
       logging.debug('Seems like device_id was given, not alias')
       return alias
-    logging.error('Unknown error getting ff_id ID for %s.' % alias)
+    logging.error(code='FF.ALI.GET.001', args=(alias))  # unknown error getting ff_id id for %s
     return None
 
   @property

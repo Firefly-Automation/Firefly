@@ -50,7 +50,7 @@ class Subscriptions(object):
 
     for ea in _event_action:
       if type(ea) is not dict:
-        logging.error('[get_subscribers] Event action is not type dict: %s [ERROR CODE: SUB.DEL.11]' % str(ea))
+        logging.error(code='FF.SUB.GET.001', args=(str(ea)))  # event action is not type dict: %s=
         continue
 
       for prop, act in ea.items():
@@ -143,7 +143,7 @@ class Subscriptions(object):
           if type(itm_act) is list:
             subscribers.update(itm_act)
           else:
-            logging.error('[get_all_subscribers] unknown error [ERROR CODE: SUB.DEL.7]')
+            logging.error(code='FF.SUB.GET.002')  # unknown error
 
     return list(subscribers)
 
@@ -254,10 +254,9 @@ class Subscriptions(object):
                 subscriptions[prop][act_itm].append(new_subscriber_id)
               changed_subscriptions += 1
             except (KeyError, ValueError):
-              logging.error(
-                '[delete_subscriber] - subscriber not found in subscriptions (it should have been) [ERROR CODE: SUB.DEL.1]')
+              logging.error(code='FF.SUB.DEL.007')  # subscriber not found in subscriptions [it should have been]
             except Exception as e:
-              logging.error('[delete_subscriber] Unknown Error: %s [ERROR CODE: SUB.DEL.10]' % e)
+              logging.error(code='FF.SUB.DEL.001', args=(e))  # unknown error: %s
       return changed_subscriptions
 
     else:
@@ -270,15 +269,14 @@ class Subscriptions(object):
                 subscriptions[EVENT_ACTON_TYPE][EVENT_ACTION_ANY].append(new_subscriber_id)
               changed_subscriptions += 1
             except (KeyError, ValueError):
-              logging.error(
-                '[delete_subscriber] - subscriber not found in subscriptions (it should have been) [ERROR CODE: SUB.DEL.2]')
+              logging.error(code='FF.SUB.DEL.003')  # subscriber not found in subscriptions [it should have been]
             except Exception as e:
-              logging.error('[delete_subscriber] Unknown Error: %s [ERROR CODE: SUB.DEL.5]' % e)
+              logging.error(code='FF.SUB.DEL.004', args=(e))  # unknown error: %s
         if type(action) is dict:
           for act_itm, act_prop in action.items():
             if act_itm in subscription_items:
               if type(act_prop) is not list:
-                logging.error('[delete_subscriber] - subscribers are not type list. [ERROR CODE: SUB.DEL.4]')
+                logging.error(code='FF.SUB.DEL.002')  # subscribers are not type list
               for p in act_prop:
                 try:
                   subscriptions[act_itm][p].remove(subscriber_id)
@@ -286,10 +284,9 @@ class Subscriptions(object):
                     subscriptions[act_itm][p].append(new_subscriber_id)
                   changed_subscriptions += 1
                 except (KeyError, ValueError):
-                  logging.error(
-                    '[delete_subscriber] - subscriber not found in subscriptions (it should have been) [ERROR CODE: SUB.DEL.3]')
+                  logging.error(code='FF.SUB.DEL.006')  # subscriber not found in subscriptions [it should have been]
                 except Exception as e:
-                  logging.error('[delete_subscriber] Unknown Error: %s [ERROR CODE: SUB.DEL.6]' % e)
+                  logging.error(code='FF.SUB.DEL.005', args=(e))  # unknown error: %s
 
     return changed_subscriptions
 
@@ -360,7 +357,8 @@ def verify_event_action(event_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY, get_s
       # Verify when not coming from get_subscribers
       if not get_subscribers:
         if type(ea) is not dict and ea != EVENT_ACTION_ANY:
-          logging.error('event_action: %s is not type dict! Making ANY listener [ERROR CODE: SUB.DEL.9]' % event_action)
+          logging.error(code='FF.SUB.VER.001',
+                        args=(event_action))  # event_action: %s is not type dict. making any listener
           if EVENT_ACTION_ANY in new_event_actions.keys():
             new_event_actions[EVENT_ACTION_ANY].append(ea)
           else:
@@ -383,7 +381,7 @@ def verify_event_action(event_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY, get_s
 
     return [new_event_actions]
 
-  logging.error("EVENT ACTION NOT VERIFIED [ERROR CODE: SUB.DEL.8]")
+  logging.error(code='FF.SUB.VER.002')  # event action not verified
   return event_action
 
 
@@ -400,28 +398,28 @@ def verify_event_action_time(event_action: EVENT_ACTON_TYPE) -> list:
   for ea in event_action:
     # Check for missing items
     if 'hour' not in ea.keys():
-      logging.error('hour not in time action')
+      logging.error(code='FF.SUB.VER.003')  # hour not in time action
       ea = {}
       continue
     if 'minute' not in ea.keys():
-      logging.error('minute not in time action')
+      logging.error(code='FF.SUB.VER.004')  # minute not in time action
       ea = {}
       continue
     if 'weekdays' not in ea.keys():
-      logging.error('weekdays not in time action. Setting to everyday.')
+      logging.error(code='FF.SUB.VER.005')  # weekdays not in time action. setting to everyday.
       ea['weekdays'] = [1,2,3,4,5,6,7]
 
     # Verify time ranges
     if ea['hour'] < 0 or ea['hour'] > 24:
-      logging.error('hour is out of range')
+      logging.error(code='FF.SUB.VER.006')  # hour is out of range
       ea ={}
       continue
     if ea['minute'] < 0 or ea['minute'] > 60:
-      logging.error('minute is out of range')
+      logging.error(code='FF.SUB.VER.007')  # minute is out of range
       ea ={}
       continue
     if max(ea['weekdays']) > 7 or min(ea['weekdays']) < 1:
-      logging.error('weekdays is out of range')
+      logging.error(code='FF.SUB.VER.008')  # weekdays is out of range
       ea = {}
       continue
 

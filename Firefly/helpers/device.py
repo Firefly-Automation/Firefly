@@ -190,7 +190,7 @@ class Device(object):
     return None
 
   def event(self, event: Event) -> None:
-    logging.error('Devices currently dont support events')
+    logging.error(code='FF.DEV.EVE.001')  # devices currently dont support events
 
   def get_api_info(self) -> dict:
     """

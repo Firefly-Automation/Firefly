@@ -174,7 +174,7 @@ class Zwave(Service):
       try:
         self.add_child_nodes(node)
       except Exception as e:
-        logging.error('[zwave] error installing node %s: %s' % (node, e))
+        logging.error(code='FF.ZWA.ZWA.001', args=(node, e))  # error installing node %s: %s
 
     elif self._installed_nodes[node_id] not in self._firefly.components:
       self._installed_nodes.pop(node_id)
@@ -182,7 +182,7 @@ class Zwave(Service):
       try:
         self.add_child_nodes(node)
       except:
-        logging.error('[zwave] error installing node %s' % node)
+        logging.error(code='FF.ZWA.ZWA.002', args=(node))  # error installing node %s
 
 
         # TODO: Change this to a send_command -> This will then do an update and broadcast
@@ -195,7 +195,7 @@ class Zwave(Service):
       try:
         self._firefly.send_command(command)
       except Exception as e:
-        logging.error('[zwave] Error sending command: %s' % e)
+        logging.error(code='FF.ZWA.ZWA.003', args=(e))  # error sending command: %s
         # self._firefly.components[self._installed_nodes[node_id]].update_from_zwave(node, values=values)
 
   def add_child_nodes(self, node):

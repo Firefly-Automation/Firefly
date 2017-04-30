@@ -158,7 +158,7 @@ class Triggers(object):
           self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, t.listen_action)
           self._trigger_sources.add(t.listen_id)
     except:
-      logging.error('[FF.TRI.REM.001]: Unknown error removing trigger: %s' % trigger)
+      logging.error(code='FF.TRI.REM.001', args=(trigger))  # unknown error removing trigger: %s
       return False
 
     return True
@@ -261,7 +261,7 @@ class Triggers(object):
                     trigger_valid = False
                     break
               except:
-                logging.error('[FF.TRI.CHE.001] Cant find device or property in current status.')
+                logging.error(code='FF.TRI.CHE.001')  # cant find device or property in current status
                 trigger_valid = False
               if not trigger_valid:
                 break
