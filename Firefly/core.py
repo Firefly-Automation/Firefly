@@ -86,7 +86,7 @@ class Firefly(object):
     for service in services:
       package = config.get(service, 'package')
       alias = ('service_%s' % service).lower()
-      enabled = config.getboolean(service, 'enabled', fallback=False)
+      enabled = config.getboolean(service, 'enable', fallback=False)
       if not enabled:
         continue
 
