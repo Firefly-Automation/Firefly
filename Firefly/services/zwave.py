@@ -58,8 +58,7 @@ def Setup(firefly, package, **kwargs):
 
   enable = config.getboolean(SECTION, 'enable', fallback=False)
   port = config.get(SECTION, 'port', fallback=None)
-  # path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzave')
-  path = config.get(SECTION, 'path', fallback=None)
+  path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
   if not enable or port is None:
     return False
 
@@ -85,7 +84,6 @@ class Zwave(Service):
 
     self._port = kwargs.get('port')
     self._path = kwargs.get('path')
-    self._path = '/opt/firefly_system/python-openzwave/openzwave/config'
     self._enable = kwargs.get('enable')
     self._zwave_option = None
     self._network: ZWaveNetwork = None
