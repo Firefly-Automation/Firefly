@@ -82,7 +82,7 @@ class EventAction(Automation):
 
   def export(self, **kwargs):
     export_data = super().export()
-    export_data['delayed_action'] = self.delayed_actions_export
+    export_data['delayed_actions'] = self.delayed_actions_export
     export_data['delayed_triggers'] = self.delayed_triggers.export()
     if self._delay_s:
       export_data['delay_s'] = self._delay_s
