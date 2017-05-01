@@ -1,3 +1,557 @@
 [
-    
+    {
+        "actions": [
+            {
+                "command": "set_light",
+                "conditions": {
+                    "is_dark": true
+                },
+                "ct": "3200k",
+                "ff_id": "hue-group-device-3",
+                "force": false,
+                "level": 100,
+                "source": "temp_routine_home"
+            },
+            {
+                "command": "set_light",
+                "conditions": {
+                    "is_dark": false
+                },
+                "ct": "6500k",
+                "ff_id": "hue-group-device-3",
+                "force": false,
+                "level": 100,
+                "source": "temp_routine_home"
+            }
+        ],
+        "alias": "home",
+        "conditions": {
+            "is_not_mode": [
+                "home",
+                "night"
+            ]
+        },
+        "ff_id": "temp_routine_home",
+        "initial_values": "TODO INITIAL VALUES",
+        "message": "Home routine executed",
+        "mode": "home",
+        "package": "Firefly.automation.routine",
+        "triggers": [
+            [
+                {
+                    "event_action": [
+                        {
+                            "contact": [
+                                "open"
+                            ]
+                        }
+                    ],
+                    "listen_id": "42c0c3e1-75bb-4729-917c-f1935c59b46a",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ]
+        ],
+        "type": "TYPE_AUTOMATION"
+    },
+    {
+        "actions": [
+            {
+                "command": "off",
+                "conditions": {},
+                "ff_id": "hue-group-device-3",
+                "force": false,
+                "source": "temp_routine_away"
+            },
+            {
+                "command": "off",
+                "conditions": {},
+                "ff_id": "2f4bd64d-5f2f-4284-a0bc-35d1580efc71",
+                "force": false,
+                "source": "temp_routine_away"
+            },
+            {
+                "command": "set_light",
+                "conditions": {
+                    "is_dark": true
+                },
+                "delay_s": 2,
+                "ff_id": "00:17:88:01:00:fa:bf:3c-0b",
+                "force": false,
+                "hue": 54736,
+                "level": 20,
+                "source": "temp_routine_away"
+            },
+            {
+                "command": "set_light",
+                "conditions": {
+                    "is_dark": true
+                },
+                "delay_s": 2,
+                "ff_id": "00:17:88:01:01:1a:54:72-0b",
+                "force": false,
+                "hue": 54049,
+                "level": 20,
+                "source": "temp_routine_away"
+            }
+        ],
+        "alias": "away",
+        "conditions": {
+            "is_mode": [
+                "home",
+                "away",
+                "arriving"
+            ]
+        },
+        "ff_id": "temp_routine_away",
+        "initial_values": "TODO INITIAL VALUES",
+        "message": "Away routine executed",
+        "mode": "away",
+        "package": "Firefly.automation.routine",
+        "triggers": [
+            [
+                {
+                    "event_action": [
+                        {
+                            "presence": [
+                                "not_present"
+                            ]
+                        }
+                    ],
+                    "listen_id": "372c02fd-5dde-4d82-8ad3-880c143575da",
+                    "source": "SOURCE_TRIGGER"
+                },
+                {
+                    "event_action": [
+                        {
+                            "presence": [
+                                "not_present"
+                            ]
+                        }
+                    ],
+                    "listen_id": "1cefbe5d-fa17-41db-b1ad-6011e70a954a",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ],
+            [
+                {
+                    "event_action": [
+                        {
+                            "presence": [
+                                "not_present"
+                            ]
+                        }
+                    ],
+                    "listen_id": "372c02fd-5dde-4d82-8ad3-880c143575da",
+                    "source": "SOURCE_TRIGGER"
+                },
+                {
+                    "event_action": [
+                        {
+                            "location": [
+                                "sunrise",
+                                "sunset"
+                            ]
+                        }
+                    ],
+                    "listen_id": "location",
+                    "source": "SOURCE_TRIGGER"
+                },
+                {
+                    "event_action": [
+                        {
+                            "presence": [
+                                "not_present"
+                            ]
+                        }
+                    ],
+                    "listen_id": "1cefbe5d-fa17-41db-b1ad-6011e70a954a",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ]
+        ],
+        "type": "TYPE_AUTOMATION"
+    },
+    {
+        "actions": [
+            {
+                "command": "set_light",
+                "conditions": {},
+                "ct": "6500k",
+                "ff_id": "hue-group-device-3",
+                "force": false,
+                "level": 100,
+                "source": "temp_routine_art"
+            }
+        ],
+        "alias": "art",
+        "conditions": {},
+        "ff_id": "temp_routine_art",
+        "initial_values": "TODO INITIAL VALUES",
+        "message": "Art routine executed",
+        "mode": "art",
+        "package": "Firefly.automation.routine",
+        "triggers": [
+            []
+        ],
+        "type": "TYPE_AUTOMATION"
+    },
+    {
+        "actions": [],
+        "alias": "arriving",
+        "conditions": {
+            "is_mode": [
+                "away"
+            ]
+        },
+        "ff_id": "temp_routine_arriving",
+        "initial_values": "TODO INITIAL VALUES",
+        "message": "arriving routine executed",
+        "mode": "arriving",
+        "package": "Firefly.automation.routine",
+        "triggers": [
+            [
+                {
+                    "event_action": [
+                        {
+                            "presence": [
+                                "present"
+                            ]
+                        }
+                    ],
+                    "listen_id": "372c02fd-5dde-4d82-8ad3-880c143575da",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ],
+            [
+                {
+                    "event_action": [
+                        {
+                            "presence": [
+                                "present"
+                            ]
+                        }
+                    ],
+                    "listen_id": "1cefbe5d-fa17-41db-b1ad-6011e70a954a",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ]
+        ],
+        "type": "TYPE_AUTOMATION"
+    },
+    {
+        "actions": [
+            {
+                "command": "ct_fade",
+                "conditions": {},
+                "end_k": "6500k",
+                "end_level": 100,
+                "fade_sec": 1500,
+                "ff_id": "hue-group-device-3",
+                "force": false,
+                "source": "temp_routine_morning",
+                "start_k": "2700k",
+                "start_level": 0
+            }
+        ],
+        "alias": "morning",
+        "conditions": {
+            "is_mode": [
+                "night"
+            ]
+        },
+        "ff_id": "temp_routine_morning",
+        "initial_values": "TODO INITIAL VALUES",
+        "message": "morning routine executed",
+        "mode": "morning",
+        "package": "Firefly.automation.routine",
+        "triggers": [
+            [
+                {
+                    "event_action": [
+                        {
+                            "hour": 6,
+                            "minute": 30,
+                            "weekdays": [
+                                1,
+                                2,
+                                3,
+                                7
+                            ]
+                        }
+                    ],
+                    "listen_id": "time",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ],
+            [
+                {
+                    "event_action": [
+                        {
+                            "hour": 9,
+                            "minute": 30,
+                            "weekdays": [
+                                4,
+                                5,
+                                6
+                            ]
+                        }
+                    ],
+                    "listen_id": "time",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ]
+        ],
+        "type": "TYPE_AUTOMATION"
+    },
+    {
+        "actions": [
+            {
+                "command": "off",
+                "conditions": {},
+                "ff_id": "hue-group-device-3",
+                "force": false,
+                "source": "temp_routine_night"
+            },
+            {
+                "command": "off",
+                "conditions": {},
+                "ff_id": "2f4bd64d-5f2f-4284-a0bc-35d1580efc71",
+                "force": false,
+                "source": "temp_routine_night"
+            },
+            {
+                "command": "set_light",
+                "conditions": {
+                    "is_dark": true
+                },
+                "delay_s": 2,
+                "ff_id": "00:17:88:01:01:1a:54:72-0b",
+                "force": false,
+                "hue": 54049,
+                "level": 10,
+                "source": "temp_routine_night"
+            }
+        ],
+        "alias": "night",
+        "conditions": {},
+        "ff_id": "temp_routine_night",
+        "initial_values": "TODO INITIAL VALUES",
+        "message": "night routine executed",
+        "mode": "night",
+        "package": "Firefly.automation.routine",
+        "triggers": [],
+        "type": "TYPE_AUTOMATION"
+    },
+    {
+        "actions": [
+            {
+                "command": "on",
+                "conditions": {},
+                "ff_id": "11681cd6-7fcf-4c70-a873-5f821b913cbd",
+                "force": false,
+                "source": "temp_event_based_action"
+            }
+        ],
+        "delayed_actions": [
+            {
+                "command": "off",
+                "conditions": {},
+                "ff_id": "11681cd6-7fcf-4c70-a873-5f821b913cbd",
+                "force": false,
+                "source": "temp_event_based_action"
+            }
+        ],
+        "alias": "event_based_action",
+        "conditions": {},
+        "ff_id": "temp_event_based_action",
+        "initial_values": "TODO INITIAL VALUES",
+        "package": "Firefly.automation.event_based_action",
+        "delay_s": 10,
+        "triggers": [
+            [
+                {
+                    "event_action": [
+                        {
+                            "contact": [
+                                "open"
+                            ]
+                        }
+                    ],
+                    "listen_id": "1c5c1e8f-dee0-480d-accf-e661a0db090b",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ]
+        ],
+        "delayed_triggers": [
+            [
+                {
+                    "event_action": [
+                        {
+                            "contact": [
+                                "close"
+                            ]
+                        }
+                    ],
+                    "listen_id": "1c5c1e8f-dee0-480d-accf-e661a0db090b",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ]
+        ],
+        "type": "TYPE_AUTOMATION"
+    },
+    {
+        "actions": [
+            {
+                "command": "on",
+                "conditions": {},
+                "ff_id": "00:17:88:01:00:fa:bf:3c-0b",
+                "force": false,
+                "source": "temp_entry_automation"
+            }
+        ],
+        "delayed_actions": [
+            {
+                "command": "off",
+                "conditions": {},
+                "ff_id": "00:17:88:01:00:fa:bf:3c-0b",
+                "force": false,
+                "source": "temp_entry_automation"
+            }
+        ],
+        "alias": "Front Door Lights",
+        "conditions": {},
+        "ff_id": "temp_entry_automation",
+        "initial_values": "TODO INITIAL VALUES",
+        "package": "Firefly.automation.event_based_action",
+        "delay_s": 10,
+        "triggers": [
+            [
+                {
+                    "event_action": [
+                        {
+                            "contact": [
+                                "open"
+                            ]
+                        }
+                    ],
+                    "listen_id": "42c0c3e1-75bb-4729-917c-f1935c59b46a",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ]
+        ],
+        "delayed_triggers": [
+            [
+                {
+                    "event_action": [
+                        {
+                            "contact": [
+                                "close"
+                            ]
+                        }
+                    ],
+                    "listen_id": "42c0c3e1-75bb-4729-917c-f1935c59b46a",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ]
+        ],
+        "type": "TYPE_AUTOMATION"
+    },
+    {
+        "actions": [
+            {
+                "command": "on",
+                "conditions": {},
+                "tags": ["light"],
+                "ff_id": "653911d9-132b-4cc7-b9b0-f6ef2c21af9e",
+                "force": false,
+                "source": "temp_kitchen_motion_light"
+            }
+        ],
+        "delayed_actions": [
+            {
+                "command": "off",
+                "tags": ["light"],
+                "conditions": {},
+                "ff_id": "653911d9-132b-4cc7-b9b0-f6ef2c21af9e",
+                "force": false,
+                "source": "temp_kitchen_motion_light"
+            }
+        ],
+        "alias": "Kitchen Motion",
+        "conditions": {},
+        "ff_id": "temp_kitchen_motion_light",
+        "initial_values": "TODO INITIAL VALUES",
+        "package": "Firefly.automation.event_based_action",
+        "delay_s": 300,
+        "triggers": [
+            [
+                {
+                    "event_action": [
+                        {
+                            "motion": [
+                                "active"
+                            ]
+                        }
+                    ],
+                    "listen_id": "653911d9-132b-4cc7-b9b0-f6ef2c21af9e",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ]
+        ],
+        "delayed_triggers": [
+            [
+                {
+                    "event_action": [
+                        {
+                            "motion": [
+                                "inactive"
+                            ]
+                        }
+                    ],
+                    "listen_id": "653911d9-132b-4cc7-b9b0-f6ef2c21af9e",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ]
+        ],
+        "type": "TYPE_AUTOMATION"
+    },
+    {
+        "actions": [
+            {
+                "command": "ct_fade",
+                "conditions": {},
+                "end_k": "3500k",
+                "end_level": 100,
+                "fade_sec": 1500,
+                "ff_id": "hue-group-device-3",
+                "force": false,
+                "source": "temp_routine_sunset",
+                "start_k": "6500k",
+                "start_level": 100
+            }
+        ],
+        "alias": "sunset",
+        "conditions": {
+            "is_mode": [
+                "home"
+            ]
+        },
+        "ff_id": "temp_routine_sunset",
+        "initial_values": "TODO INITIAL VALUES",
+        "message": "Sunset Executed",
+        "mode": "sunset",
+        "package": "Firefly.automation.routine",
+        "triggers": [
+            [
+                {
+                    "event_action": [
+                        "sunset"
+                    ],
+                    "listen_id": "location",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ]
+        ],
+        "type": "TYPE_AUTOMATION"
+    }
 ]
