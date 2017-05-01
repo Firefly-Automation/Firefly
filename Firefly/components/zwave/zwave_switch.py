@@ -3,13 +3,13 @@ from openzwave.network import ZWaveNode
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import (ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH)
+                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SWITCH)
 
 TITLE = 'Firefly Zwave Switch'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = 'Zachary Priddy'
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE]
-REQUESTS = [STATE]
+REQUESTS = [STATE, SWITCH]
 INITIAL_VALUES = {'_state': EVENT_ACTION_OFF}
 
 
@@ -37,23 +37,19 @@ class ZwaveSwitch(ZwaveDevice):
     self.add_command(ACTION_TOGGLE, self.toggle)
 
     self.add_request(STATE, self.get_state)
+    self.add_request(SWITCH, self.get_state)
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     if node is None:
       return
 
-    state_before = self.get_all_request_values()
-    super().update_from_zwave(node, **kwargs, ignore_update=True)
+    super().update_from_zwave(node, **kwargs)
 
     values = kwargs.get('values')
     if values is None:
-      state_after = self.get_all_request_values()
-      self.broadcast_changes(state_before, state_after)
       return
     genre = values.genre
     if genre != 'User':
-      state_after = self.get_all_request_values()
-      self.broadcast_changes(state_before, state_after)
       return
 
     if self._switches is None:
@@ -63,9 +59,6 @@ class ZwaveSwitch(ZwaveDevice):
       self._state = EVENT_ACTION_ON
     else:
       self._state = EVENT_ACTION_OFF
-
-    state_after = self.get_all_request_values()
-    self.broadcast_changes(state_before, state_after)
 
   def off(self, **kwargs):
     self._state = EVENT_ACTION_OFF

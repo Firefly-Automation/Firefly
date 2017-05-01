@@ -69,7 +69,7 @@ class Firefly(object):
     # self.install_package('Firefly.automation.routine', alias='Test Routines', ff_id='test_routine')
     # self.components['test_routine'].add_trigger(Trigger('66fdff0a-1fa5-4234-91bc-465c72aafb23',EVENT_ACTION_ANY))
 
-
+    logging.error(code='FF.COR.INI.001')  # this is a test error message
     logging.notify('Firefly is starting up')
 
     self.install_services()
@@ -102,10 +102,6 @@ class Firefly(object):
     Start up Firefly.
     """
     # TODO: Import current state of components on boot.
-
-    # r = logging.notify('Starting Firefly')
-    # print('########### %s ' % r)
-
     try:
       web.run_app(app, host=self.settings.firefly_host, port=self.settings.firefly_port)
     except KeyboardInterrupt:

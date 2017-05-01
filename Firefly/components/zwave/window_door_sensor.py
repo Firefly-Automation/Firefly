@@ -38,18 +38,13 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     if node is None:
       return
 
-    state_before = self.get_all_request_values()
-    super().update_from_zwave(node, **kwargs, ignore_update=True)
+    super().update_from_zwave(node, **kwargs)
 
     values = kwargs.get('values')
     if values is None:
-      state_after = self.get_all_request_values()
-      self.broadcast_changes(state_before, state_after)
       return
     genre = values.genre
     if genre != 'User':
-      state_after = self.get_all_request_values()
-      self.broadcast_changes(state_before, state_after)
       return
 
     b = self._raw_values.get('burglar')
@@ -61,8 +56,6 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
 
     self._state = CONTACT_OPEN if self.get_sensors(sensor='sensor') is True else CONTACT_CLOSED
 
-    state_after = self.get_all_request_values()
-    self.broadcast_changes(state_before, state_after)
 
   def get_state(self, **kwargs):
     return self.state

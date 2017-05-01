@@ -62,10 +62,11 @@ class Rooms(object):
         continue
       if c.room is None:
         continue
-      if c.room not in self._rooms.keys():
+      if c.room not in self._rooms.keys() and c.room != '':
         self._rooms[c.room] = Room(self.firefly, c.room)
       print(c.room)
-      self._rooms[c.room].add_device(c.id, c.tags)
+      if c.room != '':
+        self._rooms[c.room].add_device(c.id, c.tags)
 
     for _, r in self._rooms.items():
       self.firefly.components[r.id] = r

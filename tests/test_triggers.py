@@ -3,7 +3,7 @@ from unittest.mock import patch, PropertyMock, MagicMock
 from Firefly.automation.triggers import Trigger, Triggers
 from Firefly.const import (EVENT_ACTION_CLOSE, STATE, STATE_CLOSED, EVENT_ACTION_ON, EVENT_TYPE_BROADCAST,
                            EVENT_ACTION_ANY, EVENT_ACTION_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, EVENT_ACTION_OFF,
-                           SOURCE_LOCATION, TIME)
+                           SOURCE_LOCATION, TIME, EVENT_SUNSET, EVENT_SUNRISE)
 from Firefly.helpers.subscribers import Subscriptions
 from Firefly.helpers.events import Event
 
@@ -933,6 +933,60 @@ class TestTriggers(unittest.TestCase):
     self.firefly.get_device_states = MagicMock(return_value=data)
     event = Event(self.device, EVENT_TYPE_BROADCAST, {
       'MOTION': 'ACTIVE'
+    })
+    triggered = triggers.check_triggers(event)
+    self.assertFalse(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
+
+
+  def test_check_triggers_case_17(self):
+    """Verify location triggers"""
+    # Data returned for current_states
+    data = {
+      self.device:   {
+        STATE: EVENT_ACTION_ANY
+      },
+      self.device_b: {
+        STATE: EVENT_ACTION_OFF
+      }
+    }
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      SOURCE_LOCATION: [EVENT_SUNSET]
+    })
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      SOURCE_LOCATION: EVENT_SUNSET
+    })
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
+
+
+  def test_check_triggers_case_18(self):
+    """Verify location triggers"""
+    # Data returned for current_states
+    data = {
+      self.device:   {
+        STATE: EVENT_ACTION_ANY
+      },
+      self.device_b: {
+        STATE: EVENT_ACTION_OFF
+      }
+    }
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      SOURCE_LOCATION: [EVENT_SUNSET]
+    })
+    trigger_added = triggers.add_trigger(trigger)
+    self.assertTrue(trigger_added)
+    self.firefly.get_device_states = MagicMock(return_value=data)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      SOURCE_LOCATION: EVENT_SUNRISE
     })
     triggered = triggers.check_triggers(event)
     self.assertFalse(triggered)

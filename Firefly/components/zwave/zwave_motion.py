@@ -30,8 +30,7 @@ class ZwaveMotionSensor(ZwaveDevice):
     self.add_request(MOTION, self.get_motion)
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
-    state_before = self.get_all_request_values()
-    super().update_from_zwave(node, **kwargs, ignore_update=True)
+    super().update_from_zwave(node, **kwargs)
 
     # self._state = get_kwargs_value(self._sensors, 'SENSOR', False)
     b = self._raw_values.get('burglar')
@@ -42,9 +41,6 @@ class ZwaveMotionSensor(ZwaveDevice):
       self._state = False
 
     # self._state = self._raw_values.get('BURGLAR')
-
-    state_after = self.get_all_request_values()
-    self.broadcast_changes(state_before, state_after)
 
   def get_state(self, **kwargs):
     return self.state

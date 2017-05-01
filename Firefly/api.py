@@ -67,6 +67,10 @@ class FireflyCoreAPI:
       'path':     '/api/zwave',
       'function': self.zwave
     }, {
+      'method':   'GET',
+      'path':     '/api/subscriptions',
+      'function': self.get_subscriptions
+    }, {
       'method':   'POST',
       'path':     '/api/api_ai',
       'function': self.process_api_ai_request
@@ -237,6 +241,12 @@ class FireflyCoreAPI:
     request_data = yield from request.json()
     r = process_alexa_request(self.firefly, request_data)
     data = json.dumps(r)
+    return web.Response(text=data, content_type='application/json')
+
+  @asyncio.coroutine
+  def get_subscriptions(self, request):
+    subscriptions = self.firefly.subscriptions.subscriptions
+    data = json.dumps(subscriptions)
     return web.Response(text=data, content_type='application/json')
 
   def setup_api(self):

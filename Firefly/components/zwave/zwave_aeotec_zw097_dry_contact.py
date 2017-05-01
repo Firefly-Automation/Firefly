@@ -61,25 +61,18 @@ class ZwaveAeotecDryContact(ZwaveDevice):
     if node is None:
       return
 
-    state_before = self.get_all_request_values()
-    super().update_from_zwave(node, **kwargs, ignore_update=True)
+    super().update_from_zwave(node, **kwargs)
 
     values = kwargs.get('values')
     if values is None:
-      state_after = self.get_all_request_values()
-      self.broadcast_changes(state_before, state_after)
       return
     genre = values.genre
     if genre == 'Basic':
       if values.label != 'Basic':
         return
       self._state = CONTACT_OPEN if values.data == 255 else CONTACT_CLOSED
-      state_after = self.get_all_request_values()
-      self.broadcast_changes(state_before, state_after)
       return
 
-    state_after = self.get_all_request_values()
-    self.broadcast_changes(state_before, state_after)
 
   def get_state(self, **kwargs):
     return self.state

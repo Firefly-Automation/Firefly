@@ -19,7 +19,8 @@ PACKAGE_MAPPING = {
   'ZW097 Dry Contact Sensor Gen5': 'zwave_aeotec_zw097_dry_contact',
   '12730 Fan Control Switch': 'zwave_ge_12724_dimmer',
   '12729 3-Way Dimmer Switch': 'zwave_ge_12724_dimmer',
-  '12724 3-Way Dimmer Switch': 'zwave_ge_12724_dimmer'
+  '12724 3-Way Dimmer Switch': 'zwave_ge_12724_dimmer',
+  'DSB05 Multisensor': 'zwave_aeotec_dsb05_multi_sensor'
 }
 CONFIG_MAPPING = {
   'ge/12724-dimmer.xml': 'zwave_ge_12724_dimmer'

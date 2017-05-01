@@ -13,6 +13,13 @@
         "function_name": "get_device_id",
         "project_code": "FF"
     },
+    "FF.COR.INI.001": {
+        "error_code": "FF.COR.INI.001",
+        "error_message": "[FF.COR.INI.001] this is a test error message",
+        "file_name": "core.py",
+        "function_name": "init",
+        "project_code": "FF"
+    },
     "FF.COR.INS.001": {
         "error_code": "FF.COR.INS.001",
         "error_message": "[FF.COR.INS.001] error installing package %s: %s",

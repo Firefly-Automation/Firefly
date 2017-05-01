@@ -88,11 +88,11 @@ class Device(object):
     }
 
     if current_values:
-      current_values = {}
+      current_vals = {}
       for item in self._initial_values.keys():
-        current_values[item] = self.__getattribute__(item)
+        current_vals[item] = self.__getattribute__(item)
 
-      export_data['initial_values'] = current_values
+      export_data['initial_values'] = current_vals
 
     return export_data
 

@@ -6,7 +6,12 @@ from Firefly.helpers.events import Command
 # TODO: Refactor this code.
 
 class CTFade(object):
-  def __init__(self, firefly, ff_id, start_k, end_k, fade_sec, start_level, end_level, run=True):
+  def __init__(self, firefly, ff_id, start_k, end_k, fade_sec, start_level=100, end_level=100, run=True):
+    if type(start_level) is not int:
+      start_level = 100
+    if type(end_level) is not int:
+      end_level = 100
+
     self._firefly = firefly
     self._ff_id = ff_id
     self._start_ct = start_k
@@ -23,7 +28,7 @@ class CTFade(object):
     self._level_step = 0
     self._first_run = True
 
-    self._interval = 0
+    self._interval = 1
     if self._fade_sec > 100:
       self._interval = 4
     if self._fade_sec > 300:
@@ -36,11 +41,13 @@ class CTFade(object):
     self._delay = calculate_delay(self._interval, self._fade_sec)
     self._ct_step = calculate_ct_step(self._interval, self._fade_sec, self._start_ct, self._end_ct)
 
+
     self._level_control = True if self._start_level and self._end_level else False
     if self._level_control:
       self._level_step = calculate_level_step(self._interval, self._fade_sec, self._start_level, self._end_level)
       if self._level_step == 0:
         self._current_level = self._end_level
+
 
     if self._run:
       self.runFade()
@@ -49,6 +56,7 @@ class CTFade(object):
     if not self._run:
       return
 
+
     if self._first_run:
       if self._level_control:
         command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, level=self._current_level, ct=ct_string(self._start_ct), ct_fade=True, transitiontime=1)
@@ -56,6 +64,7 @@ class CTFade(object):
         command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, ct=ct_string(self._start_ct), ct_fade=True, transitiontime=1)
       self._firefly.send_command(command)
       self._first_run = False
+
 
     if self._level_control:
       command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, ct=ct_string(self._current_ct), transitiontime=self._delay * 10, level=self._current_level, ct_fade=True)

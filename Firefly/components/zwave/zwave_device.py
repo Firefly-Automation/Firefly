@@ -1,7 +1,7 @@
 from openzwave.network import ZWaveNode
 from Firefly import logging
 from Firefly.helpers.device import Device
-
+from time import sleep
 
 class ZwaveDevice(Device):
   def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
@@ -37,6 +37,8 @@ class ZwaveDevice(Device):
     self.add_request('SENSORS', self.get_sensors)
     self.add_request('PARAMS', self.get_params)
     self.add_request('RAW_VALUES', self.get_raw_values)
+
+    self._update_lock = False
 
   def update_device_config(self, **kwargs):
     self.node.refresh_info()
@@ -103,9 +105,10 @@ class ZwaveDevice(Device):
     Returns:
 
     '''
-    if not ignore_update:
-      state_before = self.get_all_request_values()
-      logging.debug('Updating ZWave Values')
+
+
+
+    logging.debug('Updating ZWave Values')
 
     # Return if no valid node object.
     if node is None:
@@ -165,10 +168,6 @@ class ZwaveDevice(Device):
     #  self._node.refresh_info()
     #  self._node.request_state()
 
-
-    if not ignore_update:
-      state_after = self.get_all_request_values()
-      self.broadcast_changes(state_before, state_after)
 
 
 

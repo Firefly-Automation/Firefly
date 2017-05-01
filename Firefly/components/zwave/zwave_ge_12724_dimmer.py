@@ -45,18 +45,13 @@ class GEDimmer(ZwaveDevice):
     if node is None:
       return
 
-    state_before = self.get_all_request_values()
-    super().update_from_zwave(node, **kwargs, ignore_update=True)
+    super().update_from_zwave(node, **kwargs)
 
     values = kwargs.get('values')
     if values is None:
-      state_after = self.get_all_request_values()
-      self.broadcast_changes(state_before, state_after)
       return
     genre = values.genre
     if genre != 'User':
-      state_after = self.get_all_request_values()
-      self.broadcast_changes(state_before, state_after)
       return
 
     if self._dimmers is None:
@@ -68,9 +63,6 @@ class GEDimmer(ZwaveDevice):
       self._state = EVENT_ACTION_OFF
     else:
       self._state = EVENT_ACTION_OFF
-
-    state_after = self.get_all_request_values()
-    self.broadcast_changes(state_before, state_after)
 
   def set_level(self, **kwargs):
     level = 100

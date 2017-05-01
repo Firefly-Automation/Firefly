@@ -1,6 +1,6 @@
 from Firefly import logging
 from Firefly.helpers.events import Request, Event
-from Firefly.const import SOURCE_TRIGGER, EVENT_ACTION_ANY, EVENT_ACTON_TYPE, TIME
+from Firefly.const import SOURCE_TRIGGER, EVENT_ACTION_ANY, EVENT_ACTON_TYPE, TIME, SOURCE_LOCATION
 from Firefly.helpers.subscribers import verify_event_action, verify_event_action_time
 import asyncio
 from typing import TypeVar, List
@@ -226,7 +226,9 @@ class Triggers(object):
             event_valid = True
             continue
           # TODO: FIX THIS
-          if t_source == "location":
+          if t_source == SOURCE_LOCATION:
+            trigger_valid &= self.check_location_trigger(event,  t)
+            event_valid = True
             continue
           if EVENT_ACTION_ANY in t_action:
             trigger_valid = True
@@ -287,6 +289,16 @@ class Triggers(object):
         if event.event_action['month'] != t['month']:
           continue
       if event.event_action['hour'] == t['hour'] and event.event_action['minute'] == t['minute'] and event.event_action['weekday'] in t['weekdays']:
+        return True
+
+    return False
+
+  def check_location_trigger(self, event: Event, trigger: Trigger) -> bool:
+    if event.source !=  SOURCE_LOCATION:
+      return False
+
+    for t in trigger.listen_action:
+      if t in event.event_action:
         return True
 
     return False
