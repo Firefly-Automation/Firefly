@@ -82,9 +82,9 @@ class Trigger(object):
 
   def export(self):
     return {
-      'listen_id':      self.listen_id,
-      'event_action':  self.listen_action,
-      'source':         self.source
+      'listen_id':    self.listen_id,
+      'event_action': self.listen_action,
+      'source':       self.source
     }
 
   @property
@@ -99,7 +99,9 @@ class Trigger(object):
   def source(self):
     return self._source
 
+
 TriggerType = TypeVar('TriggerType', Trigger, List[Trigger])
+
 
 class Triggers(object):
   def __init__(self, firefly, source_id):
@@ -134,7 +136,6 @@ class Triggers(object):
         self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, EVENT_ACTION_ANY)
         self._trigger_sources.add(t.listen_id)
     return True
-
 
   def remove_trigger(self, trigger: TriggerType) -> bool:
     logging.info('Removing trigger: %s' % trigger)
@@ -195,8 +196,6 @@ class Triggers(object):
 
     return import_count
 
-
-
   def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
     """
     Check triggers should be called when an event is received.
@@ -227,7 +226,7 @@ class Triggers(object):
             continue
           # TODO: FIX THIS
           if t_source == SOURCE_LOCATION:
-            trigger_valid &= self.check_location_trigger(event,  t)
+            trigger_valid &= self.check_location_trigger(event, t)
             event_valid = True
             continue
           if EVENT_ACTION_ANY in t_action:
@@ -275,7 +274,6 @@ class Triggers(object):
 
     return False
 
-
   def check_time_trigger(self, event: Event, trigger: Trigger) -> bool:
     # If the event source is not time then it cant match any.
     if event.source != TIME:
@@ -288,22 +286,26 @@ class Triggers(object):
       if t.get('month'):
         if event.event_action['month'] != t['month']:
           continue
-      if event.event_action['hour'] == t['hour'] and event.event_action['minute'] == t['minute'] and event.event_action['weekday'] in t['weekdays']:
+      if event.event_action['hour'] == t['hour'] and event.event_action['minute'] == t['minute'] and event.event_action[
+        'weekday'] in t['weekdays']:
         return True
 
     return False
 
   def check_location_trigger(self, event: Event, trigger: Trigger) -> bool:
-    if event.source !=  SOURCE_LOCATION:
+    if event.source != SOURCE_LOCATION:
       return False
 
     for t in trigger.listen_action:
-      if t in event.event_action:
-        return True
+      if SOURCE_LOCATION not in event.event_action:
+        return False
+      if SOURCE_LOCATION not in t:
+        return False
+      for day_event in t.get(SOURCE_LOCATION):
+        if day_event == event.event_action.get(SOURCE_LOCATION):
+          return True
 
     return False
-
-
 
   @property
   def triggers(self):

@@ -269,7 +269,7 @@
                 {
                     "event_action": [
                         {
-                            "hour": 6,
+                            "hour": 9,
                             "minute": 30,
                             "weekdays": [
                                 1,
@@ -460,7 +460,9 @@
         "actions": [
             {
                 "command": "on",
-                "conditions": {},
+                "conditions": {
+                    "is_mode": "home"
+                },
                 "tags": ["light"],
                 "ff_id": "653911d9-132b-4cc7-b9b0-f6ef2c21af9e",
                 "force": false,
@@ -545,7 +547,25 @@
             [
                 {
                     "event_action": [
-                        "sunset"
+                        {"location": ["sunset"]}
+                    ],
+                    "listen_id": "location",
+                    "source": "SOURCE_TRIGGER"
+                }
+            ]
+        ],
+        "type": "TYPE_AUTOMATION"
+    },
+    {
+        "ff_id": "temp_routine_sunrise",
+        "initial_values": "TODO INITIAL VALUES",
+        "message": "Sunrise or Dawn Executed",
+        "package": "Firefly.automation.routine",
+        "triggers": [
+            [
+                {
+                    "event_action": [
+                        {"location": ["sunrise", "dawn"]}
                     ],
                     "listen_id": "location",
                     "source": "SOURCE_TRIGGER"

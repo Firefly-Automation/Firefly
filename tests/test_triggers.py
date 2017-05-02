@@ -952,18 +952,18 @@ class TestTriggers(unittest.TestCase):
     }
 
     triggers = Triggers(self.firefly, self.trigger_id)
-    trigger = Trigger(self.device, {
+    trigger = Trigger(SOURCE_LOCATION, {
       SOURCE_LOCATION: [EVENT_SUNSET]
     })
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
     self.firefly.get_device_states = MagicMock(return_value=data)
-    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, {
       SOURCE_LOCATION: EVENT_SUNSET
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {SOURCE_LOCATION})
 
 
   def test_check_triggers_case_18(self):
@@ -979,18 +979,18 @@ class TestTriggers(unittest.TestCase):
     }
 
     triggers = Triggers(self.firefly, self.trigger_id)
-    trigger = Trigger(self.device, {
+    trigger = Trigger(SOURCE_LOCATION, {
       SOURCE_LOCATION: [EVENT_SUNSET]
     })
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
     self.firefly.get_device_states = MagicMock(return_value=data)
-    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, {
       SOURCE_LOCATION: EVENT_SUNRISE
     })
     triggered = triggers.check_triggers(event)
     self.assertFalse(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
+    MagicMock.assert_called_once_with(self.firefly.get_device_states, {SOURCE_LOCATION})
 
   def test_export_trigger_case_1(self):
     triggers = Triggers(self.firefly, self.trigger_id)
