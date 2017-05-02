@@ -48,6 +48,7 @@ COMMANDS = ['send_command', 'stop', 'add_node', 'cancel']
 REQUESTS = ['get_nodes', 'get_orphans']
 
 SECTION = 'ZWAVE'
+# TODO: Make this 300 after testing is done
 STARTUP_TIMEOUT = 10
 
 
@@ -59,6 +60,7 @@ def Setup(firefly, package, **kwargs):
   enable = config.getboolean(SECTION, 'enable', fallback=False)
   port = config.get(SECTION, 'port', fallback=None)
   path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
+  security = config.getboolean(SECTION, 'security', fallback=True)
   if not enable or port is None:
     return False
 
@@ -68,12 +70,11 @@ def Setup(firefly, package, **kwargs):
       installed_nodes = zc.get('installed_nodes')
       if installed_nodes:
         kwargs['installed_nodes'] = installed_nodes
-      print('INSTALLED NODES = %s' % str(installed_nodes))
   except Exception as e:
-    print('ZWAVE ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! %s' % e)
+    logging.error(code='FF.ZWA.SET.001', args=(e))  # error reading zwave.json file
     pass
 
-  zwave = Zwave(firefly, package, enable=enable, port=port, path=path, **kwargs)
+  zwave = Zwave(firefly, package, enable=enable, port=port, path=path, security=security, **kwargs)
   firefly.components[SERVICE_ID] = zwave
   return True
 
@@ -90,7 +91,7 @@ class Zwave(Service):
     self._installed_nodes = kwargs.get('installed_nodes', {})
 
     # TODO: Enable zwave security
-    self._security_enable = True
+    self._security_enable = kwargs.get('security')
 
     self.add_command('send_command', self.send_command)
     self.add_command('stop', self.stop)
@@ -102,18 +103,22 @@ class Zwave(Service):
 
     scheduler.runInS(5, self.initialize_zwave)
 
-    # TOD: REMOVE THIS
-    self.count = 0
-
   async def initialize_zwave(self):
     if self._network is not None:
       return False
-    self._zwave_option = ZWaveOption(self._port, self._path)
-    self._zwave_option.set_console_output(False)
-    self._zwave_option.lock()
+    logging.info('Trying to open port for ZWave...')
+    try:
+      self._zwave_option = ZWaveOption(self._port, self._path)
+      self._zwave_option.set_console_output(False)
+      self._zwave_option.lock()
 
-    self._network = ZWaveNetwork(self._zwave_option, autostart=False)
-    self._network.start()
+      self._network = ZWaveNetwork(self._zwave_option, autostart=False)
+      self._network.start()
+
+    except Exception as e:
+      logging.error(code='FF.ZWA.INI.001', args=e)  # error opening zwave port. are you running as sudo? is the port correct? error: %s
+      self._enable = False
+      return
 
     logging.message('Starting ZWAVE - This can take up to 5 minutes.. Will notify when finished')
 
@@ -156,10 +161,7 @@ class Zwave(Service):
   def zwave_handler(self, *args, **kwargs):
     print(kwargs)
     print(str(kwargs.get('value')))
-    print('**** genre: ' + str(kwargs.get('value').genre))
     if kwargs.get('node') is None:
-      logging.critical('********************\n*************')
-      logging.critical(kwargs)
       return
 
     if type(kwargs.get('node')) is ZWaveController:
@@ -260,7 +262,6 @@ class Zwave(Service):
 
     '''
     from time import sleep
-    print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&& %s' % kwargs)
     security = self._security_enable
     if kwargs.get('security'):
       security = True if kwargs.get('security') == 'true' else False

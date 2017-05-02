@@ -244,6 +244,20 @@
         "function_name": "remove_trigger",
         "project_code": "FF"
     },
+    "FF.ZWA.INI.001": {
+        "error_code": "FF.ZWA.INI.001",
+        "error_message": "[FF.ZWA.INI.001] error opening zwave port. are you running as sudo? is the port correct? error %s",
+        "file_name": "zwave.py",
+        "function_name": "initialize_zwave",
+        "project_code": "FF"
+    },
+    "FF.ZWA.SET.001": {
+        "error_code": "FF.ZWA.SET.001",
+        "error_message": "[FF.ZWA.SET.001] error reading zwave.json file",
+        "file_name": "zwave.py",
+        "function_name": "setup",
+        "project_code": "FF"
+    },
     "FF.ZWA.ZWA.001": {
         "error_code": "FF.ZWA.ZWA.001",
         "error_message": "[FF.ZWA.ZWA.001] error installing node %s: %s",
