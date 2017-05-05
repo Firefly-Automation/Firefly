@@ -4,6 +4,7 @@ from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import (ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
                            ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SWITCH)
+from Firefly.helpers.metadata import metaSwitch
 
 TITLE = 'Firefly Zwave Switch'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
@@ -38,6 +39,8 @@ class ZwaveSwitch(ZwaveDevice):
 
     self.add_request(STATE, self.get_state)
     self.add_request(SWITCH, self.get_state)
+
+    self.add_action(STATE, metaSwitch(primary=True))
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     if node is None:

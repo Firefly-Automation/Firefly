@@ -1,8 +1,8 @@
 from Firefly import logging, scheduler
 from Firefly.components.virtual_devices import AUTHOR
-from Firefly.const import ACTION_ENABLE_BEACON, ACTION_NOT_PRESENT, ACTION_NOT_PRESENT_BEACON, ACTION_PRESENT, \
-  ACTION_PRESENT_BEACON, ACTION_SET_DELAY, BEACON_ENABLED, DEVICE_TYPE_PRESENCE, ENABLED, NOT_ENABLED, NOT_PRESENT, \
-  PRESENCE, PRESENT
+from Firefly.const import (ACTION_ENABLE_BEACON, ACTION_NOT_PRESENT, ACTION_NOT_PRESENT_BEACON, ACTION_PRESENT,
+                           ACTION_PRESENT_BEACON, ACTION_SET_DELAY, BEACON_ENABLED, DEVICE_TYPE_PRESENCE, ENABLED,
+                           NOT_ENABLED, NOT_PRESENT, PRESENCE, PRESENT)
 from Firefly.helpers.device import Device
 from Firefly.helpers.metadata import metaPresence
 
@@ -10,7 +10,7 @@ TITLE = 'Firefly Virtual Presence Device'
 DEVICE_TYPE = DEVICE_TYPE_PRESENCE
 AUTHOR = AUTHOR
 COMMANDS = [ACTION_PRESENT, ACTION_NOT_PRESENT, ACTION_PRESENT_BEACON, ACTION_NOT_PRESENT_BEACON, ACTION_ENABLE_BEACON,
-            PRESENCE, ACTION_SET_DELAY]
+  PRESENCE, ACTION_SET_DELAY]
 REQUESTS = [PRESENCE, BEACON_ENABLED]
 INITIAL_VALUES = {
   '_delay':           5,
@@ -21,6 +21,13 @@ INITIAL_VALUES = {
 
 
 def Setup(firefly, package, **kwargs):
+  """
+
+  Args:
+      firefly:
+      package:
+      kwargs:
+  """
   logging.message('Entering %s setup' % TITLE)
   new_presence = VirtualPresence(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
@@ -28,7 +35,16 @@ def Setup(firefly, package, **kwargs):
 
 
 class VirtualPresence(Device):
+  """
+  """
   def __init__(self, firefly, package, **kwargs):
+    """
+
+    Args:
+        firefly:
+        package:
+        kwargs:
+    """
     kwargs['initial_values'] = INITIAL_VALUES if not kwargs.get('initial_values') else kwargs.get('initial_values')
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
     self.__dict__.update(kwargs['initial_values'])
@@ -50,6 +66,11 @@ class VirtualPresence(Device):
     self.add_homekit_export('HOMEKIT_PRESENCE', PRESENCE)
 
   def set_presence(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+    """
     presence = kwargs.get('presence', False)
     presence = True if presence.lower() == 'true' else False
     if kwargs.get('type') == 'beacon':
@@ -64,42 +85,109 @@ class VirtualPresence(Device):
         scheduler.runInS(self._delay, self._set_not_present)
 
   def set_delay(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+    """
     delay = int(kwargs.get('delay', 5))
     self._delay = delay
 
   def set_present(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+
+    Returns:
+
+    """
     self._presence = PRESENT
     return PRESENT
 
   def set_not_present(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+    """
     scheduler.runInS(self._delay, self._set_not_present)
 
   def set_beacon_present(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+
+    Returns:
+
+    """
     self._beacon_presence = PRESENT
     return PRESENT
 
   def set_beacon_not_present(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+    """
     scheduler.runInS(self._delay, self._set_beacon_not_present)
 
   def _set_beacon_not_present(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+    """
     self.member_set('_beacon_presence', NOT_PRESENT)
 
   def _set_not_present(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+    """
     self.member_set('_presence', NOT_PRESENT)
 
   def set_beacon_enabled(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+    """
     enabled = kwargs.get('enabled', False)
     enabled = ENABLED if enabled.lower() == 'true' else NOT_ENABLED
     self._beacon_enabled = enabled
 
   def get_presence(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+
+    Returns:
+
+    """
     return self.presence
 
   def get_beacon_enabled(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+
+    Returns:
+
+    """
     return self._beacon_enabled
 
   @property
   def presence(self):
+    """
+
+    Returns:
+
+    """
     if self._beacon_enabled:
       return self._presence & self._beacon_presence
     return self._presence

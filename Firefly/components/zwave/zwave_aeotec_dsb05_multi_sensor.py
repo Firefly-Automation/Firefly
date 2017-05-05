@@ -1,17 +1,20 @@
+from openzwave.network import ZWaveNode
+
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from openzwave.network import ZWaveNode
-from Firefly import logging
-from Firefly.const import (STATE, SENSORS, DEVICE_TYPE_MOTION, EVENT_TYPE_BROADCAST, MOTION, MOTION_ACTIVE, MOTION_INACTIVE)
-
-
+from Firefly.const import DEVICE_TYPE_MOTION, MOTION, MOTION_ACTIVE, MOTION_INACTIVE, STATE
+from Firefly.helpers.metadata import metaMotion
 
 TITLE = 'Aeotec DSB05 MultiSensor'
 DEVICE_TYPE = DEVICE_TYPE_MOTION
 AUTHOR = 'Zachary Priddy'
 COMMANDS = []
 REQUESTS = [STATE, MOTION]
-INITIAL_VALUES = {'_state': False, '_timeout': 300}
+INITIAL_VALUES = {
+  '_state': False,
+  '_timeout': 300
+}
+
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
@@ -33,6 +36,7 @@ class ZwaveAeotecMulti(ZwaveDevice):
     self.add_request(STATE, self.get_state)
     self.add_request(MOTION, self.get_motion)
 
+    self.add_action(STATE, metaMotion(primary=True))
 
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
@@ -40,7 +44,8 @@ class ZwaveAeotecMulti(ZwaveDevice):
     """
     Updated the devices to the desired config params. This will be useful to make new default devices configs.
 
-    For example when there is a gen6 multisensor I want it to always report every 5 minutes and timeout to be 30 seconds.
+    For example when there is a gen6 multisensor I want it to always report every 5 minutes and timeout to be 30 
+    seconds.
     Args:
       **kwargs ():
     """
@@ -49,12 +54,10 @@ class ZwaveAeotecMulti(ZwaveDevice):
       self._config_updated = True
       return
 
-
-    #timeout = 10 # index 8
+    # timeout = 10 # index 8
     timeout = self._initial_values.get('_timeout', 300)
 
     self.node.set_config_param(3, timeout)
-
 
     successful = True
     successful &= self.node.request_config_param(3) == timeout
@@ -69,24 +72,21 @@ class ZwaveAeotecMulti(ZwaveDevice):
     super().update_from_zwave(node, **kwargs)
 
     values = kwargs.get('values')
-    if values is  None:
+    if values is None:
       return
     genre = values.genre
     if genre != 'User':
       return
 
-    #self._state = get_kwargs_value(self._sensors, 'SENSOR', False)
-    #b = self._raw_values.get('burglar')
-    #print(b)
-    #if b:
-    #  self._state = b.get('value') == 8
-    #else:
-    #  self._state = False
+      # self._state = get_kwargs_value(self._sensors, 'SENSOR', False)
+      # b = self._raw_values.get('burglar')
+      # print(b)
+      # if b:
+      #  self._state = b.get('value') == 8
+      # else:
+      #  self._state = False
 
-    #self._state = self._raw_values.get('BURGLAR')
-
-
-
+      # self._state = self._raw_values.get('BURGLAR')
 
   def get_state(self, **kwargs):
     return self.state
@@ -94,8 +94,7 @@ class ZwaveAeotecMulti(ZwaveDevice):
   def get_motion(self, **kwargs):
     return MOTION_ACTIVE if self.state else MOTION_INACTIVE
 
-
   @property
   def state(self):
-    self._state =  self._sensors.get('sensor')
+    self._state = self._sensors.get('sensor')
     return self._state

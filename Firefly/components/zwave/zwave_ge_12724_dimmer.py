@@ -2,15 +2,18 @@ from openzwave.network import ZWaveNode
 
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.const import (ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, DEVICE_TYPE_DIMMER, LEVEL)
+from Firefly.const import (ACTION_OFF, ACTION_ON, ACTION_TOGGLE, DEVICE_TYPE_DIMMER, EVENT_ACTION_OFF, EVENT_ACTION_ON,
+                           LEVEL, STATE)
+from Firefly.helpers.metadata import metaDimmer, metaSwitch
 
 TITLE = 'Firefly GE Dimmer'
 DEVICE_TYPE = DEVICE_TYPE_DIMMER
 AUTHOR = 'Zachary Priddy'
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, LEVEL]
 REQUESTS = [STATE, LEVEL]
-INITIAL_VALUES = {'_state': EVENT_ACTION_OFF}
+INITIAL_VALUES = {
+  '_state': EVENT_ACTION_OFF
+}
 
 
 def Setup(firefly, package, **kwargs):
@@ -37,6 +40,9 @@ class GEDimmer(ZwaveDevice):
     self.add_command(ACTION_ON, self.on)
     self.add_command(ACTION_TOGGLE, self.toggle)
     self.add_command(LEVEL, self.set_level)
+
+    self.add_action(STATE, metaSwitch())
+    self.add_action(LEVEL, metaDimmer(primary=True))
 
     self.add_request(STATE, self.get_state)
     self.add_request(LEVEL, self.get_level)
@@ -76,7 +82,6 @@ class GEDimmer(ZwaveDevice):
       return
     self.node.set_dimmer(self._dimmers[0], level)
     self._level = level
-
 
   def off(self, **kwargs):
     self._state = EVENT_ACTION_OFF

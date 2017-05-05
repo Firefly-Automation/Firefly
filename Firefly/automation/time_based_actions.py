@@ -11,6 +11,13 @@ TITLE = 'Time Based Actions'
 COMMANDS = ['ADD_ACTION']
 
 def Setup(firefly, package, **kwargs):
+  """
+
+  Args:
+      firefly:
+      package:
+      kwargs:
+  """
   logging.message('Entering %s setup Routine')
   tba = TimeBasedAction(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
@@ -18,7 +25,16 @@ def Setup(firefly, package, **kwargs):
 
 
 class TimeBasedAction(Automation):
+  """
+  """
   def __init__(self, firefly, package,  **kwargs):
+    """
+
+    Args:
+        firefly:
+        package:
+        kwargs:
+    """
     super().__init__(firefly, package, TITLE, AUTHOR, self.event_handler, **kwargs)
 
     self.add_command('ADD_ACTION', self.add_action)
@@ -26,6 +42,15 @@ class TimeBasedAction(Automation):
 
 
   def event_handler(self, event, **kwargs):
+    """
+
+    Args:
+        event:
+        kwargs:
+
+    Returns:
+
+    """
     r = True
     for a in self.actions:
       a.execute_action(self._firefly)

@@ -1,27 +1,46 @@
 from Firefly import logging
-from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           ACTION_TOGGLE, DEVICE_TYPE_DIMMER, ACTION_LEVEL, LEVEL, EVENT_ACTION_LEVEL)
+from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF,
+                           EVENT_ACTION_ON, ACTION_TOGGLE, DEVICE_TYPE_DIMMER, ACTION_LEVEL, LEVEL, EVENT_ACTION_LEVEL)
 from Firefly.components.virtual_devices import AUTHOR
 from Firefly.helpers.device import Device
 from Firefly.helpers.metadata import metaDimmer, metaSwitch
-
 
 TITLE = 'Firefly Virtual Dimmer'
 DEVICE_TYPE = DEVICE_TYPE_DIMMER
 AUTHOR = AUTHOR
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ACTION_LEVEL]
 REQUESTS = [STATE, LEVEL]
-INITIAL_VALUES = {'_state': EVENT_ACTION_OFF,
-                  '_level': 100}
+INITIAL_VALUES = {
+  '_state': EVENT_ACTION_OFF,
+  '_level': 100
+}
+
 
 def Setup(firefly, package, **kwargs):
+  """
+
+  Args:
+      firefly:
+      package:
+      kwargs:
+  """
   logging.message('Entering %s setup' % TITLE)
   new_switch = VirtualSwitch(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
   firefly.components[new_switch.id] = new_switch
 
+
 class VirtualSwitch(Device):
+  """
+  """
   def __init__(self, firefly, package, **kwargs):
+    """
+
+    Args:
+        firefly:
+        package:
+        kwargs:
+    """
     kwargs['initial_values'] = INITIAL_VALUES if not kwargs.get('initial_values') else kwargs.get('initial_values')
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
     self.__dict__.update(kwargs['initial_values'])
@@ -34,26 +53,58 @@ class VirtualSwitch(Device):
     self.add_request(STATE, self.get_state)
     self.add_request(LEVEL, self.get_level)
 
-    self.add_action(LEVEL, metaDimmer())
+    self.add_action(LEVEL, metaDimmer(primary=True))
     self.add_action(STATE, metaSwitch())
 
     # TODO: Make HOMEKIT CONST
     self.add_homekit_export('HOMEKIT_DIMMER', LEVEL)
 
   def off(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+
+    Returns:
+
+    """
     self._state = EVENT_ACTION_OFF
     return EVENT_ACTION_OFF
 
   def on(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+
+    Returns:
+
+    """
     self._state = EVENT_ACTION_ON
     return EVENT_ACTION_ON
 
   def toggle(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+
+    Returns:
+
+    """
     if self.state == EVENT_ACTION_ON:
       return self.off()
     return self.on()
 
   def set_level(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+
+    Returns:
+
+    """
     level = int(kwargs.get('level'))
     event_actions = [EVENT_ACTION_LEVEL]
     if level is None:
@@ -71,15 +122,41 @@ class VirtualSwitch(Device):
     return event_actions
 
   def get_state(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+
+    Returns:
+
+    """
     return self.state
 
   def get_level(self, **kwargs):
+    """
+
+    Args:
+        kwargs:
+
+    Returns:
+
+    """
     return self.level
 
   @property
   def state(self):
+    """
+
+    Returns:
+
+    """
     return self._state
 
   @property
   def level(self):
+    """
+
+    Returns:
+
+    """
     return self._level

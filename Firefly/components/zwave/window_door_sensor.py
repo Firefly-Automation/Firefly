@@ -3,13 +3,16 @@ from openzwave.network import ZWaveNode
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import (STATE, EVENT_ACTION_OFF, DEVICE_TYPE_SWITCH, CONTACT, CONTACT_CLOSED, CONTACT_OPEN)
+from Firefly.helpers.metadata import metaContact
 
 TITLE = 'Zwave Generic Window Door Sensor'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = 'Zachary Priddy'
 COMMANDS = []
 REQUESTS = [STATE, CONTACT, 'alarm']
-INITIAL_VALUES = {'_state': EVENT_ACTION_OFF}
+INITIAL_VALUES = {
+  '_state': EVENT_ACTION_OFF
+}
 
 
 def Setup(firefly, package, **kwargs):
@@ -33,6 +36,7 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     self.add_request(CONTACT, self.get_state)
     self.add_request('alarm', self.get_alarm)
 
+    self.add_action(CONTACT, metaContact(primary=True))
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     if node is None:
@@ -55,7 +59,6 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
       self._alarm = False
 
     self._state = CONTACT_OPEN if self.get_sensors(sensor='sensor') is True else CONTACT_CLOSED
-
 
   def get_state(self, **kwargs):
     return self.state

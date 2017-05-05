@@ -1,7 +1,8 @@
 from openzwave.network import ZWaveNode
+
 from Firefly import logging
 from Firefly.helpers.device import Device
-from time import sleep
+
 
 class ZwaveDevice(Device):
   def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
@@ -15,7 +16,7 @@ class ZwaveDevice(Device):
 
     super().__init__(firefly, package, title, author, commands, requests, device_type, **kwargs)
 
-    self._node:ZWaveNode = kwargs.get('node')
+    self._node: ZWaveNode = kwargs.get('node')
 
     self._sensors = {}
     self._switches = {}
@@ -30,7 +31,6 @@ class ZwaveDevice(Device):
     self._product_name = ''
     self._product_type = ''
 
-
     self.add_command('ZWAVE_CONFIG', self.zwave_config)
     self.add_command('ZWAVE_UPDATE', self.update_from_zwave)
 
@@ -43,7 +43,6 @@ class ZwaveDevice(Device):
   def update_device_config(self, **kwargs):
     self.node.refresh_info()
     self._config_updated = True
-
 
   def zwave_config(self, **kwargs):
     if self._node is None:
@@ -72,14 +71,12 @@ class ZwaveDevice(Device):
     export_data['product_type'] = self._product_type
     return export_data
 
-
   def get_sensors(self, **kwargs):
     sensor = kwargs.get('sensor')
     if sensor:
       s = self._sensors.get(sensor)
       return s
     return self._sensors
-
 
   def get_params(self, **kwargs):
     values = kwargs.get('VALUE')
@@ -88,7 +85,6 @@ class ZwaveDevice(Device):
       return s
     return self._config_params
 
-
   def get_raw_values(self, **kwargs):
     values = kwargs.get('VALUE')
     if values:
@@ -96,17 +92,16 @@ class ZwaveDevice(Device):
       return s
     return self._raw_values
 
-  def update_from_zwave(self, node: ZWaveNode=None, ignore_update=False, **kwargs):
+  def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     '''
-    Currently the update command is not in the COMMANDS -> THis is because it acts differently right now.. This may change in the near future.
+    Currently the update command is not in the COMMANDS -> THis is because it acts differently right now.. This may 
+    change in the near future.
     Args:
       node ():
 
     Returns:
 
     '''
-
-
 
     logging.debug('Updating ZWave Values')
 
@@ -139,9 +134,16 @@ class ZwaveDevice(Device):
     if not self._config_updated:
       for s, i in node.get_values().items():
         if i.command_class == 112:
-          self._config_params[i.label.lower()] = {'value': i.data, 'id': i.index}
+          self._config_params[i.label.lower()] = {
+            'value': i.data,
+            'id':    i.index
+          }
         else:
-          self._raw_values[i.label.lower()] = {'value': i.data, 'id': i.index, 'class': i.command_class}
+          self._raw_values[i.label.lower()] = {
+            'value': i.data,
+            'id':    i.index,
+            'class': i.command_class
+          }
       self.update_device_config()
 
     # When security data changes sometimes you need to send a request to update the sensor value
@@ -149,27 +151,31 @@ class ZwaveDevice(Device):
 
 
 
-    #for s, i in node.get_values().items():
+    # for s, i in node.get_values().items():
     if genre == 'Config' or genre == 'System':
       if values.command_class == 112:
-        self._config_params[values.label.lower()] = {'value': values.data, 'id': values.index}
+        self._config_params[values.label.lower()] = {
+          'value': values.data,
+          'id':    values.index
+        }
 
     if genre == 'User':
-      self._raw_values[values.label.lower()] = {'value': values.data, 'id': values.index, 'class': values.command_class}
+      self._raw_values[values.label.lower()] = {
+        'value': values.data,
+        'id':    values.index,
+        'class': values.command_class
+      }
 
       for s, i in node.get_sensors().items():
         self._sensors[i.label.lower()] = i.data
 
 
-    # new_security_data = [b for a, b in self._raw_values.items() if b.get('class') == 113]
+        # new_security_data = [b for a, b in self._raw_values.items() if b.get('class') == 113]
 
-    # If any of the security values change issue update command
-    #if old_security_data != new_security_data:
-    #  self._node.refresh_info()
-    #  self._node.request_state()
-
-
-
+        # If any of the security values change issue update command
+        # if old_security_data != new_security_data:
+        #  self._node.refresh_info()
+        #  self._node.request_state()
 
   @property
   def node(self):

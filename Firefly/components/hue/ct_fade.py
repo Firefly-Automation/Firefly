@@ -21,7 +21,6 @@ class CTFade(object):
     self._fade_sec = fade_sec
     self._run = run
 
-
     self._time_remaining = self._fade_sec
     self._current_ct = self._start_ct
     self._current_level = self._start_level
@@ -41,13 +40,11 @@ class CTFade(object):
     self._delay = calculate_delay(self._interval, self._fade_sec)
     self._ct_step = calculate_ct_step(self._interval, self._fade_sec, self._start_ct, self._end_ct)
 
-
     self._level_control = True if self._start_level and self._end_level else False
     if self._level_control:
       self._level_step = calculate_level_step(self._interval, self._fade_sec, self._start_level, self._end_level)
       if self._level_step == 0:
         self._current_level = self._end_level
-
 
     if self._run:
       self.runFade()
@@ -56,21 +53,23 @@ class CTFade(object):
     if not self._run:
       return
 
-
     if self._first_run:
       if self._level_control:
-        command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, level=self._current_level, ct=ct_string(self._start_ct), ct_fade=True, transitiontime=1)
+        command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, level=self._current_level,
+                          ct=ct_string(self._start_ct), ct_fade=True, transitiontime=1)
       else:
-        command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, ct=ct_string(self._start_ct), ct_fade=True, transitiontime=1)
+        command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, ct=ct_string(self._start_ct), ct_fade=True,
+                          transitiontime=1)
       self._firefly.send_command(command)
       self._first_run = False
 
-
     if self._level_control:
-      command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, ct=ct_string(self._current_ct), transitiontime=self._delay * 10, level=self._current_level, ct_fade=True)
+      command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, ct=ct_string(self._current_ct),
+                        transitiontime=self._delay * 10, level=self._current_level, ct_fade=True)
       self._current_level += self._level_step
     else:
-      command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, ct=ct_string(self._current_ct), transitiontime=self._delay * 10, ct_fade=True)
+      command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, ct=ct_string(self._current_ct),
+                        transitiontime=self._delay * 10, ct_fade=True)
     self._firefly.send_command(command)
 
     if self._time_remaining > 0:
@@ -84,21 +83,24 @@ class CTFade(object):
     self._first_run = True
 
 
-def calculate_delay(interval:int, fade_sec:int):
+def calculate_delay(interval: int, fade_sec: int):
   if fade_sec < 10:
     return 0
-  return fade_sec/interval
+  return fade_sec / interval
 
-def calculate_ct_step(interval:int, fade_sec:int, start_ct:int, end_ct:int):
+
+def calculate_ct_step(interval: int, fade_sec: int, start_ct: int, end_ct: int):
   if fade_sec < 10:
     return 0
   else:
-    return (start_ct-end_ct)/interval
+    return (start_ct - end_ct) / interval
 
-def calculate_level_step(interval:int, fade_sec:int, start_level:int, end_level:int):
-  if abs(start_level-end_level) <= interval or fade_sec < 10:
+
+def calculate_level_step(interval: int, fade_sec: int, start_level: int, end_level: int):
+  if abs(start_level - end_level) <= interval or fade_sec < 10:
     return 0
-  return (end_level-start_level)/interval
+  return (end_level - start_level) / interval
+
 
 def ct_string(ct):
   return '%sK' % ct

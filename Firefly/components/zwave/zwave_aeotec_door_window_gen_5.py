@@ -2,15 +2,17 @@ from openzwave.network import ZWaveNode
 
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.const import (STATE, EVENT_ACTION_OFF, DEVICE_TYPE_SWITCH, CONTACT, CONTACT_CLOSED, CONTACT_OPEN)
-from time import sleep
+from Firefly.const import CONTACT, CONTACT_CLOSED, CONTACT_OPEN, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF, STATE
+from Firefly.helpers.metadata import metaContact
 
 TITLE = 'Aeotec Zwave Window Door Sensor Gen5'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = 'Zachary Priddy'
 COMMANDS = []
 REQUESTS = [STATE, CONTACT, 'alarm']
-INITIAL_VALUES = {'_state': EVENT_ACTION_OFF}
+INITIAL_VALUES = {
+  '_state': EVENT_ACTION_OFF
+}
 
 
 def Setup(firefly, package, **kwargs):
@@ -34,12 +36,15 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     self.add_request(CONTACT, self.get_state)
     self.add_request('alarm', self.get_alarm)
 
+    self.add_action(STATE, metaContact(primary=True))
+
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
     """
     Updated the devices to the desired config params. This will be useful to make new default devices configs.
 
-    For example when there is a gen6 multisensor I want it to always report every 5 minutes and timeout to be 30 seconds.
+    For example when there is a gen6 multisensor I want it to always report every 5 minutes and timeout to be 30 
+    seconds.
     Args:
       **kwargs ():
     """
@@ -82,7 +87,6 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
       self._alarm = False
 
     self._state = CONTACT_OPEN if self.get_sensors(sensor='sensor') is True else CONTACT_CLOSED
-
 
   def get_state(self, **kwargs):
     return self.state

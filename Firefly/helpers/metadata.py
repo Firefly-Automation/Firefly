@@ -1,4 +1,4 @@
-from Firefly.const import (EVENT_ACTION_ON, EVENT_ACTION_OFF, PRESENT, NOT_PRESENT)
+from Firefly.const import (EVENT_ACTION_ON, EVENT_ACTION_OFF, PRESENT, NOT_PRESENT, CONTACT_OPEN, CONTACT_CLOSED, MOTION_ACTIVE, MOTION_INACTIVE)
 
 
 def metaDimmer(min=0, max=100, command=True, request=False, primary=False):
@@ -30,7 +30,7 @@ def metaSwitch(command=True, request=True, primary=False):
   }
   return meta
 
-def metaPresence(command=False, request=True, primary=False):
+def metaPresence(command=True, request=True, primary=False):
   meta = {
     'command': command,
     'request': request,
@@ -40,6 +40,35 @@ def metaPresence(command=False, request=True, primary=False):
     'options': {
       "Present":  PRESENT,
       "Not Present": NOT_PRESENT
+    }
+  }
+  return meta
+
+
+def metaContact(command=False, request=True, primary=False):
+  meta = {
+    'command': command,
+    'request': request,
+    'primary': primary,
+    'context': 'Contact state of the device.',
+    'type':    'text',
+    'options': {
+      "Open":  CONTACT_OPEN,
+      "Closed": CONTACT_CLOSED
+    }
+  }
+  return meta
+
+def metaMotion(command=False, request=True, primary=False):
+  meta = {
+    'command': command,
+    'request': request,
+    'primary': primary,
+    'context': 'Motion state of the device.',
+    'type':    'text',
+    'options': {
+      "Active":  MOTION_ACTIVE,
+      "Inactive": MOTION_INACTIVE
     }
   }
   return meta

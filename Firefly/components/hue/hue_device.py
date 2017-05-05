@@ -1,39 +1,37 @@
 from Firefly import logging
-from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF,
-                           EVENT_ACTION_ON,
-                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, DEVICE_TYPE_COLOR_LIGHT, COMMAND_UPDATE, ACTION_LEVEL,
-                           LEVEL, COMMAND_SET_LIGHT, SWITCH)
-from Firefly.components.virtual_devices import AUTHOR
-from Firefly.helpers.device import Device
 # from rgb_cie import Converter
 from Firefly.components.hue.ct_fade import CTFade
+from Firefly.components.virtual_devices import AUTHOR
+from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, COMMAND_SET_LIGHT, COMMAND_UPDATE,
+                           DEVICE_TYPE_COLOR_LIGHT, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE, SWITCH)
+from Firefly.helpers.device import Device
 from Firefly.helpers.events import Command
-
-from Firefly.helpers.metadata import metaSwitch, metaDimmer
+from Firefly.helpers.metadata import metaDimmer, metaSwitch
 
 TITLE = 'Firefly Hue Device'
 DEVICE_TYPE = DEVICE_TYPE_COLOR_LIGHT
 AUTHOR = AUTHOR
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ACTION_LEVEL, COMMAND_SET_LIGHT, 'ct_fade']
-INITIAL_VALUES = {'_state': EVENT_ACTION_OFF,
-                  '_uniqueid': '-1',
-                  '_manufacturername': 'unknown',
-                  '_on': EVENT_ACTION_OFF,
-                  '_hue': 0,
-                  '_sat': 0,
-                  '_effect': False,
-                  '_xy': 0,
-                  '_colormode': 'unknown',
-                  '_alert': False,
-                  '_bri': 0,
-                  '_reachable': False,
-                  '_type': 'unknown',
-                  '_ct': 0,
-                  '_level': 0,
-                  '_hue_noun': 'state',
-                  '_hue_service': 'service_hue',
-                  '_hue_number': -1
-                  }
+INITIAL_VALUES = {
+  '_state':            EVENT_ACTION_OFF,
+  '_uniqueid':         '-1',
+  '_manufacturername': 'unknown',
+  '_on':               EVENT_ACTION_OFF,
+  '_hue':              0,
+  '_sat':              0,
+  '_effect':           False,
+  '_xy':               0,
+  '_colormode':        'unknown',
+  '_alert':            False,
+  '_bri':              0,
+  '_reachable':        False,
+  '_type':             'unknown',
+  '_ct':               0,
+  '_level':            0,
+  '_hue_noun':         'state',
+  '_hue_service':      'service_hue',
+  '_hue_number':       -1
+}
 
 
 class HueDevice(Device):
@@ -177,13 +175,17 @@ class HueDevice(Device):
     # XY
     xy = value.get('xy')
     if xy is not None:
-      hue_value.update({'xy': xy})
+      hue_value.update({
+                         'xy': xy
+                       })
       self._xy = xy
 
     # HUE
     hue = value.get('hue')
     if hue is not None:
-      hue_value.update({'hue': hue})
+      hue_value.update({
+                         'hue': hue
+                       })
       self._hue = hue
 
     # TRANS TIME
@@ -193,7 +195,9 @@ class HueDevice(Device):
         transitiontime = int(transitiontime)
       except:
         transitiontime = 40
-      hue_value.update({'transitiontime': transitiontime})
+      hue_value.update({
+                         'transitiontime': transitiontime
+                       })
 
     ## NAME COLOR
     # name = value.get('name')
@@ -223,12 +227,17 @@ class HueDevice(Device):
         level = min(level, 100)
         bri = int(255.0 / 100.0 * level)
         self._bri = bri
-        hue_value.update({'bri': bri})
+        hue_value.update({
+                           'bri': bri
+                         })
       else:
         bri = 0
         level = 0
         self._on = False
-        hue_value.update({'bri': bri, 'on': False})
+        hue_value.update({
+                           'bri': bri,
+                           'on':  False
+                         })
         self._bri = bri
       self._level = level
 
@@ -240,43 +249,60 @@ class HueDevice(Device):
         bri = 0
         self._level = 0
         self._on = False
-        hue_value.update({'on': False})
+        hue_value.update({
+                           'on': False
+                         })
       else:
         self._level = int(bri / 255.0 * 100.0)
-      hue_value.update({'bri': bri})
+      hue_value.update({
+                         'bri': bri
+                       })
       self._bri = bri
 
     # SET CT:
     ct = value.get('ct')
     if ct:
       ct = check_ct(ct)
-      hue_value.update({'ct': ct})
+      hue_value.update({
+                         'ct': ct
+                       })
       self._ct = ct
 
     # EFFECT
     effect = value.get('effect')
     if effect:
-      hue_value.update({'effect': effect})
+      hue_value.update({
+                         'effect': effect
+                       })
       self._effect = effect
 
     # ALERT
     alert = value.get('alert')
     if alert:
-      hue_value.update({'alert': alert})
+      hue_value.update({
+                         'alert': alert
+                       })
       self._alert = alert
 
     # SET FOR ON
     on = value.get('on')
     if on is not None:
       if on:
-        hue_value.update({'on': on})
+        hue_value.update({
+                           'on': on
+                         })
       else:
-        hue_value.update({'on': on, 'bri': 255})
+        hue_value.update({
+                           'on':  on,
+                           'bri': 255
+                         })
       self._on = on
 
     # Turn lights on unless told not to or has already been set
     if hue_value.get('on') is None and not value.get('no_on'):
-      hue_value.update({'on': True})
+      hue_value.update({
+                         'on': True
+                       })
       self._on = True
 
     self.set_hue_device(hue_value)
@@ -330,7 +356,11 @@ class HueDevice(Device):
 
   def set_hue_device(self, value):
     path = '%ss/%s/%s' % (self._hue_type, self._hue_number, self._hue_noun)
-    command = Command(self._hue_service, self.id, 'send_request', **{'path': path, 'data': value, 'method': 'PUT'})
+    command = Command(self._hue_service, self.id, 'send_request', **{
+      'path':   path,
+      'data':   value,
+      'method': 'PUT'
+    })
     self.firefly.send_command(command)
 
   def hexColor(self, colorHex):

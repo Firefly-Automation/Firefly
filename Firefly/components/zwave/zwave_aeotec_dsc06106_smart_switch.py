@@ -2,15 +2,18 @@ from openzwave.network import ZWaveNode
 
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.const import (ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_TOGGLE,
-                           DEVICE_TYPE_SWITCH, SWITCH)
+from Firefly.const import (ACTION_OFF, ACTION_ON, ACTION_TOGGLE, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF, EVENT_ACTION_ON,
+                           STATE, SWITCH)
+from Firefly.helpers.metadata import metaSwitch
 
 TITLE = 'Firefly Zwave Switch'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = 'Zachary Priddy'
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE]
 REQUESTS = [STATE, SWITCH]
-INITIAL_VALUES = {'_state': EVENT_ACTION_OFF}
+INITIAL_VALUES = {
+  '_state': EVENT_ACTION_OFF
+}
 
 
 def Setup(firefly, package, **kwargs):
@@ -39,12 +42,15 @@ class ZwaveSwitch(ZwaveDevice):
     self.add_request(STATE, self.get_state)
     self.add_request(SWITCH, self.get_state)
 
+    self.add_action(STATE, metaSwitch(primary=True))
+
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
     """
     Updated the devices to the desired config params. This will be useful to make new default devices configs.
 
-    For example when there is a gen6 multisensor I want it to always report every 5 minutes and timeout to be 30 seconds.
+    For example when there is a gen6 multisensor I want it to always report every 5 minutes and timeout to be 30 
+    seconds.
     Args:
       **kwargs ():
     """

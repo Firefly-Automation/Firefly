@@ -3,6 +3,8 @@ from openzwave.network import ZWaveNode
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import (STATE, DEVICE_TYPE_MOTION, MOTION, MOTION_ACTIVE, MOTION_INACTIVE)
+from Firefly.helpers.metadata import metaMotion
+
 
 TITLE = 'Firefly Zwave Motion Sensor'
 DEVICE_TYPE = DEVICE_TYPE_MOTION
@@ -28,6 +30,8 @@ class ZwaveMotionSensor(ZwaveDevice):
 
     self.add_request(STATE, self.get_state)
     self.add_request(MOTION, self.get_motion)
+
+    self.add_action(STATE, metaMotion(primary=True))
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     super().update_from_zwave(node, **kwargs)
