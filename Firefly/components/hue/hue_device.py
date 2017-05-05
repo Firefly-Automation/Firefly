@@ -67,7 +67,7 @@ class HueDevice(Device):
     self.add_request(STATE, self.get_state)
     self.add_request(SWITCH, self.get_state)
 
-    self.add_action(STATE, metaSwitch())
+    self.add_action(STATE, metaSwitch(primary=True))
     self.add_action(LEVEL, metaDimmer())
 
     # TODO: Make HOMEKIT CONST

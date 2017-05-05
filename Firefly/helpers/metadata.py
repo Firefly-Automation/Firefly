@@ -1,11 +1,12 @@
-from Firefly.const import (EVENT_ACTION_ON, EVENT_ACTION_OFF, PRESENT, NOT_PRESENT, CONTACT_OPEN, CONTACT_CLOSED, MOTION_ACTIVE, MOTION_INACTIVE)
-
+from Firefly.const import (CONTACT_CLOSED, CONTACT_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, MOTION_ACTIVE,
+                           MOTION_INACTIVE, NOT_PRESENT, PRESENT)
 
 def metaDimmer(min=0, max=100, command=True, request=False, primary=False):
   meta = {
     'command': command,
     'request': request,
     'primary': primary,
+    'title':   'dimmer',
     'context': 'Change dimmer level.',
     'type':    'number',
     'options': {
@@ -21,7 +22,8 @@ def metaSwitch(command=True, request=True, primary=False):
     'command': command,
     'request': request,
     'primary': primary,
-    'context': 'Change dimmer level.',
+    'title':   'siwtch',
+    'context': 'Change switch.',
     'type':    'select',
     'options': {
       "On":  EVENT_ACTION_ON,
@@ -30,15 +32,17 @@ def metaSwitch(command=True, request=True, primary=False):
   }
   return meta
 
+
 def metaPresence(command=True, request=True, primary=False):
   meta = {
     'command': command,
     'request': request,
     'primary': primary,
+    'title':   'presence',
     'context': 'Set the presence of a device.',
     'type':    'select',
     'options': {
-      "Present":  PRESENT,
+      "Present":     PRESENT,
       "Not Present": NOT_PRESENT
     }
   }
@@ -50,14 +54,16 @@ def metaContact(command=False, request=True, primary=False):
     'command': command,
     'request': request,
     'primary': primary,
+    'title':   'contact',
     'context': 'Contact state of the device.',
     'type':    'text',
     'options': {
-      "Open":  CONTACT_OPEN,
+      "Open":   CONTACT_OPEN,
       "Closed": CONTACT_CLOSED
     }
   }
   return meta
+
 
 def metaMotion(command=False, request=True, primary=False):
   meta = {
@@ -67,7 +73,7 @@ def metaMotion(command=False, request=True, primary=False):
     'context': 'Motion state of the device.',
     'type':    'text',
     'options': {
-      "Active":  MOTION_ACTIVE,
+      "Active":   MOTION_ACTIVE,
       "Inactive": MOTION_INACTIVE
     }
   }
