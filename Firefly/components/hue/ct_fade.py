@@ -63,19 +63,37 @@ class CTFade(object):
       self._firefly.send_command(command)
       self._first_run = False
 
+    self._current_ct += self._ct_step
+    self._time_remaining -= self._delay
+    if self._level_control:
+      self._current_level += self._level_step
+
     if self._level_control:
       command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, ct=ct_string(self._current_ct),
                         transitiontime=self._delay * 10, level=self._current_level, ct_fade=True)
-      self._current_level += self._level_step
     else:
       command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, ct=ct_string(self._current_ct),
                         transitiontime=self._delay * 10, ct_fade=True)
+
     self._firefly.send_command(command)
 
     if self._time_remaining > 0:
       scheduler.runInS(int(self._delay), self.runFade, replace=True, job_id=self._ff_id + '_ct_fade')
-    self._current_ct -= self._ct_step
-    self._time_remaining -= self._delay
+    else:
+      self.send_last_fade()
+
+  def send_last_fade(self):
+    if self._level_control:
+      command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, ct=ct_string(self._end_ct),
+                        transitiontime=self._delay * 10, level=self._end_level, ct_fade=True)
+    else:
+      command = Command(self._ff_id, 'ct_fade', COMMAND_SET_LIGHT, ct=ct_string(self._end_ct),
+                        transitiontime=self._delay * 10, ct_fade=True)
+
+    self._firefly.send_command(command)
+    self.endRun()
+
+
 
   def endRun(self):
     logging.info("Ending Fade")
@@ -86,20 +104,20 @@ class CTFade(object):
 def calculate_delay(interval: int, fade_sec: int):
   if fade_sec < 10:
     return 0
-  return fade_sec / interval
+  return int(fade_sec / interval)
 
 
 def calculate_ct_step(interval: int, fade_sec: int, start_ct: int, end_ct: int):
   if fade_sec < 10:
-    return 0
+    return end_ct
   else:
-    return (start_ct - end_ct) / interval
+    return int((end_ct - start_ct) / interval)
 
 
 def calculate_level_step(interval: int, fade_sec: int, start_level: int, end_level: int):
   if abs(start_level - end_level) <= interval or fade_sec < 10:
-    return 0
-  return (end_level - start_level) / interval
+    return start_level
+  return int((end_level - start_level) / interval)
 
 
 def ct_string(ct):
