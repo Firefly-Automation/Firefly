@@ -73,14 +73,15 @@ class VirtualPresence(Device):
     """
     presence = kwargs.get('presence', False)
     presence = True if presence.lower() == 'true' else False
+    presence_string = PRESENT if presence else NOT_PRESENT
     if kwargs.get('type') == 'beacon':
       if presence:
-        self._beacon_presence = presence
+        self._beacon_presence = presence_string
       else:
         scheduler.runInS(self._delay, self._set_beacon_not_present)
     else:
       if presence:
-        self._presence = presence
+        self._presence = presence_string
       else:
         scheduler.runInS(self._delay, self._set_not_present)
 
@@ -188,6 +189,9 @@ class VirtualPresence(Device):
     Returns:
 
     """
+
+    presence = True if self._presence == PRESENT else False
+    beacon_presence = True if self._beacon_presence == PRESENT else False
     if self._beacon_enabled:
-      return self._presence & self._beacon_presence
-    return self._presence
+      return presence | beacon_presence
+    return presence
