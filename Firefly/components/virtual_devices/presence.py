@@ -193,5 +193,5 @@ class VirtualPresence(Device):
     presence = True if self._presence == PRESENT else False
     beacon_presence = True if self._beacon_presence == PRESENT else False
     if self._beacon_enabled:
-      return presence | beacon_presence
-    return presence
+      return PRESENT if presence | beacon_presence else NOT_PRESENT
+    return PRESENT if presence else NOT_PRESENT
