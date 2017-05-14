@@ -38,6 +38,8 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
 
     self.add_action(STATE, metaContact(primary=True))
 
+    self._alexa_export = False
+
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
     """

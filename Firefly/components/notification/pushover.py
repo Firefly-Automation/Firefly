@@ -44,6 +44,8 @@ class Pushover(Device):
 
     self.add_command(COMMAND_NOTIFY, self.send)
 
+    self._alexa_export = False
+
   def send(self, **kwargs):
     message = kwargs.get('message')
     if message is None:

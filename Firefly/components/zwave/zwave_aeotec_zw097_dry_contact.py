@@ -34,6 +34,8 @@ class ZwaveAeotecDryContact(ZwaveDevice):
     self.add_request(STATE, self.get_state)
     self.add_request(CONTACT, self.get_state)
 
+    self._alexa_export = False
+
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
     """

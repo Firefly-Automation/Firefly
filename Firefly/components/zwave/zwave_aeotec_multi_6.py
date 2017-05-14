@@ -39,6 +39,8 @@ class ZwaveAeotecMulti(ZwaveDevice):
 
     self.add_action(STATE, metaMotion(primary=True))
 
+    self._alexa_export = False
+
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
     # TODO Copy this retry logic to all zwave devices

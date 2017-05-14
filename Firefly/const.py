@@ -60,6 +60,7 @@ TYPE_DEVICE = 'TYPE_DEVICE'
 TYPE_SERVICE = 'TYPE_SERVICE'
 
 API_INFO_REQUEST = 'API_INFO_REQUEST'
+API_ALEXA_VIEW = 'API_ALEXA_VIEW'
 
 
 
@@ -176,3 +177,29 @@ SENSORS = {
   'Relative Humidity': 'RELATIVE HUMIDITY',
   'Ultraviolet':       'ULTRAVIOLET'
 }
+
+
+
+# ALEXA
+ALEXA_DEC_PERCENTAGE = "decrementPercentage"
+ALEXA_DEC_COLOR_TEMP = "decrementColorTemperature"
+ALEXA_DEC_TARGET_TEMP = "decrementTargetTemperature"
+ALEXA_GET_LOCK = "getLockState"
+ALEXA_GET_COLOR_TEMP = "getTargetTemperature"
+ALEXA_GET_TEMP = "getTemperatureReading"
+ALEXA_INC_PERCENTAGE = "incrementPercentage"
+ALEXA_INC_COLOR_TEMP = "incrementColorTemperature"
+ALEXA_INC_TEMP ="incrementTargetTemperature"
+ALEXA_SET_COLOR = "setColor"
+ALEXA_SET_COLOR_TEMP = "setColorTemperature"
+ALEXA_SET_LOCK = "setLockState"
+ALEXA_SET_PERCENTAGE = "setPercentage"
+ALEXA_SET_TEMP = "setTargetTemperature"
+ALEXA_ON = "turnOff"
+ALEXA_OFF = "turnOn"
+
+ALEXA_SET_PERCENTAGE_REQUEST = 'SetPercentageRequest'
+ALEXA_ON_REQUEST = 'TurnOnRequest'
+ALEXA_OFF_REQUEST = 'TurnOffRequest'
+ALEXA_SET_COLOR_TEMP_REQUEST = 'SetColorTemperatureRequest'
+ALEXA_SET_COLOR_REQUEST = 'SetColorRequest'

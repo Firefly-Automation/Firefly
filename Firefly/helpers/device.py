@@ -2,9 +2,9 @@ import uuid
 from typing import Any, Callable
 
 from Firefly import aliases, logging
-from Firefly.const import API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE
+from Firefly.const import API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE, API_ALEXA_VIEW
 from Firefly.helpers.events import Command, Event, Request
-import asyncio
+
 
 class Device(object):
   def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
@@ -56,6 +56,15 @@ class Device(object):
     self._homekit_export = kwargs.get('homekit_export', True)
     self._homekit_alias = kwargs.get('homekit_alias', self._alias)
     self._homekit_types = {}
+
+    self._alexa_export = kwargs.get('alexa_export', True)
+    self._alexa_alias = kwargs.get('alexa_alias', self._alias)
+    self._alexa_actions = kwargs.get('alexa_actions', [])
+    self._alexa_model = kwargs.get('alexa_model', 'FireflyDevice')
+    self._alexa_manufacturer_name = kwargs.get('alexa_manufacturer_name', 'Firefly')
+    self._alexa_version = kwargs.get('alexa_version', '1')
+    self._alexa_description = kwargs.get('alexa_description', self._alias)
+
     self._room = kwargs.get('room', '')
     self._tags = kwargs.get('tags', [])
 
@@ -73,18 +82,25 @@ class Device(object):
       (dict): A dict of the ff_id config.
     """
     export_data = {
-      'package':         self._package,
-      'ff_id':           self.id,
-      'alias':           self._alias,
-      'type':            self.type,
-      'homekit_export':  self._homekit_export,
-      'homekit_alias':   self._homekit_alias,
-      'homekit_types':   self._homekit_types,
-      'habridge_export': self._habridge_export,
-      'habridge_alias':  self._habridge_alias,
-      'export_ui':       self._export_ui,
-      'tags': self._tags,
-      'room': self._room
+      'package':                 self._package,
+      'ff_id':                   self.id,
+      'alias':                   self._alias,
+      'type':                    self.type,
+      'homekit_export':          self._homekit_export,
+      'homekit_alias':           self._homekit_alias,
+      'homekit_types':           self._homekit_types,
+      'habridge_export':         self._habridge_export,
+      'habridge_alias':          self._habridge_alias,
+      'export_ui':               self._export_ui,
+      'tags':                    self._tags,
+      'room':                    self._room,
+      'alexa_export':            self._alexa_export,
+      'alexa_alias':             self._alexa_alias,
+      'alexa_actions':           self._alexa_actions,
+      'alexa_model':             self._alexa_model,
+      'alexa_manufacturer_name': self._alexa_manufacturer_name,
+      'alexa_version':           self._alexa_version,
+      'alexa_description':       self._alexa_description
     }
 
     if current_values:
@@ -95,6 +111,26 @@ class Device(object):
       export_data['initial_values'] = current_vals
 
     return export_data
+
+  def add_alexa_action(self, alexa_action: str) -> None:
+    if alexa_action not in self._alexa_actions:
+      self._alexa_actions.append(alexa_action)
+
+  def get_alexa_view(self):
+    if self._alexa_export is False:
+      return None
+
+    return {
+      "actions":                    self._alexa_actions,
+      "additionalApplianceDetails": {},
+      "applianceId":                self.id,
+      "friendlyDescription":        self._alexa_description,
+      "friendlyName":               self._alexa_alias,
+      "isReachable":                True,
+      "manufacturerName":           self._alexa_manufacturer_name,
+      "modelName":                  self._alexa_model,
+      "version":                    self._alexa_version
+    }
 
   def add_command(self, command: str, function: Callable) -> None:
     """
@@ -185,6 +221,8 @@ class Device(object):
     logging.debug('%s: Got Request %s' % (self.id, request))
     if request.request == API_INFO_REQUEST:
       return self.get_api_info()
+    if request.request == API_ALEXA_VIEW:
+      return self.get_alexa_view()
     if request.request in self.request_map.keys():
       return self.request_map[request.request](**request.args)
     return None
@@ -243,7 +281,8 @@ class Device(object):
     state_after = self.get_all_request_values()
     self.broadcast_changes(state_before, state_after)
 
-  # TODO: Add runInX functions to devices. These functions have to be similar to member_set and should be able to replace it.
+  # TODO: Add runInX functions to devices. These functions have to be similar to member_set and should be able to
+  # replace it.
 
   @property
   def id(self):

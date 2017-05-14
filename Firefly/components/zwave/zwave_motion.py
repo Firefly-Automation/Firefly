@@ -33,6 +33,8 @@ class ZwaveMotionSensor(ZwaveDevice):
 
     self.add_action(STATE, metaMotion(primary=True))
 
+    self._alexa_export = False
+
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     super().update_from_zwave(node, **kwargs)
 

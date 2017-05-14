@@ -5,9 +5,9 @@ from aiohttp import web
 from aiohttp.web_request import Request as webRequest
 
 from Firefly import logging
-from Firefly.const import API_INFO_REQUEST, TYPE_AUTOMATION, TYPE_DEVICE
+from Firefly.const import API_ALEXA_VIEW, API_INFO_REQUEST, TYPE_AUTOMATION, TYPE_DEVICE
 from Firefly.helpers.events import Command, Request
-from Firefly.services.alexa import process_alexa_request
+from Firefly.services.alexa import AlexaHomeRequest, process_alexa_request
 from Firefly.services.api_ai import process_api_ai_request
 
 
@@ -78,6 +78,14 @@ class FireflyCoreAPI:
       'method':   'POST',
       'path':     '/api/alexa',
       'function': self.process_alexa_request
+    }, {
+      'method':   'POST',
+      'path':     '/api/alexa_home_command',
+      'function': self.alexa_home_command
+    }, {
+      'method':   'GET',
+      'path':     '/api/alexa_home_devices',
+      'function': self.get_all_alexa_views
     }]
 
   async def hello_world(self, request):
@@ -191,6 +199,12 @@ class FireflyCoreAPI:
     return data
 
   @asyncio.coroutine
+  def get_component_alexa_view(self, ff_id, source):
+    device_request = Request(ff_id, source, API_ALEXA_VIEW)
+    data = yield from self.firefly.async_send_request(device_request)
+    return data
+
+  @asyncio.coroutine
   def get_all_component_views(self, source, filter=None):
     if type(filter) is str:
       filter = [filter]
@@ -200,6 +214,31 @@ class FireflyCoreAPI:
         data = yield from self.get_component_view(ff_id, source)
         views.append(data)
     return views
+
+  @asyncio.coroutine
+  def get_all_alexa_views(self, source, filter=TYPE_DEVICE):
+    if type(filter) is str:
+      filter = [filter]
+    views = []
+    for ff_id, device in self.firefly.components.items():
+      if device.type in filter or filter is None:
+        data = yield from self.get_component_alexa_view(ff_id, source)
+        if data is not None:
+          views.append(data)
+    # TODO MAYBE NOT RETURN HERE?
+    # return views
+    return web.Response(text=json.dumps(views), content_type='application/json')
+
+  @asyncio.coroutine
+  def alexa_home_command(self, request: webRequest):
+    request_data = yield from request.json()
+    alexa_home = AlexaHomeRequest(request_data)
+    response = alexa_home.process_command(self.firefly)
+
+    return web.Response(text=json.dumps({
+                                          'success': response.success,
+                                          'payload': response.payload
+                                        }), content_type='application/json')
 
   @asyncio.coroutine
   def api_all_components(self, request):

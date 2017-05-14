@@ -3,7 +3,7 @@ from openzwave.network import ZWaveNode
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import (ACTION_OFF, ACTION_ON, ACTION_TOGGLE, DEVICE_TYPE_DIMMER, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           LEVEL, STATE)
+                           LEVEL, STATE, ALEXA_SET_PERCENTAGE, ALEXA_OFF, ALEXA_ON)
 from Firefly.helpers.metadata import metaDimmer, metaSwitch
 
 TITLE = 'Firefly GE Dimmer'
@@ -47,6 +47,10 @@ class GEDimmer(ZwaveDevice):
     self.add_request(STATE, self.get_state)
     self.add_request(LEVEL, self.get_level)
 
+    self.add_alexa_action(ALEXA_OFF)
+    self.add_alexa_action(ALEXA_ON)
+    self.add_alexa_action(ALEXA_SET_PERCENTAGE)
+
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     if node is None:
       return
@@ -87,6 +91,7 @@ class GEDimmer(ZwaveDevice):
     self._state = EVENT_ACTION_OFF
     print(self._switches)
     self._node.set_switch(self._switches[0], 0)
+    self.node.set_dimmer(self._dimmers[0], 0)
     return EVENT_ACTION_OFF
 
   def on(self, **kwargs):

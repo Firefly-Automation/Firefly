@@ -9,3 +9,7 @@ from Firefly.helpers.scheduler import Scheduler
 
 aliases = Alias()
 scheduler = Scheduler()
+
+
+from Firefly.const import ALEXA_OFF, ALEXA_ON
+ALEXA_CONST = [ALEXA_ON, ALEXA_OFF]

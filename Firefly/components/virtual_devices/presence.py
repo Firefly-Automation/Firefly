@@ -65,6 +65,8 @@ class VirtualPresence(Device):
     # TODO: Make HOMEKIT CONST
     self.add_homekit_export('HOMEKIT_PRESENCE', PRESENCE)
 
+    self._alexa_export = False
+
   def set_presence(self, **kwargs):
     """
 

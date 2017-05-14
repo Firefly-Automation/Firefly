@@ -2,7 +2,8 @@ from Firefly import logging
 # from rgb_cie import Converter
 from Firefly.components.hue.ct_fade import CTFade
 from Firefly.components.virtual_devices import AUTHOR
-from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, COMMAND_SET_LIGHT, COMMAND_UPDATE,
+from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ALEXA_OFF, ALEXA_ON, ALEXA_SET_COLOR,
+                           ALEXA_SET_COLOR_TEMP, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, COMMAND_UPDATE,
                            DEVICE_TYPE_COLOR_LIGHT, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE, SWITCH)
 from Firefly.helpers.device import Device
 from Firefly.helpers.events import Command
@@ -69,6 +70,12 @@ class HueDevice(Device):
 
     self.add_action(STATE, metaSwitch(primary=True))
     self.add_action(LEVEL, metaDimmer())
+
+    self.add_alexa_action(ALEXA_OFF)
+    self.add_alexa_action(ALEXA_ON)
+    self.add_alexa_action(ALEXA_SET_PERCENTAGE)
+    self.add_alexa_action(ALEXA_SET_COLOR_TEMP)
+    self.add_alexa_action(ALEXA_SET_COLOR)
 
     # TODO: Make HOMEKIT CONST
     self.add_homekit_export('HOMEKIT_COLOR_LIGHT', STATE)
@@ -176,16 +183,16 @@ class HueDevice(Device):
     xy = value.get('xy')
     if xy is not None:
       hue_value.update({
-                         'xy': xy
-                       })
+        'xy': xy
+      })
       self._xy = xy
 
     # HUE
     hue = value.get('hue')
     if hue is not None:
       hue_value.update({
-                         'hue': hue
-                       })
+        'hue': hue
+      })
       self._hue = hue
 
     # TRANS TIME
@@ -196,8 +203,8 @@ class HueDevice(Device):
       except:
         transitiontime = 40
       hue_value.update({
-                         'transitiontime': transitiontime
-                       })
+        'transitiontime': transitiontime
+      })
 
     ## NAME COLOR
     # name = value.get('name')
@@ -228,16 +235,16 @@ class HueDevice(Device):
         bri = int(255.0 / 100.0 * level)
         self._bri = bri
         hue_value.update({
-                           'bri': bri
-                         })
+          'bri': bri
+        })
       else:
         bri = 0
         level = 0
         self._on = False
         hue_value.update({
-                           'bri': bri,
-                           'on':  False
-                         })
+          'bri': bri,
+          'on':  False
+        })
         self._bri = bri
       self._level = level
 
@@ -250,13 +257,13 @@ class HueDevice(Device):
         self._level = 0
         self._on = False
         hue_value.update({
-                           'on': False
-                         })
+          'on': False
+        })
       else:
         self._level = int(bri / 255.0 * 100.0)
       hue_value.update({
-                         'bri': bri
-                       })
+        'bri': bri
+      })
       self._bri = bri
 
     # SET CT:
@@ -264,24 +271,33 @@ class HueDevice(Device):
     if ct:
       ct = check_ct(ct)
       hue_value.update({
-                         'ct': ct
-                       })
+        'ct': ct
+      })
       self._ct = ct
+
+    # SET SAT:
+    sat = int(value.get('sat'))
+    if sat:
+      sat = min(sat, 255)
+      sat = max(sat, 0)
+      hue_value.update({
+                         'sat': sat
+                       })
 
     # EFFECT
     effect = value.get('effect')
     if effect:
       hue_value.update({
-                         'effect': effect
-                       })
+        'effect': effect
+      })
       self._effect = effect
 
     # ALERT
     alert = value.get('alert')
     if alert:
       hue_value.update({
-                         'alert': alert
-                       })
+        'alert': alert
+      })
       self._alert = alert
 
     # SET FOR ON
@@ -289,21 +305,34 @@ class HueDevice(Device):
     if on is not None:
       if on:
         hue_value.update({
-                           'on': on
-                         })
+          'on': on
+        })
       else:
         hue_value.update({
-                           'on':  on,
-                           'bri': 255
-                         })
+          'on':  on,
+          'bri': 255
+        })
       self._on = on
 
     # Turn lights on unless told not to or has already been set
     if hue_value.get('on') is None and not value.get('no_on'):
       hue_value.update({
-                         'on': True
-                       })
+        'on': True
+      })
       self._on = True
+
+    # Process special values from alexa
+    alexa = value.get('alexa')
+    if alexa is not None:
+      hue = int(65535 / 360 * alexa.get('hue', 0))
+      sat = int(alexa.get('sat', 0) * 254)
+      bri = int(alexa.get('bri', 0) * 254)
+
+      hue_value = {
+        'hue': hue,
+        'bri': bri,
+        'sat': sat
+      }
 
     self.set_hue_device(hue_value)
     return value

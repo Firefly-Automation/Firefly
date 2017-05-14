@@ -3,7 +3,7 @@ from openzwave.network import ZWaveNode
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import (ACTION_OFF, ACTION_ON, ACTION_TOGGLE, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           STATE)
+                           STATE, ALEXA_ON, ALEXA_OFF)
 from Firefly.helpers.metadata import metaSwitch
 
 TITLE = 'Firefly Aeotec SmartSwitch Gen6'
@@ -42,6 +42,9 @@ class ZwaveSwitch(ZwaveDevice):
     self.add_request(STATE, self.get_state)
 
     self.add_action(STATE, metaSwitch())
+
+    self.add_alexa_action(ALEXA_OFF)
+    self.add_alexa_action(ALEXA_ON)
 
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
