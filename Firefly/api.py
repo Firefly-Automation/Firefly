@@ -3,6 +3,7 @@ import json
 
 from aiohttp import web
 from aiohttp.web_request import Request as webRequest
+import aiohttp_cors
 
 from Firefly import logging
 from Firefly.const import API_ALEXA_VIEW, API_INFO_REQUEST, TYPE_AUTOMATION, TYPE_DEVICE
@@ -12,7 +13,8 @@ from Firefly.services.api_ai import process_api_ai_request
 
 
 class FireflyCoreAPI:
-  def __init__(self, firefly):
+  def __init__(self, firefly, app):
+    self.app = app
     self.firefly = firefly
     self.api_functions = [{
       'method':   'GET',
@@ -288,7 +290,18 @@ class FireflyCoreAPI:
     data = json.dumps(subscriptions)
     return web.Response(text=data, content_type='application/json')
 
+
+
   def setup_api(self):
     for function in self.api_functions:
       print(function)
       self.firefly.add_route(function.get('path'), function.get('method'), function.get('function'))
+
+    # Configure CORS on all routes.
+
+    cors = aiohttp_cors.setup(self.app, defaults={
+      "*": aiohttp_cors.ResourceOptions(allow_credentials=True, expose_headers="*", allow_headers="*", )
+    })
+
+    for route in list(self.app.router.routes()):
+      cors.add(route)

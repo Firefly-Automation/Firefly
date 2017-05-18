@@ -4,6 +4,8 @@ from Firefly.const import CONFIG_FILE
 
 from Firefly.api import FireflyCoreAPI
 
+from Firefly.core import app
+
 
 def main():
   # Get settings for Firefly.
@@ -13,7 +15,7 @@ def main():
   firefly = Firefly(firefly_settings)
 
   # Initialize core API functions.
-  core_api = FireflyCoreAPI(firefly)
+  core_api = FireflyCoreAPI(firefly, app)
   core_api.setup_api()
 
   # Start Firefly.
