@@ -17,7 +17,7 @@ INITIAL_VALUES = {
   '_state':            EVENT_ACTION_OFF,
   '_uniqueid':         '-1',
   '_manufacturername': 'unknown',
-  '_on':               EVENT_ACTION_OFF,
+  '_on':               False,
   '_hue':              0,
   '_sat':              0,
   '_effect':           False,
@@ -38,6 +38,10 @@ INITIAL_VALUES = {
 class HueDevice(Device):
   def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
     if not kwargs.get('initial_values'):
+      kwargs['initial_values'] = INITIAL_VALUES
+    else:
+      # TODO: Remove hacky logic
+      # INITIAL_VALUES.update(kwargs['initial_values'])
       kwargs['initial_values'] = INITIAL_VALUES
     if commands:
       c = set(commands)
@@ -89,34 +93,34 @@ class HueDevice(Device):
     self._hue_number = kwargs.get('hue_number')
 
     self._name = kwargs.get('name')
-    self._uniqueid = kwargs.get('uniqueid')
-    self._manufacturername = kwargs.get('manufacturername')
-    self._swversion = kwargs.get('swversion')
-    self._modelid = kwargs.get('modelid')
+    self._uniqueid = kwargs.get('uniqueid', '-1')
+    self._manufacturername = kwargs.get('manufacturername', '')
+    self._swversion = kwargs.get('swversion', '')
+    self._modelid = kwargs.get('modelid', '')
     self._bri = 0
     self._ct_fade = None
 
     if kwargs.get(self.hue_noun):
-      self._on = kwargs.get(self.hue_noun).get('on')
-      self._hue = kwargs.get(self.hue_noun).get('hue')
-      self._sat = kwargs.get(self.hue_noun).get('sat')
-      self._effect = kwargs.get(self.hue_noun).get('effect')
-      self._xy = kwargs.get(self.hue_noun).get('xy')
-      self._colormode = kwargs.get(self.hue_noun).get('colormode')
-      self._alert = kwargs.get(self.hue_noun).get('alert')
-      self._bri = kwargs.get(self.hue_noun).get('bri')
-      self._reachable = kwargs.get(self.hue_noun).get('reachable')
-      self._ct = kwargs.get(self.hue_noun).get('ct')
+      self._on = kwargs.get(self.hue_noun).get('on', False)
+      self._hue = kwargs.get(self.hue_noun).get('hue', 0)
+      self._sat = kwargs.get(self.hue_noun).get('sat', 0)
+      self._effect = kwargs.get(self.hue_noun).get('effect', '')
+      self._xy = kwargs.get(self.hue_noun).get('xy', 0)
+      self._colormode = kwargs.get(self.hue_noun).get('colormode', '')
+      self._alert = kwargs.get(self.hue_noun).get('alert', False)
+      self._bri = kwargs.get(self.hue_noun).get('bri', 0)
+      self._reachable = kwargs.get(self.hue_noun).get('reachable', '-1')
+      self._ct = kwargs.get(self.hue_noun).get('ct', 0)
 
     self._level = int(self._bri / 255.0 * 100.0)
 
   def update(self, **kwargs):
     self._name = kwargs.get('name')
-    self._uniqueid = kwargs.get('uniqueid')
-    self._manufacturername = kwargs.get('manufacturername')
-    self._swversion = kwargs.get('swversion')
-    self._modelid = kwargs.get('modelid')
-    self._hue_service = kwargs.get('hue_service')
+    self._uniqueid = kwargs.get('uniqueid', '')
+    self._manufacturername = kwargs.get('manufacturername', '')
+    self._swversion = kwargs.get('swversion', '')
+    self._modelid = kwargs.get('modelid', '')
+    self._hue_service = kwargs.get('hue_service', 'service_hue')
     self._hue_number = kwargs.get('hue_number')
 
     if kwargs.get(self.hue_noun):
@@ -268,7 +272,7 @@ class HueDevice(Device):
 
     # SET CT:
     ct = value.get('ct')
-    if ct:
+    if ct is not None:
       ct = check_ct(ct)
       hue_value.update({
         'ct': ct
@@ -276,17 +280,21 @@ class HueDevice(Device):
       self._ct = ct
 
     # SET SAT:
-    sat = int(value.get('sat'))
-    if sat:
-      sat = min(sat, 255)
-      sat = max(sat, 0)
-      hue_value.update({
-                         'sat': sat
-                       })
+    sat = value.get('sat')
+    if sat is not None:
+      try:
+        sat = int(sat)
+        sat = min(sat, 255)
+        sat = max(sat, 0)
+        hue_value.update({
+          'sat': sat
+        })
+      except:
+        pass
 
     # EFFECT
     effect = value.get('effect')
-    if effect:
+    if effect is not None:
       hue_value.update({
         'effect': effect
       })
@@ -294,7 +302,7 @@ class HueDevice(Device):
 
     # ALERT
     alert = value.get('alert')
-    if alert:
+    if alert is not None:
       hue_value.update({
         'alert': alert
       })

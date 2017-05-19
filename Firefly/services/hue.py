@@ -1,15 +1,12 @@
 import configparser
-from Firefly import scheduler
-from Firefly import logging
-from Firefly.const import SERVICE_CONFIG_FILE
-from Firefly.helpers.service import Service
-from Firefly.helpers.events import Command
-import requests
-import json
-import asyncio
-from Firefly.const import COMMAND_UPDATE
 from time import sleep
-from Firefly.components.hue import hue_light
+
+import requests
+
+from Firefly import logging, scheduler
+from Firefly.const import COMMAND_UPDATE, SERVICE_CONFIG_FILE
+from Firefly.helpers.events import Command
+from Firefly.helpers.service import Service
 
 TITLE = 'Hue service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
@@ -29,7 +26,7 @@ def Setup(firefly, package, **kwargs):
   ip = config.get(SECTION, 'ip', fallback=None)
   username = config.get(SECTION, 'username', fallback=None)
 
-  hue = Hue(firefly, package, enable=enable, ip=ip, username=username,  **kwargs)
+  hue = Hue(firefly, package, enable=enable, ip=ip, username=username, **kwargs)
   firefly.components[SERVICE_ID] = hue
 
   if not enable:
@@ -48,14 +45,13 @@ class Hue(Service):
     self._installed_items = {}
 
     self.add_command('send_request', self.send_request)
-    #self.add_command('refresh', self.refresh)
+    # self.add_command('refresh', self.refresh)
 
-    #self.add_request('get_lights', self.get_lights)
-    #self.add_request('get_groups', self.get_groups)
-    #self.add_request('get_orphans', self.get_orphans)
+    # self.add_request('get_lights', self.get_lights)
+    # self.add_request('get_groups', self.get_groups)
+    # self.add_request('get_orphans', self.get_orphans)
 
     self._rCount = 0
-    print(self._ip)
 
     self.initialize_hue()
     scheduler.runEveryS(10, self.refresh)
@@ -65,7 +61,6 @@ class Hue(Service):
       self.get_ip()
     if not self._username:
       self.register()
-
 
   def get_ip(self):
     data = requests.get('http://www.meethue.com/api/nupnp')
@@ -79,8 +74,8 @@ class Hue(Service):
       self._enable = False
 
   def send_request(self, path=None, data=None, method='GET', return_json=True, no_username=False, **kwargs):
-    if data:
-      data = json.dumps(data)
+    # if data:
+    #  data = json.dumps(data)
 
     r = None
     url = ''
@@ -94,14 +89,14 @@ class Hue(Service):
     logging.debug('Request URL: ' + url + ' Method: ' + method)
 
     if method == 'POST':
-      r = requests.post(url, data=data)
+      r = requests.post(url, json=data)
 
     elif method == 'PUT':
-      r = requests.put(url, data=data)
+      r = requests.put(url, json=data)
 
     elif method == 'GET':
       if data:
-        r = requests.get(url, data=data)
+        r = requests.get(url, json=data)
       else:
         r = requests.get(url)
 
@@ -110,14 +105,16 @@ class Hue(Service):
     return r
 
   def register(self):
-    request_data = {'devicetype': 'firefly'}
+    request_data = {
+      'devicetype': 'firefly'
+    }
     response = self.send_request('api', request_data, method='POST', no_username=True)[0]
 
     logging.debug('Response: ' + str(response))
 
     if 'error' in response:
       if response['error']['type'] == 101:
-        if self._rCount%5 == 0 or self._rCount == 0:
+        if self._rCount % 5 == 0 or self._rCount == 0:
           logging.notify('Please press the hue button.')
         if (self._rCount < 30):
           sleep(10)
@@ -143,12 +140,10 @@ class Hue(Service):
       logging.debug('Sending Light Request')
       self.send_request('lights/' + str(request.get('lightID')) + '/state', data=request.get('data'), method='PUT')
 
-
   def sendGroupRequest(self, request):
     if 'groupID' in request.keys():
       logging.debug('Sending Group Request')
       self.send_request('groups/' + str(request.get('groupID')) + '/action', data=request.get('data'), method='PUT')
-
 
   def refresh(self):
     data = self.send_request()
@@ -159,11 +154,10 @@ class Hue(Service):
       light['hue_service'] = SERVICE_ID
 
       if ff_id in self._firefly.components:
-        command = Command(ff_id, SERVICE_ID,COMMAND_UPDATE, **light)
+        command = Command(ff_id, SERVICE_ID, COMMAND_UPDATE, **light)
         self._firefly.send_command(command)
       else:
         self._firefly.install_package('Firefly.components.hue.hue_light', ff_id=ff_id, alias=light.get('name'), **light)
-
 
     for group_id, group in data['groups'].items():
       ff_id = 'hue-group-device-%s' % str(group_id)
@@ -171,13 +165,7 @@ class Hue(Service):
       group['hue_service'] = SERVICE_ID
 
       if ff_id in self._firefly.components:
-        command = Command(ff_id, SERVICE_ID,COMMAND_UPDATE, **group)
+        command = Command(ff_id, SERVICE_ID, COMMAND_UPDATE, **group)
         self._firefly.send_command(command)
       else:
         self._firefly.install_package('Firefly.components.hue.hue_group', ff_id=ff_id, alias=group.get('name'), **group)
-
-
-
-
-
-
