@@ -36,7 +36,7 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     self.add_request(CONTACT, self.get_state)
     self.add_request('alarm', self.get_alarm)
 
-    self.add_action(STATE, metaContact(primary=True))
+    self.add_action(CONTACT, metaContact(primary=True))
 
     self._alexa_export = False
 

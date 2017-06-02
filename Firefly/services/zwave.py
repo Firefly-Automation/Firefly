@@ -140,7 +140,8 @@ class Zwave(Service):
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_OFF)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_ON)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
+    # TODO Maybe comment next line
+    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_ALL_NODES_QUERIED)

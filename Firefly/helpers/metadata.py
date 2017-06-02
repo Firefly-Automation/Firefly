@@ -22,12 +22,12 @@ def metaSwitch(command=True, request=True, primary=False):
     'command': command,
     'request': request,
     'primary': primary,
-    'title':   'siwtch',
+    'title':   'switch',
     'context': 'Change switch.',
     'type':    'select',
     'options': {
-      "On":  EVENT_ACTION_ON,
-      "Off": EVENT_ACTION_OFF
+      EVENT_ACTION_ON: "On",
+      EVENT_ACTION_OFF: "Off"
     }
   }
   return meta
@@ -42,8 +42,8 @@ def metaPresence(command=True, request=True, primary=False):
     'context': 'Set the presence of a device.',
     'type':    'select',
     'options': {
-      "Present":     PRESENT,
-      "Not Present": NOT_PRESENT
+      PRESENT: "Present",
+      NOT_PRESENT: "Not Present"
     }
   }
   return meta
@@ -58,8 +58,8 @@ def metaContact(command=False, request=True, primary=False):
     'context': 'Contact state of the device.',
     'type':    'text',
     'options': {
-      "Open":   CONTACT_OPEN,
-      "Closed": CONTACT_CLOSED
+      CONTACT_OPEN: "Open",
+      CONTACT_CLOSED: "Closed"
     }
   }
   return meta
@@ -70,11 +70,27 @@ def metaMotion(command=False, request=True, primary=False):
     'command': command,
     'request': request,
     'primary': primary,
+    'title': 'motion',
     'context': 'Motion state of the device.',
     'type':    'text',
     'options': {
-      "Active":   MOTION_ACTIVE,
-      "Inactive": MOTION_INACTIVE
+      MOTION_ACTIVE: "Active",
+      MOTION_INACTIVE: "Inactive"
+    }
+  }
+  return meta
+
+def metaWaterLevel(command=False, request=True, primary=False):
+  meta = {
+    'command': command,
+    'request': request,
+    'primary': primary,
+    'title':   'water_level',
+    'context': 'Is it full or empty',
+    'type':    'text',
+    'options': {
+      CONTACT_OPEN: "Empty",
+      CONTACT_CLOSED: "Full"
     }
   }
   return meta

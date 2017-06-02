@@ -123,6 +123,10 @@ class HueDevice(Device):
     self._hue_service = kwargs.get('hue_service', 'service_hue')
     self._hue_number = kwargs.get('hue_number')
 
+    if self._alias != self._name:
+      self._alias = self._name
+      self.firefly.aliases.set_alias(self.id, self._alias)
+
     if kwargs.get(self.hue_noun):
       self._on = kwargs.get(self.hue_noun).get('on')
       self._hue = kwargs.get(self.hue_noun).get('hue')

@@ -27,3 +27,4 @@ yarl
 typing
 asyncio
 aiohttp_cors
+pyrebase

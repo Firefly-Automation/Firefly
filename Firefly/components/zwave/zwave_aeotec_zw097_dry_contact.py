@@ -3,6 +3,7 @@ from openzwave.network import ZWaveNode
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import CONTACT, CONTACT_CLOSED, CONTACT_OPEN, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF, STATE
+from Firefly.helpers.metadata import metaWaterLevel
 
 TITLE = 'Aeotec Zwave ZW097 Dry Conact'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
@@ -34,6 +35,8 @@ class ZwaveAeotecDryContact(ZwaveDevice):
     self.add_request(STATE, self.get_state)
     self.add_request(CONTACT, self.get_state)
 
+    self.add_action(CONTACT, metaWaterLevel())
+
     self._alexa_export = False
 
   def update_device_config(self, **kwargs):
@@ -46,14 +49,13 @@ class ZwaveAeotecDryContact(ZwaveDevice):
     Args:
       **kwargs ():
     """
-    self.node.refresh_info()
     if self._update_try_count >= 5:
       self._config_updated = True
       return
 
-    # TODO: self._sensitivity ??
     # https://github.com/OpenZWave/open-zwave/blob/master/config/aeotec/zw097.xml
     self.node.set_config_param(2, 0, size=1)  # Disable 10 min wakeup
+    self.node.set_config_param(121, 272, 4)
 
     successful = True
     successful &= self.node.request_config_param(2) == 0
@@ -64,18 +66,28 @@ class ZwaveAeotecDryContact(ZwaveDevice):
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     if node is None:
       return
+    print(kwargs)
 
-    super().update_from_zwave(node, **kwargs)
-
+    print('water 1')
     values = kwargs.get('values')
     if values is None:
       return
-    genre = values.genre
-    if genre == 'Basic':
-      if values.label != 'Basic':
-        return
-      self._state = CONTACT_OPEN if values.data == 255 else CONTACT_CLOSED
-      return
+
+    self._state = CONTACT_OPEN if values == 255 else CONTACT_CLOSED
+
+    try:
+      super().update_from_zwave(node, **kwargs)
+    except Exception as e:
+      print(e)
+
+
+    #genre = values.genre
+    #if genre != 'User':
+    #  return
+
+    print('water 2')
+    #self._state = CONTACT_OPEN if values.data == 255 else CONTACT_CLOSED
+    #self._state = CONTACT_OPEN if self.get_sensors(sensor='sensor') is True else CONTACT_CLOSED
 
   def get_state(self, **kwargs):
     return self.state

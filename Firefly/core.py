@@ -24,6 +24,7 @@ class Firefly(object):
     # TODO: Most of this should be in startup not init.
     logging.Startup(self)
     logging.message('Initializing Firefly')
+    self._components = {}
     self.settings = settings
     self.loop = asyncio.get_event_loop()
 
@@ -33,7 +34,7 @@ class Firefly(object):
     self._subscriptions = Subscriptions()
 
     self.location = Location(self, self.settings.postal_code, self.settings.modes)
-    self._components = {}
+
 
     # Start Notification service
     self.install_package('Firefly.services.notification', alias='service notification')
@@ -188,6 +189,14 @@ class Firefly(object):
       kwargs.pop('package')
     return package.Setup(self, module, **kwargs)
 
+  def send_firebase(self, event):
+    if self.components.get('service_firebase'):
+      message = {
+        event.source : event.event_action
+
+      }
+      self.components['service_firebase'].push(data=message)
+
   @asyncio.coroutine
   def async_send_event(self, event):
     logging.info('Received event: %s' % event)
@@ -196,6 +205,7 @@ class Firefly(object):
     send_to = self._subscriptions.get_subscribers(event.source, event_action=event.event_action)
     for s in send_to:
       s &= yield from self._send_event(event, s, fut)
+    self.send_firebase(event)
     return s
 
   def send_event(self, event: Event) -> Any:
@@ -206,6 +216,7 @@ class Firefly(object):
       # asyncio.ensure_future(self._send_event(event, s, fut), loop=self.loop)
       self.components[s].event(event)
       # self.loop.run_in_executor(None,self.components[s].event, event)
+    self.send_firebase(event)
     return True
 
   @asyncio.coroutine
