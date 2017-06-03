@@ -213,9 +213,9 @@ class Firebase(Service):
       self.user = self.auth.refresh(self.user['refreshToken'])
       self.id_token = self.user['idToken']
       self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
-      logging.notify('Token Refreshed')
+      #logging.notify('Token Refreshed')
     except Exception as e:
-      logging.notify(e)
+      #logging.notify(e)
       try:
         try:
           self.stream.close()
@@ -225,8 +225,9 @@ class Firebase(Service):
         self.id_token = self.user['idToken']
         self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
       except Exception as e:
-        logging.notify('failed to reauth for stream')
-        logging.notify(e)
+        #logging.notify('failed to reauth for stream')
+        #logging.notify(e)
+        pass
 
 
   def push(self, **kwargs):

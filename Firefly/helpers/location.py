@@ -63,7 +63,7 @@ class Location(object):
   def DayEventHandler(self, day_event):
     logging.info('day event handler - event: {}'.format(day_event))
     # TODO: Remove this logging.notify
-    logging.notify('day event handler - event: {}'.format(day_event))
+    #logging.notify('day event handler - event: {}'.format(day_event))
     event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={SOURCE_LOCATION: day_event})
     self._firefly.send_event(event)
     next_day_event_time = self.getNextDayEvent(day_event)

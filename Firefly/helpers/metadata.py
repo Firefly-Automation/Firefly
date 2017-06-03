@@ -17,7 +17,7 @@ def metaDimmer(min=0, max=100, command=True, request=False, primary=False):
   return meta
 
 
-def metaSwitch(command=True, request=True, primary=False):
+def metaSwitch(command=True, request=True, primary=False, on_action=EVENT_ACTION_ON, off_action=EVENT_ACTION_OFF):
   meta = {
     'command': command,
     'request': request,
@@ -26,8 +26,8 @@ def metaSwitch(command=True, request=True, primary=False):
     'context': 'Change switch.',
     'type':    'select',
     'options': {
-      EVENT_ACTION_ON: "On",
-      EVENT_ACTION_OFF: "Off"
+      on_action: "On",
+      off_action: "Off"
     }
   }
   return meta
