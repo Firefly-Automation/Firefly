@@ -73,6 +73,10 @@ class ZwaveAeotecDryContact(ZwaveDevice):
     if values is None:
       return
 
+    print(values)
+
+    print(values)
+
     self._state = CONTACT_OPEN if values == 255 else CONTACT_CLOSED
 
     try:
