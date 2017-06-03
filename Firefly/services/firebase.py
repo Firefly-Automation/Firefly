@@ -107,7 +107,11 @@ class Firebase(Service):
       path = message['path']
       ff_id = path[1:]
       command = message['data']
-      myCommand = Command(ff_id, 'webapi', command)
+      myCommand = None
+      if type(command) is str:
+        myCommand = Command(ff_id, 'webapi', command)
+      elif type(command) is dict:
+        myCommand = Command(ff_id, 'webapi', list(command.keys())[0], **dict(list(command.values())[0]))
       self.firefly.send_command(myCommand)
 
       self.db.child("userCommands/" + self.uid).child(ff_id).remove(self.id_token)
@@ -230,9 +234,7 @@ class Firebase(Service):
         pass
 
 
-  def push(self, **kwargs):
-    data = kwargs.get('data')
-    print(data)
-    self.db.child("userDevices").child(self.uid).update(data, self.id_token)
+  def push(self, source, action):
+    self.db.child("userDevices").child(self.uid).child(source).update(action, self.id_token)
 
 

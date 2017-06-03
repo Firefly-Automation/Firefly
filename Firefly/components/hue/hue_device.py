@@ -242,8 +242,10 @@ class HueDevice(Device):
         level = min(level, 100)
         bri = int(255.0 / 100.0 * level)
         self._bri = bri
+        self._on = True
         hue_value.update({
-          'bri': bri
+          'bri': bri,
+          'on': True
         })
       else:
         bri = 0
@@ -268,9 +270,11 @@ class HueDevice(Device):
           'on': False
         })
       else:
+        self._on = True
         self._level = int(bri / 255.0 * 100.0)
       hue_value.update({
-        'bri': bri
+        'bri': bri,
+        'on': True
       })
       self._bri = bri
 

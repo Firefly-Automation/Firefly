@@ -68,8 +68,32 @@ class Device(object):
     self._room = kwargs.get('room', '')
     self._tags = kwargs.get('tags', [])
 
+    self.add_command('set_alias', self.set_alias)
+    self.add_command('set_room', self.set_room)
+
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
+
+  def set_alias(self, **kwargs):
+    new_alias = kwargs.get('alias')
+    if new_alias is None:
+      return
+
+    self._alias = aliases.set_alias(self._id, new_alias)
+    self._habridge_alias = self._alias
+    self._alexa_alias = self._alias
+    self._homekit_alias = self._alias
+
+  def set_room(self, **kwargs):
+    new_room = kwargs.get('room')
+    if new_room is None:
+      return
+
+    self._room = new_room
+    self.firefly._rooms.build_rooms()
+
+
+
 
   def export(self, current_values: bool = True, api_view: bool = False) -> dict:
     """

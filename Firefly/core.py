@@ -191,11 +191,7 @@ class Firefly(object):
 
   def send_firebase(self, event):
     if self.components.get('service_firebase'):
-      message = {
-        event.source : event.event_action
-
-      }
-      self.components['service_firebase'].push(data=message)
+      self.components['service_firebase'].push(event.source, event.event_action)
 
   @asyncio.coroutine
   def async_send_event(self, event):
