@@ -54,8 +54,8 @@ class ZwaveAeotecDryContact(ZwaveDevice):
       return
 
     # https://github.com/OpenZWave/open-zwave/blob/master/config/aeotec/zw097.xml
-    self.node.set_config_param(2, 0, size=1)  # Disable 10 min wakeup
-    self.node.set_config_param(121, 272, size=4)
+    #self.node.set_config_param(2, 0, size=1)  # Disable 10 min wakeup
+    #self.node.set_config_param(121, 272, size=4)
 
     successful = True
     #successful &= self.node.request_config_param(2) == 0
