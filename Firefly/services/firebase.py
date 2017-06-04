@@ -2,13 +2,9 @@ import configparser
 
 import pyrebase
 
-from Firefly import logging
-from Firefly.const import SERVICE_CONFIG_FILE
-from Firefly.helpers.service import Service, Request, Command
-from Firefly import scheduler
-from Firefly.const import TYPE_DEVICE,API_INFO_REQUEST, API_ALEXA_VIEW
-
-
+from Firefly import logging, scheduler
+from Firefly.const import API_ALEXA_VIEW, API_INFO_REQUEST, SERVICE_CONFIG_FILE, TYPE_AUTOMATION, TYPE_DEVICE
+from Firefly.helpers.service import Command, Request, Service
 
 TITLE = 'Firebase Service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
@@ -63,18 +59,16 @@ class Firebase(Service):
     self.add_command('push', self.push)
 
     self.config = {
-      "apiKey":      self.api_key,
-      "authDomain":  self.auth_domain,
-      "databaseURL": self.database_url,
-      "storageBucket" : self.storage_bucket
+      "apiKey":        self.api_key,
+      "authDomain":    self.auth_domain,
+      "databaseURL":   self.database_url,
+      "storageBucket": self.storage_bucket
     }
-
 
     self.firebase = pyrebase.initialize_app(self.config)
 
     # Get a reference to the auth service
     self.auth = self.firebase.auth()
-
 
     # Log the user in
     self.user = self.auth.sign_in_with_email_and_password(self.email, self.password)
@@ -84,7 +78,6 @@ class Firebase(Service):
     print('***********************')
     print(str(self.user))
     print('***********************')
-
 
     # Get a reference to the database service
     self.db = self.firebase.database()
@@ -96,7 +89,6 @@ class Firebase(Service):
     scheduler.runInS(20, self.refresh_status)
 
     self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
-
 
   def refresh_stream(self):
     self.stream.close()
@@ -116,8 +108,6 @@ class Firebase(Service):
 
       self.db.child("userCommands/" + self.uid).child(ff_id).remove(self.id_token)
 
-
-
   def refresh_all(self):
     # Hard-coded refresh all device values
     # TODO use core api for this.
@@ -136,9 +126,27 @@ class Firebase(Service):
 
       modes = self.firefly.location.modes
       self.db.child("userModes").child(self.uid).set(modes, self.id_token)
+
+      routines = self.get_routines()
+      self.db.child("userRoutines").child(self.uid).set(routines, self.id_token)
+
     except Exception as e:
       logging.notify(e)
 
+  def get_routines(self):
+    routines = []
+    for ff_id, d in self.firefly.components.items():
+      if d.type == TYPE_AUTOMATION and 'routine' in d._package:
+        routines.append({
+          'alias': d._alias,
+          'title': d._title,
+          'ff_id': ff_id,
+          'icon':  d.icon,
+          'mode':  d.mode,
+          'export_ui': d.export_ui,
+          'config': d.export()
+        })
+    return routines
 
   def get_component_view(self, ff_id, source):
     device_request = Request(ff_id, source, API_INFO_REQUEST)
@@ -169,10 +177,9 @@ class Firebase(Service):
     views = []
     for ff_id, device in self.firefly.components.items():
       if device.type in filter or filter is None:
-        data =  self.get_component_view(ff_id, source)
+        data = self.get_component_view(ff_id, source)
         views.append(data)
     return views
-
 
   def refresh_status(self):
     status_data = {}
@@ -197,18 +204,17 @@ class Firebase(Service):
     except Exception as e:
       logging.notify(e)
 
-
   def refresh_user(self):
-    #TODO FIX THIS
-    #self.user = self.auth.refresh(self.user['refreshToken'])
-    #self.id_token = self.user['idToken']
+    # TODO FIX THIS
+    # self.user = self.auth.refresh(self.user['refreshToken'])
+    # self.id_token = self.user['idToken']
 
-    #self.user = self.auth.sign_in_with_email_and_password(self.email, self.password)
-    #self.uid = self.user['localId']
-    #self.id_token = self.user['idToken']
+    # self.user = self.auth.sign_in_with_email_and_password(self.email, self.password)
+    # self.uid = self.user['localId']
+    # self.id_token = self.user['idToken']
 
-    #self.stream.close()
-    #self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
+    # self.stream.close()
+    # self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
     try:
       try:
         self.stream.close()
@@ -217,9 +223,9 @@ class Firebase(Service):
       self.user = self.auth.refresh(self.user['refreshToken'])
       self.id_token = self.user['idToken']
       self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
-      #logging.notify('Token Refreshed')
+      # logging.notify('Token Refreshed')
     except Exception as e:
-      #logging.notify(e)
+      # logging.notify(e)
       try:
         try:
           self.stream.close()
@@ -229,12 +235,9 @@ class Firebase(Service):
         self.id_token = self.user['idToken']
         self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
       except Exception as e:
-        #logging.notify('failed to reauth for stream')
-        #logging.notify(e)
+        # logging.notify('failed to reauth for stream')
+        # logging.notify(e)
         pass
-
 
   def push(self, source, action):
     self.db.child("userDevices").child(self.uid).child(source).update(action, self.id_token)
-
-

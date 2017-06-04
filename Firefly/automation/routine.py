@@ -22,6 +22,8 @@ class Routine(Automation):
     self.add_command('execute', self.event_handler)
     self._message = kwargs.get('message')
     self._set_mode = kwargs.get('mode')
+    self._icon = kwargs.get('icon', 'new_releases')
+    self._export_ui = kwargs.get('export_ui', True)
 
   def export(self, **kwargs):
     export_data = super().export()
@@ -29,7 +31,10 @@ class Routine(Automation):
       export_data['message'] = self._message
     if self._set_mode:
       export_data['mode'] = self._set_mode
+    export_data['icon'] = self.icon
+    export_data['export_ui'] = self.export_ui
     return export_data
+
 
   def event_handler(self, event=None, **kwargs):
     if self._message:
@@ -42,4 +47,16 @@ class Routine(Automation):
     for a in self.actions:
       a.execute_action(self._firefly)
     return True
+
+  @property
+  def icon(self):
+      return self._icon
+
+  @property
+  def export_ui(self):
+      return self._export_ui
+
+  @property
+  def mode(self):
+    return self._set_mode
 
