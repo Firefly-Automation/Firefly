@@ -70,6 +70,7 @@ class Device(object):
 
     self.add_command('set_alias', self.set_alias)
     self.add_command('set_room', self.set_room)
+    self.add_command('delete', self.delete_device)
 
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
@@ -93,7 +94,9 @@ class Device(object):
     self.firefly._rooms.build_rooms()
 
 
-
+  def delete_device(self):
+    self.firefly.delete_device(self.id)
+    return
 
   def export(self, current_values: bool = True, api_view: bool = False) -> dict:
     """

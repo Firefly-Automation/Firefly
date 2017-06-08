@@ -1,6 +1,7 @@
 import configparser
 
 import pyrebase
+import requests
 
 from Firefly import logging, scheduler
 from Firefly.const import API_ALEXA_VIEW, API_INFO_REQUEST, SERVICE_CONFIG_FILE, TYPE_AUTOMATION, TYPE_DEVICE
@@ -33,11 +34,12 @@ def Setup(firefly, package, **kwargs):
   email = config.get(SECTION, 'email', fallback=None)
   password = config.get(SECTION, 'password', fallback=None)
   storage_bucket = config.get(SECTION, 'storage_bucket', fallback=None)
+  home_id = config.get(SECTION, 'home_id', fallback=None)
   if api_key is None:
     logging.error('firebase error')  # TODO Make this error code
     return False
   firebase = Firebase(firefly, package, api_key=api_key, auth_domain=auth_domain, database_url=database_url,
-                      email=email, password=password, storage_bucket=storage_bucket)
+                      email=email, password=password, storage_bucket=storage_bucket, home_id=home_id)
   firefly.components[SERVICE_ID] = firebase
   return True
 
@@ -55,6 +57,8 @@ class Firebase(Service):
     self.storage_bucket = kwargs.get('storage_bucket')
     self.email = kwargs.get('email')
     self.password = kwargs.get('password')
+
+    self.home_id = kwargs.get('home_id')
 
     self.add_command('push', self.push)
 
@@ -82,17 +86,41 @@ class Firebase(Service):
     # Get a reference to the database service
     self.db = self.firebase.database()
 
+    if self.home_id is None:
+      self.register_home()
+
     scheduler.runEveryM(30, self.refresh_user)
     scheduler.runEveryM(5, self.refresh_all)
     scheduler.runInS(20, self.refresh_all)
     scheduler.runEveryM(20, self.refresh_status)
     scheduler.runInS(20, self.refresh_status)
 
-    self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
+    #self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
+    self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler,
+                                                                                           self.id_token)
+
+  def register_home(self):
+    register_url = 'https://us-central1-firefly-beta-cdb9d.cloudfunctions.net/registerHome'
+    return_data = requests.post(register_url, data={
+      'uid': self.uid
+    }).json()
+    self.home_id = return_data.get('home_id')
+
+    if self.home_id is None:
+      logging.notify('error registering home')
+      return
+
+    config = configparser.ConfigParser()
+    config.read(SERVICE_CONFIG_FILE)
+    config.set(SECTION, r'home_id', str(self.home_id))
+    with open(SERVICE_CONFIG_FILE, 'w') as configfile:
+      config.write(configfile)
+    logging.info('Config file for hue has been updated.')
 
   def refresh_stream(self):
     self.stream.close()
-    self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
+    #self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
+    self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler, self.id_token)
 
   def stream_handler(self, message):
     if message['data']:
@@ -106,7 +134,8 @@ class Firebase(Service):
         myCommand = Command(ff_id, 'webapi', list(command.keys())[0], **dict(list(command.values())[0]))
       self.firefly.send_command(myCommand)
 
-      self.db.child("userCommands/" + self.uid).child(ff_id).remove(self.id_token)
+      #self.db.child("userCommands/" + self.uid).child(ff_id).remove(self.id_token)
+      self.db.child('homeStatus').child(self.home_id).child('commands').child(ff_id).remove(self.id_token)
 
   def refresh_all(self):
     # Hard-coded refresh all device values
@@ -119,16 +148,20 @@ class Firebase(Service):
         pass
 
     try:
-      self.db.child("userDevices").child(self.uid).update(all_values, self.id_token)
-
       alexa_views = self.get_all_alexa_views('firebase')
       self.db.child("userAlexa").child(self.uid).child("devices").set(alexa_views, self.id_token)
 
-      modes = self.firefly.location.modes
-      self.db.child("userModes").child(self.uid).set(modes, self.id_token)
+      #modes = self.firefly.location.modes
+      #self.db.child("userModes").child(self.uid).set(modes, self.id_token)
 
       routines = self.get_routines()
-      self.db.child("userRoutines").child(self.uid).set(routines, self.id_token)
+      #self.db.child("userRoutines").child(self.uid).set(routines, self.id_token)
+
+      #self.db.child("userDevices").child(self.uid).update(all_values, self.id_token)
+
+      #TODO DELETE ABOVE WHEN HOUSES WORK
+      self.db.child("homeStatus").child(self.home_id).child('devices').update(all_values, self.id_token)
+      self.db.child("homeStatus").child(self.home_id).child('routines').set(routines, self.id_token)
 
     except Exception as e:
       logging.notify(e)
@@ -138,13 +171,13 @@ class Firebase(Service):
     for ff_id, d in self.firefly.components.items():
       if d.type == TYPE_AUTOMATION and 'routine' in d._package:
         routines.append({
-          'alias': d._alias,
-          'title': d._title,
-          'ff_id': ff_id,
-          'icon':  d.icon,
-          'mode':  d.mode,
+          'alias':     d._alias,
+          'title':     d._title,
+          'ff_id':     ff_id,
+          'icon':      d.icon,
+          'mode':      d.mode,
           'export_ui': d.export_ui,
-          'config': d.export()
+          'config':    d.export()
         })
     return routines
 
@@ -200,7 +233,9 @@ class Firebase(Service):
     print(status_data)
 
     try:
-      self.db.child("userStatus").child(self.uid).set(status_data, self.id_token)
+      # TODO Delete this line when homes work
+      #self.db.child("userStatus").child(self.uid).set(status_data, self.id_token)
+      self.db.child("homeStatus").child(self.home_id).child('status').set(status_data, self.id_token)
     except Exception as e:
       logging.notify(e)
 
@@ -215,29 +250,37 @@ class Firebase(Service):
 
     # self.stream.close()
     # self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
+    # try:
+    #  try:
+    #    self.stream.close()
+    #  except:
+    #    pass
+    #  self.user = self.auth.refresh(self.user['refreshToken'])
+    #  self.id_token = self.user['idToken']
+    #  self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
+    #  # logging.notify('Token Refreshed')
+    # except Exception as e:
+    # logging.notify(e)
     try:
       try:
         self.stream.close()
       except:
         pass
-      self.user = self.auth.refresh(self.user['refreshToken'])
+      self.user = self.auth.sign_in_with_email_and_password(self.email, self.password)
       self.id_token = self.user['idToken']
-      self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
-      # logging.notify('Token Refreshed')
+      #self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
+      self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler,
+                                                                                             self.id_token)
     except Exception as e:
-      # logging.notify(e)
-      try:
-        try:
-          self.stream.close()
-        except:
-          pass
-        self.user = self.auth.sign_in_with_email_and_password(self.email, self.password)
-        self.id_token = self.user['idToken']
-        self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
-      except Exception as e:
-        # logging.notify('failed to reauth for stream')
-        # logging.notify(e)
-        pass
+      # logging.notify('failed to reauth for stream')
+      logging.notify(e)
+      pass
 
   def push(self, source, action):
-    self.db.child("userDevices").child(self.uid).child(source).update(action, self.id_token)
+    try:
+      #self.db.child("userDevices").child(self.uid).child(source).update(action, self.id_token)
+      self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
+    except:
+      self.refresh_user()
+      #self.db.child("userDevices").child(self.uid).child(source).update(action, self.id_token)
+      self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)

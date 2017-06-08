@@ -137,6 +137,11 @@ class Firefly(object):
     future.set_result(r)
     return r
 
+  def delete_device(self, ff_id):
+    self.components.pop(ff_id)
+    if self.components.get('service_firebase'):
+      self.components['service_firebase'].refresh_all()
+
   def export_all_components(self) -> None:
     """
     Export current values to backup files to restore current config on reboot.
