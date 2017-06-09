@@ -31,12 +31,16 @@ class ZwaveDevice(Device):
     self._product_name = ''
     self._product_type = ''
 
+    self._battery = 'NOT REPORTED'
+
     self.add_command('ZWAVE_CONFIG', self.zwave_config)
     self.add_command('ZWAVE_UPDATE', self.update_from_zwave)
 
     self.add_request('SENSORS', self.get_sensors)
     self.add_request('PARAMS', self.get_params)
     self.add_request('RAW_VALUES', self.get_raw_values)
+
+    self.add_request('battery', self.get_battery)
 
     self._update_lock = False
 
@@ -166,6 +170,9 @@ class ZwaveDevice(Device):
         'class': values.command_class
       }
 
+      if values.command_class == 128:
+        self._battery = values.data
+
       for s, i in node.get_sensors().items():
         self._sensors[i.label.lower()] = i.data
 
@@ -176,6 +183,9 @@ class ZwaveDevice(Device):
         # if old_security_data != new_security_data:
         #  self._node.refresh_info()
         #  self._node.request_state()
+
+  def get_battery(self):
+    return self._battery
 
   @property
   def node(self):

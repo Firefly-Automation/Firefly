@@ -51,6 +51,10 @@ class Notify(Service):
     for d in device:
       notify_command = Command(d, SERVICE_ID, COMMAND_NOTIFY, priority=priority, **kwargs)
       self._firefly.send_command(notify_command)
+
+    if self._firefly.components.get('service_firebase'):
+      self._firefly.components['service_firebase'].push_notification(message, priority)
+
     return True
 
 

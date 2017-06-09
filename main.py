@@ -1,10 +1,7 @@
-from Firefly.core import Firefly
-from Firefly.helpers.settings import Settings
-from Firefly.const import CONFIG_FILE
-
 from Firefly.api import FireflyCoreAPI
-
-from Firefly.core import app
+from Firefly.const import CONFIG_FILE
+from Firefly.core import Firefly, app
+from Firefly.helpers.settings import Settings
 
 
 def main():
@@ -20,6 +17,7 @@ def main():
 
   # Start Firefly.
   firefly.start()
+
 
 if __name__ == '__main__':
   main()

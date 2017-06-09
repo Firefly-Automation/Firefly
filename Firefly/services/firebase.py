@@ -95,7 +95,6 @@ class Firebase(Service):
     scheduler.runEveryM(20, self.refresh_status)
     scheduler.runInS(20, self.refresh_status)
 
-    #self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
     self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler,
                                                                                            self.id_token)
 
@@ -119,23 +118,26 @@ class Firebase(Service):
 
   def refresh_stream(self):
     self.stream.close()
-    #self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
-    self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler, self.id_token)
+    # self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
+    self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler,
+                                                                                           self.id_token)
 
   def stream_handler(self, message):
-    if message['data']:
-      path = message['path']
-      ff_id = path[1:]
-      command = message['data']
-      myCommand = None
-      if type(command) is str:
-        myCommand = Command(ff_id, 'webapi', command)
-      elif type(command) is dict:
-        myCommand = Command(ff_id, 'webapi', list(command.keys())[0], **dict(list(command.values())[0]))
-      self.firefly.send_command(myCommand)
-
-      #self.db.child("userCommands/" + self.uid).child(ff_id).remove(self.id_token)
-      self.db.child('homeStatus').child(self.home_id).child('commands').child(ff_id).remove(self.id_token)
+    try:
+      if message['data']:
+        path = message['path']
+        ff_id = path[1:]
+        command = message['data']
+        myCommand = None
+        if type(command) is str:
+          myCommand = Command(ff_id, 'webapi', command)
+        elif type(command) is dict:
+          myCommand = Command(ff_id, 'webapi', list(command.keys())[0], **dict(list(command.values())[0]))
+        self.firefly.send_command(myCommand)
+        self.db.child('homeStatus').child(self.home_id).child('commands').child(ff_id).remove(self.id_token)
+    except Exception as e:
+      logging.notify(e)
+      self.db.child('homeStatus').child(self.home_id).child('commands').remove(self.id_token)
 
   def refresh_all(self):
     # Hard-coded refresh all device values
@@ -150,16 +152,8 @@ class Firebase(Service):
     try:
       alexa_views = self.get_all_alexa_views('firebase')
       self.db.child("userAlexa").child(self.uid).child("devices").set(alexa_views, self.id_token)
-
-      #modes = self.firefly.location.modes
-      #self.db.child("userModes").child(self.uid).set(modes, self.id_token)
-
       routines = self.get_routines()
-      #self.db.child("userRoutines").child(self.uid).set(routines, self.id_token)
-
-      #self.db.child("userDevices").child(self.uid).update(all_values, self.id_token)
-
-      #TODO DELETE ABOVE WHEN HOUSES WORK
+      # TODO DELETE ABOVE WHEN HOUSES WORK
       self.db.child("homeStatus").child(self.home_id).child('devices').update(all_values, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('routines').set(routines, self.id_token)
 
@@ -230,37 +224,19 @@ class Firebase(Service):
     status_data['is_dark'] = self.firefly.location.isDark
     status_data['mode'] = self.firefly.location.mode
     status_data['last_mode'] = self.firefly.location.lastMode
-    print(status_data)
+
+    for room_alias, room in self.firefly._rooms._rooms.items():
+      status_data['devices'].append({'ff_id': room.id, 'alias':room.alias + ' (room)'})
+
 
     try:
       # TODO Delete this line when homes work
-      #self.db.child("userStatus").child(self.uid).set(status_data, self.id_token)
+      # self.db.child("userStatus").child(self.uid).set(status_data, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('status').set(status_data, self.id_token)
     except Exception as e:
       logging.notify(e)
 
   def refresh_user(self):
-    # TODO FIX THIS
-    # self.user = self.auth.refresh(self.user['refreshToken'])
-    # self.id_token = self.user['idToken']
-
-    # self.user = self.auth.sign_in_with_email_and_password(self.email, self.password)
-    # self.uid = self.user['localId']
-    # self.id_token = self.user['idToken']
-
-    # self.stream.close()
-    # self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
-    # try:
-    #  try:
-    #    self.stream.close()
-    #  except:
-    #    pass
-    #  self.user = self.auth.refresh(self.user['refreshToken'])
-    #  self.id_token = self.user['idToken']
-    #  self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
-    #  # logging.notify('Token Refreshed')
-    # except Exception as e:
-    # logging.notify(e)
     try:
       try:
         self.stream.close()
@@ -268,19 +244,54 @@ class Firebase(Service):
         pass
       self.user = self.auth.sign_in_with_email_and_password(self.email, self.password)
       self.id_token = self.user['idToken']
-      #self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
       self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler,
                                                                                              self.id_token)
     except Exception as e:
-      # logging.notify('failed to reauth for stream')
       logging.notify(e)
       pass
 
   def push(self, source, action):
     try:
-      #self.db.child("userDevices").child(self.uid).child(source).update(action, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
+      if source != 'time':
+        now = self.firefly.location.now
+        now_time = now.strftime("%B %d %Y %I:%M:%S")
+        self.db.child("homeStatus").child(self.home_id).child('events').push({
+          'ff_id':     source,
+          'event':     action,
+          'timestamp': now.timestamp(),
+          'time':      now_time
+        }, self.id_token)
     except:
       self.refresh_user()
-      #self.db.child("userDevices").child(self.uid).child(source).update(action, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
+      if source != 'time':
+        now = self.firefly.location.now
+        now_time = now.strftime("%B %d %Y %I:%M:%S")
+        self.db.child("homeStatus").child(self.home_id).child('events').push({
+          'ff_id':     source,
+          'event':     action,
+          'timestamp': now.timestamp(),
+          'time':      now_time
+        }, self.id_token)
+
+  def push_notification(self, message, priority):
+    try:
+      now = self.firefly.location.now
+      now_time = now.strftime("%B %d %Y %I:%M:%S")
+      self.db.child("homeStatus").child(self.home_id).child('notifications').push({
+        'message':   message,
+        'priority':  priority,
+        'timestamp': now.timestamp(),
+        'time':      now_time
+      }, self.id_token)
+    except:
+      self.refresh_user()
+      now = self.firefly.location.now
+      now_time = now.strftime("%B %d %Y %I:%M:%S")
+      self.db.child("homeStatus").child(self.home_id).child('notifications').push({
+        'message':   message,
+        'priority':  priority,
+        'timestamp': now.timestamp(),
+        'time':      now_time
+      }, self.id_token)
