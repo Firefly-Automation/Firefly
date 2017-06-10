@@ -32,7 +32,7 @@ class ZwaveDevice(Device):
     self._product_name = ''
     self._product_type = ''
 
-    self._battery = 'NOT REPORTED'
+    self._battery = kwargs.get('battery', 'NOT REPORTED')
 
     self.add_command('ZWAVE_CONFIG', self.zwave_config)
     self.add_command('ZWAVE_UPDATE', self.update_from_zwave)
@@ -74,6 +74,7 @@ class ZwaveDevice(Device):
     export_data['manufacturer_name'] = self._manufacturer_name
     export_data['product_name'] = self._product_name
     export_data['product_type'] = self._product_type
+    export_data['battery'] = self._battery
     return export_data
 
   def get_sensors(self, **kwargs):
