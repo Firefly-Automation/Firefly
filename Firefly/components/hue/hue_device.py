@@ -72,6 +72,9 @@ class HueDevice(Device):
     self.add_request(STATE, self.get_state)
     self.add_request(SWITCH, self.get_state)
 
+    self.add_request('hue', self.get_hue)
+    self.add_request('sat', self.get_sat)
+
     self.add_action(STATE, metaSwitch(primary=True))
     self.add_action(LEVEL, metaDimmer())
 
@@ -158,6 +161,12 @@ class HueDevice(Device):
 
   def get_level(self, **kwargs):
     return self._level
+
+  def get_sat(self, **kwargs):
+    return self._sat
+
+  def get_hue(self, **kwargs):
+    return self._hue
 
   def set_level(self, **kwargs):
     try:

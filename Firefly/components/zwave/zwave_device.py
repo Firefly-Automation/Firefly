@@ -13,6 +13,7 @@ class ZwaveDevice(Device):
     requests.append('SENSORS')
     requests.append('PARAMS')
     requests.append('RAW_VALUES')
+    requests.append('battery')
 
     super().__init__(firefly, package, title, author, commands, requests, device_type, **kwargs)
 

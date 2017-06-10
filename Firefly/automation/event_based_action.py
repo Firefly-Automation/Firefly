@@ -90,6 +90,8 @@ class EventAction(Automation):
       export_data['delay_m'] = self._delay_m
     if self._delay_h:
       export_data['delay_h'] = self._delay_h
+    if self._message:
+      export_data['message'] = self._message
     return export_data
 
   @property
