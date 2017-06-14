@@ -11,12 +11,13 @@ DEVICE_TYPE = DEVICE_TYPE_PRESENCE
 AUTHOR = AUTHOR
 COMMANDS = [ACTION_PRESENT, ACTION_NOT_PRESENT, ACTION_PRESENT_BEACON, ACTION_NOT_PRESENT_BEACON, ACTION_ENABLE_BEACON,
   PRESENCE, ACTION_SET_DELAY]
-REQUESTS = [PRESENCE, BEACON_ENABLED]
+REQUESTS = [PRESENCE, BEACON_ENABLED, 'beacon_presence', 'raw_presence']
 INITIAL_VALUES = {
-  '_delay':           5,
+  '_delay':           300,
   '_presence':        NOT_PRESENT,
   '_beacon_enabled':  NOT_ENABLED,
-  '_beacon_presence': NOT_PRESENT
+  '_beacon_presence': NOT_PRESENT,
+  '_raw_presence':    NOT_PRESENT
 }
 
 
@@ -37,6 +38,7 @@ def Setup(firefly, package, **kwargs):
 class VirtualPresence(Device):
   """
   """
+
   def __init__(self, firefly, package, **kwargs):
     """
 
@@ -59,6 +61,8 @@ class VirtualPresence(Device):
 
     self.add_request(PRESENCE, self.get_presence)
     self.add_request(BEACON_ENABLED, self.get_beacon_enabled)
+    self.add_request('beacon_presence', self.get_beacon_presence)
+    self.add_request('raw_presence', self.get_raw_presence)
 
     self.add_action(PRESENCE, metaPresence(primary=True))
 
@@ -106,6 +110,7 @@ class VirtualPresence(Device):
 
     """
     self._presence = PRESENT
+    self._raw_presence = PRESENT
     return PRESENT
 
   def set_not_present(self, **kwargs):
@@ -114,6 +119,7 @@ class VirtualPresence(Device):
     Args:
         kwargs:
     """
+    self._raw_presence = NOT_PRESENT
     scheduler.runInS(self._delay, self._set_not_present)
 
   def set_beacon_present(self, **kwargs):
@@ -197,3 +203,9 @@ class VirtualPresence(Device):
     if self._beacon_enabled:
       return PRESENT if presence | beacon_presence else NOT_PRESENT
     return PRESENT if presence else NOT_PRESENT
+
+  def get_beacon_presence(self, **kwargs):
+    return self._beacon_presence
+
+  def get_raw_presence(self, **kwargs):
+    return self._raw_presence
