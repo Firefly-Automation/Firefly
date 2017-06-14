@@ -47,7 +47,8 @@ class VirtualPresence(Device):
         package:
         kwargs:
     """
-    kwargs['initial_values'] = INITIAL_VALUES if not kwargs.get('initial_values') else kwargs.get('initial_values')
+    kwargs['initial_values'] = INITIAL_VALUES if not kwargs.get('initial_values') else INITIAL_VALUES.update(
+      kwargs.get('initial_values'))
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
     self.__dict__.update(kwargs['initial_values'])
 
