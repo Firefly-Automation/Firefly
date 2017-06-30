@@ -20,7 +20,8 @@ PACKAGE_MAPPING = {
   '12730 Fan Control Switch': 'zwave_ge_12724_dimmer',
   '12729 3-Way Dimmer Switch': 'zwave_ge_12724_dimmer',
   '12724 3-Way Dimmer Switch': 'zwave_ge_12724_dimmer',
-  'DSB05 Multisensor': 'zwave_aeotec_dsb05_multi_sensor'
+  'DSB05 Multisensor': 'zwave_aeotec_dsb05_multi_sensor',
+  'DSC11 Smart Strip': 'zwave_aeotec_dsc11_smart_strip'
 }
 CONFIG_MAPPING = {
   'ge/12724-dimmer.xml': 'zwave_ge_12724_dimmer'

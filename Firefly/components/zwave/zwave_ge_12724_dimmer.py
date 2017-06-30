@@ -30,10 +30,8 @@ class GEDimmer(ZwaveDevice):
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
     self.__dict__.update(kwargs['initial_values'])
 
-    if self._node:
-      self._dimmers = list(self._node.get_dimmers().keys())
-    else:
-      self._dimmers = None
+    self._dimmers = None
+    self._switches = None
     self._level = 0
 
     self.add_command(ACTION_OFF, self.off)
@@ -41,8 +39,8 @@ class GEDimmer(ZwaveDevice):
     self.add_command(ACTION_TOGGLE, self.toggle)
     self.add_command(LEVEL, self.set_level)
 
-    self.add_action(STATE, metaSwitch())
-    self.add_action(LEVEL, metaDimmer(primary=True))
+    self.add_action(STATE, metaSwitch(primary=True))
+    self.add_action(LEVEL, metaDimmer())
 
     self.add_request(STATE, self.get_state)
     self.add_request(LEVEL, self.get_level)
@@ -64,8 +62,12 @@ class GEDimmer(ZwaveDevice):
     if genre != 'User':
       return
 
-    if self._dimmers is None:
-      self._dimmers = list(self._node.get_dimmers().keys())
+    print(self._node.to_dict())
+
+
+    self._dimmers = list(self._node.get_dimmers().keys())
+    #self._switches = list(self._node.get_switches().keys())
+    self._switches = list(self._node.get_switches_all().keys())
 
     self._level = node.get_dimmer_level(self._dimmers[0])
 
@@ -73,6 +75,9 @@ class GEDimmer(ZwaveDevice):
       self._state = EVENT_ACTION_OFF
     else:
       self._state = EVENT_ACTION_OFF
+
+  def set_light(self, **kwargs):
+    self.set_level(**kwargs)
 
   def set_level(self, **kwargs):
     level = 100
@@ -84,19 +89,22 @@ class GEDimmer(ZwaveDevice):
     if self.node is None:
       logging.error('[GE Dimmer] Node is not set yet.')
       return
-    self.node.set_dimmer(self._dimmers[0], level)
+    self._node.set_dimmer(self._dimmers[0], level)
+    self._node.set_switch_all(self._switches[0], 1)
     self._level = level
+    self._state = level > 0
 
   def off(self, **kwargs):
     self._state = EVENT_ACTION_OFF
-    print(self._switches)
-    self._node.set_switch(self._switches[0], 0)
-    self.node.set_dimmer(self._dimmers[0], 0)
+    self._node.set_dimmer(self._dimmers[0], 0)
+    self._node.set_switch_all(self._switches[0], 0)
     return EVENT_ACTION_OFF
 
   def on(self, **kwargs):
     self._state = EVENT_ACTION_ON
-    self._node.set_switch(self._switches[0], 1)
+    self._node.set_dimmer(self._dimmers[0], 255)
+    self._node.set_switch_all(self._switches[0], 1)
+    self._level = self._node.get_dimmer_level(self._dimmers[0])
     return EVENT_ACTION_ON
 
   def toggle(self, **kwargs):

@@ -1,11 +1,13 @@
 import configparser
+from difflib import get_close_matches
 
 import pyrebase
 import requests
 
-from Firefly import logging, scheduler
+from Firefly import aliases, logging, scheduler
 from Firefly.const import API_ALEXA_VIEW, API_INFO_REQUEST, SERVICE_CONFIG_FILE, TYPE_AUTOMATION, TYPE_DEVICE
 from Firefly.helpers.service import Command, Request, Service
+from Firefly.services.api_ai import apiai_command_reply
 
 TITLE = 'Firebase Service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
@@ -38,8 +40,7 @@ def Setup(firefly, package, **kwargs):
   if api_key is None:
     logging.error('firebase error')  # TODO Make this error code
     return False
-  firebase = Firebase(firefly, package, api_key=api_key, auth_domain=auth_domain, database_url=database_url,
-                      email=email, password=password, storage_bucket=storage_bucket, home_id=home_id)
+  firebase = Firebase(firefly, package, api_key=api_key, auth_domain=auth_domain, database_url=database_url, email=email, password=password, storage_bucket=storage_bucket, home_id=home_id)
   firefly.components[SERVICE_ID] = firebase
   return True
 
@@ -79,10 +80,6 @@ class Firebase(Service):
     self.uid = self.user['localId']
     self.id_token = self.user['idToken']
 
-    print('***********************')
-    print(str(self.user))
-    print('***********************')
-
     # Get a reference to the database service
     self.db = self.firebase.database()
 
@@ -95,8 +92,8 @@ class Firebase(Service):
     scheduler.runEveryM(20, self.refresh_status)
     scheduler.runInS(20, self.refresh_status)
 
-    self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler,
-                                                                                           self.id_token)
+    self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler, self.id_token)
+    self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
 
   def register_home(self):
     register_url = 'https://us-central1-firefly-beta-cdb9d.cloudfunctions.net/registerHome'
@@ -118,9 +115,23 @@ class Firebase(Service):
 
   def refresh_stream(self):
     self.stream.close()
-    # self.stream = self.db.child("userCommands").child(self.uid).stream(self.stream_handler, self.id_token)
-    self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler,
-                                                                                           self.id_token)
+    self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler, self.id_token)
+    self.commandReplyStream.close()
+    self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
+
+  def command_reply(self, message):
+    if not message['data']:
+      return
+    if message['data'].get('reply') is not None or message.get('reply') is not None:
+      return
+    key = message['path'][1:]
+    if 'reply' in key or 'speech' in key:
+      return
+    try:
+      reply = apiai_command_reply(self.firefly, message['data'])
+      self.db.child('homeStatus').child(self.home_id).child('commandReply').child(key).child('reply').set(reply, self.id_token)
+    except Exception as e:
+      print(str(e))
 
   def stream_handler(self, message):
     try:
@@ -135,8 +146,11 @@ class Firebase(Service):
           myCommand = Command(ff_id, 'webapi', list(command.keys())[0], **dict(list(command.values())[0]))
         self.firefly.send_command(myCommand)
         self.db.child('homeStatus').child(self.home_id).child('commands').child(ff_id).remove(self.id_token)
+        if command == 'delete':
+          self.refresh_all()
     except Exception as e:
       logging.notify(e)
+      self.refresh_all()
       self.db.child('homeStatus').child(self.home_id).child('commands').remove(self.id_token)
 
   def refresh_all(self):
@@ -154,6 +168,7 @@ class Firebase(Service):
       self.db.child("userAlexa").child(self.uid).child("devices").set(alexa_views, self.id_token)
       routines = self.get_routines()
       # TODO DELETE ABOVE WHEN HOUSES WORK
+      print(all_values)
       self.db.child("homeStatus").child(self.home_id).child('devices').update(all_values, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('routines').set(routines, self.id_token)
 
@@ -226,12 +241,12 @@ class Firebase(Service):
     status_data['last_mode'] = self.firefly.location.lastMode
 
     for room_alias, room in self.firefly._rooms._rooms.items():
-      status_data['devices'].append({'ff_id': room.id, 'alias':room.alias + ' (room)'})
-
+      status_data['devices'].append({
+        'ff_id': room.id,
+        'alias': room.alias + ' (room)'
+      })
 
     try:
-      # TODO Delete this line when homes work
-      # self.db.child("userStatus").child(self.uid).set(status_data, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('status').set(status_data, self.id_token)
     except Exception as e:
       logging.notify(e)
@@ -244,8 +259,8 @@ class Firebase(Service):
         pass
       self.user = self.auth.sign_in_with_email_and_password(self.email, self.password)
       self.id_token = self.user['idToken']
-      self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler,
-                                                                                             self.id_token)
+      self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler, self.id_token)
+      self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
     except Exception as e:
       logging.notify(e)
       pass

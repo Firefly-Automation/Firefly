@@ -1,8 +1,125 @@
 from difflib import get_close_matches
 
 from Firefly import aliases
-from Firefly.const import LEVEL, TYPE_DEVICE
+from Firefly.const import LEVEL, TYPE_AUTOMATION, TYPE_DEVICE, COMMAND_SET_LIGHT
 from Firefly.helpers.events import Command
+
+
+class NoDeviceFound(Exception):
+  pass
+
+
+def get_device_id(firefly, device_alias):
+  devices = [device._alias for _, device in firefly.components.items() if device.type == TYPE_DEVICE]
+  d = get_close_matches(device_alias, devices)
+  if len(d) == 0:
+    error = 'No device found matching name %s' % device_alias
+    raise NoDeviceFound(error)
+  d = d[0]
+  ff_id = aliases.get_device_id(d)
+  return ff_id
+
+
+def get_routine_id(firefly, routine_alias):
+  routines = {}
+  for id, c in firefly.components.items():
+    if c.type == TYPE_AUTOMATION and 'routine' in c._package:
+      routines[c._alias] = id
+  r_alias = get_close_matches(routine_alias, routines.keys())
+  if len(r_alias) == 0:
+    error = 'No device found matching name %s' % routine_alias
+    raise NoDeviceFound(error)
+  r_alias = r_alias[0]
+  r = routines[r_alias]
+  return r
+
+
+# TODO: Rename these api_ai
+def apiai_command_reply(firefly, message):
+  try:
+    print('************ API AI **************')
+    print(str(message))
+    command = message.get('command')
+    if command == 'switch':
+      return apiai_switch(firefly, message)
+    if command == 'routine':
+      return apiai_routine(firefly, message)
+    if command == 'level':
+      return apiai_level(firefly, message)
+  except:
+    pass
+
+  return {
+    'text':   'Unknown error',
+    'speech': 'Unknown error'
+  }
+
+
+def apiai_switch(firefly, message):
+  try:
+    devices = [get_device_id(firefly, d) for d in message.get('firefly_devices')]
+  except NoDeviceFound as e:
+    return {
+      'text':   e,
+      'speech': e
+    }
+  except:
+    return {
+      'text':   'Unknown error',
+      'speech': 'Unknown error'
+    }
+  switch_action = message.get('firefly_switch_action')
+  for d in devices:
+    c = Command(d, 'api_ai', switch_action)
+    firefly.send_command(c)
+  return {
+    'text':   'Okay',
+    'speech': 'Okay'
+  }
+
+def apiai_level(firefly, message):
+  try:
+    devices = [get_device_id(firefly, d) for d in message.get('firefly_devices')]
+  except NoDeviceFound as e:
+    return {
+      'text':   e,
+      'speech': e
+    }
+  except Exception as e:
+    return {
+      'text':   e,
+      'speech': e
+    }
+  level = int(message.get('level'))
+  for d in devices:
+    c = Command(d, 'api_ai', COMMAND_SET_LIGHT, level=level)
+    firefly.send_command(c)
+  return {
+    'text':   'Okay',
+    'speech': 'Okay'
+  }
+
+
+def apiai_routine(firefly, message):
+  routine = message.get('mode')
+  try:
+    r = get_routine_id(firefly, routine)
+  except NoDeviceFound as e:
+    return {
+      'text':   e,
+      'speech': e
+    }
+  except:
+    return {
+      'text':   'Unknown error',
+      'speech': 'Unknown error'
+    }
+  c = Command(r, 'api_ai', 'execute')
+  firefly.send_command(c)
+  return {
+    'text':   'Okay',
+    'speech': 'Okay'
+  }
 
 
 def process_api_ai_request(firefly, request):

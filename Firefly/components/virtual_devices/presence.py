@@ -90,7 +90,9 @@ class VirtualPresence(Device):
     else:
       if presence:
         self._presence = presence_string
+        self._raw_presence = presence_string
       else:
+        self._raw_presence = NOT_PRESENT
         scheduler.runInS(self._delay, self._set_not_present)
 
   def set_delay(self, **kwargs):
