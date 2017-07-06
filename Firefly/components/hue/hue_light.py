@@ -19,6 +19,8 @@ def Setup(firefly, package, **kwargs):
       kwargs:
   """
   logging.message('Entering %s setup' % TITLE)
+  # TODO: Remove this in the future
+  kwargs['tags'] = ['light']
   hue_light = HueLight(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
   firefly.components[hue_light.id] = hue_light

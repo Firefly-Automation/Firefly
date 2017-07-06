@@ -103,6 +103,7 @@ class HueDevice(Device):
     self._bri = 0
     self._ct_fade = None
 
+
     if kwargs.get(self.hue_noun):
       self._on = kwargs.get(self.hue_noun).get('on', False)
       self._hue = kwargs.get(self.hue_noun).get('hue', 0)

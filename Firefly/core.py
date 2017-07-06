@@ -250,8 +250,9 @@ class Firefly(object):
       return False
     try:
       self.loop.run_in_executor(None, self.components[command.device].command, command)
-    except:
+    except Exception as e:
       logging.error(code='FF.COR.SEN.001') #unknown error sending command
+      logging.error(e)
     # TODO: Figure out how to wait for result
     return True
 

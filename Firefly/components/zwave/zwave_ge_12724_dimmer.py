@@ -2,14 +2,13 @@ from openzwave.network import ZWaveNode
 
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.const import (ACTION_OFF, ACTION_ON, ACTION_TOGGLE, DEVICE_TYPE_DIMMER, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           LEVEL, STATE, ALEXA_SET_PERCENTAGE, ALEXA_OFF, ALEXA_ON)
+from Firefly.const import ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, DEVICE_TYPE_DIMMER, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE
 from Firefly.helpers.metadata import metaDimmer, metaSwitch
 
 TITLE = 'Firefly GE Dimmer'
 DEVICE_TYPE = DEVICE_TYPE_DIMMER
 AUTHOR = 'Zachary Priddy'
-COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, LEVEL]
+COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, LEVEL, COMMAND_SET_LIGHT]
 REQUESTS = [STATE, LEVEL]
 INITIAL_VALUES = {
   '_state': EVENT_ACTION_OFF
@@ -38,6 +37,7 @@ class GEDimmer(ZwaveDevice):
     self.add_command(ACTION_ON, self.on)
     self.add_command(ACTION_TOGGLE, self.toggle)
     self.add_command(LEVEL, self.set_level)
+    self.add_command(COMMAND_SET_LIGHT, self.set_light)
 
     self.add_action(STATE, metaSwitch(primary=True))
     self.add_action(LEVEL, metaDimmer())
@@ -64,17 +64,11 @@ class GEDimmer(ZwaveDevice):
 
     print(self._node.to_dict())
 
-
     self._dimmers = list(self._node.get_dimmers().keys())
-    #self._switches = list(self._node.get_switches().keys())
     self._switches = list(self._node.get_switches_all().keys())
 
     self._level = node.get_dimmer_level(self._dimmers[0])
-
-    if self.level == 0:
-      self._state = EVENT_ACTION_OFF
-    else:
-      self._state = EVENT_ACTION_OFF
+    self._state = EVENT_ACTION_OFF if self._level == 0 else EVENT_ACTION_ON
 
   def set_light(self, **kwargs):
     self.set_level(**kwargs)
@@ -90,9 +84,9 @@ class GEDimmer(ZwaveDevice):
       logging.error('[GE Dimmer] Node is not set yet.')
       return
     self._node.set_dimmer(self._dimmers[0], level)
-    self._node.set_switch_all(self._switches[0], 1)
+    self._node.set_switch_all(self._switches[0], 1 if level > 0 else 0)
     self._level = level
-    self._state = level > 0
+    self._state = EVENT_ACTION_OFF if self._level == 0 else EVENT_ACTION_ON
 
   def off(self, **kwargs):
     self._state = EVENT_ACTION_OFF

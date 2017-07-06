@@ -76,6 +76,62 @@
         "function_name": "get_ip",
         "project_code": "FF"
     },
+    "FF.HUE.REF.001": {
+        "error_code": "FF.HUE.REF.001",
+        "error_message": "[FF.HUE.REF.001] error talking to hue hub",
+        "file_name": "hue.py",
+        "function_name": "refresh",
+        "project_code": "FF"
+    },
+    "FF.HUE.REG.001": {
+        "error_code": "FF.HUE.REG.001",
+        "error_message": "[FF.HUE.REG.001] error talking to hue bridge",
+        "file_name": "hue.py",
+        "function_name": "register",
+        "project_code": "FF"
+    },
+    "FF.HUE.SEN.001": {
+        "error_code": "FF.HUE.SEN.001",
+        "error_message": "[FF.HUE.SEN.001] error talking to hue bridge",
+        "file_name": "hue.py",
+        "function_name": "sendLightRequest",
+        "project_code": "FF"
+    },
+    "FF.HUE.SEN.002": {
+        "error_code": "FF.HUE.SEN.002",
+        "error_message": "[FF.HUE.SEN.002] error talking to hue bridge",
+        "file_name": "hue.py",
+        "function_name": "sendGroupRequest",
+        "project_code": "FF"
+    },
+    "FF.HUE.SEN.003": {
+        "error_code": "FF.HUE.SEN.003",
+        "error_message": "[FF.HUE.SEN.003] no light id given",
+        "file_name": "hue.py",
+        "function_name": "sendLightRequest",
+        "project_code": "FF"
+    },
+    "FF.HUE.SEN.004": {
+        "error_code": "FF.HUE.SEN.004",
+        "error_message": "[FF.HUE.SEN.004] no group id given",
+        "file_name": "hue.py",
+        "function_name": "sendGroupRequest",
+        "project_code": "FF"
+    },
+    "FF.HUE.SEN.005": {
+        "error_code": "FF.HUE.SEN.005",
+        "error_message": "[FF.HUE.SEN.005] request time out",
+        "file_name": "hue.py",
+        "function_name": "send_request",
+        "project_code": "FF"
+    },
+    "FF.HUE.SEN.006": {
+        "error_code": "FF.HUE.SEN.006",
+        "error_message": "[FF.HUE.SEN.006] unknown hue error",
+        "file_name": "hue.py",
+        "function_name": "send_request",
+        "project_code": "FF"
+    },
     "FF.HUE.SET.001": {
         "error_code": "FF.HUE.SET.001",
         "error_message": "[FF.HUE.SET.001] unknown value passed for level",

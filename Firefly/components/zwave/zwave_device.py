@@ -44,6 +44,7 @@ class ZwaveDevice(Device):
     self.add_request('battery', self.get_battery)
 
     self._update_lock = False
+    self._last_command_source = 'startup'
 
   def update_device_config(self, **kwargs):
     self.node.refresh_info()

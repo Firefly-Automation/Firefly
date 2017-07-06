@@ -9,6 +9,18 @@ class NoDeviceFound(Exception):
   pass
 
 
+def apiai_make_response(text, speech=''):
+  if not speech:
+    return {
+      'text': text,
+      'speech': text
+    }
+
+  return {
+    'text': text,
+    'speech': speech
+  }
+
 def get_device_id(firefly, device_alias):
   devices = [device._alias for _, device in firefly.components.items() if device.type == TYPE_DEVICE]
   d = get_close_matches(device_alias, devices)
@@ -39,87 +51,174 @@ def apiai_command_reply(firefly, message):
   try:
     print('************ API AI **************')
     print(str(message))
-    command = message.get('command')
+    params = message.get('parameters')
+    command = params.get('command')
+    action = message.get('action')
+    if action == 'addZwave':
+      return apiai_add_zwave(firefly, params)
+    if action == 'switchRoom':
+      return apiai_make_response('Switching room is not yet supported')
+    if action == 'addRule.motion':
+      return apiai_add_rule_motion(firefly, params)
     if command == 'switch':
-      return apiai_switch(firefly, message)
+      return apiai_switch(firefly, params)
     if command == 'routine':
-      return apiai_routine(firefly, message)
+      return apiai_routine(firefly, params)
     if command == 'level':
-      return apiai_level(firefly, message)
+      return apiai_level(firefly, params)
   except:
     pass
 
-  return {
-    'text':   'Unknown error',
-    'speech': 'Unknown error'
+  return apiai_make_response('Unknown Error')
+
+
+def apiai_add_rule_motion(firefly, params):
+  print('***************************************')
+  print(params)
+  print('***************************************')
+
+  room = params.get('room')
+  duration = params.get('duration')
+  action = params.get('action')
+  tags = params.get('tags')
+  trigger = params.get('trigger')
+
+  # TODO: Make this a function
+  rooms = [device._alias for _, device in firefly.components.items() if device.type == 'ROOM']
+  r = get_close_matches(room, rooms)
+  if len(r) == 0:
+    error = 'No room found matching name %s' % room
+    return make_response(all=error)
+  r = r[0]
+
+  room_ff_id = aliases.get_device_id(r)
+  first_action = action
+  delayed_action = 'off' if action == 'on' else 'on'
+
+  actions = [{
+    "command":    first_action,
+    "conditions": {
+    },
+    "ff_id":      room_ff_id,
+    "force":      False,
+    "source":     "api_ai_automation",
+    "tags":       [tags]
+  }]
+
+  delayed_actions = [{
+    "command":    delayed_action,
+    "conditions": {
+    },
+    "ff_id":      room_ff_id,
+    "force":      False,
+    "source":     "api_ai_automation",
+    "tags":       [tags]
+  }]
+
+  delayed_trigger = 'inactive' if trigger == 'active' else 'active'
+  triggers = [[{
+    "event_action": [{
+      "motion": [trigger]
+    }],
+    "listen_id":    room_ff_id,
+    "source":       "SOURCE_TRIGGER"
+  }]]
+
+  delayed_triggers = [[{
+    "event_action": [{
+      "motion": [delayed_trigger]
+    }],
+    "listen_id":    room_ff_id,
+    "source":       "SOURCE_TRIGGER"
+  }]]
+
+  new_automation = {
+    "actions":          actions,
+    "alias":            "api_ai_automation",
+    "conditions":       {},
+    "delayed_actions":  delayed_actions,
+    "delayed_triggers": delayed_triggers,
+    "ff_id":            "api_ai_automation",
+    "initial_values":   "TODO INITIAL VALUES",
+    "package":          "Firefly.automation.event_based_action",
+    "triggers":         triggers,
+    "type":             "TYPE_AUTOMATION"
   }
 
+  if type(duration) is not dict:
+    new_automation.update({
+      'delay_s': 10
+    })
+  elif duration.get('unit') == 'min':
+    new_automation.update({
+      'delay_m': duration.get('amount')
+    })
+  elif duration.get('unit') == 's':
+    new_automation.update({
+      'delay_s': duration.get('amount')
+    })
+  elif duration.get('unit') == 'h':
+    new_automation.update({
+      'delay_h': duration.get('amount')
+    })
+  else:
+    new_automation.update({
+      'delay_s': 10
+    })
 
-def apiai_switch(firefly, message):
+  print(new_automation)
+  firefly.install_package('Firefly.automation.event_based_action', **new_automation)
+  return apiai_make_response("Okay, new automation rule added.")
+
+def apiai_add_zwave(firefly, params):
+  new_device_name = params.get('newName')
+  # TODO: Make Const
+  ff_id = 'service_zwave'
+  c = Command(ff_id, 'api_ai', 'add_node', alias=new_device_name)
+  firefly.send_command(c)
+  return apiai_make_response('Ready to pair Z-Wave device. Please press pairing button')
+
+def apiai_switch(firefly, params):
   try:
-    devices = [get_device_id(firefly, d) for d in message.get('firefly_devices')]
+    devices = [get_device_id(firefly, d) for d in params.get('firefly_devices')]
   except NoDeviceFound as e:
-    return {
-      'text':   e,
-      'speech': e
-    }
+    return apiai_make_response(e)
   except:
-    return {
-      'text':   'Unknown error',
-      'speech': 'Unknown error'
-    }
-  switch_action = message.get('firefly_switch_action')
+    return apiai_make_response('Unknown Error')
+
+  switch_action = params.get('firefly_switch_action')
   for d in devices:
     c = Command(d, 'api_ai', switch_action)
     firefly.send_command(c)
-  return {
-    'text':   'Okay',
-    'speech': 'Okay'
-  }
+  return apiai_make_response('Okay')
 
-def apiai_level(firefly, message):
+def apiai_level(firefly, params):
   try:
-    devices = [get_device_id(firefly, d) for d in message.get('firefly_devices')]
+    devices = [get_device_id(firefly, d) for d in params.get('firefly_devices')]
   except NoDeviceFound as e:
-    return {
-      'text':   e,
-      'speech': e
-    }
+    return apiai_make_response(e)
   except Exception as e:
-    return {
-      'text':   e,
-      'speech': e
-    }
-  level = int(message.get('level'))
+    return apiai_make_response(e)
+
+  level = int(params.get('level'))
   for d in devices:
     c = Command(d, 'api_ai', COMMAND_SET_LIGHT, level=level)
     firefly.send_command(c)
-  return {
-    'text':   'Okay',
-    'speech': 'Okay'
-  }
+  return apiai_make_response('Okay')
 
 
-def apiai_routine(firefly, message):
-  routine = message.get('mode')
+def apiai_routine(firefly, params):
+  routine = params.get('mode')
   try:
     r = get_routine_id(firefly, routine)
   except NoDeviceFound as e:
-    return {
-      'text':   e,
-      'speech': e
-    }
-  except:
-    return {
-      'text':   'Unknown error',
-      'speech': 'Unknown error'
-    }
+    return apiai_make_response(e)
+  except Exception as e:
+    return apiai_make_response(e)
+
   c = Command(r, 'api_ai', 'execute')
   firefly.send_command(c)
-  return {
-    'text':   'Okay',
-    'speech': 'Okay'
-  }
+  return apiai_make_response('Okay')
 
 
 def process_api_ai_request(firefly, request):

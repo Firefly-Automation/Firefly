@@ -3,6 +3,8 @@ from difflib import get_close_matches
 
 import pyrebase
 import requests
+import json
+import copy
 
 from Firefly import aliases, logging, scheduler
 from Firefly.const import API_ALEXA_VIEW, API_INFO_REQUEST, SERVICE_CONFIG_FILE, TYPE_AUTOMATION, TYPE_DEVICE
@@ -12,7 +14,7 @@ from Firefly.services.api_ai import apiai_command_reply
 TITLE = 'Firebase Service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
 SERVICE_ID = 'service_firebase'
-COMMANDS = ['push']
+COMMANDS = ['push', 'refresh']
 REQUESTS = []
 
 SECTION = 'FIREBASE'
@@ -62,6 +64,7 @@ class Firebase(Service):
     self.home_id = kwargs.get('home_id')
 
     self.add_command('push', self.push)
+    self.add_command('refresh', self.refresh_all)
 
     self.config = {
       "apiKey":        self.api_key,
@@ -149,11 +152,11 @@ class Firebase(Service):
         if command == 'delete':
           self.refresh_all()
     except Exception as e:
-      logging.notify(e)
+      logging.notify("Firebase 153: %s" % str(e))
       self.refresh_all()
       self.db.child('homeStatus').child(self.home_id).child('commands').remove(self.id_token)
 
-  def refresh_all(self):
+  def refresh_all(self, **kwargs):
     # Hard-coded refresh all device values
     # TODO use core api for this.
     all_values = {}
@@ -173,7 +176,9 @@ class Firebase(Service):
       self.db.child("homeStatus").child(self.home_id).child('routines').set(routines, self.id_token)
 
     except Exception as e:
-      logging.notify(e)
+      logging.notify("Firebase 177: %s" % str(e))
+
+    self.refresh_status()
 
   def get_routines(self):
     routines = []
@@ -223,7 +228,8 @@ class Firebase(Service):
         views.append(data)
     return views
 
-  def refresh_status(self):
+
+  def refresh_status(self, **kwargs):
     status_data = {}
     status_data['devices'] = self.get_all_component_views('firebase_refresh', filter=TYPE_DEVICE)
     now = self.firefly.location.now
@@ -246,15 +252,22 @@ class Firebase(Service):
         'alias': room.alias + ' (room)'
       })
 
+    # Nasty json sanitation
+    status_data = scrub(status_data)
+    status_data = json.dumps(status_data)
+    status_data.replace('null', '')
+    status_data = json.loads(status_data)
+
     try:
       self.db.child("homeStatus").child(self.home_id).child('status').set(status_data, self.id_token)
     except Exception as e:
-      logging.notify(e)
+      logging.notify("Firebase 263: %s" % str(e))
 
   def refresh_user(self):
     try:
       try:
         self.stream.close()
+        self.commandReplyStream.close()
       except:
         pass
       self.user = self.auth.sign_in_with_email_and_password(self.email, self.password)
@@ -262,7 +275,7 @@ class Firebase(Service):
       self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler, self.id_token)
       self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
     except Exception as e:
-      logging.notify(e)
+      logging.notify("Firebase 266: %s" % str(e))
       pass
 
   def push(self, source, action):
@@ -310,3 +323,21 @@ class Firebase(Service):
         'timestamp': now.timestamp(),
         'time':      now_time
       }, self.id_token)
+
+
+def scrub(x):
+  # Converts None to empty string
+  ret = copy.deepcopy(x)
+  # Handle dictionaries, lits & tuples. Scrub all values
+  if isinstance(x, dict):
+    for k, v in ret.items():
+      ret[k] = scrub(v)
+
+  if isinstance(x, (list, tuple)):
+    for k, v in enumerate(ret):
+      ret[k] = scrub(v)
+  # Handle None
+  if x is None:
+    ret = ''
+  # Finished scrubbing
+  return ret

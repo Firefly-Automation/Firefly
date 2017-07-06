@@ -18,6 +18,8 @@ INITIAL_VALUES = {
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
+  # TODO: Remove this when fixed
+  kwargs['tags'] = ['motion']
   sensor = ZwaveAeotecMulti(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
   firefly.components[sensor.id] = sensor
@@ -32,6 +34,8 @@ class ZwaveAeotecMulti(ZwaveDevice):
     kwargs['initial_values'] = init_values
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
     self.__dict__.update(kwargs['initial_values'])
+
+    self._state = MOTION_INACTIVE
 
     self.add_request(STATE, self.get_state)
     self.add_request(MOTION, self.get_motion)
@@ -99,4 +103,6 @@ class ZwaveAeotecMulti(ZwaveDevice):
   @property
   def state(self):
     self._state = self._sensors.get('sensor')
+    if self._state is None:
+      self._state = False
     return self._state

@@ -102,6 +102,8 @@ class Zwave(Service):
     self.add_request('get_nodes', self.get_nodes)
     self.add_request('get_orphans', self.get_orphans)
 
+    self.new_alias = None
+
     scheduler.runInS(5, self.initialize_zwave)
 
   async def initialize_zwave(self):
@@ -153,6 +155,7 @@ class Zwave(Service):
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NOTIFICATION)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
     dispatcher.connect(self.new_node, ZWaveNetwork.SIGNAL_NODE_ADDED)
+
 
     self._network.set_poll_interval(milliseconds=500)
 
@@ -215,39 +218,56 @@ class Zwave(Service):
     print(node.manufacturer_name)
     print('******************************************')
 
+    alias = product_name
+    if self.new_alias is not None:
+      alias = self.new_alias
+
     if product_name in PACKAGE_MAPPING:
       package = 'Firefly.components.zwave.%s' % PACKAGE_MAPPING[product_name]
-      device_id = self._firefly.install_package(package, alias=product_name, node=node)
+      device_id = self._firefly.install_package(package, alias=alias, node=node)
       self._installed_nodes[node_id] = device_id
+      self.new_alias = None
+      self.refresh_firebase()
+      self.export()
 
     elif config in CONFIG_MAPPING:
       package = 'Firefly.components.zwave.%s' % CONFIG_MAPPING[config]
-      device_id = self._firefly.install_package(package, alias=product_name, node=node)
+      device_id = self._firefly.install_package(package, alias=alias, node=node)
       self._installed_nodes[node_id] = device_id
+      self.new_alias = None
+      self.refresh_firebase()
+      self.export()
 
     elif 'On/Off Power Switch' in node.device_type  or 'On/Off Relay Switch' in node.device_type:
-      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_switch', alias=node.device_type, node=node)
+      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_switch', alias=alias, node=node)
       self._installed_nodes[node_id] = device_id
+      self.new_alias = None
+      self.refresh_firebase()
+      self.export()
 
     elif 'On/Off Power Switch' in product_name  or 'On/Off Relay Switch' in product_name:
-      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_switch', alias=product_name, node=node)
+      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_switch', alias=alias, node=node)
       self._installed_nodes[node_id] = device_id
+      self.new_alias = None
+      self.refresh_firebase()
+      self.export()
 
     elif 'Door/Window Sensor' in product_name:
-      device_id = self._firefly.install_package('Firefly.components.zwave.window_door_sensor', alias=product_name, node=node)
+      device_id = self._firefly.install_package('Firefly.components.zwave.window_door_sensor', alias=alias, node=node)
       self._installed_nodes[node_id] = device_id
+      self.new_alias = None
+      self.refresh_firebase()
+      self.export()
 
-    else:
-      print('******************************************')
-      print(node_id)
-      print(node.to_dict())
-      print(node.device_type)
-      print(product_name)
-      print(node.manufacturer_id)
-      print(node.manufacturer_name)
-      print('******************************************')
 
-    self.export()
+
+
+
+
+
+  def refresh_firebase(self):
+    refresh_command = Command('service_firebase', 'zwave', 'refresh')
+    self._firefly.send_command(refresh_command)
 
   def export(self):
     with open(ZWAVE_FILE, 'w') as f:
@@ -255,6 +275,7 @@ class Zwave(Service):
 
   def new_node(self, *args, **kwargs):
     logging.notify('New Node Added: %s' % kwargs)
+    self.refresh_firebase()
     pass
 
   def add_device(self, **kwargs):
@@ -264,6 +285,7 @@ class Zwave(Service):
 
     '''
     from time import sleep
+    self.new_alias = kwargs.get('alias')
     security = self._security_enable
     if kwargs.get('security'):
       security = True if kwargs.get('security') == 'true' else False

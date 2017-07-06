@@ -34,7 +34,7 @@ class Device(object):
 
     # If alias given but no ID look at config files for ID.
     if not device_id and alias:
-      if aliases.get_device_id(alias):
+      if aliases.get_device_id(alias) is not None:
         device_id = aliases.get_device_id(alias)
         if device_id in self.firefly.components:
           device_id = None
@@ -44,7 +44,7 @@ class Device(object):
         alias = aliases.get_alias(device_id)
 
     # If no ff_id ID given -> generate random ID.
-    if not device_id:
+    if device_id is None:
       device_id = str(uuid.uuid4())
 
     self._id = device_id

@@ -53,14 +53,34 @@ class Hue(Service):
 
     self._rCount = 0
 
+    self.temp_disabled = False
+    self._request_count = 0
+
     self.initialize_hue()
     scheduler.runEveryS(10, self.refresh)
+    scheduler.runInM(5, self.reset_request_count)
+
 
   def initialize_hue(self, **kwargs):
     if not self._ip:
       self.get_ip()
     if not self._username:
       self.register()
+
+
+  def reset_request_count(self):
+    logging.info('resetting request count.')
+    self._request_count = 0
+
+  def temp_disable(self, disable_min):
+    logging.info("Disabling hue for %d min" % disable_min)
+    self.reset_request_count()
+    self.temp_disabled = True
+    scheduler.runInM(disable_min, self.end_temp_disable)
+
+  def end_temp_disable(self):
+    logging.info("Re-Enabling Hue")
+    self.temp_disabled = False
 
   def get_ip(self):
     data = requests.get('http://www.meethue.com/api/nupnp')
@@ -74,8 +94,24 @@ class Hue(Service):
       self._enable = False
 
   def send_request(self, path=None, data=None, method='GET', return_json=True, no_username=False, **kwargs):
-    # if data:
-    #  data = json.dumps(data)
+    """
+
+    Args:
+      path: (str) url path
+      data: (dict) json data to post
+      method: (str) HTTP Method [GET POST PUT]
+      return_json: (bool) return the json data requested otherwise the request object is returned
+      no_username: (bool) is there a username provided, no_username is used for initial pairing
+      **kwargs:
+
+    Returns:
+      if None is returned then there was an error making the request.
+      You should be able to handle None, Request Response or JSON dict with your function.
+      if return_json is passed then only the JSON output is returned, otherwise the full request object is returned.
+
+    """
+    if self.temp_disabled:
+      return None
 
     r = None
     url = ''
@@ -86,19 +122,27 @@ class Hue(Service):
     else:
       url = 'http://%s/api/%s/%s' % (self._ip, self._username, path)
 
-    logging.debug('Request URL: ' + url + ' Method: ' + method)
+    try:
+      if method == 'POST':
+        r = requests.post(url, json=data)
 
-    if method == 'POST':
-      r = requests.post(url, json=data)
+      elif method == 'PUT':
+        r = requests.put(url, json=data)
 
-    elif method == 'PUT':
-      r = requests.put(url, json=data)
-
-    elif method == 'GET':
-      if data:
-        r = requests.get(url, json=data)
-      else:
-        r = requests.get(url)
+      elif method == 'GET':
+        if data:
+          r = requests.get(url, json=data)
+        else:
+          r = requests.get(url)
+    except requests.RequestException as e:
+      print('**********************')
+      print(e)
+      logging.error(code='FF.HUE.SEN.005')  # request time out
+      self._request_count += 1
+      if self._request_count > 5:
+        self.temp_disable(1)
+    except Exception as e:
+      logging.error(code='FF.HUE.SEN.006')  # unknown hue error
 
     if return_json and r is not None:
       return r.json()
@@ -109,6 +153,8 @@ class Hue(Service):
       'devicetype': 'firefly'
     }
     response = self.send_request('api', request_data, method='POST', no_username=True)[0]
+    if response is None:
+      logging.error(code='FF.HUE.REG.001')  # error talking to hue bridge
 
     logging.debug('Response: ' + str(response))
 
@@ -138,15 +184,32 @@ class Hue(Service):
   def sendLightRequest(self, request):
     if 'lightID' in request.keys():
       logging.debug('Sending Light Request')
-      self.send_request('lights/' + str(request.get('lightID')) + '/state', data=request.get('data'), method='PUT')
+      success = self.send_request('lights/' + str(request.get('lightID')) + '/state', data=request.get('data'), method='PUT')
+      if success is None:
+        logging.error(code='FF.HUE.SEN.001')  # error talking to hue bridge
+      return
+    logging.error(code='FF.HUE.SEN.003')  # no light id given
+
 
   def sendGroupRequest(self, request):
     if 'groupID' in request.keys():
       logging.debug('Sending Group Request')
-      self.send_request('groups/' + str(request.get('groupID')) + '/action', data=request.get('data'), method='PUT')
+      success = self.send_request('groups/' + str(request.get('groupID')) + '/action', data=request.get('data'), method='PUT')
+      if success is None:
+        logging.error(code='FF.HUE.SEN.002')  # error talking to hue bridge
+      return
+    logging.error(code='FF.HUE.SEN.004')  # no group id given
 
   def refresh(self):
     data = self.send_request()
+    # TODO: Handle errors like:
+    # [{'error': {'type': 1, 'address': '/', 'description': 'unauthorized user'}}] that is returned as data
+
+    if data is None:
+      logging.error(code='FF.HUE.REF.001')  # error talking to hue hub
+      return
+
+    need_to_refresh = False
 
     for light_id, light in data['lights'].items():
       ff_id = light['uniqueid']
@@ -158,6 +221,7 @@ class Hue(Service):
         self._firefly.send_command(command)
       else:
         self._firefly.install_package('Firefly.components.hue.hue_light', ff_id=ff_id, alias=light.get('name'), **light)
+        need_to_refresh = True
 
     for group_id, group in data['groups'].items():
       ff_id = 'hue-group-device-%s' % str(group_id)
@@ -169,3 +233,11 @@ class Hue(Service):
         self._firefly.send_command(command)
       else:
         self._firefly.install_package('Firefly.components.hue.hue_group', ff_id=ff_id, alias=group.get('name'), **group)
+        need_to_refresh = True
+
+    if need_to_refresh:
+      self.refresh_firebase()
+
+  def refresh_firebase(self):
+    refresh_command = Command('service_firebase', 'hue', 'refresh')
+    self._firefly.send_command(refresh_command)
