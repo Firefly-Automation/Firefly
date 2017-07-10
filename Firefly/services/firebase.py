@@ -166,12 +166,20 @@ class Firebase(Service):
       except:
         pass
 
+    # Nasty json sanitation
+    all_values = scrub(all_values)
+    all_values = json.dumps(all_values)
+    all_values= all_values.replace('null', '')
+    all_values = all_values.replace('#', '')
+    all_values = all_values.replace('$', '')
+    all_values = all_values.replace('/', '_')
+    all_values = json.loads(all_values)
+
     try:
       alexa_views = self.get_all_alexa_views('firebase')
       self.db.child("userAlexa").child(self.uid).child("devices").set(alexa_views, self.id_token)
       routines = self.get_routines()
       # TODO DELETE ABOVE WHEN HOUSES WORK
-      print(all_values)
       self.db.child("homeStatus").child(self.home_id).child('devices').update(all_values, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('routines').set(routines, self.id_token)
 
@@ -255,8 +263,12 @@ class Firebase(Service):
     # Nasty json sanitation
     status_data = scrub(status_data)
     status_data = json.dumps(status_data)
-    status_data.replace('null', '')
+    status_data = status_data.replace('null', '')
+    status_data = status_data.replace('$', '')
+    status_data = status_data.replace('#', '')
+    status_data = status_data.replace('/', '_')
     status_data = json.loads(status_data)
+
 
     try:
       self.db.child("homeStatus").child(self.home_id).child('status').set(status_data, self.id_token)

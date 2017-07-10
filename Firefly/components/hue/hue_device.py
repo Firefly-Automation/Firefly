@@ -335,8 +335,7 @@ class HueDevice(Device):
         })
       else:
         hue_value.update({
-          'on':  on,
-          'bri': 255
+          'on':  on
         })
       self._on = on
 
