@@ -243,18 +243,32 @@ class Firefly(object):
     fut.set_result(result)
     return result
 
-  def send_command(self, command):
-    fut = asyncio.Future(loop=self.loop)
-    # result = asyncio.ensure_future(self._send_command(command, fut), loop=self.loop)
+  def send_command(self, command, wait=False):
     if command.device not in self.components:
       return False
     try:
-      self.loop.run_in_executor(None, self.components[command.device].command, command)
+      if wait:
+        fut = asyncio.run_coroutine_threadsafe(self.new_send_command(command, None, self.loop), self.loop)
+        return fut.result(10)
+      else:
+        asyncio.ensure_future(self.send_command_no_wait(command, self.loop), loop=self.loop)
+        return True
     except Exception as e:
       logging.error(code='FF.COR.SEN.001') #unknown error sending command
       logging.error(e)
-    # TODO: Figure out how to wait for result
+      # TODO: Figure out how to wait for result
+    return False
+
+  async def new_send_command(self, command, fut, loop ):
+    fut = await asyncio.ensure_future(loop.run_in_executor(None, self.components[command.device].command, command))
+    return  fut
+
+  async def send_command_no_wait(self, command, loop):
+    #await asyncio.ensure_future(loop.run_in_executor(None, self.components[command.device].command, command))
+    self.components[command.device].command(command)
+    #loop.run_in_executor(None, self.components[command.device].command, command)
     return True
+
 
   @asyncio.coroutine
   def async_send_command(self, command):
