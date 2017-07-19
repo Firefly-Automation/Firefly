@@ -2,6 +2,8 @@ import asyncio
 import configparser
 import importlib
 import json
+import sys
+import signal
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
@@ -17,13 +19,19 @@ from Firefly.helpers.subscribers import Subscriptions
 app = web.Application()
 
 
+def sigterm_handler(_signo, _stack_frame):
+  # Raises SystemExit(0):
+  sys.exit(0)
+
 class Firefly(object):
   ''' Core running loop and scheduler of Firefly'''
 
   def __init__(self, settings):
+    signal.signal(signal.SIGTERM, sigterm_handler)
     # TODO: Most of this should be in startup not init.
     logging.Startup(self)
     logging.message('Initializing Firefly')
+    self._firebase_enabled = False
     self._components = {}
     self.settings = settings
     self.loop = asyncio.get_event_loop()
@@ -41,6 +49,7 @@ class Firefly(object):
 
     # self.install_package('Firefly.components.notification.pushover', alias='Pushover', api_key='KEY', user_key='KEY')
 
+    self.install_services()
     for c in COMPONENT_MAP:
       self.import_devices(c['file'])
 
@@ -73,8 +82,6 @@ class Firefly(object):
     logging.error(code='FF.COR.INI.001')  # this is a test error message
     logging.notify('Firefly is starting up')
 
-    self.install_services()
-
     # TODO: Leave In.
     scheduler.runEveryH(1, self.export_all_components)
 
@@ -97,6 +104,9 @@ class Firefly(object):
         logging.error(code='FF.COR.INS.001', args=(service, e))  # error installing package %s: %s
         logging.notify('Error installing package %s: %s' % (service, e))
 
+    if self.components.get('service_firebase'):
+      self._firebase_enabled = True
+
 
   def start(self) -> None:
     """
@@ -106,6 +116,8 @@ class Firefly(object):
     try:
       web.run_app(app, host=self.settings.firefly_host, port=self.settings.firefly_port)
     except KeyboardInterrupt:
+      self.export_all_components()
+    except SystemExit:
       self.export_all_components()
     finally:
       self.stop()
@@ -119,14 +131,15 @@ class Firefly(object):
     logging.message('Stopping Firefly')
 
     # TODO: export automation.
-    self.export_all_components()
+    #self.export_all_components()
 
     try:
       logging.message('Stopping zwave service')
       self.components['service_zwave'].stop()
-    except:
-      pass
+    except Exception as e:
+      logging.firefly(e)
 
+    self.loop.stop()
     self.loop.close()
 
   @asyncio.coroutine
@@ -251,7 +264,7 @@ class Firefly(object):
         fut = asyncio.run_coroutine_threadsafe(self.new_send_command(command, None, self.loop), self.loop)
         return fut.result(10)
       else:
-        asyncio.ensure_future(self.send_command_no_wait(command, self.loop), loop=self.loop)
+        asyncio.run_coroutine_threadsafe(self.send_command_no_wait(command, self.loop), self.loop)
         return True
     except Exception as e:
       logging.error(code='FF.COR.SEN.001') #unknown error sending command
@@ -308,3 +321,7 @@ class Firefly(object):
   @property
   def subscriptions(self):
     return self._subscriptions
+
+  @property
+  def firebase_enabled(self):
+    return self._firebase_enabled

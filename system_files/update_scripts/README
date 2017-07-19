@@ -1,0 +1,8 @@
+This is the directory where auto-update scripts will be stored.
+
+The latest version of the update should be stored in the logs folder. Firefly will apply updates in order that they were released from the current version to the latest version.
+Currently this scrip pulls github but does not stop and restart firefly
+
+CHANGELOG:
+update_0-0-1:
+    No action - placeholder script.
