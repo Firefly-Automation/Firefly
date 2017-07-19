@@ -54,3 +54,6 @@ cd Firefly
 sudo pip3 install -r requirements.txt
 cp -r sample_config dev_config
 echo [] > dev_config/automation.json
+
+cd /opt/firefly_system/Firefly/system_files
+sudo bash setup_autostart.sh
