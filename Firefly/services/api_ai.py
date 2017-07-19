@@ -58,6 +58,8 @@ def apiai_command_reply(firefly, message):
       return apiai_add_zwave(firefly, params)
     if action == 'switchRoom':
       return apiai_make_response('Switching room is not yet supported')
+    if action == 'setMode':
+      return apiai_routine(firefly, params)
     if action == 'addRule.motion':
       return apiai_add_rule_motion(firefly, params)
     if command == 'switch':

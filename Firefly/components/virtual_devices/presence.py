@@ -5,19 +5,20 @@ from Firefly.const import (ACTION_ENABLE_BEACON, ACTION_NOT_PRESENT, ACTION_NOT_
                            NOT_ENABLED, NOT_PRESENT, PRESENCE, PRESENT)
 from Firefly.helpers.device import Device
 from Firefly.helpers.metadata import metaPresence
+from Firefly.helpers.action import Command
 
 TITLE = 'Firefly Virtual Presence Device'
 DEVICE_TYPE = DEVICE_TYPE_PRESENCE
 AUTHOR = AUTHOR
 COMMANDS = [ACTION_PRESENT, ACTION_NOT_PRESENT, ACTION_PRESENT_BEACON, ACTION_NOT_PRESENT_BEACON, ACTION_ENABLE_BEACON,
   PRESENCE, ACTION_SET_DELAY]
-REQUESTS = [PRESENCE, BEACON_ENABLED, 'beacon_presence', 'raw_presence']
+REQUESTS = [PRESENCE, BEACON_ENABLED, 'beacon_presence', 'raw_presence', 'firebase_api_key']
 INITIAL_VALUES = {
   '_delay':           300,
   '_presence':        NOT_PRESENT,
   '_beacon_enabled':  NOT_ENABLED,
   '_beacon_presence': NOT_PRESENT,
-  '_raw_presence':    NOT_PRESENT
+  '_raw_presence':    NOT_PRESENT,
 }
 
 
@@ -65,6 +66,7 @@ class VirtualPresence(Device):
     self.add_request(BEACON_ENABLED, self.get_beacon_enabled)
     self.add_request('beacon_presence', self.get_beacon_presence)
     self.add_request('raw_presence', self.get_raw_presence)
+    self.add_request('firebase_api_key', self.get_firebase_api_key)
 
     self.add_action(PRESENCE, metaPresence(primary=True))
 
@@ -72,6 +74,14 @@ class VirtualPresence(Device):
     self.add_homekit_export('HOMEKIT_PRESENCE', PRESENCE)
 
     self._alexa_export = False
+    self.firebase_api_key = kwargs.get('firebase_api_key', None)
+    if self.firebase_api_key is None and self.firefly.firebase_enabled:
+      self.register_firebase()
+
+  def export(self, current_values: bool = True, api_view: bool = False):
+    export_data = super().export(current_values, api_view)
+    export_data['firebase_api_key'] = self.firebase_api_key
+    return export_data
 
   def set_presence(self, **kwargs):
     """
@@ -213,3 +223,15 @@ class VirtualPresence(Device):
 
   def get_raw_presence(self, **kwargs):
     return self._raw_presence
+
+  def register_firebase(self):
+    command = Command('service_firebase', self.id, 'get_api_id', callback=self.set_firebase_api_key, api_ff_id=self.id)
+    self.firefly.send_command(command)
+
+  def set_firebase_api_key(self, **kwargs):
+    print('SETTING FIREBASE API KEY!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    self.firebase_api_key = kwargs.get('firebase_api_key')
+
+  def get_firebase_api_key(self):
+    return str(self.firebase_api_key)
+

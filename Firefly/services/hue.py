@@ -2,6 +2,7 @@ import configparser
 from time import sleep
 
 import requests
+import aiohttp
 
 from Firefly import logging, scheduler
 from Firefly.const import COMMAND_UPDATE, SERVICE_CONFIG_FILE
@@ -128,6 +129,7 @@ class Hue(Service):
 
       elif method == 'PUT':
         r = requests.put(url, json=data)
+        logging.error("[HUE] send_request is deprecated for PUT method requests")
 
       elif method == 'GET':
         if data:
@@ -135,8 +137,6 @@ class Hue(Service):
         else:
           r = requests.get(url)
     except requests.RequestException as e:
-      print('**********************')
-      print(e)
       logging.error(code='FF.HUE.SEN.005')  # request time out
       self._request_count += 1
       if self._request_count > 5:
@@ -181,10 +181,20 @@ class Hue(Service):
         config.write(configfile)
       logging.info('Config file for hue has been updated.')
 
+
+  #TODO: Rename this when more functionality is added.
+  async def makeHuePutRequest(self, url, data, method):
+    async with aiohttp.ClientSession() as session:
+      if method == 'PUT':
+        async with session.put(url, data=data, timeout=10) as resp:
+          return await resp.status == 200
+
+
   def sendLightRequest(self, request):
     if 'lightID' in request.keys():
       logging.debug('Sending Light Request')
-      success = self.send_request('lights/' + str(request.get('lightID')) + '/state', data=request.get('data'), method='PUT')
+      #success = self.send_request('lights/' + str(request.get('lightID')) + '/state', data=request.get('data'), method='PUT')
+      success = self.makeHuePutRequest('lights/' + str(request.get('lightID')) + '/state', data=request.get('data'), method='PUT')
       if success is None:
         logging.error(code='FF.HUE.SEN.001')  # error talking to hue bridge
       return
@@ -194,13 +204,15 @@ class Hue(Service):
   def sendGroupRequest(self, request):
     if 'groupID' in request.keys():
       logging.debug('Sending Group Request')
-      success = self.send_request('groups/' + str(request.get('groupID')) + '/action', data=request.get('data'), method='PUT')
+      #success = self.send_request('groups/' + str(request.get('groupID')) + '/action', data=request.get('data'), method='PUT')
+      success = self.makeHuePutRequest('groups/' + str(request.get('groupID')) + '/action', data=request.get('data'), method='PUT')
       if success is None:
         logging.error(code='FF.HUE.SEN.002')  # error talking to hue bridge
       return
     logging.error(code='FF.HUE.SEN.004')  # no group id given
 
   def refresh(self):
+    #TODO: Make this an async function with a callback when data is gathered.
     data = self.send_request()
     # TODO: Handle errors like:
     # [{'error': {'type': 1, 'address': '/', 'description': 'unauthorized user'}}] that is returned as data

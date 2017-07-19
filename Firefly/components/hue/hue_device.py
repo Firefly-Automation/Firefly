@@ -191,6 +191,9 @@ class HueDevice(Device):
     value = kwargs
     hue_value = {}
 
+    # TODO: Remove This
+    logging.info(value)
+
     # END FADE IF SET COMMAND IS GIVEN
     if not value.get('ct_fade', False):
       if self._ct_fade is not None:
@@ -350,8 +353,8 @@ class HueDevice(Device):
     alexa = value.get('alexa')
     if alexa is not None:
       hue = int(65535 / 360 * alexa.get('hue', 0))
-      sat = int(alexa.get('sat', 0) * 254)
-      bri = int(alexa.get('bri', 0) * 254)
+      sat = int(alexa.get('saturation', 0) * 254)
+      bri = int(alexa.get('brightness', 0) * 254)
 
       hue_value = {
         'hue': hue,
@@ -359,6 +362,8 @@ class HueDevice(Device):
         'sat': sat
       }
 
+    # TODO: Remove This
+    logging.info(hue_value)
     self.set_hue_device(hue_value)
     return value
 

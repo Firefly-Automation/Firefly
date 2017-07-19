@@ -17,17 +17,17 @@ def metaDimmer(min=0, max=100, command=True, request=False, primary=False):
   return meta
 
 
-def metaSwitch(command=True, request=True, primary=False, on_action=EVENT_ACTION_ON, off_action=EVENT_ACTION_OFF):
+def metaSwitch(command=True, request=True, primary=False, on_action=EVENT_ACTION_ON, off_action=EVENT_ACTION_OFF, title='switch', context='Change switch.', control_type='select'):
   meta = {
     'command': command,
     'request': request,
     'primary': primary,
-    'title':   'switch',
-    'context': 'Change switch.',
-    'type':    'select',
+    'title':   title,
+    'context': context,
+    'type':    control_type,
     'options': {
-      on_action: "On",
-      off_action: "Off"
+      'on': on_action,
+      'off': off_action
     }
   }
   return meta

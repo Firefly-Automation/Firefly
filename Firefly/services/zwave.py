@@ -22,7 +22,8 @@ PACKAGE_MAPPING = {
   '12724 3-Way Dimmer Switch': 'zwave_ge_12724_dimmer',
   '12727 In-Wall Smart Switch (Toggle)': 'zwave_switch',
   'DSB05 Multisensor': 'zwave_aeotec_dsb05_multi_sensor',
-  'DSC11 Smart Strip': 'zwave_aeotec_dsc11_smart_strip'
+  'DSC11 Smart Strip': 'zwave_aeotec_dsc11_smart_strip',
+  'ZW080 Siren Gen5': 'zwave_aeotec_zw080'
 }
 CONFIG_MAPPING = {
   'ge/12724-dimmer.xml': 'zwave_ge_12724_dimmer'

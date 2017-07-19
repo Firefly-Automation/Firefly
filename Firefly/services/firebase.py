@@ -1,6 +1,7 @@
 import configparser
 from difflib import get_close_matches
 
+
 import pyrebase
 import requests
 import json
@@ -14,7 +15,7 @@ from Firefly.services.api_ai import apiai_command_reply
 TITLE = 'Firebase Service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
 SERVICE_ID = 'service_firebase'
-COMMANDS = ['push', 'refresh']
+COMMANDS = ['push', 'refresh', 'get_api_id']
 REQUESTS = []
 
 SECTION = 'FIREBASE'
@@ -65,6 +66,7 @@ class Firebase(Service):
 
     self.add_command('push', self.push)
     self.add_command('refresh', self.refresh_all)
+    self.add_command('get_api_id', self.get_api_id)
 
     self.config = {
       "apiKey":        self.api_key,
@@ -135,6 +137,7 @@ class Firebase(Service):
       self.db.child('homeStatus').child(self.home_id).child('commandReply').child(key).child('reply').set(reply, self.id_token)
     except Exception as e:
       print(str(e))
+
 
   def stream_handler(self, message):
     try:
@@ -335,6 +338,39 @@ class Firebase(Service):
         'timestamp': now.timestamp(),
         'time':      now_time
       }, self.id_token)
+
+  def get_api_id(self, **kwargs):
+    print('^^^^^^^^^^^^^^^^^^^ GET API KEY ^^^^^^^^^^^^^^^')
+    ff_id = kwargs.get('api_ff_id')
+    callback = kwargs.get('callback')
+    my_stream = None
+
+    if ff_id is None or callback is None:
+      return False
+
+    def stream_api_key(message):
+      data = message.get('data')
+      print('*************** API_KEY: ' + str(data))
+      if data is None:
+        return
+
+      api_key = data
+
+      if api_key is None:
+        return
+
+
+      callback(firebase_api_key=api_key)
+      try:
+        my_stream.close()
+      except:
+        pass
+
+    now = self.firefly.location.now.timestamp()
+    self.db.child("homeStatus").child(self.home_id).child("apiDevices").update({ff_id:{'added':now}}, self.id_token)
+    my_stream = self.db.child("homeStatus").child(self.home_id).child("apiDevices").child(ff_id).child('apiKey').stream(stream_api_key, self.id_token)
+
+
 
 
 def scrub(x):
