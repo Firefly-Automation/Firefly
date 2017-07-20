@@ -48,6 +48,19 @@ def metaPresence(command=True, request=True, primary=False):
   }
   return meta
 
+def metaText(command=False, request=False, primary=False, title='text', text=''):
+  meta = {
+    'command': command,
+    'request': request,
+    'primary': primary,
+    'title': title,
+    'context': 'Placeholder text.',
+    'options': {
+      'text': text
+    }
+  }
+  return meta
+
 
 def metaContact(command=False, request=True, primary=False):
   meta = {
