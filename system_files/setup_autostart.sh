@@ -55,6 +55,8 @@ mkdir $FIREFLY_ROOT/logs
 chmod -R 775 $FIREFLY_ROOT/logs
 
 echo -e -n "/opt/firefly_system/logs/firefly.log {\n\tsize 100M\n\tcreate 766 root root\n\trotate 5\n}" >> /etc/logrotate.conf
+echo -e -n "/opt/firefly_system/logs/firefly_update.log {\n\tsize 100M\n\tcreate 766 root root\n\trotate 5\n}" >> /etc/logrotate.conf
+echo -e -n "/opt/firefly_system/logs/firefly_brakeglass.log {\n\tsize 100M\n\tcreate 766 root root\n\trotate 5\n}" >> /etc/logrotate.conf
 
 #################################
 # SETUP CRON FOR FUTURE UPDATES
@@ -63,7 +65,13 @@ echo -e -n "/opt/firefly_system/logs/firefly.log {\n\tsize 100M\n\tcreate 766 ro
 cd $FIREFLY_ROOT/Firefly/system_files
 sudo crontab -l > mycron
 #echo new cron into cron file
-echo "00 02 * * 6 /opt/firefly_system/Firefly/system_files/update_firefly.sh" >> mycron
+echo "SHELL=/bin/sh" >> mycron
+echo "MAILTO=/var/mail/root" >> mycron
+echo "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games" >> mycron
+echo "" >> mycron
+echo "00 02 * * 6 /opt/firefly_system/Firefly/system_files/update_firefly.sh >> /opt/firefly_system/logs/firefly_update.log" >> mycron
+echo "00 * * * * /opt/firefly_system/Firefly/system_files/update_scripts/firefly_brakeglass_update.sh >> /opt/firefly_system/logs/firefly_brakeglass.log" >> mycron
+echo "" >> mycron
 #install new cron file
 sudo crontab mycron
 rm mycron
