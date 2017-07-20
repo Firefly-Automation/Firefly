@@ -140,6 +140,7 @@ class Firebase(Service):
 
 
   def stream_handler(self, message):
+    refresh = False
     try:
       if message['data']:
         path = message['path']
@@ -148,11 +149,13 @@ class Firebase(Service):
         myCommand = None
         if type(command) is str:
           myCommand = Command(ff_id, 'webapi', command)
+          refresh = command == 'delete'
         elif type(command) is dict:
           myCommand = Command(ff_id, 'webapi', list(command.keys())[0], **dict(list(command.values())[0]))
+          refresh = list(command.keys())[0] == 'set_alias' or list(command.keys())[0] == 'set_room'
         self.firefly.send_command(myCommand)
         self.db.child('homeStatus').child(self.home_id).child('commands').child(ff_id).remove(self.id_token)
-        if command == 'delete':
+        if refresh:
           self.refresh_all()
     except Exception as e:
       logging.notify("Firebase 153: %s" % str(e))
