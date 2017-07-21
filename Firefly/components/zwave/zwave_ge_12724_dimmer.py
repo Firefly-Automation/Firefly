@@ -1,6 +1,6 @@
 from openzwave.network import ZWaveNode
 
-from Firefly import logging
+from Firefly import logging, scheduler
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, DEVICE_TYPE_DIMMER, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE
 from Firefly.helpers.metadata import metaDimmer, metaSwitch
@@ -94,7 +94,7 @@ class GEDimmer(ZwaveDevice):
     self._state = EVENT_ACTION_OFF
     self._done_sending_off_command = False
 
-    self.firefly.scheduler.runInS(5, self.set_done_sending_off, job_id='set_off')
+    scheduler.runInS(5, self.set_done_sending_off, job_id='set_off')
     self._node.set_dimmer(self._dimmers[0], 0)
     self._node.set_switch_all(self._switches[0], 0)
     self._state = EVENT_ACTION_OFF
@@ -106,7 +106,7 @@ class GEDimmer(ZwaveDevice):
   def on(self, **kwargs):
     self._state = EVENT_ACTION_ON
     self._done_sending_off_command = True
-    self.firefly.scheduler.cancel('set_off')
+    scheduler.cancel('set_off')
 
     self._node.set_dimmer(self._dimmers[0], 255)
     self._node.set_switch_all(self._switches[0], 1)
