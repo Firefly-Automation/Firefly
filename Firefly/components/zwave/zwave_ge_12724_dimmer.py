@@ -68,7 +68,7 @@ class GEDimmer(ZwaveDevice):
     self._switches = list(self._node.get_switches_all().keys())
 
     self._level = node.get_dimmer_level(self._dimmers[0])
-    self._state = EVENT_ACTION_OFF if self._level == 0 else EVENT_ACTION_ON
+    self._state = EVENT_ACTION_ON if self._node.get_switch_all_state(self._switches[0]) else EVENT_ACTION_OFF
 
   def set_light(self, **kwargs):
     self.set_level(**kwargs)
@@ -87,18 +87,19 @@ class GEDimmer(ZwaveDevice):
     self._node.set_switch_all(self._switches[0], 1 if level > 0 else 0)
     self._level = level
     self._state = EVENT_ACTION_OFF if self._level == 0 else EVENT_ACTION_ON
+    #self._state = EVENT_ACTION_ON if self._node.get_switch_all_state(self._switches[0]) else EVENT_ACTION_OFF
 
   def off(self, **kwargs):
-    self._state = EVENT_ACTION_OFF
     self._node.set_dimmer(self._dimmers[0], 0)
     self._node.set_switch_all(self._switches[0], 0)
+    self._state = EVENT_ACTION_OFF
     return EVENT_ACTION_OFF
 
   def on(self, **kwargs):
-    self._state = EVENT_ACTION_ON
     self._node.set_dimmer(self._dimmers[0], 255)
     self._node.set_switch_all(self._switches[0], 1)
     self._level = self._node.get_dimmer_level(self._dimmers[0])
+    self._state = EVENT_ACTION_ON
     return EVENT_ACTION_ON
 
   def toggle(self, **kwargs):
