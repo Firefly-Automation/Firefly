@@ -229,7 +229,6 @@ class VirtualPresence(Device):
     self.firefly.send_command(command)
 
   def set_firebase_api_key(self, **kwargs):
-    print('SETTING FIREBASE API KEY!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     self.firebase_api_key = kwargs.get('firebase_api_key')
 
   def get_firebase_api_key(self):
