@@ -2,8 +2,7 @@ from openzwave.network import ZWaveNode
 
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.const import (ACTION_OFF, ACTION_ON, ACTION_TOGGLE, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           STATE, ALEXA_ON, ALEXA_OFF)
+from Firefly.const import ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ALEXA_OFF, ALEXA_ON, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF, EVENT_ACTION_ON, STATE
 from Firefly.helpers.metadata import metaSwitch
 
 TITLE = 'Firefly Aeotec SmartSwitch Gen6'
@@ -97,13 +96,12 @@ class ZwaveSwitch(ZwaveDevice):
       self._state = EVENT_ACTION_OFF
 
   def off(self, **kwargs):
-    self._state = EVENT_ACTION_OFF
-    print(self._switches)
+    self.member_set('_state', EVENT_ACTION_OFF)
     self._node.set_switch(self._switches[0], 0)
     return EVENT_ACTION_OFF
 
   def on(self, **kwargs):
-    self._state = EVENT_ACTION_ON
+    self.member_set('_state', EVENT_ACTION_ON)
     self._node.set_switch(self._switches[0], 1)
     return EVENT_ACTION_ON
 

@@ -91,7 +91,6 @@ class GEDimmer(ZwaveDevice):
     # self._state = EVENT_ACTION_ON if self._node.get_switch_all_state(self._switches[0]) else EVENT_ACTION_OFF
 
   def off(self, **kwargs):
-    #self._state = EVENT_ACTION_OFF
     self.member_set('_state', EVENT_ACTION_OFF)
     self._done_sending_command = False
     scheduler.runInS(5, self.set_done_sending_command, job_id='set_command')
@@ -105,7 +104,6 @@ class GEDimmer(ZwaveDevice):
     self._done_sending_command = True
 
   def on(self, **kwargs):
-    #self._state = EVENT_ACTION_ON
     self.member_set('_state', EVENT_ACTION_ON)
     self._done_sending_command = False
     scheduler.runInS(5, self.set_done_sending_command, job_id='set_command')

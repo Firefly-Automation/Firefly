@@ -98,12 +98,12 @@ class ZwaveSwitch(ZwaveDevice):
       self._state = EVENT_ACTION_OFF
 
   def off(self, **kwargs):
-    self._state = EVENT_ACTION_OFF
+    self.member_set('_state', EVENT_ACTION_OFF)
     self._node.set_switch(self._switches[0], 0)
     return EVENT_ACTION_OFF
 
   def on(self, **kwargs):
-    self._state = EVENT_ACTION_ON
+    self.member_set('_state', EVENT_ACTION_ON)
     self._node.set_switch(self._switches[0], 1)
     return EVENT_ACTION_ON
 
