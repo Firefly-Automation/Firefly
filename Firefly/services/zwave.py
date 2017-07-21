@@ -2,33 +2,31 @@ import asyncio
 import configparser
 import json
 
-from openzwave.network import ZWaveNetwork, dispatcher, ZWaveController
+from openzwave.network import ZWaveController, ZWaveNetwork, dispatcher
 from openzwave.option import ZWaveOption
 
-from Firefly import logging
-from Firefly import scheduler
+from Firefly import logging, scheduler
 from Firefly.const import SERVICE_CONFIG_FILE, ZWAVE_FILE
 from Firefly.helpers.events import Command
 from Firefly.helpers.service import Service
 
 PACKAGE_MAPPING = {
-  'ZW096 Smart Switch 6': 'zwave_aeotec_smart_switch_gen_6',
-  'DSC06106 Smart Energy Switch': 'zwave_aeotec_dsc06106_smart_switch',
-  'ZW100 MultiSensor 6': 'zwave_aeotec_multi_6',
-  'ZW120 Door Window Sensor Gen5': 'zwave_aeotec_door_window_gen_5',
-  'ZW097 Dry Contact Sensor Gen5': 'zwave_aeotec_zw097_dry_contact',
-  '12730 Fan Control Switch': 'zwave_ge_12724_dimmer',
-  '12729 3-Way Dimmer Switch': 'zwave_ge_12724_dimmer',
-  '12724 3-Way Dimmer Switch': 'zwave_ge_12724_dimmer',
+  'ZW096 Smart Switch 6':                'zwave_aeotec_smart_switch_gen_6',
+  'DSC06106 Smart Energy Switch':        'zwave_aeotec_dsc06106_smart_switch',
+  'ZW100 MultiSensor 6':                 'zwave_aeotec_multi_6',
+  'ZW120 Door Window Sensor Gen5':       'zwave_aeotec_door_window_gen_5',
+  'ZW097 Dry Contact Sensor Gen5':       'zwave_aeotec_zw097_dry_contact',
+  '12730 Fan Control Switch':            'zwave_ge_12724_dimmer',
+  '12729 3-Way Dimmer Switch':           'zwave_ge_12724_dimmer',
+  '12724 3-Way Dimmer Switch':           'zwave_ge_12724_dimmer',
   '12727 In-Wall Smart Switch (Toggle)': 'zwave_switch',
-  'DSB05 Multisensor': 'zwave_aeotec_dsb05_multi_sensor',
-  'DSC11 Smart Strip': 'zwave_aeotec_dsc11_smart_strip',
-  'ZW080 Siren Gen5': 'zwave_aeotec_zw080'
+  'DSB05 Multisensor':                   'zwave_aeotec_dsb05_multi_sensor',
+  'DSC11 Smart Strip':                   'zwave_aeotec_dsc11_smart_strip',
+  'ZW080 Siren Gen5':                    'zwave_aeotec_zw080'
 }
 CONFIG_MAPPING = {
   'ge/12724-dimmer.xml': 'zwave_ge_12724_dimmer'
 }
-
 
 '''
 The ZWAVE service is the background service for zwave.
@@ -158,7 +156,6 @@ class Zwave(Service):
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
     dispatcher.connect(self.new_node, ZWaveNetwork.SIGNAL_NODE_ADDED)
 
-
     self._network.set_poll_interval(milliseconds=500)
 
   def stop(self):
@@ -240,14 +237,14 @@ class Zwave(Service):
       self.refresh_firebase()
       self.export()
 
-    elif 'On/Off Power Switch' in node.device_type  or 'On/Off Relay Switch' in node.device_type:
+    elif 'On/Off Power Switch' in node.device_type or 'On/Off Relay Switch' in node.device_type:
       device_id = self._firefly.install_package('Firefly.components.zwave.zwave_switch', alias=alias, node=node)
       self._installed_nodes[node_id] = device_id
       self.new_alias = None
       self.refresh_firebase()
       self.export()
 
-    elif 'On/Off Power Switch' in product_name  or 'On/Off Relay Switch' in product_name:
+    elif 'On/Off Power Switch' in product_name or 'On/Off Relay Switch' in product_name:
       device_id = self._firefly.install_package('Firefly.components.zwave.zwave_switch', alias=alias, node=node)
       self._installed_nodes[node_id] = device_id
       self.new_alias = None
@@ -261,19 +258,15 @@ class Zwave(Service):
       self.refresh_firebase()
       self.export()
 
-
-
-
-
-
-
   def refresh_firebase(self):
     refresh_command = Command('service_firebase', 'zwave', 'refresh')
     self._firefly.send_command(refresh_command)
 
   def export(self):
     with open(ZWAVE_FILE, 'w') as f:
-      json.dump({'installed_nodes': self._installed_nodes}, f, sort_keys=True, indent=4)
+      json.dump({
+                  'installed_nodes': self._installed_nodes
+                }, f, sort_keys=True, indent=4)
 
   def new_node(self, *args, **kwargs):
     logging.notify('New Node Added: %s' % kwargs)
@@ -286,17 +279,16 @@ class Zwave(Service):
     Returns:
 
     '''
-    from time import sleep
     self.new_alias = kwargs.get('alias')
     security = self._security_enable
     if kwargs.get('security'):
       security = True if kwargs.get('security') == 'true' else False
-    #tries = 0
-    #while self._network.controller.is_locked and tries < 30:
+    # tries = 0
+    # while self._network.controller.is_locked and tries < 30:
     #  logging.info('sleeping while zwave is locked. security_enabled=%s' % security)
     #  sleep(1)
     #  tries += 1
-    #if tries >= 30:
+    # if tries >= 30:
     #  logging.notify('error unlocking zwave. Try again.')
     #  return
     logging.notify('Ready to pair zwave device.')

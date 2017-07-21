@@ -2,16 +2,17 @@ from openzwave.network import ZWaveNode
 
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.const import (STATE, DEVICE_TYPE_MOTION, MOTION, MOTION_ACTIVE, MOTION_INACTIVE)
+from Firefly.const import DEVICE_TYPE_MOTION, MOTION, MOTION_ACTIVE, MOTION_INACTIVE, STATE
 from Firefly.helpers.metadata import metaMotion
-
 
 TITLE = 'Firefly Zwave Motion Sensor'
 DEVICE_TYPE = DEVICE_TYPE_MOTION
 AUTHOR = 'Zachary Priddy'
 COMMANDS = []
 REQUESTS = [STATE]
-INITIAL_VALUES = {'_state': False}
+INITIAL_VALUES = {
+  '_state': False
+}
 
 
 def Setup(firefly, package, **kwargs):
@@ -46,7 +47,7 @@ class ZwaveMotionSensor(ZwaveDevice):
     else:
       self._state = False
 
-    # self._state = self._raw_values.get('BURGLAR')
+      # self._state = self._raw_values.get('BURGLAR')
 
   def get_state(self, **kwargs):
     return self.state

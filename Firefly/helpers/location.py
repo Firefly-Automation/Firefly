@@ -1,20 +1,15 @@
-from Firefly import logging
-from astral import Astral
-from astral import GoogleGeocoder
-from datetime import datetime
-from datetime import timedelta
-
-from Firefly.const import (SOURCE_LOCATION, EVENT_TYPE_BROADCAST, DAY_EVENTS, TIME)
-
-from Firefly.helpers.events import Event
-
-from Firefly import scheduler
-
 import asyncio
+from datetime import datetime, timedelta
+
+from astral import Astral, GoogleGeocoder
+
+from Firefly import logging, scheduler
+from Firefly.const import DAY_EVENTS, EVENT_TYPE_BROADCAST, SOURCE_LOCATION, TIME
+from Firefly.helpers.events import Event
 
 
 class Location(object):
-  def __init__(self, firefly, zipcode, modes, setup=True):
+  def __init__(self, firefly, zipcode, modes, mode=None, last_mode=None, setup=True):
     logging.info('Setup Location')
     self._firefly = firefly
     self._modes = modes
@@ -22,9 +17,15 @@ class Location(object):
     self._isDark = True
     self._city = None
 
-    self._mode = self._modes[0]
-    self._last_mode = self.mode
+    if mode:
+      self._mode = mode
+    else:
+      self._mode = self._modes[0]
 
+    if last_mode:
+      self._last_mode = last_mode
+    else:
+      self._last_mode = self.mode
 
     if setup:
       self._a = Astral(GoogleGeocoder)
@@ -34,14 +35,26 @@ class Location(object):
       self._longitude = self._city.longitude
       self.setupScheduler()
 
+  def export(self, **kwargs) -> dict:
+    export_data = {
+      'modes':     self.modes,
+      'mode':      self.mode,
+      'last_mode': self.lastMode,
+      'zipcode':   self._zipcode
+    }
+    return export_data
 
-  def setupScheduler(self):
+  # TODO: Add handling for realtime adding/deleting modes, changing zipcode etc.
+
+  def setupScheduler(self) -> None:
     for e in DAY_EVENTS:
       day_event_time = self.getNextDayEvent(e)
       logging.info('Day Event: {} Time: {}'.format(e, str(day_event_time)))
       scheduler.runAt(day_event_time, self.DayEventHandler, day_event=e, job_id=e)
 
-    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={SOURCE_LOCATION:'STARTUP'})
+    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={
+      SOURCE_LOCATION: 'STARTUP'
+    })
     self._firefly.send_event(event)
 
     # Setup Time Broadcast to start at the next minute
@@ -52,19 +65,17 @@ class Location(object):
       strat_at = now + timedelta(minutes=2) - timedelta(seconds=now.second)
     scheduler.runAt(strat_at, self.setup_time_broadcast)
 
-
-  def setup_time_broadcast(self):
+  def setup_time_broadcast(self) -> None:
     # Setup Time Broadcast
     scheduler.runEveryM(1, self.broadcast_time)
     self.broadcast_time()
-    logging.notify('Scheduler has started.')
 
   @asyncio.coroutine
   def DayEventHandler(self, day_event):
     logging.info('day event handler - event: {}'.format(day_event))
-    # TODO: Remove this logging.notify
-    #logging.notify('day event handler - event: {}'.format(day_event))
-    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={SOURCE_LOCATION: day_event})
+    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={
+      SOURCE_LOCATION: day_event
+    })
     self._firefly.send_event(event)
     next_day_event_time = self.getNextDayEvent(day_event)
     scheduler.runAt(next_day_event_time, self.DayEventHandler, day_event=day_event, job_id=day_event)
@@ -88,8 +99,15 @@ class Location(object):
     if mode in self.modes:
       self._last_mode = self._mode
       self._mode = mode
-      event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, {'EVENT_ACTION_MODE':mode})
-      self._firefly.send_event(event)
+      event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, {
+        'EVENT_ACTION_MODE': mode,
+        'mode':              mode,
+        'last_mode':         self.lastMode,
+        'is_dark':           self.isDark
+      })
+      self.firefly.send_event(event)
+      # Export location to file on change. This will be good for unexpected restarts.
+      self.firefly.export_location()
 
   @property
   def modes(self):
@@ -128,10 +146,17 @@ class Location(object):
         return False
     return not self.isDark
 
-
   def broadcast_time(self) -> None:
     now = self.now
-    event = Event(TIME, EVENT_TYPE_BROADCAST, {'epoch': now.timestamp(), 'day': now.day, 'month': now.month, 'year': now.year, 'hour':  now.hour, 'minute': now.minute, 'weekday': now.isoweekday()})
+    event = Event(TIME, EVENT_TYPE_BROADCAST, {
+      'epoch':   now.timestamp(),
+      'day':     now.day,
+      'month':   now.month,
+      'year':    now.year,
+      'hour':    now.hour,
+      'minute':  now.minute,
+      'weekday': now.isoweekday()
+    })
     self.firefly.send_event(event)
 
   @property

@@ -32,7 +32,7 @@ class GEDimmer(ZwaveDevice):
     self._dimmers = None
     self._switches = None
     self._level = 0
-    self._done_sending_off_command = True
+    self._done_sending_command = True
 
     self.add_command(ACTION_OFF, self.off)
     self.add_command(ACTION_ON, self.on)
@@ -68,7 +68,7 @@ class GEDimmer(ZwaveDevice):
 
     self._level = node.get_dimmer_level(self._dimmers[0])
 
-    if self._done_sending_off_command:
+    if self._done_sending_command:
       self._state = EVENT_ACTION_ON if self._node.get_switch_all_state(self._switches[0]) else EVENT_ACTION_OFF
 
   def set_light(self, **kwargs):
@@ -88,25 +88,25 @@ class GEDimmer(ZwaveDevice):
     self._node.set_switch_all(self._switches[0], 1 if level > 0 else 0)
     self._level = level
     self._state = EVENT_ACTION_OFF if self._level == 0 else EVENT_ACTION_ON
-    #self._state = EVENT_ACTION_ON if self._node.get_switch_all_state(self._switches[0]) else EVENT_ACTION_OFF
+    # self._state = EVENT_ACTION_ON if self._node.get_switch_all_state(self._switches[0]) else EVENT_ACTION_OFF
 
   def off(self, **kwargs):
     self._state = EVENT_ACTION_OFF
-    self._done_sending_off_command = False
-    scheduler.runInS(5, self.set_done_sending_off, job_id='set_off')
+    self._done_sending_command = False
+    scheduler.runInS(5, self.set_done_sending_command, job_id='set_command')
 
     self._node.set_dimmer(self._dimmers[0], 0)
     self._node.set_switch_all(self._switches[0], 0)
     self._state = EVENT_ACTION_OFF
     return EVENT_ACTION_OFF
 
-  def set_done_sending_off(self, **kwargs):
-    self._done_sending_off_command = True
+  def set_done_sending_command(self, **kwargs):
+    self._done_sending_command = True
 
   def on(self, **kwargs):
     self._state = EVENT_ACTION_ON
-    self._done_sending_off_command = False
-    scheduler.runInS(5, self.set_done_sending_off, job_id='set_off')
+    self._done_sending_command = False
+    scheduler.runInS(5, self.set_done_sending_command, job_id='set_command')
 
     self._node.set_dimmer(self._dimmers[0], 255)
     self._node.set_switch_all(self._switches[0], 1)

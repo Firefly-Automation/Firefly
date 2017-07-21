@@ -2,15 +2,15 @@ import asyncio
 import configparser
 import importlib
 import json
-import sys
 import signal
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 from aiohttp import web
 
 from Firefly import aliases, logging, scheduler
-from Firefly.const import COMPONENT_MAP, DEVICE_FILE, SERVICE_CONFIG_FILE, TIME
+from Firefly.const import COMPONENT_MAP, DEVICE_FILE, LOCATION_FILE, SERVICE_CONFIG_FILE, TIME
 from Firefly.helpers.events import (Event, Request)
 from Firefly.helpers.location import Location
 from Firefly.helpers.room import Rooms
@@ -21,7 +21,9 @@ app = web.Application()
 
 def sigterm_handler(_signo, _stack_frame):
   # Raises SystemExit(0):
+  logging.notify('Firefly is shutting down...')
   sys.exit(0)
+
 
 class Firefly(object):
   ''' Core running loop and scheduler of Firefly'''
@@ -41,7 +43,8 @@ class Firefly(object):
 
     self._subscriptions = Subscriptions()
 
-    self.location = Location(self, self.settings.postal_code, self.settings.modes)
+    self.location = self.set_location()
+    # self.location = Location(self, self.settings.postal_code, self.settings.modes)
 
 
     # Start Notification service
@@ -80,13 +83,32 @@ class Firefly(object):
     # self.components['test_routine'].add_trigger(Trigger('66fdff0a-1fa5-4234-91bc-465c72aafb23',EVENT_ACTION_ANY))
 
     logging.error(code='FF.COR.INI.001')  # this is a test error message
-    logging.notify('Firefly is starting up')
+    # logging.notify('Firefly is starting up')
+    logging.notify('Firefly is starting up in mode: %s' % self.location.mode)
 
     # TODO: Leave In.
     scheduler.runEveryH(1, self.export_all_components)
 
+  def set_location(self) -> Location:
+    try:
+      with open(LOCATION_FILE) as file:
+        l = json.loads(file.read())
+        return Location(self, l['zipcode'], l['modes'], l['mode'], l['last_mode'])
+    except KeyError:
+      return Location(self, self.settings.postal_code, self.settings.modes)
+    except FileNotFoundError:
+      return Location(self, self.settings.postal_code, self.settings.modes)
+    except Exception as e:
+      logging.critical('Error importing location data. Exiting. - %s' % str(e))
+      exit(1)
+
+  def export_location(self) -> None:
+    location_data = self.location.export()
+    with open(LOCATION_FILE, 'w') as file:
+      json.dump(location_data, file, indent=4, sort_keys=True)
+
   def install_services(self) -> None:
-    logging.notify('Installing Services')
+    # logging.notify('Installing Services')
     config = configparser.ConfigParser()
     config.read(SERVICE_CONFIG_FILE)
     services = config.sections()
@@ -107,7 +129,6 @@ class Firefly(object):
     if self.components.get('service_firebase'):
       self._firebase_enabled = True
 
-
   def start(self) -> None:
     """
     Start up Firefly.
@@ -116,9 +137,9 @@ class Firefly(object):
     try:
       web.run_app(app, host=self.settings.firefly_host, port=self.settings.firefly_port)
     except KeyboardInterrupt:
-      self.export_all_components()
+      logging.message('Firefly was manually killed')
     except SystemExit:
-      self.export_all_components()
+      logging.message('Firefly was killed by system process. Probably due to automatic updates')
     finally:
       self.stop()
 
@@ -127,17 +148,18 @@ class Firefly(object):
 
     Shutdown process should export the current state of all components so it can be imported on reboot and startup.
     '''
+    logging.notify('Firefly is shutting down...')
     # TODO: Export current state of components on shutdown
     logging.message('Stopping Firefly')
 
-    # TODO: export automation.
-    #self.export_all_components()
+    self.export_all_components()
+    self.export_location()
 
     try:
       logging.message('Stopping zwave service')
       self.components['service_zwave'].stop()
     except Exception as e:
-      logging.firefly(e)
+      logging.notify(e)
 
     self.loop.stop()
     self.loop.close()
@@ -164,15 +186,19 @@ class Firefly(object):
       self.export_components(c['file'], c['type'])
     aliases.export_aliases()
 
+  # TODO: Rename this import_omponents
   def import_devices(self, config_file=DEVICE_FILE):
     logging.message('Importing components from config file.')
     # TODO: Check for duplicate alias and or IDs.
     devices = {}
-    with open(config_file) as file:
-      devices = json.loads(file.read())
+    try:
+      with open(config_file) as file:
+        devices = json.loads(file.read())
 
-    for device in devices:
-      self.install_package(device.get('package'), **device)
+      for device in devices:
+        self.install_package(device.get('package'), **device)
+    except Exception as e:
+      logging.notify('Error importing data from: %s - %s' % (DEVICE_FILE, str(e)))
 
   def export_components(self, config_file: str, component_type: str, current_values: bool = True) -> None:
     """
@@ -264,24 +290,24 @@ class Firefly(object):
         fut = asyncio.run_coroutine_threadsafe(self.new_send_command(command, None, self.loop), self.loop)
         return fut.result(10)
       else:
-        asyncio.run_coroutine_threadsafe(self.send_command_no_wait(command, self.loop), self.loop)
+        #asyncio.run_coroutine_threadsafe(self.send_command_no_wait(command, self.loop), self.loop)
+        self.components[command.device].command(command)
         return True
     except Exception as e:
-      logging.error(code='FF.COR.SEN.001') #unknown error sending command
+      logging.error(code='FF.COR.SEN.001')  # unknown error sending command
       logging.error(e)
       # TODO: Figure out how to wait for result
     return False
 
-  async def new_send_command(self, command, fut, loop ):
+  async def new_send_command(self, command, fut, loop):
     fut = await asyncio.ensure_future(loop.run_in_executor(None, self.components[command.device].command, command))
-    return  fut
+    return fut
 
   async def send_command_no_wait(self, command, loop):
-    #await asyncio.ensure_future(loop.run_in_executor(None, self.components[command.device].command, command))
+    # await asyncio.ensure_future(loop.run_in_executor(None, self.components[command.device].command, command))
     self.components[command.device].command(command)
-    #loop.run_in_executor(None, self.components[command.device].command, command)
+    # loop.run_in_executor(None, self.components[command.device].command, command)
     return True
-
 
   @asyncio.coroutine
   def async_send_command(self, command):

@@ -52,8 +52,6 @@ class Firebase(Service):
   def __init__(self, firefly, package, **kwargs):
     super().__init__(firefly, SERVICE_ID, package, TITLE, AUTHOR, COMMANDS, REQUESTS)
 
-    logging.notify('setting up firebase')
-
     self.firefly = firefly
     self.api_key = kwargs.get('api_key')
     self.auth_domain = kwargs.get('auth_domain')

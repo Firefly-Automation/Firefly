@@ -2,8 +2,7 @@ from openzwave.network import ZWaveNode
 
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.const import (ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
-                           ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SWITCH, ALEXA_ON, ALEXA_OFF)
+from Firefly.const import ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ALEXA_OFF, ALEXA_ON, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF, EVENT_ACTION_ON, STATE, SWITCH
 from Firefly.helpers.metadata import metaSwitch
 
 TITLE = 'Firefly Zwave Switch'
@@ -11,7 +10,9 @@ DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = 'Zachary Priddy'
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE]
 REQUESTS = [STATE, SWITCH]
-INITIAL_VALUES = {'_state': EVENT_ACTION_OFF}
+INITIAL_VALUES = {
+  '_state': EVENT_ACTION_OFF
+}
 
 
 def Setup(firefly, package, **kwargs):
