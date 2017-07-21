@@ -32,8 +32,7 @@ class GEDimmer(ZwaveDevice):
     self._dimmers = None
     self._switches = None
     self._level = 0
-    self._off_command_sent = False
-    self._done_sending_off_command = False
+    self._done_sending_off_command = True
 
     self.add_command(ACTION_OFF, self.off)
     self.add_command(ACTION_ON, self.on)
@@ -64,17 +63,13 @@ class GEDimmer(ZwaveDevice):
     if genre != 'User':
       return
 
-    print(self._node.to_dict())
-
     self._dimmers = list(self._node.get_dimmers().keys())
     self._switches = list(self._node.get_switches_all().keys())
 
     self._level = node.get_dimmer_level(self._dimmers[0])
-    if not self._off_command_sent:
+
+    if self._done_sending_off_command:
       self._state = EVENT_ACTION_ON if self._node.get_switch_all_state(self._switches[0]) else EVENT_ACTION_OFF
-    elif self._off_command_sent and not self._node.get_switch_all_state(self._switches[0]) and self._done_sending_off_command:
-      self._off_command_sent = False
-      self._done_sending_off_command = False
 
   def set_light(self, **kwargs):
     self.set_level(**kwargs)
@@ -97,17 +92,21 @@ class GEDimmer(ZwaveDevice):
 
   def off(self, **kwargs):
     self._state = EVENT_ACTION_OFF
-    self._off_command_sent = True
+    self._done_sending_off_command = False
+
+    self.firefly.scheduler.runInS(5, self.set_done_sending_off, job_id='set_off')
     self._node.set_dimmer(self._dimmers[0], 0)
     self._node.set_switch_all(self._switches[0], 0)
-    self._done_sending_off_command = True
     self._state = EVENT_ACTION_OFF
     return EVENT_ACTION_OFF
 
+  def set_done_sending_off(self, **kwargs):
+    self._done_sending_off_command = True
+
   def on(self, **kwargs):
     self._state = EVENT_ACTION_ON
-    self._off_command_sent = False
     self._done_sending_off_command = True
+    self.firefly.scheduler.cancel('set_off')
 
     self._node.set_dimmer(self._dimmers[0], 255)
     self._node.set_switch_all(self._switches[0], 1)
