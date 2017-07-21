@@ -51,8 +51,7 @@ class FireflyLogging(object):
       return
     from Firefly.helpers.events import Command
     notify = Command(SERVICE_NOTIFICATION,'LOGGING', COMMAND_NOTIFY, message=message)
-    # TODO: Uncomment when you want notifications
-    s = self.firefly.send_command(notify)
+    self.firefly.send_command(notify)
 
 
   def debug(self, message):
@@ -84,12 +83,16 @@ class FireflyLogging(object):
     func = inspect.currentframe().f_back.f_code
     function_name = func.co_name
     file_name = os.path.basename(func.co_filename)
-    if code:
-      if args:
-        message = str(error_codes.get(code)) % args
-      else:
-        message = error_codes.get(code)
-    logging.error('%-130s [%s - %s]' % (message, function_name, file_name))
+    try:
+      if code:
+        if args:
+          message = str(error_codes.get(code)) % args
+        else:
+          message = error_codes.get(code)
+      logging.error('%-130s [%s - %s]' % (message, function_name, file_name))
+    except:
+      logging.error('error getting code: %-130s [%s - %s]' % (code, function_name, file_name))
+    #TODO: Log errors to Fierbase for future debugging
 
   def critical(self, message):
     func = inspect.currentframe().f_back.f_code
