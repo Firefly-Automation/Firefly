@@ -11,7 +11,11 @@ AUTHOR = 'Zachary Priddy'
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, 'switch1', 'switch2', 'switch3', 'switch4', 'switchoff1', 'switchoff2', 'switchoff3', 'switchoff4']
 REQUESTS = [STATE, 'switch1', 'switch2', 'switch3', 'switch4']
 INITIAL_VALUES = {
-  '_state': EVENT_ACTION_OFF
+  '_state':  EVENT_ACTION_OFF,
+  '_state1': EVENT_ACTION_OFF,
+  '_state2': EVENT_ACTION_OFF,
+  '_state3': EVENT_ACTION_OFF,
+  '_state4': EVENT_ACTION_OFF
 }
 
 
@@ -62,11 +66,6 @@ class Dsc11(ZwaveDevice):
 
     self.add_alexa_action(ALEXA_OFF)
     self.add_alexa_action(ALEXA_ON)
-
-    self._state1 = EVENT_ACTION_OFF
-    self._state2 = EVENT_ACTION_OFF
-    self._state3 = EVENT_ACTION_OFF
-    self._state4 = EVENT_ACTION_OFF
 
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values

@@ -11,7 +11,8 @@ AUTHOR = 'Zachary Priddy'
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, LEVEL, COMMAND_SET_LIGHT]
 REQUESTS = [STATE, LEVEL]
 INITIAL_VALUES = {
-  '_state': EVENT_ACTION_OFF
+  '_state': EVENT_ACTION_OFF,
+  '_level': 0
 }
 
 
@@ -31,7 +32,6 @@ class GEDimmer(ZwaveDevice):
 
     self._dimmers = None
     self._switches = None
-    self._level = 0
     self._done_sending_command = True
 
     self.add_command(ACTION_OFF, self.off)
