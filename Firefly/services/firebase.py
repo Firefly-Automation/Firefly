@@ -299,7 +299,7 @@ class Firebase(Service):
       self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
       if source != 'time':
         now = self.firefly.location.now
-        now_time = now.strftime("%B %d %Y %I:%M:%S")
+        now_time = now.strftime("%B %d %Y %I:%M:%S %p")
         self.db.child("homeStatus").child(self.home_id).child('events').push({
           'ff_id':     source,
           'event':     action,
@@ -311,7 +311,7 @@ class Firebase(Service):
       self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
       if source != 'time':
         now = self.firefly.location.now
-        now_time = now.strftime("%B %d %Y %I:%M:%S")
+        now_time = now.strftime("%B %d %Y %I:%M:%S %p")
         self.db.child("homeStatus").child(self.home_id).child('events').push({
           'ff_id':     source,
           'event':     action,
@@ -322,7 +322,7 @@ class Firebase(Service):
   def push_notification(self, message, priority):
     try:
       now = self.firefly.location.now
-      now_time = now.strftime("%B %d %Y %I:%M:%S")
+      now_time = now.strftime("%B %d %Y %I:%M:%S %p")
       self.db.child("homeStatus").child(self.home_id).child('notifications').push({
         'message':   message,
         'priority':  priority,
@@ -332,7 +332,7 @@ class Firebase(Service):
     except:
       self.refresh_user()
       now = self.firefly.location.now
-      now_time = now.strftime("%B %d %Y %I:%M:%S")
+      now_time = now.strftime("%B %d %Y %I:%M:%S %p")
       self.db.child("homeStatus").child(self.home_id).child('notifications').push({
         'message':   message,
         'priority':  priority,
