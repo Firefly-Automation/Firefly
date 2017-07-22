@@ -31,7 +31,7 @@ def Setup(firefly, package, **kwargs):
 
 class Dsc11(ZwaveDevice):
   def __init__(self, firefly, package, **kwargs):
-    kwargs['initial_values'] = INITIAL_VALUES if not kwargs.get('initial_values') else kwargs.get('initial_values')
+    kwargs['initial_values'] = INITIAL_VALUES.update(kwargs.get('initial_values') if kwargs.get('initial_values') is not None else {})
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
     self.__dict__.update(kwargs['initial_values'])
 
