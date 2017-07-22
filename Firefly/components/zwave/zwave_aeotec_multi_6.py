@@ -29,10 +29,9 @@ def Setup(firefly, package, **kwargs):
 
 class ZwaveAeotecMulti(ZwaveDevice):
   def __init__(self, firefly, package, **kwargs):
-    init_values = INITIAL_VALUES
-    if kwargs.get('initial_values'):
-      init_values.update(kwargs.get('initial_values'))
-    kwargs['initial_values'] = init_values
+    if kwargs.get('initial_values') is not None:
+      INITIAL_VALUES.update(kwargs['initial_values'])
+    kwargs['initial_values'] = INITIAL_VALUES
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
     self.__dict__.update(kwargs['initial_values'])
     self._state = MOTION_INACTIVE
