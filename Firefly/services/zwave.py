@@ -22,7 +22,8 @@ PACKAGE_MAPPING = {
   '12727 In-Wall Smart Switch (Toggle)': 'zwave_switch',
   'DSB05 Multisensor':                   'zwave_aeotec_dsb05_multi_sensor',
   'DSC11 Smart Strip':                   'zwave_aeotec_dsc11_smart_strip',
-  'ZW080 Siren Gen5':                    'zwave_aeotec_zw080'
+  'ZW080 Siren Gen5':                    'zwave_aeotec_zw080',
+  'Unknown: type=0004, id=0002':         'zwave_ecolink_door_window_plus'
 }
 CONFIG_MAPPING = {
   'ge/12724-dimmer.xml': 'zwave_ge_12724_dimmer'
@@ -211,8 +212,10 @@ class Zwave(Service):
     print('******************************************')
     print(node_id)
     print(node.to_dict())
-    print(node.device_type)
     print(product_name)
+    print(node.product_type)
+    print(node.product_id)
+    print(node.product_type)
     print(node.manufacturer_id)
     print(node.manufacturer_name)
     print('******************************************')
@@ -265,8 +268,8 @@ class Zwave(Service):
   def export(self):
     with open(ZWAVE_FILE, 'w') as f:
       json.dump({
-                  'installed_nodes': self._installed_nodes
-                }, f, sort_keys=True, indent=4)
+        'installed_nodes': self._installed_nodes
+      }, f, sort_keys=True, indent=4)
 
   def new_node(self, *args, **kwargs):
     logging.notify('New Node Added: %s' % kwargs)
