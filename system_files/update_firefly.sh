@@ -4,6 +4,7 @@ FIREFLY_ROOT="/opt/firefly_system"
 FIREFLY_META="/opt/firefly_system/.firefly"
 FIREFLY_BACKUP="/opt/firefly_system/.firefly/backup"
 FIREFLY_CONFIG="/opt/firefly_system/Firefly/dev_config"
+FIREFLY_UPDATE_PATH="/opt/firefly_system/Firefly/system_files/update_scripts"
 
 if [ ! -d "$FIREFLY_META" ]; then
     mkdir $FIREFLY_META
@@ -37,7 +38,14 @@ cd $FIREFLY_BACKUP
 cd /opt/firefly_system/Firefly
 git pull
 
-# This is a placeholder and in the future will do checks and stop/update/start firefly
-bash /opt/firefly_system/Firefly/system_files/update_scripts/update_0-0-1.sh
+if [ ! -f $FIREFLY_META/current_version ]; then
+    # This is a placeholder and in the future will do checks and stop/update/start firefly
+    bash /opt/firefly_system/Firefly/system_files/update_scripts/update_0.0.0.a.sh
+fi
+
+UPDATE_SCRIPT="update_from$(cat $FIREFLY_META/current_version).sh"
+if [ -f $FIREFLY_UPDATE_PATH/$UPDATE_SCRIPT ]; then
+    bash $FIREFLY_UPDATE_PATH/$UPDATE_SCRIPT
+fi
 
 exit 0
