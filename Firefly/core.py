@@ -10,7 +10,7 @@ from typing import Any
 from aiohttp import web
 
 from Firefly import aliases, logging, scheduler
-from Firefly.const import COMPONENT_MAP, DEVICE_FILE, LOCATION_FILE, SERVICE_CONFIG_FILE, TIME
+from Firefly.const import COMPONENT_MAP, DEVICE_FILE, LOCATION_FILE, SERVICE_CONFIG_FILE, TIME, VERSION
 from Firefly.helpers.events import (Event, Request)
 from Firefly.helpers.location import Location
 from Firefly.helpers.room import Rooms
@@ -44,8 +44,9 @@ class Firefly(object):
     self._subscriptions = Subscriptions()
 
     self.location = self.set_location()
-    # self.location = Location(self, self.settings.postal_code, self.settings.modes)
 
+    # Get the beacon ID.
+    self.beacon_id = settings.beacon_id
 
     # Start Notification service
     self.install_package('Firefly.services.notification', alias='service notification')
@@ -351,3 +352,7 @@ class Firefly(object):
   @property
   def firebase_enabled(self):
     return self._firebase_enabled
+
+  @property
+  def version(self):
+    return VERSION

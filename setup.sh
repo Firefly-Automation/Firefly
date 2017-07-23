@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+FIREFLY_ROOT="/opt/firefly_system"
+FIREFLY_META="/opt/firefly_system/.firefly"
+FIREFLY_BACKUP="/opt/firefly_system/.firefly/backup"
+
 if [[ $EUID -ne 0 ]]; then
    echo -e "This script must be run as root"
    exit 1
@@ -55,5 +59,20 @@ sudo pip3 install -r requirements.txt
 cp -r sample_config dev_config
 echo [] > dev_config/automation.json
 
+#####################################
+# SETUP BEACON
+#####################################
+BEACON_ID=$(cat /dev/urandom | tr -dc '0-9A-F' | fold -w 32 | head -n 1 | sed -e 's/\(..\)/\1 /g')
+echo \beacon=$BEACON_ID >> $FIREFLY_ROOT/Firefly/dev_config/firefly.config
+echo $BEACON_ID > $FIREFLY_META/beacon_id
+
+#####################################
+# RECORD UPDATE VERSION
+#####################################
+echo "0.0.0.b" > $FIREFLY_META/current_version
+
+#####################################
+# SETUP AUTO-START
+#####################################
 cd /opt/firefly_system/Firefly/system_files
 sudo bash setup_autostart.sh

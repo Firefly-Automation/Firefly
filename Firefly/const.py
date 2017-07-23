@@ -3,6 +3,7 @@ from typing import TypeVar
 EVENT_ACTON_TYPE = TypeVar('EVENT_ACTION', dict, str, list)
 
 AUTHOR = 'Zachary Priddy (me@zpriddy.com)'
+VERSION = '0.0.0.b'
 
 # #### SETTINGS ####
 FIREFLY_CONFIG_SECTION = 'FIREFLY'
@@ -13,6 +14,7 @@ CONFIG_DEFAULT_HOST = 'localhost'
 CONFIG_MODES = 'modes'
 CONFIG_MODES_DEFAULT = 'home, away, morning, night'
 CONFIG_POSTAL_CODE = 'postal_code'
+CONFIG_BEACON = 'beacon'
 CONFIG_FILE = 'dev_config/firefly.config'
 
 SERVICE_CONFIG_FILE = 'dev_config/services.config'

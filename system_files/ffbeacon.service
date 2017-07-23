@@ -1,0 +1,10 @@
+[Unit]
+Description=Firefly Startup Script
+After=multi-user.target
+
+[Service]
+WorkingDirectory=/opt/firefly_system/Firefly
+ExecStart=/bin/sh -c '/bin/sh /opt/firefly_system/Firefly/system_files/firefly_beacon.sh >> /opt/firefly_system/logs/firefly_beacon.log  2>&1'
+
+[Install]
+WantedBy=multi-user.target

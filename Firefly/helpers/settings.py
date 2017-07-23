@@ -1,7 +1,7 @@
 import configparser
 
 from Firefly.const import (FIREFLY_CONFIG_SECTION, CONFIG_HOST, CONFIG_PORT, CONFIG_DEFAULT_HOST, CONFIG_DEFAULT_PORT,
-                           CONFIG_POSTAL_CODE, CONFIG_MODES, CONFIG_MODES_DEFAULT)
+                           CONFIG_POSTAL_CODE, CONFIG_MODES, CONFIG_MODES_DEFAULT, CONFIG_BEACON)
 
 
 class Settings(object):
@@ -27,3 +27,7 @@ class Settings(object):
   @property
   def postal_code(self):
     return self.config.get(FIREFLY_CONFIG_SECTION, CONFIG_POSTAL_CODE, fallback=None)
+
+  @property
+  def beacon_id(self):
+    return self.config.get(FIREFLY_CONFIG_SECTION, CONFIG_BEACON, fallback=None)

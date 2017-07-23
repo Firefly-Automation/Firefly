@@ -1,4 +1,4 @@
-# Firefly Home Automation
+# Firefly Home
 
 ## What is Firefly? 
 
@@ -10,53 +10,18 @@ For example my Hue lights fade from an orange to a daylight white either before 
 
 Firefly has an open API that makes it easy to integrate with other systems allowing for seamless interactions such as the included ha-bridge functionality. 
 
-## What deviecs are supported?
+Firefly Home: https://firefly-home.io
 
-Voice commands using HA-Bridge (color commands not yet supported):
-
-- Google Home
-  - Hey Google, turn on kitchen lights
-  - Hey Google, set lamp to 10%
-- Alexa (Amazon Echo)
-  - Alexa, turn on kitchen lights
-  - Alexa, set lamp to 10%
-
-Services:
-
-- IFTTT
-- Pushover (notifications)
-- Locative (geofencing)
-
-Devices:
-- Hue Lights
-- Nest
-- Zwave sensors and switches
-
-Partial Support:
-
-- Lifx Lights*
-- Ecobee*
-- LG TV*
-
-Coming Soon: 
-
-- Chromecast
-- Sonos
-- Harmony Support (Using HA-Bridge)
-
-
-## Requirements
-
-- Dynamic DNS Service (Google Domains or DuckDNS.org) 
-  - Currently working on other options but using the install script will only work if using dynamic DNS
-- Port 443 forawrded to the IP of the RaspberryPi (This is for LetsEncrypt and Remote Access)
-
-
-## Install Firefly
-
-- Setup a raspberrypi with raspbian (GUI is Okay)
-- Set timezone and keyboard settings in raspberry pi
-- Set hostname of system (use the subdomain of the dynamic DNS domain as the hostname)
-- Expand Filesystem $ sudo raspi-config
-- Get install script $ wget https://raw.githubusercontent.com/zpriddy/Firefly/master/install_firefly.sh
-- Run setup script $ sudo bash install_firefly.sh
+## Features
+- Google Home Support
+- Alexa Support
+- Hue Support
+- ZWave Support
+- Remote Cloud Access
+- Web based control: https://beta.firefly-home.io
+- Geofencing and iBeacon via OwnTracks
+- OAuth Linking for external services
+- Local API
+- Remote API (In progress)
+- WebApp support for iOS and Android
+- Notifications via Pushover: http://pushover.net
