@@ -149,14 +149,22 @@ class Firebase(Service):
           myCommand = Command(ff_id, 'webapi', command)
           refresh = command == 'delete'
         elif type(command) is dict:
-          myCommand = Command(ff_id, 'webapi', list(command.keys())[0], **dict(list(command.values())[0]))
-          refresh = list(command.keys())[0] == 'set_alias' or list(command.keys())[0] == 'set_room'
+          #TODO: Make this more structured.
+          if list(command.keys())[0] == 'install_package':
+            self.firefly.install_package(**dict(list(command.values())[0]))
+            refresh = True
+          else:
+            myCommand = Command(ff_id, 'webapi', list(command.keys())[0], **dict(list(command.values())[0]))
+            refresh = list(command.keys())[0] == 'set_alias' or list(command.keys())[0] == 'set_room'
         self.firefly.send_command(myCommand)
         self.db.child('homeStatus').child(self.home_id).child('commands').child(ff_id).remove(self.id_token)
         if refresh:
           self.refresh_all()
     except Exception as e:
       logging.notify("Firebase 153: %s" % str(e))
+      logging.notify(str(message['data']))
+      if type(message['data']):
+        logging.notify(list(message['data'].keys())[0])
       self.refresh_all()
       self.db.child('homeStatus').child(self.home_id).child('commands').remove(self.id_token)
 
