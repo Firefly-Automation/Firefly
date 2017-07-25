@@ -149,7 +149,6 @@ class Firefly(object):
 
     Shutdown process should export the current state of all components so it can be imported on reboot and startup.
     '''
-    logging.notify('Firefly is shutting down...')
     # TODO: Export current state of components on shutdown
     logging.message('Stopping Firefly')
 
@@ -175,6 +174,7 @@ class Firefly(object):
 
   def delete_device(self, ff_id):
     self.components.pop(ff_id)
+    aliases.aliases.pop(ff_id)
     if self.components.get('service_firebase'):
       self.components['service_firebase'].refresh_all()
 
