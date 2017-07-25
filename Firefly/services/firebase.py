@@ -176,7 +176,7 @@ class Firebase(Service):
     all_values= all_values.replace('null', '')
     all_values = all_values.replace('#', '')
     all_values = all_values.replace('$', '')
-    all_values = all_values.replace('/', '_')
+    all_values = all_values.replace('/', '_-_')
     all_values = json.loads(all_values)
 
     try:
@@ -270,7 +270,7 @@ class Firebase(Service):
     status_data = status_data.replace('null', '')
     status_data = status_data.replace('$', '')
     status_data = status_data.replace('#', '')
-    status_data = status_data.replace('/', '_')
+    status_data = status_data.replace('/', '_-_')
     status_data = json.loads(status_data)
 
 

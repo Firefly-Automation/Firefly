@@ -48,16 +48,43 @@ def metaPresence(command=True, request=True, primary=False):
   }
   return meta
 
-
-def metaText(command=False, request=False, primary=False, title='text', text=''):
+def metaQR(command=False, request=False, primary=False, title='qrcode', control_type='qrcode', context='QR Code', data=''):
   meta = {
     'command': command,
     'request': request,
     'primary': primary,
     'title':   title,
-    'context': 'Placeholder text.',
+    'context': context,
+    'type':    control_type,
+    'data': data
+  }
+  return meta
+
+def metaOwntracks(command=False, request=False, primary=False, title='OwnTracks Config', control_type='otrc', context='Clicks to download owntracks config.', data=''):
+  meta = {
+    'command': command,
+    'request': request,
+    'primary': primary,
+    'title':   title,
+    'context': context,
+    'type':    control_type,
+    'data': data
+  }
+  return meta
+
+
+
+def metaText(command=False, request=False, primary=False, title='text', text='', text_request='', context=''):
+  meta = {
+    'command': command,
+    'request': request,
+    'primary': primary,
+    'title':   title,
+    'context': context,
+    'type': 'text',
     'options': {
-      'text': text
+      'text': text,
+      'request': text_request
     }
   }
   return meta
