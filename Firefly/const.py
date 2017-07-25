@@ -85,6 +85,7 @@ ACTION_OFF = 'off'
 ACTION_ON = 'on'
 ACTION_TOGGLE = 'toggle'
 ACTION_LEVEL = 'level'
+ACTION_SET_PRESENCE = 'set_presence'
 ACTION_PRESENT = 'present'
 ACTION_NOT_PRESENT = 'not_present'
 
