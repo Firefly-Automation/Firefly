@@ -181,6 +181,8 @@ class Device(object):
 
   def add_action(self, action, action_meta):
     self._metadata['actions'][action] = action_meta
+    if action_meta.get('primary') is True:
+      self._metadata['primary'] = action
 
   def add_homekit_export(self, homekit_type, action):
     self._homekit_types[homekit_type] = action

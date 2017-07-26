@@ -8,4 +8,7 @@ update_0-0-1/update_0.0.0.a:
     Generate beacon uuid. Also chnage naming for update scripts.
 
 update_0.0.0.b:
-    Not written yet
+    Add nest support and install python-nest.
+
+update_0.0.0.c:
+    Not written yet.

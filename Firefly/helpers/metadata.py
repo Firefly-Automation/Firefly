@@ -17,6 +17,71 @@ def metaDimmer(min=0, max=100, command=True, request=False, primary=False):
   return meta
 
 
+def metaSlider(command=True, request=False, primary=False, min=0, max=100, step=1, action_type='slider', request_param='level', context='Change slider.', title='slider', set_command='',
+               command_param=''):
+  meta = {
+    'command': command,
+    'request': request,
+    'primary': primary,
+    'title':   title,
+    'context': context,
+    'type':    action_type,
+    'options': {
+      'min':           min,
+      'max':           max,
+      'step':          step,
+      'request':       request_param,
+      'command':       set_command,
+      'command_param': command_param,
+    }
+  }
+  return meta
+
+
+def metaButton(command=True, request=False, primary=False, action_type='button', text='Button', context='Button', title='Button', set_command='', command_param='', command_value=''):
+  meta = {
+    'command': command,
+    'request': request,
+    'primary': primary,
+    'title':   title,
+    'context': context,
+    'type':    action_type,
+    'options': {
+      'text':          text,
+      'command':       set_command,
+      'command_param': command_param,
+      'command_value': command_value
+    }
+  }
+  return meta
+
+
+def metaButtons(command=False, request=False, primary=False, action_type='buttons', context='Button', title='Buttons', buttons=[], request_val=''):
+  meta = {
+    'command': command,
+    'request': request,
+    'primary': primary,
+    'title':   title,
+    'context': context,
+    'type':    action_type,
+    'options': {
+      'buttons':     buttons,
+      'request_val': request_val
+    }
+  }
+  return meta
+
+
+def metaButtonObject(text='Button', set_command='', command_param='', command_value=''):
+  meta = {
+    'text':          text,
+    'command':       set_command,
+    'command_param': command_param,
+    'command_value': command_value
+  }
+  return meta
+
+
 def metaSwitch(command=True, request=True, primary=False, on_action=EVENT_ACTION_ON, off_action=EVENT_ACTION_OFF, title='switch', context='Change switch.', control_type='select'):
   meta = {
     'command': command,
@@ -48,6 +113,7 @@ def metaPresence(command=True, request=True, primary=False):
   }
   return meta
 
+
 def metaQR(command=False, request=False, primary=False, title='qrcode', control_type='qrcode', context='QR Code', data=''):
   meta = {
     'command': command,
@@ -56,9 +122,10 @@ def metaQR(command=False, request=False, primary=False, title='qrcode', control_
     'title':   title,
     'context': context,
     'type':    control_type,
-    'data': data
+    'data':    data
   }
   return meta
+
 
 def metaOwntracks(command=False, request=False, primary=False, title='OwnTracks Config', control_type='otrc', context='Clicks to download owntracks config.', data=''):
   meta = {
@@ -68,10 +135,9 @@ def metaOwntracks(command=False, request=False, primary=False, title='OwnTracks 
     'title':   title,
     'context': context,
     'type':    control_type,
-    'data': data
+    'data':    data
   }
   return meta
-
 
 
 def metaText(command=False, request=False, primary=False, title='text', text='', text_request='', context=''):
@@ -81,9 +147,9 @@ def metaText(command=False, request=False, primary=False, title='text', text='',
     'primary': primary,
     'title':   title,
     'context': context,
-    'type': 'text',
+    'type':    'text',
     'options': {
-      'text': text,
+      'text':    text,
       'request': text_request
     }
   }
