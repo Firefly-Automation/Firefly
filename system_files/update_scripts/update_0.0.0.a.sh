@@ -6,7 +6,8 @@ FIREFLY_BACKUP="/opt/firefly_system/.firefly/backup"
 
 if [ ! -f $FIREFLY_META/beacon_id ]; then
     BEACON_ID=$(cat /dev/urandom | tr -dc '0-9A-F' | fold -w 32 | head -n 1 | sed -e 's/\(..\)/\1 /g')
-    echo \beacon=$BEACON_ID >> $FIREFLY_ROOT/Firefly/dev_config/firefly.config
+    echo "" >> $FIREFLY_ROOT/Firefly/dev_config/firefly.config
+    echo beacon=$BEACON_ID >> $FIREFLY_ROOT/Firefly/dev_config/firefly.config
     echo $BEACON_ID > $FIREFLY_META/beacon_id
 fi
 
