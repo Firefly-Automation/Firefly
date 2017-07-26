@@ -30,6 +30,9 @@ dev_config_backup/*
 ## File-based project format:
 *.iws
 
+## Firefly
+nest.json
+
 ## Plugin-specific files:
 
 # IntelliJ

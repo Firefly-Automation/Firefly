@@ -18,6 +18,7 @@ CONFIG_BEACON = 'beacon'
 CONFIG_FILE = 'dev_config/firefly.config'
 
 SERVICE_CONFIG_FILE = 'dev_config/services.config'
+NEST_CACHE_FILE = 'dev_config/service_nest_cache.config'
 
 ALIAS_FILE = 'dev_config/device_alias.json'
 DEVICE_FILE = 'dev_config/devices.json'
