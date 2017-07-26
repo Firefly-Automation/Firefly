@@ -43,7 +43,7 @@ if [ ! -f $FIREFLY_META/current_version ]; then
     bash /opt/firefly_system/Firefly/system_files/update_scripts/update_0.0.0.a.sh
 fi
 
-UPDATE_SCRIPT="update_from$(cat $FIREFLY_META/current_version).sh"
+UPDATE_SCRIPT="update_$(cat $FIREFLY_META/current_version).sh"
 if [ -f $FIREFLY_UPDATE_PATH/$UPDATE_SCRIPT ]; then
     bash $FIREFLY_UPDATE_PATH/$UPDATE_SCRIPT
 fi
