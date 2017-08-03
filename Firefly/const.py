@@ -3,7 +3,7 @@ from typing import TypeVar
 EVENT_ACTON_TYPE = TypeVar('EVENT_ACTION', dict, str, list)
 
 AUTHOR = 'Zachary Priddy (me@zpriddy.com)'
-VERSION = '0.0.0.b'
+VERSION = '0.0.0.c'
 
 # #### SETTINGS ####
 FIREFLY_CONFIG_SECTION = 'FIREFLY'
