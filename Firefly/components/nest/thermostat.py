@@ -8,11 +8,12 @@ from Firefly.helpers.metadata import metaButtonObject, metaButtons, metaSlider, 
 TITLE = 'Nest Thermostat'
 DEVICE_TYPE = DEVICE_TYPE_THERMOSTAT
 AUTHOR = AUTHOR
-COMMANDS = [COMMAND_UPDATE, LEVEL, 'temperature', 'mode']
-REQUESTS = ['temperature', 'humidity', 'mode', 'away']
+COMMANDS = [COMMAND_UPDATE, LEVEL, 'temperature', 'mode', 'away', 'home']
+REQUESTS = ['temperature', 'humidity', 'mode', 'away', 'target']
 INITIAL_VALUES = {
   '_temperature': -1,
   '_humidity':    -1,
+  '_target':      -1,
   '_mode':        'unknown',
   '_away':        'unknown'
 }
@@ -46,16 +47,17 @@ class Thermostat(Device):
     self.add_command(COMMAND_UPDATE, self.update_thermostat)
     self.add_command('temperature', self.set_temperature)
     self.add_command('mode', self.set_mode)
-    # TODO: Enable away command.
-    # self.add_command('away', self.set_away )
+    self.add_command('away', self.set_away)
+    self.add_command('home', self.set_home)
 
     self.add_request('temperature', self.get_temperature)
+    self.add_request('target', self.get_target)
     self.add_request('humidity', self.get_humidity)
     self.add_request('mode', self.get_mode)
     self.add_request('away', self.get_away)
 
-    self.add_action('temperature', metaSlider(min=50, max=90, primary=True, request_param='temperature', set_command='temperature', command_param='temperature', title='Target Temperature'))
-    self.add_action('away', metaText(title='Nest Home Status', text_request='away'))
+    self.add_action('temperature', metaSlider(min=50, max=90, request_param='target', set_command='temperature', command_param='temperature', title='Target Temperature'))
+    self.add_action('away', metaText(title='Current Temperature', text_request='temperature', primary=True))
     eco_button = metaButtonObject('Eco', 'mode', 'mode', 'eco')
     heat_button = metaButtonObject('Heat', 'mode', 'mode', 'heat')
     cool_button = metaButtonObject('Cool', 'mode', 'mode', 'cool')
@@ -65,10 +67,18 @@ class Thermostat(Device):
     buttons = [eco_button, cool_button, heat_button, off_button]
     self.add_action('mode_buttons', metaButtons(title='AC Modes', buttons=buttons, request_val='mode', context='Change AC Mode'))
 
+    # Buttons for Home/Away
+    home_button = metaButtonObject('Home', 'away', 'away', 'home')
+    away_button = metaButtonObject('Away', 'away', 'away', 'away')
+    self.add_action('home_away_buttons', metaButtons(title='Home Mode (nest)', buttons=[home_button, away_button], request_val='away', context='Set Nest to Home/Away'))
+
     self._alexa_export = False
 
   def get_temperature(self, **kwargs):
     return self.temperature
+
+  def get_target(self, **kwargs):
+    return self.target
 
   def get_humidity(self, **kwargs):
     return self.humidity
@@ -78,6 +88,19 @@ class Thermostat(Device):
 
   def get_away(self, **kwargs):
     return self.away
+
+  def set_away(self, **kwargs):
+    '''set_away will set to away by default, if 'away' is in kwargs it will set to the value of 'away'
+    '''
+    away = kwargs.get('away')
+    if away is None:
+      away = 'away'
+    if away not in ['away', 'home']:
+      return
+    self.away = away
+
+  def set_home(self, **kwargs):
+    self.away = 'home'
 
   def set_temperature(self, **kwargs):
     t = kwargs.get('temperature')
@@ -152,3 +175,9 @@ class Thermostat(Device):
       self._away = value
     else:
       logging.error('thermostat not set yet')
+
+  @property
+  def target(self):
+    if self.thermostat:
+      self._target = self.thermostat.target
+    return self._target
