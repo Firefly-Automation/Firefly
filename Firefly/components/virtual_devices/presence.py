@@ -87,7 +87,7 @@ class VirtualPresence(Device):
       "port":  443,
     }
 
-    self.add_action('owntracks', metaOwntracks(data=ownTracksData, title="OWnTracks Config (iOS)",
+    self.add_action('owntracks', metaOwntracks(data=ownTracksData, title="OwnTracks Config (iOS)",
                                                context="Its best to download this on a computer and email it to your phone. You should be able to open it on your phone and owntracks will open. "
                                                        "After this is done use the import beacon button below  from the web browser."))
 
