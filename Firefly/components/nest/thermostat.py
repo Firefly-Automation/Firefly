@@ -57,7 +57,7 @@ class Thermostat(Device):
     self.add_request('away', self.get_away)
 
     self.add_action('temperature', metaSlider(min=50, max=90, request_param='target', set_command='temperature', command_param='temperature', title='Target Temperature'))
-    self.add_action('away', metaText(title='Current Temperature', text_request='temperature', primary=True))
+    self.add_action('current_temperature', metaText(title='Current Temperature', text_request='temperature', primary=True))
     eco_button = metaButtonObject('Eco', 'mode', 'mode', 'eco')
     heat_button = metaButtonObject('Heat', 'mode', 'mode', 'heat')
     cool_button = metaButtonObject('Cool', 'mode', 'mode', 'cool')
