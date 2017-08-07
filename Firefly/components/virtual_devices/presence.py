@@ -151,11 +151,11 @@ class VirtualPresence(Device):
 
   def set_geo_presence(self, presence):
     if presence == PRESENT:
-      scheduler.cancel('set_geo_presence')
+      scheduler.cancel(job_id='%s_set_geo_presence'%self.id)
       self._geo_presence = PRESENT
       self.check_presence()
     else:
-      scheduler.runInM(self._delay, self.set_geo_not_present, job_id='set_geo_presence')
+      scheduler.runInM(self._delay, self.set_geo_not_present, job_id='%s_set_geo_presence'%self.id)
 
   def set_geo_not_present(self):
     self.member_set('_geo_presence', NOT_PRESENT)
@@ -163,11 +163,11 @@ class VirtualPresence(Device):
 
   def set_beacon_presence(self, presence):
     if presence == PRESENT:
-      scheduler.cancel('set_beacon_presence')
+      scheduler.cancel('%s_set_beacon_presence'%self.id)
       self._beacon_presence = PRESENT
       self.check_presence()
     else:
-      scheduler.runInM(self._delay, self.set_beacon_not_present, job_id='set_beacon_presence')
+      scheduler.runInM(self._delay, self.set_beacon_not_present, job_id='%s_set_beacon_presence'%self.id)
 
   def set_beacon_not_present(self):
     self.member_set('_beacon_presence', NOT_PRESENT)
