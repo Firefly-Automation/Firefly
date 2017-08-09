@@ -61,6 +61,7 @@ class VirtualPresence(Device):
     self.add_request('firebase_api_key', self.get_firebase_api_key)
 
     self.add_action(PRESENCE, metaPresence(primary=True))
+    self.add_action('presenceText', metaText(title='Presence New', text_request=PRESENCE, context='Presence of the device.'))
     self.add_action('zone', metaText(title='Current Zone', text_request='zone', context='Current Zone'))
 
     beacon = self.firefly.beacon_id
@@ -149,13 +150,15 @@ class VirtualPresence(Device):
         presence = PRESENT if (presence == PRESENT or beacon_presence == PRESENT) else NOT_PRESENT
         self.set_zone(presence, zone)
 
+    self.check_presence()
+
   def set_geo_presence(self, presence):
     if presence == PRESENT:
-      scheduler.cancel(job_id='%s_set_geo_presence'%self.id)
+      scheduler.cancel(job_id='%s_set_geo_presence' % self.id)
       self._geo_presence = PRESENT
       self.check_presence()
     else:
-      scheduler.runInM(self._delay, self.set_geo_not_present, job_id='%s_set_geo_presence'%self.id)
+      scheduler.runInM(self._delay, self.set_geo_not_present, job_id='%s_set_geo_presence' % self.id)
 
   def set_geo_not_present(self):
     self.member_set('_geo_presence', NOT_PRESENT)
@@ -163,11 +166,11 @@ class VirtualPresence(Device):
 
   def set_beacon_presence(self, presence):
     if presence == PRESENT:
-      scheduler.cancel('%s_set_beacon_presence'%self.id)
+      scheduler.cancel('%s_set_beacon_presence' % self.id)
       self._beacon_presence = PRESENT
       self.check_presence()
     else:
-      scheduler.runInM(self._delay, self.set_beacon_not_present, job_id='%s_set_beacon_presence'%self.id)
+      scheduler.runInM(self._delay, self.set_beacon_not_present, job_id='%s_set_beacon_presence' % self.id)
 
   def set_beacon_not_present(self):
     self.member_set('_beacon_presence', NOT_PRESENT)
@@ -187,7 +190,7 @@ class VirtualPresence(Device):
     if presence == PRESENT:
       self._presence = PRESENT
     else:
-      self.member_set('_presence', presence)
+      self.member_set('_presence', NOT_PRESENT)
     self.set_zone(presence, 'Home')
 
   def set_delay(self, **kwargs):
