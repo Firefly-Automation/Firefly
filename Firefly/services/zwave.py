@@ -143,7 +143,7 @@ class Zwave(Service):
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_ADDED)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_OFF)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_ON)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
+    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
     # TODO Maybe comment next line
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
@@ -153,7 +153,7 @@ class Zwave(Service):
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_SCENE_EVENT)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_GROUP)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_CONTROLLER_WAITING)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NOTIFICATION)
+    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NOTIFICATION)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
     dispatcher.connect(self.new_node, ZWaveNetwork.SIGNAL_NODE_ADDED)
 
@@ -249,6 +249,14 @@ class Zwave(Service):
 
     elif 'On/Off Power Switch' in product_name or 'On/Off Relay Switch' in product_name:
       device_id = self._firefly.install_package('Firefly.components.zwave.zwave_switch', alias=alias, node=node)
+      self._installed_nodes[node_id] = device_id
+      self.new_alias = None
+      self.refresh_firebase()
+      self.export()
+
+    # TODO: update openzwave and see if this fixes this or create a new fix
+    elif node.manufacturer_name == 'Leviton' and node.product_type == '0x1c02':
+      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_leviton_dzs15_switch', alias='Leviton Zwave Switch', node=node)
       self._installed_nodes[node_id] = device_id
       self.new_alias = None
       self.refresh_firebase()

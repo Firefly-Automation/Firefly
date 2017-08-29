@@ -42,6 +42,9 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
 
     self._alexa_export = False
 
+    if self.tags is []:
+      self._tags = ['contact']
+
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
     """
