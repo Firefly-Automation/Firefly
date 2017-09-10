@@ -28,6 +28,8 @@ class EcolinkDoorWindosPlus(ZwaveDevice):
     if kwargs.get('initial_values') is not None:
       INITIAL_VALUES.update(kwargs['initial_values'])
     kwargs['initial_values'] = INITIAL_VALUES
+    if kwargs.get('tags') is None:
+      kwargs['tags'] = ['contact']
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
     self.__dict__.update(kwargs['initial_values'])
 

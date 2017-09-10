@@ -15,15 +15,18 @@ PACKAGE_MAPPING = {
   'DSC06106 Smart Energy Switch':        'zwave_aeotec_dsc06106_smart_switch',
   'ZW100 MultiSensor 6':                 'zwave_aeotec_multi_6',
   'ZW120 Door Window Sensor Gen5':       'zwave_aeotec_door_window_gen_5',
+  'ZW112 Door Window Sensor 6':          'zwave_aeotec_door_window_gen_6',
   'ZW097 Dry Contact Sensor Gen5':       'zwave_aeotec_zw097_dry_contact',
   '12730 Fan Control Switch':            'zwave_ge_12724_dimmer',
   '12729 3-Way Dimmer Switch':           'zwave_ge_12724_dimmer',
   '12724 3-Way Dimmer Switch':           'zwave_ge_12724_dimmer',
+  '14294 In-Wall Smart Dimmer':          'zwave_ge_12724_dimmer',
   '12727 In-Wall Smart Switch (Toggle)': 'zwave_switch',
   'DSB05 Multisensor':                   'zwave_aeotec_dsb05_multi_sensor',
   'DSC11 Smart Strip':                   'zwave_aeotec_dsc11_smart_strip',
   'ZW080 Siren Gen5':                    'zwave_aeotec_zw080',
-  'Unknown: type=0004, id=0002':         'zwave_ecolink_door_window_plus'
+  'Unknown: type=0004, id=0002':         'zwave_ecolink_door_window_plus',
+  'ZW111 Nano Dimmer':                   'zwave_aeotec_zw111_dimmer'
 }
 CONFIG_MAPPING = {
   'ge/12724-dimmer.xml': 'zwave_ge_12724_dimmer'

@@ -5,7 +5,7 @@ from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, DEVICE_TYPE_DIMMER, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE, SWITCH
 from Firefly.helpers.metadata import metaDimmer, metaSwitch
 
-TITLE = 'Firefly GE Dimmer'
+TITLE = 'Aeotec ZW111 Dimmer'
 DEVICE_TYPE = DEVICE_TYPE_DIMMER
 AUTHOR = 'Zachary Priddy'
 COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, LEVEL, COMMAND_SET_LIGHT]
@@ -18,13 +18,13 @@ INITIAL_VALUES = {
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
-  new_switch = GEDimmer(firefly, package, **kwargs)
+  new_switch = ZW111(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
   firefly.components[new_switch.id] = new_switch
   return new_switch.id
 
 
-class GEDimmer(ZwaveDevice):
+class ZW111(ZwaveDevice):
   def __init__(self, firefly, package, **kwargs):
     if kwargs.get('initial_values') is not None:
       INITIAL_VALUES.update(kwargs['initial_values'])
