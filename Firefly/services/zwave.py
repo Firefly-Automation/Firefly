@@ -2,7 +2,7 @@ import asyncio
 import configparser
 import json
 
-from openzwave.network import ZWaveController, ZWaveNetwork, dispatcher
+from openzwave.network import ZWaveController, ZWaveNetwork, dispatcher, ZWaveNode
 from openzwave.option import ZWaveOption
 
 from Firefly import logging, scheduler
@@ -110,6 +110,8 @@ class Zwave(Service):
 
     scheduler.runInS(5, self.initialize_zwave)
 
+    scheduler.runEveryM(1, self.poll_nodes)
+
   async def initialize_zwave(self):
     if self._network is not None:
       return False
@@ -146,9 +148,9 @@ class Zwave(Service):
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_ADDED)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_OFF)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_ON)
-    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
+    #### dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
     # TODO Maybe comment next line
-    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
+    #### dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_ALL_NODES_QUERIED)
@@ -167,8 +169,6 @@ class Zwave(Service):
     self._network.stop()
 
   def zwave_handler(self, *args, **kwargs):
-    print(kwargs)
-    print(str(kwargs.get('value')))
     if kwargs.get('node') is None:
       return
 
@@ -177,7 +177,6 @@ class Zwave(Service):
 
     logging.debug('zwave change received %s' % kwargs.get('node').node_id)
     node_id = str(kwargs.get('node').node_id)
-    print(self._installed_nodes)
     if node_id not in self._installed_nodes:
       node = kwargs.get('node')
       try:
@@ -359,3 +358,14 @@ class Zwave(Service):
 
     '''
     pass
+
+  def poll_nodes(self, **kwargs):
+    logging.info('polling zwave nodes')
+    nodes = self._network.nodes.values()
+    logging.debug('******************************** ZWAVE NODES ******************************')
+    logging.debug(str(nodes))
+
+    for n in nodes:
+      #n:ZWaveNode = n
+      n.request_state()
+      #n.refresh_info()

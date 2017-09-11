@@ -10,7 +10,7 @@ from typing import Any
 from aiohttp import web
 
 from Firefly import aliases, logging, scheduler
-from Firefly.const import COMPONENT_MAP, DEVICE_FILE, LOCATION_FILE, SERVICE_CONFIG_FILE, TIME, VERSION
+from Firefly.const import COMPONENT_MAP, DEVICE_FILE, LOCATION_FILE, SERVICE_CONFIG_FILE, TIME, VERSION, TYPE_DEVICE, EVENT_TYPE_BROADCAST
 from Firefly.helpers.events import (Event, Request)
 from Firefly.helpers.location import Location
 from Firefly.helpers.room import Rooms
@@ -33,6 +33,10 @@ class Firefly(object):
     # TODO: Most of this should be in startup not init.
     logging.Startup(self)
     logging.message('Initializing Firefly')
+
+    # TODO (zpriddy): Add import and export of current state.
+    self.current_state = {}
+
     self._firebase_enabled = False
     self._components = {}
     self.settings = settings
@@ -89,6 +93,13 @@ class Firefly(object):
 
     # TODO: Leave In.
     scheduler.runEveryH(1, self.export_all_components)
+
+
+    # Set the current state for all devices.
+    # TODO (zpriddy): Remove this when import and export is done.
+    all_devices = set([c_id for c_id, c in self.components.items() if (c.type == TYPE_DEVICE or c.type == 'ROOM')])
+    self.current_state = self.get_device_states(all_devices)
+
 
   def set_location(self) -> Location:
     try:
@@ -257,6 +268,7 @@ class Firefly(object):
       # asyncio.ensure_future(self._send_event(event, s, fut), loop=self.loop)
       self.components[s].event(event)
       # self.loop.run_in_executor(None,self.components[s].event, event)
+    self.update_current_state(event)
     self.send_firebase(event)
     return True
 
@@ -331,7 +343,9 @@ class Firefly(object):
   def add_get(self, route, handler, *args):
     app.router.add_get(route, handler)
 
+  # TODO(zpriddy): Remove this function.
   def get_device_states(self, devices: set) -> dict:
+    logging.warn('This is now deprecated.')
     current_state = {}
     if TIME in devices:
       devices.remove(TIME)
@@ -340,6 +354,31 @@ class Firefly(object):
     for device in devices:
       current_state[device] = self.components[device].get_all_request_values()
     return current_state
+
+
+  def update_current_state(self, event: Event) -> None:
+    """
+    Update the global current state when a broadcast event is sent.
+
+    Args:
+      event (Event): the broadcast event.
+    """
+    # Do not update time.
+    if event.source == TIME:
+      return
+
+    # Only look at broadcast events.
+    if event.event_type != EVENT_TYPE_BROADCAST:
+      return
+
+    if event.source not in self.current_state:
+      self.current_state[event.source] = {}
+
+    self.current_state[event.source].update(event.event_action)
+
+  def get_current_states(self):
+    return self.current_state
+
 
   @property
   def components(self):
