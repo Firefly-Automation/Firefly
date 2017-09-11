@@ -536,13 +536,12 @@ class TestTriggers(unittest.TestCase):
     })
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_ON
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
 
   def test_check_triggers_case_2(self):
     """Event not in triggers"""
@@ -559,13 +558,12 @@ class TestTriggers(unittest.TestCase):
     })
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device_b, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_ON
     })
     triggered = triggers.check_triggers(event)
     self.assertFalse(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
 
   def test_check_triggers_case_3(self):
     """Trigger of two devices. Invalid Trigger"""
@@ -588,13 +586,12 @@ class TestTriggers(unittest.TestCase):
     })
     trigger_added = triggers.add_trigger([trigger, trigger_b])
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_ON
     })
     triggered = triggers.check_triggers(event)
     self.assertFalse(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
 
   def test_check_triggers_case_4(self):
     """Trigger of two devices. Valid Trigger."""
@@ -617,13 +614,13 @@ class TestTriggers(unittest.TestCase):
     })
     trigger_added = triggers.add_trigger([trigger, trigger_b])
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_ON
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
+
 
   def test_check_triggers_case_5(self):
     """2 Triggers of one devices. Valid Trigger."""
@@ -648,13 +645,12 @@ class TestTriggers(unittest.TestCase):
     self.assertTrue(trigger_added)
     trigger_added = triggers.add_trigger([trigger_b])
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_ON
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
 
   def test_check_triggers_case_6(self):
     """2 Triggers of one devices. Reordered Valid Trigger."""
@@ -679,13 +675,12 @@ class TestTriggers(unittest.TestCase):
     self.assertTrue(trigger_added)
     trigger_added = triggers.add_trigger([trigger_b])
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device_b, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_OFF
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
 
   def test_check_triggers_case_7(self):
     """2 Triggers of one devices. Invalid Trigger."""
@@ -710,13 +705,12 @@ class TestTriggers(unittest.TestCase):
     self.assertTrue(trigger_added)
     trigger_added = triggers.add_trigger([trigger_b])
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device_b, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_ON
     })
     triggered = triggers.check_triggers(event)
     self.assertFalse(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
 
   def test_check_triggers_case_8(self):
     """2 Triggers of one devices, overwrite current_states with trigger value. Valid Trigger."""
@@ -741,16 +735,15 @@ class TestTriggers(unittest.TestCase):
     self.assertTrue(trigger_added)
     trigger_added = triggers.add_trigger([trigger_b])
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device_b, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_OFF
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
 
   def test_check_triggers_case_9(self):
-    """2 Triggers of one devices, overwrite current_states with trigger value, but told to ignore event. Invalid 
+    """2 Triggers of one devices, overwrite current_states with trigger value, but told to ignore event. Invalid
     Trigger."""
     # Data returned for current_states
     data = {
@@ -773,13 +766,12 @@ class TestTriggers(unittest.TestCase):
     self.assertTrue(trigger_added)
     trigger_added = triggers.add_trigger([trigger_b])
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device_b, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_OFF
     })
     triggered = triggers.check_triggers(event, ignore_event=True)
     self.assertFalse(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
 
   def test_check_triggers_case_10(self):
     """Test error of improper current_states"""
@@ -799,13 +791,12 @@ class TestTriggers(unittest.TestCase):
     })
     trigger_added = triggers.add_trigger([trigger, trigger_b])
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device_b, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_ON
     })
     triggered = triggers.check_triggers(event)
     self.assertFalse(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
 
   def test_check_triggers_case_11(self):
     """Test trigger ANY. Valid Trigger"""
@@ -816,13 +807,12 @@ class TestTriggers(unittest.TestCase):
     trigger = Trigger(self.device)
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_ON
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
 
   def test_check_triggers_case_12(self):
     """Test trigger ANY. Valid Trigger"""
@@ -835,13 +825,12 @@ class TestTriggers(unittest.TestCase):
     })
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_ON
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
 
   def test_check_triggers_case_13(self):
     """Test trigger ANY. Valid Trigger"""
@@ -855,13 +844,12 @@ class TestTriggers(unittest.TestCase):
     })
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_ON
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
 
   def test_check_triggers_case_14(self):
     """Test trigger ANY. Valid Trigger"""
@@ -874,16 +862,15 @@ class TestTriggers(unittest.TestCase):
     })
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_ON
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
 
   def test_check_triggers_case_15(self):
-    """2 Triggers of one devices, overwrite current_states with trigger value, but told to ignore event. Invalid 
+    """2 Triggers of one devices, overwrite current_states with trigger value, but told to ignore event. Invalid
     Trigger."""
     # Data returned for current_states
     data = {
@@ -904,13 +891,13 @@ class TestTriggers(unittest.TestCase):
     })
     trigger_added = triggers.add_trigger([trigger, trigger_b])
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device, EVENT_TYPE_BROADCAST, {
       STATE: EVENT_ACTION_OFF
     })
+    self.firefly.update_current_state(event)
     triggered = triggers.check_triggers(event, ignore_event=True)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b})
 
   def test_check_triggers_case_16(self):
     """Verify trigger any of property only"""
@@ -930,13 +917,12 @@ class TestTriggers(unittest.TestCase):
     })
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(self.device, EVENT_TYPE_BROADCAST, {
       'MOTION': 'ACTIVE'
     })
     triggered = triggers.check_triggers(event)
     self.assertFalse(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device})
 
 
   def test_check_triggers_case_17(self):
@@ -957,13 +943,12 @@ class TestTriggers(unittest.TestCase):
     })
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, {
       SOURCE_LOCATION: EVENT_SUNSET
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {SOURCE_LOCATION})
 
 
   def test_check_triggers_case_18(self):
@@ -984,13 +969,12 @@ class TestTriggers(unittest.TestCase):
     })
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, {
       SOURCE_LOCATION: EVENT_SUNRISE
     })
     triggered = triggers.check_triggers(event)
     self.assertFalse(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {SOURCE_LOCATION})
 
   def test_export_trigger_case_1(self):
     triggers = Triggers(self.firefly, self.trigger_id)
@@ -1249,7 +1233,7 @@ class TestTriggers(unittest.TestCase):
     self.assertTrue(trigger_added)
     trigger_added = triggers.add_trigger(trigger_c)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(TIME, EVENT_TYPE_BROADCAST, {
       'epoch':   1491076620.683116,
       'day':     1,
@@ -1261,7 +1245,6 @@ class TestTriggers(unittest.TestCase):
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b, TIME})
 
   def test_check_triggers_time_case_2(self):
     # Data returned for current_states
@@ -1290,7 +1273,7 @@ class TestTriggers(unittest.TestCase):
     self.assertTrue(trigger_added)
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(TIME, EVENT_TYPE_BROADCAST, {
       'epoch':   1491076620.683116,
       'day':     1,
@@ -1302,7 +1285,6 @@ class TestTriggers(unittest.TestCase):
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b, TIME})
 
   def test_check_triggers_time_case_3(self):
     # Data returned for current_states
@@ -1331,7 +1313,7 @@ class TestTriggers(unittest.TestCase):
     self.assertTrue(trigger_added)
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(TIME, EVENT_TYPE_BROADCAST, {
       'epoch':   1491076620.683116,
       'day':     1,
@@ -1343,7 +1325,6 @@ class TestTriggers(unittest.TestCase):
     })
     triggered = triggers.check_triggers(event)
     self.assertFalse(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b, TIME})
 
   def test_check_triggers_time_case_4(self):
     # Data returned for current_states
@@ -1372,7 +1353,7 @@ class TestTriggers(unittest.TestCase):
     self.assertTrue(trigger_added)
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(TIME, EVENT_TYPE_BROADCAST, {
       'epoch':   1491076620.683116,
       'day':     1,
@@ -1384,7 +1365,6 @@ class TestTriggers(unittest.TestCase):
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, self.device_b, TIME})
 
   def test_check_triggers_time_case_5(self):
     # Data returned for current_states
@@ -1415,7 +1395,7 @@ class TestTriggers(unittest.TestCase):
     self.assertTrue(trigger_added)
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
-    self.firefly.get_device_states = MagicMock(return_value=data)
+    self.firefly.current_state = data
     event = Event(TIME, EVENT_TYPE_BROADCAST, {
       'epoch':   1491076620.683116,
       'day':     1,
@@ -1427,7 +1407,6 @@ class TestTriggers(unittest.TestCase):
     })
     triggered = triggers.check_triggers(event)
     self.assertFalse(triggered)
-    MagicMock.assert_called_once_with(self.firefly.get_device_states, {self.device, TIME})
 
   def test_export_trigger_time(self):
     triggers = Triggers(self.firefly, self.trigger_id)

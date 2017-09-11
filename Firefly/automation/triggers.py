@@ -207,7 +207,9 @@ class Triggers(object):
     """
 
     devices = self.trigger_sources
-    current_states = self._firefly.get_device_states(devices.copy())
+    #current_states = self._firefly.get_device_states(devices.copy())
+
+    current_states = self._firefly.current_state
 
     if event.source not in devices and not ignore_event:
       return False
