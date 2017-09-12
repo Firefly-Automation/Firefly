@@ -133,7 +133,7 @@ class TriggerSet(object):
         return False
     return True
 
-  def add_trigger(self, trigger):
+  def add_trigger(self, trigger: Trigger):
     # Need to make sure that trigger set is not already in trigger set
     # self.trigger_set.append(trigger)
     pass
@@ -170,7 +170,7 @@ class TriggerList(object):
         return True
     return False
 
-  def add_trigger_set(self, trigger_set):
+  def add_trigger_set(self, trigger_set: TriggerSet):
     # Need to make sure that trigger set is not already in trigger list
     # self.trigger_list.append(trigger_set)
     pass
