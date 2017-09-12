@@ -198,7 +198,7 @@ class Triggers(object):
 
   def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
     """
-    Check triggers should be called when an event is received.
+    Validates that an event relates to the triggers. Should be called when an event is received.
 
     Args:
       ignore_event (bool): Ignore the device_id and action_type from the event and just see if trigger conditions are
@@ -207,72 +207,72 @@ class Triggers(object):
     """
 
     devices = self.trigger_sources
-    #current_states = self._firefly.get_device_states(devices.copy())
+    # current_states = self._firefly.get_device_states(devices.copy())
 
     current_states = self._firefly.current_state
 
     if event.source not in devices and not ignore_event:
       return False
 
-    for trigger in self.triggers:
+    for triggers in self.triggers:
       trigger_valid = True
       event_valid = False
-      trigger_devices = [t.listen_id for t in trigger]
-      if event.source in trigger_devices:
-        for t in trigger:
-          t_action = t.listen_action
-          t_source = t.listen_id
-          if t_source == TIME:
-            trigger_valid &= self.check_time_trigger(event, t)
-            event_valid = True
-            continue
-          # TODO: FIX THIS
-          if t_source == SOURCE_LOCATION:
-            trigger_valid &= self.check_location_trigger(event, t)
-            event_valid = True
-            continue
-          if EVENT_ACTION_ANY in t_action:
-            trigger_valid = True
-            event_valid = True
-            continue
-          for act in t_action:
-            for prop, vals in act.items():
-              try:
-                if prop not in act.keys() and EVENT_ACTION_ANY not in act.keys():
-                  trigger_valid = False
-                  break
-                # If ANY then continue
-                if EVENT_ACTION_ANY in vals:
-                  trigger_valid = True
-                  if prop in event.event_action.keys() or prop == EVENT_ACTION_ANY:
-                    event_valid = True
-                  continue
-                # If the trigger value is in the event, use the event value unless ignore event.
-                if prop in event.event_action.keys() and event.source == t_source and not ignore_event:
-                  if event.event_action[prop] in vals or EVENT_ACTION_ANY in vals:
-                    trigger_valid = True
-                    event_valid = True
-                    continue
-                  else:
-                    trigger_valid = False
-                    break
-                else:
-                  if current_states[t_source][prop] in vals:
-                    trigger_valid = True
-                    continue
-                  else:
-                    trigger_valid = False
-                    break
-              except:
-                logging.error(code='FF.TRI.CHE.001')  # cant find device or property in current status
-                trigger_valid = False
-              if not trigger_valid:
-                break
+      trigger_devices = [trigger.listen_id for trigger in triggers]
+      if event.source not in trigger_devices:
+        continue
+      for trigger in triggers:
+        listen_action = trigger.listen_action[0]  # events are a list always containing a single dict
+        trigger_source = trigger.listen_id
 
-        if trigger_valid:
-          if ignore_event:
-            return True
-          return trigger_valid & event_valid
+        if trigger_source == TIME:
+          trigger_valid &= self.check_time_trigger(event, trigger)
+          if not trigger_valid:
+            return False
+          event_valid = True
+          continue
+        if trigger_source == SOURCE_LOCATION:
+          trigger_valid &= self.check_location_trigger(event, trigger)
+          if not trigger_valid:
+            return False
+          event_valid = True
+          continue
+        if EVENT_ACTION_ANY in listen_action:  # if EVENT_ACTION_ANY is a property
+          trigger_valid = True
+          event_valid = True
+          continue
+
+        for prop, vals in listen_action.items():
+          try:
+            # If ANY then continue
+            if EVENT_ACTION_ANY in vals:
+              trigger_valid = True
+              if prop in event.event_action:
+                event_valid = True
+              continue
+            # If the trigger value is in the event, use the event value unless ignore event.
+            if prop in event.event_action and event.source == trigger_source and not ignore_event:
+              if event.event_action[prop] in vals:
+                trigger_valid = True
+                event_valid = True
+                continue
+              else:
+                return False
+            else:
+              if current_states[trigger_source][prop] in vals:
+                trigger_valid = True
+                continue
+              else:
+                return False
+          except:
+            logging.error(code='FF.TRI.CHE.001')  # cant find device or property in current status
+            trigger_valid = False
+          if not trigger_valid:
+            return False
+
+      if trigger_valid:
+        if ignore_event:
+          return True
+        return trigger_valid & event_valid
 
     return False
 
