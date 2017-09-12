@@ -1,14 +1,12 @@
 import configparser
-from difflib import get_close_matches
-
+import copy
+import json
 
 import pyrebase
 import requests
-import json
-import copy
 
 from Firefly import aliases, logging, scheduler
-from Firefly.const import API_ALEXA_VIEW, API_INFO_REQUEST, SERVICE_CONFIG_FILE, TYPE_AUTOMATION, TYPE_DEVICE
+from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SERVICE_CONFIG_FILE, TYPE_AUTOMATION, TYPE_DEVICE
 from Firefly.helpers.service import Command, Request, Service
 from Firefly.services.api_ai import apiai_command_reply
 
@@ -136,7 +134,6 @@ class Firebase(Service):
     except Exception as e:
       print(str(e))
 
-
   def stream_handler(self, message):
     refresh = False
     try:
@@ -149,7 +146,7 @@ class Firebase(Service):
           myCommand = Command(ff_id, 'webapi', command)
           refresh = command == 'delete'
         elif type(command) is dict:
-          #TODO: Make this more structured.
+          # TODO: Make this more structured.
           if list(command.keys())[0] == 'install_package':
             self.firefly.install_package(**dict(list(command.values())[0]))
             refresh = True
@@ -181,7 +178,7 @@ class Firebase(Service):
     # Nasty json sanitation
     all_values = scrub(all_values)
     all_values = json.dumps(all_values)
-    all_values= all_values.replace('null', '')
+    all_values = all_values.replace('null', '')
     all_values = all_values.replace('#', '')
     all_values = all_values.replace('$', '')
     all_values = all_values.replace('/', '_-_')
@@ -189,11 +186,32 @@ class Firebase(Service):
 
     try:
       alexa_views = self.get_all_alexa_views('firebase')
-      self.db.child("userAlexa").child(self.uid).child("devices").set(alexa_views, self.id_token)
       routines = self.get_routines()
-      # TODO DELETE ABOVE WHEN HOUSES WORK
+
+      # TODO(zpriddy): Remove old views when new UI is done
+      self.db.child("userAlexa").child(self.uid).child("devices").set(alexa_views, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('devices').update(all_values, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('routines').set(routines, self.id_token)
+      # End of old views
+
+      routine_view = {}
+      for r in routines:
+        routine_view[r.get('ff_id')] = r
+
+      # This is the new location of aliases [/homeStatus/{homeId}/aliases]
+      self.db.child("homeStatus").child(self.home_id).child('aliases').set(aliases.aliases, self.id_token)
+
+      # This is the new location of device status [/homeStatus/{homeId}/deviceStatus]
+      self.db.child("homeStatus").child(self.home_id).child('deviceStatus').set(all_values, self.id_token)
+
+      # This is the new location of routine views [/homeStatus/{homeId}/routineViews]
+      self.db.child("homeStatus").child(self.home_id).child('routineViews').set(routine_view, self.id_token)
+
+      # This is the new location of location status [/homeStatus/{homeId}/locationStatus]
+      self.db.child("homeStatus").child(self.home_id).child('locationStatus').set(self.get_location_status(), self.id_token)
+
+      # This is the new location of alexa api data [/homeStatus/{homeId}/alexaAPIView]
+      self.db.child("homeStatus").child(self.home_id).child('alexaAPIViews').set(alexa_views, self.id_token)
 
     except Exception as e:
       logging.notify("Firebase 177: %s" % str(e))
@@ -216,7 +234,7 @@ class Firebase(Service):
     return routines
 
   def get_component_view(self, ff_id, source):
-    device_request = Request(ff_id, source, API_INFO_REQUEST)
+    device_request = Request(ff_id, source, API_FIREBASE_VIEW)
     data = self.firefly.components[device_request.ff_id].request(device_request)
     return data
 
@@ -234,8 +252,6 @@ class Firebase(Service):
         data = self.get_component_alexa_view(ff_id, source)
         if data is not None:
           views.append(data)
-    # TODO MAYBE NOT RETURN HERE?
-    # return views
     return views
 
   def get_all_component_views(self, source, filter=None):
@@ -248,6 +264,31 @@ class Firebase(Service):
         views.append(data)
     return views
 
+  def get_location_status(self, **kwargs):
+    """
+    Get the location status.
+    Args:
+      **kwargs:
+
+    Returns: dict of location status
+
+    """
+    now = self.firefly.location.now
+    return_data = {
+      'time':      {
+        'epoch':  now.timestamp(),
+        'day':    now.day,
+        'month':  now.month,
+        'year':   now.year,
+        'hour':   now.hour,
+        'minute': now.minute,
+        'str':    str(now)
+      },
+      'is_dark':   self.firefly.location.isDark,
+      'mode':      self.firefly.location.mode,
+      'last_mode': self.firefly.location.lastMode
+    }
+    return return_data
 
   def refresh_status(self, **kwargs):
     status_data = {}
@@ -281,9 +322,17 @@ class Firebase(Service):
     status_data = status_data.replace('/', '_-_')
     status_data = json.loads(status_data)
 
-
     try:
+      # TODO(zpriddy) remove this when new UI is done.
       self.db.child("homeStatus").child(self.home_id).child('status').set(status_data, self.id_token)
+
+      # This is the new location of device metadata [/homeStatus/{homeId}/deviceViews]
+      device_views = {}
+      for d in status_data['devices']:
+        device_views[d.get('ff_id')] = d
+      self.db.child("homeStatus").child(self.home_id).child('deviceViews').set(device_views, self.id_token)
+
+
     except Exception as e:
       logging.notify("Firebase 263: %s" % str(e))
 
@@ -304,7 +353,27 @@ class Firebase(Service):
 
   def push(self, source, action):
     try:
-      self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
+      # New device status location
+      if source != 'time':
+        # The lines below pop unneeded zwave data.
+        # TODO(zpriddy): Find a better way to do this
+        if 'PARAMS' in action.keys():
+          action.pop('PARAMS')
+        if 'RAW_VALUES' in action.keys():
+          action.pop('RAW_VALUES')
+        if 'SENSORS' in action.keys():
+          action.pop('SENSORS')
+
+        self.db.child("homeStatus").child(self.home_id).child('deviceStatus').child(source).update(action, self.id_token)
+
+        # TODO(zpriddy): Remove this when new UI is done.
+        self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
+      else:
+        self.db.child("homeStatus").child(self.home_id).child('locationStatus').child(source).update(action, self.id_token)
+
+        # TODO(zpriddy): Remove this when new UI is done.
+        self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
+
       if source != 'time':
         now = self.firefly.location.now
         now_time = now.strftime("%B %d %Y %I:%M:%S %p")
@@ -349,7 +418,6 @@ class Firebase(Service):
       }, self.id_token)
 
   def get_api_id(self, **kwargs):
-    print('^^^^^^^^^^^^^^^^^^^ GET API KEY ^^^^^^^^^^^^^^^')
     ff_id = kwargs.get('api_ff_id')
     callback = kwargs.get('callback')
     my_stream = None
@@ -359,7 +427,6 @@ class Firebase(Service):
 
     def stream_api_key(message):
       data = message.get('data')
-      print('*************** API_KEY: ' + str(data))
       if data is None:
         return
 
@@ -368,7 +435,6 @@ class Firebase(Service):
       if api_key is None:
         return
 
-
       callback(firebase_api_key=api_key)
       try:
         my_stream.close()
@@ -376,10 +442,12 @@ class Firebase(Service):
         pass
 
     now = self.firefly.location.now.timestamp()
-    self.db.child("homeStatus").child(self.home_id).child("apiDevices").update({ff_id:{'added':now}}, self.id_token)
+    self.db.child("homeStatus").child(self.home_id).child("apiDevices").update({
+      ff_id: {
+        'added': now
+      }
+    }, self.id_token)
     my_stream = self.db.child("homeStatus").child(self.home_id).child("apiDevices").child(ff_id).child('apiKey').stream(stream_api_key, self.id_token)
-
-
 
 
 def scrub(x):

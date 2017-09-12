@@ -2,7 +2,7 @@ import uuid
 from typing import Any, Callable
 
 from Firefly import aliases, logging
-from Firefly.const import API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE, API_ALEXA_VIEW
+from Firefly.const import API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE, API_ALEXA_VIEW, API_FIREBASE_VIEW
 from Firefly.helpers.events import Command, Event, Request
 
 
@@ -250,6 +250,8 @@ class Device(object):
     logging.debug('%s: Got Request %s' % (self.id, request))
     if request.request == API_INFO_REQUEST:
       return self.get_api_info()
+    if request.request == API_FIREBASE_VIEW:
+      return self.get_firebase_views()
     if request.request == API_ALEXA_VIEW:
       return self.get_alexa_view()
     if request.request in self.request_map.keys():
@@ -280,6 +282,27 @@ class Device(object):
     for r in self._requests:
       return_data['request_values'][r] = self.request_map[r]()
     return return_data
+
+  def get_firebase_views(self, **kwargs) -> dict:
+    """
+    Get the minimum data needed for the web ui for firebase.
+    Args:
+      **kwargs:
+
+    Returns: (dict) firebase view.
+
+    """
+    return_data = {
+      'ff_id': self.id,
+      'alias': self._alias,
+      'metadata': self._metadata,
+      'device_type': self._device_type,
+      'tags': self._tags,
+      'room': self._room,
+      'export_ui': self._export_ui
+    }
+    return return_data
+
 
   def get_all_request_values(self) -> dict:
     """Function to get all requestable values.
