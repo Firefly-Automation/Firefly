@@ -226,14 +226,10 @@ class Triggers(object):
 
         if trigger_source == TIME:
           trigger_valid &= self.check_time_trigger(event, trigger)
-          if not trigger_valid:
-            return False
           event_valid = True
           continue
         if trigger_source == SOURCE_LOCATION:
           trigger_valid &= self.check_location_trigger(event, trigger)
-          if not trigger_valid:
-            return False
           event_valid = True
           continue
         if EVENT_ACTION_ANY in listen_action:  # if EVENT_ACTION_ANY is a property
