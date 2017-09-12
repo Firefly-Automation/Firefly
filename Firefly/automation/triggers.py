@@ -181,7 +181,7 @@ class TriggerList(object):
     return False
 
   def add_trigger_set(self, trigger_set: TriggerSet):
-      self.trigger_sources.add(TriggerSet.trigger_sources)
+    self.trigger_sources.add(TriggerSet.trigger_sources)
     # Need to make sure that trigger set is not already in trigger list
     # self.trigger_list.append(trigger_set)
     pass
