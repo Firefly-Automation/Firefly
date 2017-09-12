@@ -65,6 +65,13 @@ class Trigger(object):
       self._listen_action = verify_event_action(event_action)
     self._source = source
 
+   # TODO: Build this out.
+  def check_trigger(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
+    # TODO: checks for location and time triggers
+    # TODO: Trigger source in Event?
+    # TODO: Check states of other trigger devices using firefly.current_state (need to have firefly in Trigger or pass in current states or firefly when called.
+    return False
+
   def __str__(self):
     return '<FIREFLY TRIGGER - LISTEN TO: %s | LISTEN ACTION: %s >' % (self.listen_id, self.listen_action)
 
@@ -102,7 +109,86 @@ class Trigger(object):
 
 TriggerType = TypeVar('TriggerType', Trigger, List[Trigger])
 
+"""
+TriggerSet is a list of triggers that are &&'ed together when checking. 
 
+A single trigger in a TriggerSet will return False when checking. 
+
+Example: 
+trigger_set = [{A:Open},{B:Close}]
+event_action = {A:Open}
+current state of B = Open
+
+trigger_set.check_triggers(event) should return False
+"""
+class TriggerSet(object):
+  def __init__(self, **kwargs):
+    self.trigger_set = []
+    #if kwargs.get('trigger_set'):
+    #  self.import_trigger_set(kwargs.get('trigger_set'))
+
+  def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
+    for trigger in self.trigger_set:
+      if not trigger.check_trigger(event, ignore_event, **kwargs):
+        return False
+    return True
+
+  def add_trigger(self, trigger):
+    # Need to make sure that trigger set is not already in trigger set
+    # self.trigger_set.append(trigger)
+    pass
+
+  def export(self, **kwargs):
+    pass
+
+  def import_trigger_set(self, trigger_set, **kwargs):
+    pass
+
+"""
+TriggerList is a list of TriggerSet(s) that are ||'ed together when checking.
+
+A single TriggerSet returning True when checking triggers should return True.
+
+Example:
+trigger_set_a = [{A:Open},{B:Close}]
+trigger_set_b = [{A:Open},{C:Close}]
+event_action = {A:Open}
+Current state of B = Open
+Current state of C = Close
+
+trigger_list = [trigger_set_a, trigger_set_b]
+trigger_list.check_triggers(event) should return True
+"""
+class TriggerList(object):
+  def __init__(self, **kwargs):
+    self.trigger_list = []
+
+  def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
+    for trigger_set in self.trigger_list:
+      if trigger_set.check_triggers(event, ignore_event, **kwargs):
+        return True
+    return False
+
+  def add_trigger_set(self, trigger_set):
+    # Need to make sure that trigger set is not already in trigger list
+    # self.trigger_list.append(trigger_set)
+    pass
+
+  def export(self, **kwargs):
+    pass
+
+  def import_trigger_list(self, **kwargs):
+    # for trigger_set in trigger_list:
+    #   self.add_trigger_set(TriggerSet(trigger_set=trigger_set))
+    pass
+
+
+# TODO: Triggers should wrap TriggerSet. This will make it easier to use in future code beacuse we think in triggers like:
+'''
+class Triggers(TriggerSet):
+  def __init__(self, firefly, soruce_id):
+     super().__init__(firefly, source_id)
+'''
 class Triggers(object):
   def __init__(self, firefly, source_id):
     """
