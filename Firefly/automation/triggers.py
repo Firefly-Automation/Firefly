@@ -124,8 +124,8 @@ trigger_set.check_triggers(event) should return False
 class TriggerSet(object):
   def __init__(self, **kwargs):
     self.trigger_set = []
-    #if kwargs.get('trigger_set'):
-    #  self.import_trigger_set(kwargs.get('trigger_set'))
+    if kwargs.get('trigger_set'):
+      self.import_trigger_set(kwargs.get('trigger_set'))
 
   def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
     for trigger in self.trigger_set:
@@ -180,9 +180,9 @@ class TriggerList(object):
   def export(self, **kwargs):
     pass
 
-  def import_trigger_list(self, **kwargs):
-    # for trigger_set in trigger_list:
-    #   self.add_trigger_set(TriggerSet(trigger_set=trigger_set))
+  def import_trigger_list(self, trigger_list, **kwargs):
+    for trigger_set in trigger_list:
+        self.add_trigger_set(TriggerSet(trigger_set=trigger_set))
     pass
 
 
