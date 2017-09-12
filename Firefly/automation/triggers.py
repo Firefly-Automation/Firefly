@@ -252,18 +252,20 @@ class Triggers(object):
                 event_valid = True
                 continue
               else:
-                return False
+                trigger_valid = False
+                break
             else:
               if current_states[trigger_source][prop] in vals:
                 trigger_valid = True
                 continue
               else:
-                return False
+                trigger_valid = False
+                break
           except:
             logging.error(code='FF.TRI.CHE.001')  # cant find device or property in current status
             trigger_valid = False
           if not trigger_valid:
-            return False
+            break
 
       if trigger_valid:
         if ignore_event:
