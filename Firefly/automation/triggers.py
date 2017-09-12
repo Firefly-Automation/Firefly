@@ -159,6 +159,7 @@ Current state of C = Close
 trigger_list = [trigger_set_a, trigger_set_b]
 trigger_list.check_triggers(event) should return True
 """
+# TODO: Base TriggerList off of the format of Triggers below.
 class TriggerList(object):
   def __init__(self, **kwargs):
     self.trigger_list = []
