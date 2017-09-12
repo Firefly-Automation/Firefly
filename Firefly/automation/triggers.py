@@ -142,6 +142,8 @@ class TriggerSet(object):
     pass
 
   def import_trigger_set(self, trigger_set, **kwargs):
+    for trigger in trigger_set:
+        self.add_trigger(Trigger(**trigger))
     pass
 
 """
