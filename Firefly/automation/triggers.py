@@ -55,6 +55,9 @@ Example Trigger:
 
 """
 
+# TODO: Change listen_id to trigger_source
+# TODO: Change event_action to trigger_action
+# TODO: Change source to subscriber_id (This may get moved to TriggerList as a TriggerList is all for the same subscriber)
 
 class Trigger(object):
   def __init__(self, listen_id: str, event_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY, source: str = SOURCE_TRIGGER):
@@ -122,29 +125,33 @@ current state of B = Open
 trigger_set.check_triggers(event) should return False
 """
 class TriggerSet(object):
-  def __init__(self, **kwargs):
+  def __init__(self, trigger_set=[], **kwargs):
     self.trigger_set = []
-    if kwargs.get('trigger_set'):
+    self.trigger_sources = set()
+    if trigger_set:
       self.import_trigger_set(kwargs.get('trigger_set'))
 
   def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
+    # Event source is not in TriggerSet sources -> return False.
+    if event.source not in self.trigger_sources:
+        return False
     for trigger in self.trigger_set:
       if not trigger.check_trigger(event, ignore_event, **kwargs):
         return False
     return True
 
   def add_trigger(self, trigger: Trigger):
+    self.trigger_sources.add(trigger.listen_id)
     # Need to make sure that trigger set is not already in trigger set
     # self.trigger_set.append(trigger)
     pass
 
   def export(self, **kwargs):
-    pass
+    return [trigger.export() for trigger in self.trigger_set]
 
   def import_trigger_set(self, trigger_set, **kwargs):
     for trigger in trigger_set:
         self.add_trigger(Trigger(**trigger))
-    pass
 
 """
 TriggerList is a list of TriggerSet(s) that are ||'ed together when checking.
@@ -165,6 +172,7 @@ trigger_list.check_triggers(event) should return True
 class TriggerList(object):
   def __init__(self, **kwargs):
     self.trigger_list = []
+    self.trigger_sources = set()
 
   def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
     for trigger_set in self.trigger_list:
@@ -173,17 +181,17 @@ class TriggerList(object):
     return False
 
   def add_trigger_set(self, trigger_set: TriggerSet):
+      self.trigger_sources.add(TriggerSet.trigger_sources)
     # Need to make sure that trigger set is not already in trigger list
     # self.trigger_list.append(trigger_set)
     pass
 
   def export(self, **kwargs):
-    pass
+    return [trigger_set.export() for trigger_set in self.trigger_list]
 
   def import_trigger_list(self, trigger_list, **kwargs):
     for trigger_set in trigger_list:
-        self.add_trigger_set(TriggerSet(trigger_set=trigger_set))
-    pass
+        self.add_trigger_set(TriggerSet(trigger_set))
 
 
 # TODO: Triggers should wrap TriggerSet. This will make it easier to use in future code beacuse we think in triggers like:
