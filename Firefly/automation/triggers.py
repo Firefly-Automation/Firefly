@@ -1,9 +1,9 @@
+from typing import List, TypeVar
+
 from Firefly import logging
-from Firefly.helpers.events import Request, Event
-from Firefly.const import SOURCE_TRIGGER, EVENT_ACTION_ANY, EVENT_ACTON_TYPE, TIME, SOURCE_LOCATION
+from Firefly.const import EVENT_ACTION_ANY, EVENT_ACTON_TYPE, SOURCE_LOCATION, SOURCE_TRIGGER, TIME
+from Firefly.helpers.events import Event
 from Firefly.helpers.subscribers import verify_event_action, verify_event_action_time
-import asyncio
-from typing import TypeVar, List
 
 """
 An individual trigger should be a dict type. Each individual trigger will be treated as an 'OR' trigger. Meaning
@@ -55,28 +55,70 @@ Example Trigger:
 
 """
 
+
 # TODO: Change listen_id to trigger_source
 # TODO: Change event_action to trigger_action
 # TODO: Change source to subscriber_id (This may get moved to TriggerList as a TriggerList is all for the same subscriber)
 
 class Trigger(object):
-  def __init__(self, listen_id: str, event_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY, source: str = SOURCE_TRIGGER):
-    self._listen_id = listen_id
+  def __init__(self, listen_id: str, trigger_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY, source: str = SOURCE_TRIGGER):
+    self.listen_id = listen_id
     if listen_id == TIME:
-      self._listen_action = verify_event_action_time(event_action)
+      self.trigger_action = verify_event_action_time(trigger_action)
     else:
-      self._listen_action = verify_event_action(event_action)
-    self._source = source
+      self.trigger_action = verify_event_action(trigger_action)
+    self.source = source
 
-   # TODO: Build this out.
-  def check_trigger(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
-    # TODO: checks for location and time triggers
-    # TODO: Trigger source in Event?
-    # TODO: Check states of other trigger devices using firefly.current_state (need to have firefly in Trigger or pass in current states or firefly when called.
+    # TODO: Build this out.
+
+  def check_trigger(self, firefly, event: Event, ignore_event: bool = False, **kwargs) -> bool:
+    if self.listen_id == TIME:
+      return self.check_time_trigger(event)
+    # TODO: checks for location
+
+    trigger_action = self.trigger_action[0]
+    if self.listen_id == event.source and not ignore_event:
+      if EVENT_ACTION_ANY in trigger_action:
+        return True
+      for item, value in event.event_action.items():
+        if item in trigger_action and value in trigger_action[item]:
+          return True
+        if item in trigger_action and EVENT_ACTION_ANY in trigger_action[item]:
+          return True
+      return False
+
+    current_states = firefly.current_state
+
+    try:
+      prop = list(trigger_action.keys())[0]
+      if current_states[self.listen_id][prop] in trigger_action[prop]:
+        return True
+      if EVENT_ACTION_ANY in trigger_action[prop]:
+        return True
+    except:
+      return False
+
+    return False
+
+  def check_time_trigger(self, event: Event) -> bool:
+    # If the event source is not time then it cant match any.
+    if event.source != TIME:
+      return False
+    # If any time trigger in list of times matches return True.
+    for t in self.trigger_action:
+      if t.get('day'):
+        if event.event_action['day'] != t['day']:
+          continue
+      if t.get('month'):
+        if event.event_action['month'] != t['month']:
+          continue
+      if event.event_action['hour'] == t['hour'] and event.event_action['minute'] == t['minute'] and event.event_action['weekday'] in t['weekdays']:
+        return True
+
     return False
 
   def __str__(self):
-    return '<FIREFLY TRIGGER - LISTEN TO: %s | LISTEN ACTION: %s >' % (self.listen_id, self.listen_action)
+    return '<FIREFLY TRIGGER - LISTEN TO: %s | TRIGGER ACTION: %s >' % (self.listen_id, self.trigger_action)
 
   def __repr__(self):
     return str(self.__dict__)
@@ -92,22 +134,10 @@ class Trigger(object):
 
   def export(self):
     return {
-      'listen_id':    self.listen_id,
-      'event_action': self.listen_action,
-      'source':       self.source
+      'listen_id':      self.listen_id,
+      'trigger_action': self.trigger_action,
+      'source':         self.source
     }
-
-  @property
-  def listen_id(self):
-    return self._listen_id
-
-  @property
-  def listen_action(self):
-    return self._listen_action
-
-  @property
-  def source(self):
-    return self._source
 
 
 TriggerType = TypeVar('TriggerType', Trigger, List[Trigger])
@@ -124,34 +154,50 @@ current state of B = Open
 
 trigger_set.check_triggers(event) should return False
 """
+
+
 class TriggerSet(object):
-  def __init__(self, trigger_set=[], **kwargs):
+  def __init__(self, firefly, subscriber_id, trigger_set=[], **kwargs):
+    self.firefly = firefly
+    self.subscriber_id = subscriber_id
     self.trigger_set = []
     self.trigger_sources = set()
     if trigger_set:
-      self.import_trigger_set(kwargs.get('trigger_set'))
+      self.import_trigger_set(trigger_set)
 
   def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
     # Event source is not in TriggerSet sources -> return False.
     if event.source not in self.trigger_sources:
-        return False
+      return False
     for trigger in self.trigger_set:
-      if not trigger.check_trigger(event, ignore_event, **kwargs):
+      if not trigger.check_trigger(self.firefly, event, ignore_event, **kwargs):
         return False
     return True
 
   def add_trigger(self, trigger: Trigger):
+    if trigger in self.trigger_set:
+      return False
+
+    if {trigger} in [{t} for t in self.trigger_set]:
+      logging.info('Trigger already in triggers: %s' % trigger)
+      return False
+
     self.trigger_sources.add(trigger.listen_id)
-    # Need to make sure that trigger set is not already in trigger set
-    # self.trigger_set.append(trigger)
-    pass
+    self.trigger_set.append(trigger)
+    if trigger.listen_id != TIME:
+      logging.debug('Adding subscription: %s %s %s' % (self.subscriber_id, trigger.listen_id, trigger.trigger_action))
+      self.firefly.subscriptions.add_subscriber(self.subscriber_id, trigger.listen_id, trigger.trigger_action)
+    else:
+      self.firefly.subscriptions.add_subscriber(self.subscriber_id, trigger.listen_id, EVENT_ACTION_ANY)
+    return True
 
   def export(self, **kwargs):
     return [trigger.export() for trigger in self.trigger_set]
 
   def import_trigger_set(self, trigger_set, **kwargs):
     for trigger in trigger_set:
-        self.add_trigger(Trigger(**trigger))
+      self.add_trigger(trigger)
+
 
 """
 TriggerList is a list of TriggerSet(s) that are ||'ed together when checking.
@@ -168,9 +214,13 @@ Current state of C = Close
 trigger_list = [trigger_set_a, trigger_set_b]
 trigger_list.check_triggers(event) should return True
 """
+
+
 # TODO: Base TriggerList off of the format of Triggers below.
 class TriggerList(object):
-  def __init__(self, **kwargs):
+  def __init__(self, firefly, subscriber_id, **kwargs):
+    self.firefly = firefly
+    self.subscriber_id = subscriber_id
     self.trigger_list = []
     self.trigger_sources = set()
 
@@ -180,18 +230,20 @@ class TriggerList(object):
         return True
     return False
 
-  def add_trigger_set(self, trigger_set: TriggerSet):
-    self.trigger_sources.add(TriggerSet.trigger_sources)
-    # Need to make sure that trigger set is not already in trigger list
-    # self.trigger_list.append(trigger_set)
-    pass
+  def add_trigger_set(self, trigger_set: TriggerSet) -> bool:
+    if trigger_set in self.trigger_list:
+      return False
+
+    self.trigger_list.append(trigger_set)
+    self.trigger_sources.update(trigger_set.trigger_sources)
+    return True
 
   def export(self, **kwargs):
     return [trigger_set.export() for trigger_set in self.trigger_list]
 
   def import_trigger_list(self, trigger_list, **kwargs):
     for trigger_set in trigger_list:
-        self.add_trigger_set(TriggerSet(trigger_set))
+      self.add_trigger_set(TriggerSet(self.firefly, self.subscriber_id, trigger_set))
 
 
 # TODO: Triggers should wrap TriggerSet. This will make it easier to use in future code beacuse we think in triggers like:
@@ -200,7 +252,28 @@ class Triggers(TriggerSet):
   def __init__(self, firefly, soruce_id):
      super().__init__(firefly, source_id)
 '''
-class Triggers(object):
+
+
+class Triggers(TriggerList):
+  def __init__(self, firefly, source_id):
+    super().__init__(firefly, source_id)
+
+  def add_trigger(self, trigger) -> bool:
+    print('Adding trigger: %s' % trigger)
+    if type(trigger) is not list:
+      trigger = [trigger]
+    if set(trigger) in [set(t.trigger_set) for t in self.trigger_list]:
+      logging.info('Trigger already in trigger_set: %s' % trigger)
+      return False
+    return self.add_trigger_set(TriggerSet(self.firefly, self.subscriber_id, trigger))
+
+  @property
+  def triggers(self):
+    print(self.export())
+    return self.export()
+
+
+class TriggersOld(object):
   def __init__(self, firefly, source_id):
     """
     Args:
@@ -383,8 +456,7 @@ class Triggers(object):
       if t.get('month'):
         if event.event_action['month'] != t['month']:
           continue
-      if event.event_action['hour'] == t['hour'] and event.event_action['minute'] == t['minute'] and event.event_action[
-        'weekday'] in t['weekdays']:
+      if event.event_action['hour'] == t['hour'] and event.event_action['minute'] == t['minute'] and event.event_action['weekday'] in t['weekdays']:
         return True
 
     return False
