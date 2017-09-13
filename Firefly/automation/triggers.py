@@ -57,7 +57,6 @@ Example Trigger:
 
 
 # TODO: Change listen_id to trigger_source
-# TODO: Change event_action to trigger_action
 # TODO: Change source to subscriber_id (This may get moved to TriggerList as a TriggerList is all for the same subscriber)
 
 class Trigger(object):
@@ -69,12 +68,11 @@ class Trigger(object):
       self.trigger_action = verify_event_action(trigger_action)
     self.source = source
 
-    # TODO: Build this out.
-
   def check_trigger(self, firefly, event: Event, ignore_event: bool = False, **kwargs) -> bool:
     if self.listen_id == TIME:
       return self.check_time_trigger(event)
-    # TODO: checks for location
+    if self.listen_id == SOURCE_LOCATION:
+      return self.check_location_trigger(event)
 
     trigger_action = self.trigger_action[0]
     if self.listen_id == event.source and not ignore_event:
@@ -114,7 +112,20 @@ class Trigger(object):
           continue
       if event.event_action['hour'] == t['hour'] and event.event_action['minute'] == t['minute'] and event.event_action['weekday'] in t['weekdays']:
         return True
+    return False
 
+  def check_location_trigger(self, event: Event) -> bool:
+    if event.source != SOURCE_LOCATION:
+      return False
+
+    for t in self.trigger_action:
+      if SOURCE_LOCATION not in event.event_action:
+        return False
+      if SOURCE_LOCATION not in t:
+        return False
+      for day_event in t.get(SOURCE_LOCATION):
+        if day_event == event.event_action.get(SOURCE_LOCATION):
+          return True
     return False
 
   def __str__(self):
@@ -246,14 +257,6 @@ class TriggerList(object):
       self.add_trigger_set(TriggerSet(self.firefly, self.subscriber_id, trigger_set))
 
 
-# TODO: Triggers should wrap TriggerSet. This will make it easier to use in future code beacuse we think in triggers like:
-'''
-class Triggers(TriggerSet):
-  def __init__(self, firefly, soruce_id):
-     super().__init__(firefly, source_id)
-'''
-
-
 class Triggers(TriggerList):
   def __init__(self, firefly, source_id):
     super().__init__(firefly, source_id)
@@ -267,85 +270,6 @@ class Triggers(TriggerList):
       return False
     return self.add_trigger_set(TriggerSet(self.firefly, self.subscriber_id, trigger))
 
-  @property
-  def triggers(self):
-    print(self.export())
-    return self.export()
-
-
-class TriggersOld(object):
-  def __init__(self, firefly, source_id):
-    """
-    Args:
-      firefly (firefly): Firefly object
-      source_id (str): The source of the triggers object. This is used to build out the subscribers list.
-    """
-    self._firefly = firefly
-    self._source_id = source_id
-    self._triggers = []
-    self._trigger_sources = set()
-
-  def add_trigger(self, trigger: TriggerType) -> bool:
-    logging.info('Adding trigger: %s' % trigger)
-
-    if type(trigger) is not list:
-      trigger = [trigger]
-
-    if set(trigger) in [set(t) for t in self.triggers]:
-      logging.info('Trigger already in triggers: %s' % trigger)
-      return False
-
-    self.triggers.append(trigger)
-
-    for t in trigger:
-      if t.listen_id != TIME:
-        logging.debug('Adding subscription: %s %s %s' % (self._source_id, t.listen_id, t.listen_action))
-        self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, t.listen_action)
-        self._trigger_sources.add(t.listen_id)
-      else:
-        self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, EVENT_ACTION_ANY)
-        self._trigger_sources.add(t.listen_id)
-    return True
-
-  def remove_trigger(self, trigger: TriggerType) -> bool:
-    logging.info('Removing trigger: %s' % trigger)
-
-    if type(trigger) is not list:
-      trigger = [trigger]
-
-    if trigger not in self.triggers:
-      logging.info('trigger not in triggers. Can not remove.')
-      return False
-
-    try:
-      # Remove trigger from triggers
-      self.triggers.remove(trigger)
-      # Delete all subscriptions from trigger source
-      self._firefly.subscriptions.delete_all_subscriptions(self._source_id)
-      self._trigger_sources = set()
-      # Add all triggers back in
-      for trigs in self.triggers:
-        for t in trigs:
-          self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, t.listen_action)
-          self._trigger_sources.add(t.listen_id)
-    except:
-      logging.error(code='FF.TRI.REM.001', args=(trigger))  # unknown error removing trigger: %s
-      return False
-
-    return True
-
-  def export(self):
-    logging.info('Exporting triggers')
-    export_data = []
-
-    for trigger in self.triggers:
-      trigger_section = []
-      for t in trigger:
-        trigger_section.append(t.export())
-      export_data.append(trigger_section)
-
-    return export_data
-
   def import_triggers(self, import_data: list) -> int:
     import_count = 0
     for trigger in import_data:
@@ -353,133 +277,15 @@ class TriggersOld(object):
       for t in trigger:
         triggers.append(Trigger(**t))
       import_count += 1 if self.add_trigger(triggers) else 0
-
-    for trigs in self.triggers:
-      for t in trigs:
-        if t.listen_id != TIME:
-          logging.debug('Adding subscription: %s %s %s' % (self._source_id, t.listen_id, t.listen_action))
-          self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, t.listen_action)
-          self._trigger_sources.add(t.listen_id)
-        else:
-          self._firefly.subscriptions.add_subscriber(self._source_id, t.listen_id, EVENT_ACTION_ANY)
-          self._trigger_sources.add(t.listen_id)
-
     return import_count
 
-  def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
-    """
-    Validates that an event relates to the triggers. Should be called when an event is received.
+  # TODO: Add functions to remove triggers. Is this really needed?
+  def remove_triggers(self, trigger):
+    pass
 
-    Args:
-      ignore_event (bool): Ignore the device_id and action_type from the event and just see if trigger conditions are
-                           met.
-      **kwargs ():
-    """
-
-    devices = self.trigger_sources
-    # current_states = self._firefly.get_device_states(devices.copy())
-
-    current_states = self._firefly.current_state
-
-    if event.source not in devices and not ignore_event:
-      return False
-
-    for triggers in self.triggers:
-      trigger_valid = True
-      event_valid = False
-      trigger_devices = [trigger.listen_id for trigger in triggers]
-      if event.source not in trigger_devices:
-        continue
-      for trigger in triggers:
-        listen_action = trigger.listen_action[0]  # events are a list always containing a single dict
-        trigger_source = trigger.listen_id
-
-        if trigger_source == TIME:
-          trigger_valid &= self.check_time_trigger(event, trigger)
-          event_valid = True
-          continue
-        if trigger_source == SOURCE_LOCATION:
-          trigger_valid &= self.check_location_trigger(event, trigger)
-          event_valid = True
-          continue
-        if EVENT_ACTION_ANY in listen_action:  # if EVENT_ACTION_ANY is a property
-          trigger_valid = True
-          event_valid = True
-          continue
-
-        for prop, vals in listen_action.items():
-          try:
-            # If ANY then continue
-            if EVENT_ACTION_ANY in vals:
-              trigger_valid = True
-              if prop in event.event_action:
-                event_valid = True
-              continue
-            # If the trigger value is in the event, use the event value unless ignore event.
-            if prop in event.event_action and event.source == trigger_source and not ignore_event:
-              if event.event_action[prop] in vals:
-                trigger_valid = True
-                event_valid = True
-                continue
-              else:
-                trigger_valid = False
-                break
-            else:
-              if current_states[trigger_source][prop] in vals:
-                trigger_valid = True
-                continue
-              else:
-                trigger_valid = False
-                break
-          except:
-            logging.error(code='FF.TRI.CHE.001')  # cant find device or property in current status
-            trigger_valid = False
-          if not trigger_valid:
-            break
-
-      if trigger_valid:
-        if ignore_event:
-          return True
-        return trigger_valid & event_valid
-
-    return False
-
-  def check_time_trigger(self, event: Event, trigger: Trigger) -> bool:
-    # If the event source is not time then it cant match any.
-    if event.source != TIME:
-      return False
-    # If any time trigger in list of times matches return True.
-    for t in trigger.listen_action:
-      if t.get('day'):
-        if event.event_action['day'] != t['day']:
-          continue
-      if t.get('month'):
-        if event.event_action['month'] != t['month']:
-          continue
-      if event.event_action['hour'] == t['hour'] and event.event_action['minute'] == t['minute'] and event.event_action['weekday'] in t['weekdays']:
-        return True
-
-    return False
-
-  def check_location_trigger(self, event: Event, trigger: Trigger) -> bool:
-    if event.source != SOURCE_LOCATION:
-      return False
-
-    for t in trigger.listen_action:
-      if SOURCE_LOCATION not in event.event_action:
-        return False
-      if SOURCE_LOCATION not in t:
-        return False
-      for day_event in t.get(SOURCE_LOCATION):
-        if day_event == event.event_action.get(SOURCE_LOCATION):
-          return True
-
-    return False
+  # TODO: Find way to migrate old config files, maybe variable cloning? Maybe basic bash script?
 
   @property
   def triggers(self):
-    return self._triggers
-
-  @property
-  def trigger_sources(self):
-    return self._trigger_sources
+    print(self.export())
+    return self.export()

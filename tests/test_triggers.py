@@ -1,11 +1,10 @@
 import unittest
-from unittest.mock import patch, PropertyMock, MagicMock
+from unittest.mock import patch
+
 from Firefly.automation.triggers import Trigger, Triggers
-from Firefly.const import (EVENT_ACTION_CLOSE, STATE, STATE_CLOSED, EVENT_ACTION_ON, EVENT_TYPE_BROADCAST,
-                           EVENT_ACTION_ANY, EVENT_ACTION_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, EVENT_ACTION_OFF,
-                           SOURCE_LOCATION, TIME, EVENT_SUNSET, EVENT_SUNRISE)
-from Firefly.helpers.subscribers import Subscriptions
+from Firefly.const import EVENT_ACTION_ANY, EVENT_ACTION_OFF, EVENT_ACTION_ON, EVENT_SUNRISE, EVENT_SUNSET, EVENT_TYPE_BROADCAST, SOURCE_LOCATION, STATE, TIME
 from Firefly.helpers.events import Event
+from Firefly.helpers.subscribers import Subscriptions
 
 
 class TestTriggers(unittest.TestCase):
@@ -61,11 +60,11 @@ class TestTriggers(unittest.TestCase):
     trigger_added = triggers.add_trigger(trigger)
     self.assertTrue(trigger_added)
     self.assertListEqual(triggers.triggers, [[{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }]])
 
     self.assertDictEqual(self.firefly.subscriptions.subscriptions, {
@@ -87,11 +86,11 @@ class TestTriggers(unittest.TestCase):
     trigger_added = triggers.add_trigger(trigger)
     self.assertFalse(trigger_added)
     self.assertListEqual(triggers.triggers, [[{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }]])
     self.assertDictEqual(self.firefly.subscriptions.subscriptions, {
       self.device: {
@@ -113,17 +112,17 @@ class TestTriggers(unittest.TestCase):
     trigger_added = triggers.add_trigger([trigger, trigger2])
     self.assertTrue(trigger_added)
     self.assertListEqual(triggers.triggers, [[{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }, {
-      'listen_id':     self.device_b,
+      'listen_id':      self.device_b,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }]])
     self.assertDictEqual(self.firefly.subscriptions.subscriptions, {
       self.device:   {
@@ -152,17 +151,17 @@ class TestTriggers(unittest.TestCase):
     trigger_added = triggers.add_trigger([trigger, trigger2])
     self.assertFalse(trigger_added)
     self.assertListEqual(triggers.triggers, [[{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }, {
-      'listen_id':     self.device_b,
+      'listen_id':      self.device_b,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }]])
     self.assertDictEqual(self.firefly.subscriptions.subscriptions, {
       self.device:   {
@@ -191,17 +190,17 @@ class TestTriggers(unittest.TestCase):
     trigger_added = triggers.add_trigger([trigger2, trigger])
     self.assertFalse(trigger_added)
     self.assertListEqual(triggers.triggers, [[{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }, {
-      'listen_id':     self.device_b,
+      'listen_id':      self.device_b,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }]])
     self.assertDictEqual(self.firefly.subscriptions.subscriptions, {
       self.device:   {
@@ -232,23 +231,23 @@ class TestTriggers(unittest.TestCase):
     trigger_added = triggers.add_trigger([trigger])
     self.assertTrue(trigger_added)
     self.assertListEqual(triggers.triggers, [[{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }, {
-      'listen_id':     self.device_b,
+      'listen_id':      self.device_b,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }], [{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }]])
     self.assertDictEqual(self.firefly.subscriptions.subscriptions, {
       self.device:   {
@@ -270,11 +269,11 @@ class TestTriggers(unittest.TestCase):
     trigger_added = triggers.add_trigger([trigger])
     self.assertTrue(trigger_added)
     self.assertListEqual(triggers.triggers, [[{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         EVENT_ACTION_ANY: [EVENT_ACTION_ANY]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }]])
     self.assertDictEqual(self.firefly.subscriptions.subscriptions, {
       self.device: {
@@ -293,11 +292,11 @@ class TestTriggers(unittest.TestCase):
     trigger_added = triggers.add_trigger([trigger])
     self.assertTrue(trigger_added)
     self.assertListEqual(triggers.triggers, [[{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ANY]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }]])
     self.assertDictEqual(self.firefly.subscriptions.subscriptions, {
       self.device: {
@@ -343,23 +342,23 @@ class TestTriggers(unittest.TestCase):
     trigger_added = triggers.add_trigger([trigger_a, trigger_b])
     self.assertTrue(trigger_added)
     self.assertListEqual(triggers.triggers, [[{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }], [{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }, {
-      'listen_id':     self.device_b,
+      'listen_id':      self.device_b,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }]])
     self.assertDictEqual(self.firefly.subscriptions.subscriptions, {
       self.device:   {
@@ -376,17 +375,17 @@ class TestTriggers(unittest.TestCase):
     removed = triggers.remove_trigger(trigger)
     self.assertTrue(removed)
     self.assertListEqual(triggers.triggers, [[{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }, {
-      'listen_id':     self.device_b,
+      'listen_id':      self.device_b,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }]])
     self.assertDictEqual(self.firefly.subscriptions.subscriptions, {
       self.device:   {
@@ -418,23 +417,23 @@ class TestTriggers(unittest.TestCase):
     trigger_added = triggers.add_trigger([trigger_a, trigger_b])
     self.assertTrue(trigger_added)
     self.assertListEqual(triggers.triggers, [[{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }], [{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }, {
-      'listen_id':     self.device_b,
+      'listen_id':      self.device_b,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }]])
     self.assertDictEqual(self.firefly.subscriptions.subscriptions, {
       self.device:   {
@@ -451,11 +450,11 @@ class TestTriggers(unittest.TestCase):
     removed = triggers.remove_trigger([trigger_a, trigger_b])
     self.assertTrue(removed)
     self.assertListEqual(triggers.triggers, [[{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }]])
     self.assertDictEqual(self.firefly.subscriptions.subscriptions, {
       self.device:   {
@@ -489,23 +488,23 @@ class TestTriggers(unittest.TestCase):
     removed = triggers.remove_trigger(trigger_b)
     self.assertFalse(removed)
     self.assertListEqual(triggers.triggers, [[{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }], [{
-      'listen_id':     self.device,
+      'listen_id':      self.device,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }, {
-      'listen_id':     self.device_b,
+      'listen_id':      self.device_b,
       'trigger_action': [{
         STATE: [EVENT_ACTION_ON]
       }],
-      'source':        'SOURCE_TRIGGER'
+      'source':         'SOURCE_TRIGGER'
     }]])
     self.assertDictEqual(self.firefly.subscriptions.subscriptions, {
       self.device:   {
@@ -620,7 +619,6 @@ class TestTriggers(unittest.TestCase):
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-
 
   def test_check_triggers_case_5(self):
     """2 Triggers of one devices. Valid Trigger."""
@@ -924,7 +922,6 @@ class TestTriggers(unittest.TestCase):
     triggered = triggers.check_triggers(event)
     self.assertFalse(triggered)
 
-
   def test_check_triggers_case_17(self):
     """Verify location triggers"""
     # Data returned for current_states
@@ -949,7 +946,6 @@ class TestTriggers(unittest.TestCase):
     })
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
-
 
   def test_check_triggers_case_18(self):
     """Verify location triggers"""
@@ -985,8 +981,8 @@ class TestTriggers(unittest.TestCase):
       'trigger_action': [{
         EVENT_ACTION_ANY: [EVENT_ACTION_ANY]
       }],
-      'listen_id':    self.device,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device,
+      'source':         'SOURCE_TRIGGER'
     }]])
 
   def test_export_trigger_case_2(self):
@@ -998,8 +994,8 @@ class TestTriggers(unittest.TestCase):
       'trigger_action': [{
         EVENT_ACTION_ANY: [EVENT_ACTION_ON, EVENT_ACTION_OFF]
       }],
-      'listen_id':    self.device,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device,
+      'source':         'SOURCE_TRIGGER'
     }]])
 
   def test_export_trigger_case_3(self):
@@ -1013,14 +1009,14 @@ class TestTriggers(unittest.TestCase):
       'trigger_action': [{
         EVENT_ACTION_ANY: [EVENT_ACTION_ANY]
       }],
-      'listen_id':    self.device,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device,
+      'source':         'SOURCE_TRIGGER'
     }, {
       'trigger_action': [{
         EVENT_ACTION_ANY: [EVENT_ACTION_ANY]
       }],
-      'listen_id':    self.device_b,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device_b,
+      'source':         'SOURCE_TRIGGER'
     }]])
 
   def test_export_trigger_case_4(self):
@@ -1034,8 +1030,8 @@ class TestTriggers(unittest.TestCase):
       'trigger_action': [{
         STATE: [EVENT_ACTION_ANY]
       }],
-      'listen_id':    self.device,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device,
+      'source':         'SOURCE_TRIGGER'
     }]])
 
   def test_export_trigger_case_5(self):
@@ -1053,14 +1049,14 @@ class TestTriggers(unittest.TestCase):
       'trigger_action': [{
         STATE: [EVENT_ACTION_ANY]
       }],
-      'listen_id':    self.device,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device,
+      'source':         'SOURCE_TRIGGER'
     }], [{
       'trigger_action': [{
         STATE: [EVENT_ACTION_ANY]
       }],
-      'listen_id':    self.device_b,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device_b,
+      'source':         'SOURCE_TRIGGER'
     }]])
 
   def test_import_trigger_case_1(self):
@@ -1069,8 +1065,8 @@ class TestTriggers(unittest.TestCase):
       'trigger_action': [{
         EVENT_ACTION_ANY: [EVENT_ACTION_ANY]
       }],
-      'listen_id':    self.device,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device,
+      'source':         'SOURCE_TRIGGER'
     }]]
     count = triggers.import_triggers(import_data)
     self.assertEquals(count, 1)
@@ -1084,8 +1080,8 @@ class TestTriggers(unittest.TestCase):
       'trigger_action': [{
         EVENT_ACTION_ANY: [EVENT_ACTION_ON, EVENT_ACTION_OFF]
       }],
-      'listen_id':    self.device,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device,
+      'source':         'SOURCE_TRIGGER'
     }]]
     count = triggers.import_triggers(import_data)
     self.assertEquals(count, 1)
@@ -1099,14 +1095,14 @@ class TestTriggers(unittest.TestCase):
       'trigger_action': [{
         EVENT_ACTION_ANY: [EVENT_ACTION_ANY]
       }],
-      'listen_id':    self.device,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device,
+      'source':         'SOURCE_TRIGGER'
     }, {
       'trigger_action': [{
         EVENT_ACTION_ANY: [EVENT_ACTION_ANY]
       }],
-      'listen_id':    self.device_b,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device_b,
+      'source':         'SOURCE_TRIGGER'
     }]]
     count = triggers.import_triggers(import_data)
     self.assertEquals(count, 1)
@@ -1120,8 +1116,8 @@ class TestTriggers(unittest.TestCase):
       'trigger_action': [{
         STATE: [EVENT_ACTION_ANY]
       }],
-      'listen_id':    self.device,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device,
+      'source':         'SOURCE_TRIGGER'
     }]]
     count = triggers.import_triggers(import_data)
     self.assertEquals(count, 1)
@@ -1135,14 +1131,14 @@ class TestTriggers(unittest.TestCase):
       'trigger_action': [{
         STATE: [EVENT_ACTION_ANY]
       }],
-      'listen_id':    self.device,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device,
+      'source':         'SOURCE_TRIGGER'
     }], [{
-      'event_action': [{
+      'trigger_action': [{
         STATE: [EVENT_ACTION_ANY]
       }],
-      'listen_id':    self.device_b,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      self.device_b,
+      'source':         'SOURCE_TRIGGER'
     }]]
     count = triggers.import_triggers(import_data)
     self.assertEquals(count, 2)
@@ -1423,20 +1419,20 @@ class TestTriggers(unittest.TestCase):
         'minute':   00,
         'weekdays': [1, 2, 3, 4]
       }],
-      'listen_id':    TIME,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      TIME,
+      'source':         'SOURCE_TRIGGER'
     }]])
 
   def test_import_trigger_time(self):
     triggers = Triggers(self.firefly, self.trigger_id)
     import_data = [[{
-      'event_action': [{
+      'trigger_action': [{
         'hour':     8,
         'minute':   00,
         'weekdays': [1, 2, 3, 4]
       }],
-      'listen_id':    TIME,
-      'source':       'SOURCE_TRIGGER'
+      'listen_id':      TIME,
+      'source':         'SOURCE_TRIGGER'
     }]]
     count = triggers.import_triggers(import_data)
     self.assertListEqual(triggers.triggers, [[{
@@ -1445,14 +1441,14 @@ class TestTriggers(unittest.TestCase):
         'minute':   00,
         'weekdays': [1, 2, 3, 4]
       }],
-      'listen_id':     TIME,
-      'source':        'SOURCE_TRIGGER'
+      'listen_id':      TIME,
+      'source':         'SOURCE_TRIGGER'
     }]])
     self.assertEquals(count, 1)
     self.assertSetEqual(triggers.trigger_sources, {TIME})
     export_data = triggers.export()
     self.assertListEqual(export_data, import_data)
-    self.assertEquals(export_data[0][0]['event_action'][0]['hour'], 8)
+    self.assertEquals(export_data[0][0]['trigger_action'][0]['hour'], 8)
     event = Event(TIME, EVENT_TYPE_BROADCAST, {
       'epoch':   1491076620.683116,
       'day':     1,
