@@ -2,7 +2,7 @@ import asyncio
 import configparser
 import json
 
-from openzwave.network import ZWaveController, ZWaveNetwork, dispatcher, ZWaveNode
+from openzwave.network import ZWaveController, ZWaveNetwork, dispatcher
 from openzwave.option import ZWaveOption
 
 from Firefly import logging, scheduler
@@ -17,6 +17,7 @@ PACKAGE_MAPPING = {
   'ZW120 Door Window Sensor Gen5':       'zwave_aeotec_door_window_gen_5',
   'ZW112 Door Window Sensor 6':          'zwave_aeotec_door_window_gen_6',
   'ZW097 Dry Contact Sensor Gen5':       'zwave_aeotec_zw097_dry_contact',
+  'DSB45 Water Sensor':                  'zwave_aeotec_dsb45_water',
   '12730 Fan Control Switch':            'zwave_ge_12724_dimmer',
   '12729 3-Way Dimmer Switch':           'zwave_ge_12724_dimmer',
   '12724 3-Way Dimmer Switch':           'zwave_ge_12724_dimmer',
@@ -64,7 +65,7 @@ def Setup(firefly, package, **kwargs):
 
   enable = config.getboolean(SECTION, 'enable', fallback=False)
   port = config.get(SECTION, 'port', fallback=None)
-  #path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
+  # path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
   path = config.get(SECTION, 'path', fallback=None)
   security = config.getboolean(SECTION, 'security', fallback=True)
   if not enable or port is None:
@@ -367,6 +368,6 @@ class Zwave(Service):
     logging.debug(str(nodes))
 
     for n in nodes:
-      #n:ZWaveNode = n
+      # n:ZWaveNode = n
       n.request_state()
-      #n.refresh_info()
+      # n.refresh_info()

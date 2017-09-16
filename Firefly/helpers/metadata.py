@@ -202,3 +202,18 @@ def metaWaterLevel(command=False, request=True, primary=False):
     }
   }
   return meta
+
+def metaWaterSensor(command=False, request=True, primary=False):
+  meta = {
+    'command': command,
+    'request': request,
+    'primary': primary,
+    'title':   'water_level',
+    'context': 'Is it full or empty',
+    'type':    'text',
+    'options': {
+      CONTACT_OPEN:   "Dry",
+      CONTACT_CLOSED: "WET"
+    }
+  }
+  return meta
