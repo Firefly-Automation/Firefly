@@ -212,8 +212,8 @@ def metaWaterSensor(command=False, request=True, primary=False):
     'context': 'Is it full or empty',
     'type':    'text',
     'options': {
-      CONTACT_OPEN:   "Dry",
-      CONTACT_CLOSED: "WET"
+      CONTACT_OPEN:   "WET",
+      CONTACT_CLOSED: "Dry"
     }
   }
   return meta

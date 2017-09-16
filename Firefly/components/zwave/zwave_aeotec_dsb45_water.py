@@ -57,10 +57,10 @@ class ZwaveAeotecDryContact(ZwaveDevice):
 
     # https://github.com/OpenZWave/open-zwave/blob/master/config/aeotec/zw097.xml
     #self.node.set_config_param(2, 0, size=1)  # Disable 10 min wakeup
-    #self.node.set_config_param(121, 272, size=4)
+    self.node.set_config_param(121, 4113)
 
     successful = True
-    #successful &= self.node.request_config_param(2) == 0
+    successful &= self.node.request_config_param(121) == 4113
 
     self._update_try_count += 1
     self._config_updated = successful
@@ -79,20 +79,7 @@ class ZwaveAeotecDryContact(ZwaveDevice):
     if values is None:
       return
 
-    print(values)
-
-    print(values.data)
-
-    self._state = CONTACT_OPEN if values.data == 255 else CONTACT_CLOSED
-
-
-    #genre = values.genre
-    #if genre != 'User':
-    #  return
-
-    print('water 2')
-    #self._state = CONTACT_OPEN if values.data == 255 else CONTACT_CLOSED
-    #self._state = CONTACT_OPEN if self.get_sensors(sensor='sensor') is True else CONTACT_CLOSED
+    self._state = CONTACT_OPEN if self.get_sensors(sensor='sensor') is True else CONTACT_CLOSED
 
   def get_state(self, **kwargs):
     return self.state
