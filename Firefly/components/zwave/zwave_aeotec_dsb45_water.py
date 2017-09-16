@@ -68,8 +68,12 @@ class ZwaveAeotecDryContact(ZwaveDevice):
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     if node is None:
       return
-    print(kwargs)
 
+    super().update_from_zwave(node, **kwargs)
+
+    logging.debug('&&&&&&&&&&&&&&&&&&& VALUES &&&&&&&&&&&&&&&&')
+    logging.debug(str(kwargs.get('values')))
+    logging.debug(str(self.get_sensors()))
     print('water 1')
     values = kwargs.get('values')
     if values is None:
@@ -80,11 +84,6 @@ class ZwaveAeotecDryContact(ZwaveDevice):
     print(values.data)
 
     self._state = CONTACT_OPEN if values.data == 255 else CONTACT_CLOSED
-
-    try:
-      super().update_from_zwave(node, **kwargs)
-    except Exception as e:
-      print(e)
 
 
     #genre = values.genre
