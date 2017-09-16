@@ -36,6 +36,8 @@ class ZwaveAeotecDryContact(ZwaveDevice):
 
     self.add_request(STATE, self.get_state)
     self.add_request(CONTACT, self.get_state)
+    # TODO - Make this a const
+    self.add_request('water', self.get_water)
 
     self.add_action(CONTACT, metaWaterSensor())
 
@@ -71,18 +73,18 @@ class ZwaveAeotecDryContact(ZwaveDevice):
 
     super().update_from_zwave(node, **kwargs)
 
-    logging.debug('&&&&&&&&&&&&&&&&&&& VALUES &&&&&&&&&&&&&&&&')
-    logging.debug(str(kwargs.get('values')))
-    logging.debug(str(self.get_sensors()))
-    print('water 1')
     values = kwargs.get('values')
     if values is None:
       return
 
-    self._state = CONTACT_OPEN if self.get_sensors(sensor='sensor') is True else CONTACT_CLOSED
+    self._water = self.get_sensors(sensor='sensor') if self.get_sensors(sensor='sensor') else False
+    self._state = CONTACT_OPEN if self._water is True else CONTACT_CLOSED
 
   def get_state(self, **kwargs):
     return self.state
+
+  def get_water(self, **kwargs):
+    return self._water
 
   @property
   def state(self):
