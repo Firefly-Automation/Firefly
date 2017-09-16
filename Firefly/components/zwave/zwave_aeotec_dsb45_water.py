@@ -5,11 +5,11 @@ from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import CONTACT, CONTACT_CLOSED, CONTACT_OPEN, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF, STATE
 from Firefly.helpers.metadata import metaWaterSensor
 
-TITLE = 'Aeotec Zwave DSB45 Dry Conact'
+TITLE = 'Aeotec Zwave DSB45 Water Sensor'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
 AUTHOR = 'Zachary Priddy'
 COMMANDS = []
-REQUESTS = [STATE, CONTACT]
+REQUESTS = [STATE, CONTACT, 'water']
 INITIAL_VALUES = {
   '_state': EVENT_ACTION_OFF
 }
