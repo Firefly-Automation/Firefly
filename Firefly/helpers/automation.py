@@ -8,29 +8,29 @@ from Firefly.helpers.conditions import Conditions
 from Firefly.helpers.events import Event
 
 # TODO(zpriddy): These should be in const file
-LABEL_TRIGGERS = 'triggers'
-LABEL_ACTIONS = 'actions'
+LABEL_ACTIONS    = 'actions'
 LABEL_CONDITIONS = 'conditions'
-LABEL_DELAYS = 'delays'
-LABEL_MESSAGES = 'messages'
-INTERFACE_LABELS = [LABEL_ACTIONS, LABEL_CONDITIONS, LABEL_DELAYS, LABEL_TRIGGERS, LABEL_MESSAGES]
+LABEL_DELAYS     = 'delays'
+LABEL_MESSAGES   = 'messages'
+LABEL_TRIGGERS   = 'triggers'
+INTERFACE_LABELS = [LABEL_ACTIONS, LABEL_CONDITIONS, LABEL_DELAYS, LABEL_MESSAGES, LABEL_TRIGGERS]
 
 from typing import Callable
 
 
 class Automation(object):
-  def __init__(self, firefly: object, package: str, event_handler: Callable, metadata: dict, interface: dict = {}, **kwargs):
-    self.firefly = firefly
-    self.metadata = metadata
-    self.event_handler = event_handler
-    self.interface = interface
-    self.package = package
+  def __init__(self, firefly: object, package: str, event_handler: Callable, metadata: dict, interface: dict, **kwargs):
     self.actions = {}
-    self.triggers = {}
+    self.command_map = {}
     self.conditions = {}
     self.delays = {}
+    self.event_handler = event_handler
+    self.firefly = firefly
+    self.interface = interface
     self.messages = {}
-    self.command_map = {}
+    self.metadata = metadata
+    self.package = package
+    self.triggers = {}
 
     # TODO(zpriddy): Should should be a shared function in a lib somewhere.
     # Alias and id functions
@@ -76,12 +76,13 @@ class Automation(object):
       (dict): A dict of the ff_id config.
     """
     export_data = {
-      'type':      self.type,
-      'package':   self.package,
-      'ff_id':     self.id,
       'alias':     self.alias,
+      'commands':  self.command_map.keys(),
+      'ff_id':     self.id,
+      'interface': self.export_interface(),
       'metadata':  self.metadata,
-      'interface': self.export_interface()
+      'package':   self.package,
+      'type':      self.type
     }
     return export_data
 
