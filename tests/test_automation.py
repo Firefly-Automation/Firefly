@@ -29,6 +29,11 @@ class TestAutomationHelper(unittest.TestCase):
           'first_trigger': {
             'context': 'Initial trigger of automation'
           }
+        },
+        LABEL_ACTIONS: {
+          'first_trigger': {
+            'context': 'Initial trigger action'
+          }
         }
       }
     }
@@ -41,6 +46,9 @@ class TestAutomationHelper(unittest.TestCase):
           'listen_id':    self.device,
           'source':       'SOURCE_TRIGGER'
         }]]
+      },
+      LABEL_ACTIONS: {
+        'first_trigger':[]
       }
     }
     automation = Automation(self.firefly, self.package, self.event_handler, metadata, interface)

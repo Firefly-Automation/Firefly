@@ -19,7 +19,7 @@ from typing import Callable
 
 
 class Automation(object):
-  def __init__(self, firefly: object, package: str, event_handler: Callable, metadata: dict, interface: dict, **kwargs):
+  def __init__(self, firefly: object, package: str, event_handler: Callable, metadata: dict = {}, interface: dict = {}, **kwargs):
     self.actions = {}
     self.command_map = {}
     self.conditions = {}
@@ -34,8 +34,8 @@ class Automation(object):
 
     # TODO(zpriddy): Should should be a shared function in a lib somewhere.
     # Alias and id functions
-    ff_id = metadata.get('ff_id')
-    alias = metadata.get('alias')
+    ff_id = kwargs.get('ff_id')
+    alias = kwargs.get('alias')
     # If alias given but no ID look at config files for ID.
     if not ff_id and alias:
       if aliases.get_device_id(alias):
@@ -77,7 +77,7 @@ class Automation(object):
     """
     export_data = {
       'alias':     self.alias,
-      'commands':  self.command_map.keys(),
+      #'commands':  self.command_map.keys(),
       'ff_id':     self.id,
       'interface': self.export_interface(),
       'metadata':  self.metadata,
@@ -130,31 +130,43 @@ class Automation(object):
         self.build_conditions_interface(interface_data)
       if label == LABEL_DELAYS:
         self.build_delays_interface(interface_data)
+      if label == LABEL_MESSAGES:
+        self.build_messages_interface(interface_data)
 
   def build_actions_interface(self, interface_data: dict, **kwargs):
     for action_index in interface_data.keys():
       self.actions[action_index] = []
       # TODO(zpriddy): Do we want to keep the add_action function?
+      if not self.interface.get(LABEL_ACTIONS):
+        continue
       for action in self.interface.get(LABEL_ACTIONS).get(action_index):
         self.actions[action_index].append(Action(**action))
 
   def build_triggers_interface(self, interface_data: dict, **kwargs):
     for trigger_index in interface_data.keys():
+      if not self.interface.get(LABEL_TRIGGERS):
+        continue
       self.triggers[trigger_index] = Triggers(self.firefly, self.id)
       self.triggers[trigger_index].import_triggers(self.interface.get(LABEL_TRIGGERS).get(trigger_index))
 
   def build_conditions_interface(self, interface_data: dict, **kwargs):
     for condition_index in interface_data.keys():
       self.conditions[condition_index] = []
+      if not self.interface.get(LABEL_CONDITIONS):
+        continue
       for conditions in self.interface.get(LABEL_CONDITIONS).get(condition_index):
         self.conditions[condition_index] = Conditions(**conditions)
 
   def build_delays_interface(self, interface_data: dict, **kwargs):
     for delay_index in interface_data.keys():
+      if not self.interface.get(LABEL_DELAYS):
+        continue
       self.delays[delay_index] = self.interface.get(LABEL_DELAYS).get(delay_index)
 
   def build_messages_interface(self, interface_data: dict, **kwargs):
     for message_index in interface_data.keys():
+      if not self.interface.get(LABEL_MESSAGES):
+        continue
       self.messages[message_index] = self.interface.get(LABEL_MESSAGES).get(message_index)
 
   def export_interface(self, **kwargs):
@@ -166,7 +178,7 @@ class Automation(object):
 
     interface[LABEL_ACTIONS] = {}
     for action_index, action in self.actions.items():
-      interface[LABEL_ACTIONS][action_index] = action.export()
+      interface[LABEL_ACTIONS][action_index] = [a.export() for a in action]
 
     interface[LABEL_CONDITIONS] = {}
     for condition_index, condition in self.conditions.items():
