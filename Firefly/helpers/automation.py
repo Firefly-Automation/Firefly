@@ -1,8 +1,10 @@
+from Firefly import logging
 from Firefly import aliases
 import uuid
 from Firefly.automation.triggers import Triggers
 from Firefly.helpers.action import Action
 from Firefly.helpers.conditions import Conditions
+from Firefly.helpers.events import Request, Event
 
 # TODO(zpriddy): These should be in const file
 LABEL_TRIGGERS = 'triggers'
@@ -47,6 +49,8 @@ class Automation(object):
     self.id = ff_id
     self.alias = alias if alias else ff_id
 
+    self.build_interfaces()
+
   def build_interfaces(self, **kwargs):
     """
     builds the interfaces (actions, conditions, delays, triggers) using the metadata and config information.
@@ -56,7 +60,7 @@ class Automation(object):
     Returns:
 
     """
-    meta_interfaces = self.metadata.get('interfaces')
+    meta_interfaces = self.metadata.get('interface')
     if not meta_interfaces:
       return
     for label in INTERFACE_LABELS:
@@ -97,3 +101,16 @@ class Automation(object):
   def build_messages_interface(self, interface_data: dict, **kwargs):
     for message_index in interface_data.keys():
       self.messages[message_index] = self.interface.get(LABEL_MESSAGES).get(message_index)
+
+  def event(self, event: Event, **kwargs):
+    logging.info('[AUTOMATION] %s - Receiving event: %s' % (self.id, event))
+    # Check each triggerList in triggers.
+    for trigger_index, trigger in self.triggers.items():
+      if trigger.check_triggers(event):
+        # Check if there are conditions with the same index, if so check them.
+        if self.conditions.get(trigger_index):
+          if not self.conditions[trigger_index].check_conditions(self.firefly):
+            continue
+        # Call the event handler passing in the trigger_index and return.
+        return self.event_handler(event, trigger_index, **kwargs)
+
