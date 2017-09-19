@@ -93,3 +93,4 @@ class TestAutomationHelper(unittest.TestCase):
     executed = automation.event(event)
     self.assertTrue(executed)
     Mock.assert_called_once_with(self.event_handler, event, 'second_trigger')
+    print(automation.export())

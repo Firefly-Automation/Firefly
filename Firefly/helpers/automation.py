@@ -1,10 +1,11 @@
-from Firefly import logging
-from Firefly import aliases
 import uuid
+
+from Firefly import aliases, logging
 from Firefly.automation.triggers import Triggers
+from Firefly.const import TYPE_AUTOMATION
 from Firefly.helpers.action import Action
 from Firefly.helpers.conditions import Conditions
-from Firefly.helpers.events import Request, Event
+from Firefly.helpers.events import Event
 
 # TODO(zpriddy): These should be in const file
 LABEL_TRIGGERS = 'triggers'
@@ -23,11 +24,13 @@ class Automation(object):
     self.metadata = metadata
     self.event_handler = event_handler
     self.interface = interface
+    self.package = package
     self.actions = {}
     self.triggers = {}
     self.conditions = {}
     self.delays = {}
     self.messages = {}
+    self.command_map = {}
 
     # TODO(zpriddy): Should should be a shared function in a lib somewhere.
     # Alias and id functions
@@ -50,6 +53,57 @@ class Automation(object):
     self.alias = alias if alias else ff_id
 
     self.build_interfaces()
+
+  def event(self, event: Event, **kwargs):
+    logging.info('[AUTOMATION] %s - Receiving event: %s' % (self.id, event))
+    # Check each triggerList in triggers.
+    for trigger_index, trigger in self.triggers.items():
+      if trigger.check_triggers(event):
+        # Check if there are conditions with the same index, if so check them.
+        if self.conditions.get(trigger_index):
+          if not self.conditions[trigger_index].check_conditions(self.firefly):
+            continue
+        # Call the event handler passing in the trigger_index and return.
+        return self.event_handler(event, trigger_index, **kwargs)
+
+  def export(self, **kwargs):
+    """
+    Export ff_id config with options current values to a dictionary.
+
+    Args:
+
+    Returns:
+      (dict): A dict of the ff_id config.
+    """
+    export_data = {
+      'type':      self.type,
+      'package':   self.package,
+      'ff_id':     self.id,
+      'alias':     self.alias,
+      'metadata':  self.metadata,
+      'interface': self.export_interface()
+    }
+    return export_data
+
+  def command(self, command, **kwargs):
+    """
+    Function that is called to send a command to a ff_id.
+
+    Commands can be used to reset times or other items if the automation needs it.
+    Args:
+      command (Command): The command to be sent in a Command object
+
+    Returns:
+      (bool): Command successful.
+    """
+    logging.debug('%s: Got Command: %s' % (self.id, command.command))
+    if command.command in self.command_map.keys():
+      try:
+        self.command_map[command.command](**command.args)
+        return True
+      except:
+        return False
+    return False
 
   def build_interfaces(self, **kwargs):
     """
@@ -102,15 +156,41 @@ class Automation(object):
     for message_index in interface_data.keys():
       self.messages[message_index] = self.interface.get(LABEL_MESSAGES).get(message_index)
 
-  def event(self, event: Event, **kwargs):
-    logging.info('[AUTOMATION] %s - Receiving event: %s' % (self.id, event))
-    # Check each triggerList in triggers.
-    for trigger_index, trigger in self.triggers.items():
-      if trigger.check_triggers(event):
-        # Check if there are conditions with the same index, if so check them.
-        if self.conditions.get(trigger_index):
-          if not self.conditions[trigger_index].check_conditions(self.firefly):
-            continue
-        # Call the event handler passing in the trigger_index and return.
-        return self.event_handler(event, trigger_index, **kwargs)
+  def export_interface(self, **kwargs):
+    interface = {}
 
+    interface[LABEL_TRIGGERS] = {}
+    for trigger_index, trigger in self.triggers.items():
+      interface[LABEL_TRIGGERS][trigger_index] = trigger.export()
+
+    interface[LABEL_ACTIONS] = {}
+    for action_index, action in self.actions.items():
+      interface[LABEL_ACTIONS][action_index] = action.export()
+
+    interface[LABEL_CONDITIONS] = {}
+    for condition_index, condition in self.conditions.items():
+      interface[LABEL_CONDITIONS][condition_index] = condition
+
+    interface[LABEL_MESSAGES] = {}
+    for message_index, message in self.messages.items():
+      interface[LABEL_MESSAGES][message_index] = message
+
+    interface[LABEL_DELAYS] = {}
+    for delay_index, delay in self.delays.items():
+      interface[LABEL_DELAYS][delay_index] = delay
+
+    return interface
+
+  def add_command(self, command: str, function: Callable) -> None:
+    """
+    Adds a command to the list of supported ff_id commands.
+
+    Args:
+      command (str): The string of the command
+      function (Callable): The function to be executed.
+    """
+    self.command_map[command] = function
+
+  @property
+  def type(self):
+    return TYPE_AUTOMATION
