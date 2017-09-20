@@ -6,44 +6,44 @@ from Firefly.const import SERVICE_NOTIFICATION, COMMAND_NOTIFY, AUTHOR
 TITLE = 'Firefly Routines'
 COMMANDS = ['execute']
 METADATA = {
-  'title': TITLE,
-  'author': AUTHOR,
-  'commands':COMMANDS,
-  'interface':{
-    'actions':{
+  'title':     TITLE,
+  'author':    AUTHOR,
+  'commands':  COMMANDS,
+  'interface': {
+    'actions':   {
       "routine": {
         'context': 'Actions to be executed when routine runs.',
-        'type': 'commandList'
+        'type':    'commandList'
       }
     },
-    'messages': {
+    'messages':  {
       "routine": {
         'context': 'Message to be sent when routine executes.',
-        'type': 'string'
+        'type':    'string'
       }
     },
-    'mode': {
+    'mode':      {
       "routine": {
         'context': 'Mode to be set when routine executes.',
-        'type': 'modeString'
+        'type':    'modeString'
       }
     },
-    'icon': {
+    'icon':      {
       "routine": {
         'context': 'Name of icon to be displayed on UI.',
-        'type': 'iconString'
+        'type':    'iconString'
       }
     },
     'export_ui': {
       "routine": {
         'context': 'Display routine on web interface.',
-        'type': 'boolean'
+        'type':    'boolean'
       }
     },
-    'triggers':{
+    'triggers':  {
       "routine": {
         'context': 'Actions that will trigger the routine',
-        'type': 'triggerList'
+        'type':    'triggerList'
       }
     },
   }
@@ -87,8 +87,10 @@ class Routine(Automation):
 
     self.add_command('execute', self.event_handler)
 
-
   def export(self, **kwargs):
+    if kwargs.get('firebase_view'):
+      return self.get_view(**kwargs)
+
     export_data = super().export()
     export_data['interface']['icon'] = {}
     export_data['interface']['icon']["routine"] = self.icon
@@ -100,8 +102,17 @@ class Routine(Automation):
 
     return export_data
 
+  def get_view(self, **kwargs):
+    view_data = {
+      'ff_id': self.id,
+      'alias': self.alias,
+      'icon':  self.icon,
+      'command': 'execute',
+      'export_ui': self.export_ui
+    }
+    return view_data
 
-  def event_handler(self, event:Event = None, trigger_index=0, **kwargs):
+  def event_handler(self, event: Event = None, trigger_index=0, **kwargs):
     if self.messages.get("routine"):
       notify = Command(SERVICE_NOTIFICATION, self.id, COMMAND_NOTIFY, message=self.messages["routine"])
       self.firefly.send_command(notify)
@@ -113,4 +124,3 @@ class Routine(Automation):
       for a in self.actions["routine"]:
         a.execute_action(self.firefly)
     return True
-
