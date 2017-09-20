@@ -268,7 +268,10 @@ class Firefly(object):
     send_to = self._subscriptions.get_subscribers(event.source, event_action=event.event_action)
     for s in send_to:
       # asyncio.ensure_future(self._send_event(event, s, fut), loop=self.loop)
-      self.components[s].event(event)
+      try:
+        self.components[s].event(event)
+      except Exception as e:
+        logging.error('Error sending event %s' % str(e))
       # self.loop.run_in_executor(None,self.components[s].event, event)
     self.update_current_state(event)
     self.send_firebase(event)

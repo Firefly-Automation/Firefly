@@ -35,6 +35,9 @@ class Routine(Automation):
     export_data['export_ui'] = self.export_ui
     return export_data
 
+  def get_view(self, **kwargs):
+    return self.export(**kwargs)
+
 
   def event_handler(self, event=None, **kwargs):
     if self._message:

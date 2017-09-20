@@ -2,24 +2,24 @@ import uuid
 
 from Firefly import aliases, logging
 from Firefly.automation.triggers import Triggers
-from Firefly.const import TYPE_AUTOMATION
+from Firefly.const import TYPE_AUTOMATION, SERVICE_NOTIFICATION, COMMAND_NOTIFY
 from Firefly.helpers.action import Action
 from Firefly.helpers.conditions import Conditions
-from Firefly.helpers.events import Event
+from Firefly.helpers.events import Event, Command
 
 # TODO(zpriddy): These should be in const file
-LABEL_ACTIONS    = 'actions'
+LABEL_ACTIONS = 'actions'
 LABEL_CONDITIONS = 'conditions'
-LABEL_DELAYS     = 'delays'
-LABEL_MESSAGES   = 'messages'
-LABEL_TRIGGERS   = 'triggers'
+LABEL_DELAYS = 'delays'
+LABEL_MESSAGES = 'messages'
+LABEL_TRIGGERS = 'triggers'
 INTERFACE_LABELS = [LABEL_ACTIONS, LABEL_CONDITIONS, LABEL_DELAYS, LABEL_MESSAGES, LABEL_TRIGGERS]
 
 from typing import Callable
 
 
 class Automation(object):
-  def __init__(self, firefly: object, package: str, event_handler: Callable, metadata: dict = {}, interface: dict = {}, **kwargs):
+  def __init__(self, firefly, package: str, event_handler: Callable, metadata: dict = {}, interface: dict = {}, **kwargs):
     self.actions = {}
     self.command_map = {}
     self.conditions = {}
@@ -76,8 +76,7 @@ class Automation(object):
       (dict): A dict of the ff_id config.
     """
     export_data = {
-      'alias':     self.alias,
-      #'commands':  self.command_map.keys(),
+      'alias':     self.alias,  # 'commands':  self.command_map.keys(),
       'ff_id':     self.id,
       'interface': self.export_interface(),
       'metadata':  self.metadata,
@@ -203,6 +202,20 @@ class Automation(object):
       function (Callable): The function to be executed.
     """
     self.command_map[command] = function
+
+  def execute_actions(self, action_index: str, **kwargs) -> bool:
+    if not self.actions.get(action_index):
+      return False
+    for action in self.actions.get(action_index):
+      action.execute_action(self.firefly)
+    return True
+
+  def send_messages(self, message_index: str, **kwargs) -> bool:
+    if not self.messages.get(message_index):
+      return False
+    notify = Command(SERVICE_NOTIFICATION, self.id, COMMAND_NOTIFY, message=self.messages.get(message_index))
+    self.firefly.send_command(notify)
+    return True
 
   @property
   def type(self):
