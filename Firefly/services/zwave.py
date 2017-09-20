@@ -65,8 +65,8 @@ def Setup(firefly, package, **kwargs):
 
   enable = config.getboolean(SECTION, 'enable', fallback=False)
   port = config.get(SECTION, 'port', fallback=None)
-  # path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
-  path = config.get(SECTION, 'path', fallback=None)
+  path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
+  #path = config.get(SECTION, 'path', fallback=None)
   security = config.getboolean(SECTION, 'security', fallback=True)
   if not enable or port is None:
     return False
@@ -112,7 +112,7 @@ class Zwave(Service):
 
     scheduler.runInS(5, self.initialize_zwave)
 
-    scheduler.runEveryM(1, self.poll_nodes)
+    #scheduler.runEveryM(1, self.poll_nodes)
 
   async def initialize_zwave(self):
     if self._network is not None:
@@ -150,7 +150,7 @@ class Zwave(Service):
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_ADDED)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_OFF)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_ON)
-    #### dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
+    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
     # TODO Maybe comment next line
     #### dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
