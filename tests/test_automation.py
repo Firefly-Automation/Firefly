@@ -40,7 +40,7 @@ class TestAutomationHelper(unittest.TestCase):
     interface = {
       LABEL_TRIGGERS: {
         'first_trigger': [[{
-          'event_action': [{
+          'trigger_action': [{
             EVENT_ACTION_ANY: [EVENT_ACTION_ANY]
           }],
           'listen_id':    self.device,
@@ -77,14 +77,14 @@ class TestAutomationHelper(unittest.TestCase):
     interface = {
       LABEL_TRIGGERS: {
         'first_trigger':  [[{
-          'event_action': [{
+          'trigger_action': [{
             EVENT_ACTION_ANY: [EVENT_ACTION_ANY]
           }],
           'listen_id':    self.device,
           'source':       'SOURCE_TRIGGER'
         }]],
         'second_trigger': [[{
-          'event_action': [{
+          'trigger_action': [{
             EVENT_ACTION_ANY: [EVENT_ACTION_ANY]
           }],
           'listen_id':    self.device_2,
