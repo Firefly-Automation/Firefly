@@ -60,7 +60,7 @@ class Automation(object):
     for trigger_index, trigger in self.triggers.items():
       if trigger.check_triggers(event):
         # Check if there are conditions with the same index, if so check them.
-        if self.conditions.get(trigger_index):
+        if self.conditions.get(trigger_index) is not None:
           if not self.conditions[trigger_index].check_conditions(self.firefly):
             continue
         # Call the event handler passing in the trigger_index and return.
@@ -150,11 +150,12 @@ class Automation(object):
 
   def build_conditions_interface(self, interface_data: dict, **kwargs):
     for condition_index in interface_data.keys():
-      self.conditions[condition_index] = []
+      self.conditions[condition_index] = None
       if not self.interface.get(LABEL_CONDITIONS):
         continue
-      for conditions in self.interface.get(LABEL_CONDITIONS).get(condition_index):
-        self.conditions[condition_index] = Conditions(**conditions)
+      if not self.interface.get(LABEL_CONDITIONS).get(condition_index):
+        continue
+      self.conditions[condition_index] = Conditions(**self.interface.get(LABEL_CONDITIONS).get(condition_index))
 
   def build_delays_interface(self, interface_data: dict, **kwargs):
     for delay_index in interface_data.keys():
@@ -181,7 +182,7 @@ class Automation(object):
 
     interface[LABEL_CONDITIONS] = {}
     for condition_index, condition in self.conditions.items():
-      interface[LABEL_CONDITIONS][condition_index] = condition
+      interface[LABEL_CONDITIONS][condition_index] = condition.export()
 
     interface[LABEL_MESSAGES] = {}
     for message_index, message in self.messages.items():

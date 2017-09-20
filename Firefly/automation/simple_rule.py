@@ -32,6 +32,16 @@ METADATA = {
         'type':    'string'
       }
     },
+    'conditions': {
+      "initial": {
+        'context': 'Condition for initial trigger.',
+        'type':    'condition'
+      },
+      "delayed": {
+        'context': 'Condition for delayed trigger.',
+        'type':    'condition'
+      }
+    },
     'triggers': {
       "initial": {
         'context': 'Triggers to initially trigger the initial actions.',
@@ -53,11 +63,13 @@ METADATA = {
 
 
 def Setup(firefly, package, **kwargs):
-  logging.message('Entering %s setup Routine' % package)
+  logging.message('Entering %s setup simple_rules' % package)
   if not kwargs.get('interface'):
     kwargs['interface'] = {}
   if not kwargs.get('metadata'):
     kwargs['metadata'] = METADATA
+  else:
+    kwargs['metadata'].update(METADATA)
   simepl_rule = SimpleRule(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
   firefly.components[simepl_rule.id] = simepl_rule
@@ -83,7 +95,6 @@ class SimpleRule(Automation):
   def initial_event_handler(self, event: Event = None, trigger_index="initial", **kwargs):
     # If it's the first time getting triggered then send the message.
     # If it has already been triggered then cancel the current delayed action timer.
-    logging.message('SIMPLE RULE: EXECUTE INTI ACTIONS')
     if not self.triggered:
       self.send_messages(trigger_index)
       self.triggered = True
@@ -102,7 +113,6 @@ class SimpleRule(Automation):
       self.execute_delayed_actions(trigger_index)
 
   def execute_delayed_actions(self, trigger_index="delayed", **kwargs):
-    logging.message('SIMPLE RULE: EXECUTE DELAY ACTIONS')
     self.triggered = False
     self.send_messages(trigger_index)
     self.execute_actions(trigger_index)
