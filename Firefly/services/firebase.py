@@ -309,11 +309,12 @@ class Firebase(Service):
     status_data['mode'] = self.firefly.location.mode
     status_data['last_mode'] = self.firefly.location.lastMode
 
-    for room_alias, room in self.firefly._rooms._rooms.items():
-      status_data['devices'].append({
-        'ff_id': room.id,
-        'alias': room.alias + ' (room)'
-      })
+    if self.firefly._rooms:
+      for room_alias, room in self.firefly._rooms._rooms.items():
+        status_data['devices'].append({
+          'ff_id': room.id,
+          'alias': room.alias + ' (room)'
+        })
 
     # Nasty json sanitation
     status_data = scrub(status_data)

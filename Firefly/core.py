@@ -40,6 +40,7 @@ class Firefly(object):
     self.current_state = {}
 
     self._firebase_enabled = False
+    self._rooms = None
     self._components = {}
     self.settings = settings
     self.loop = asyncio.get_event_loop()
