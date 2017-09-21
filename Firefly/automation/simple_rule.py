@@ -12,7 +12,7 @@ METADATA = {
   'author':    AUTHOR,
   'commands':  COMMANDS,
   'interface': {
-    'actions':  {
+    'actions':    {
       "initial": {
         'context': 'Actions to be executed when on initial trigger.',
         'type':    'commandList'
@@ -22,7 +22,7 @@ METADATA = {
         'type':    'commandList'
       }
     },
-    'messages': {
+    'messages':   {
       "initial": {
         'context': 'Message to be sent on initial trigger.',
         'type':    'string'
@@ -42,7 +42,7 @@ METADATA = {
         'type':    'condition'
       }
     },
-    'triggers': {
+    'triggers':   {
       "initial": {
         'context': 'Triggers to initially trigger the initial actions.',
         'type':    'triggerList'
@@ -52,9 +52,13 @@ METADATA = {
         'type':    'triggerList'
       }
     },
-    'delays':   {
-      'delay': {
+    'delays':     {
+      'delayed': {
         'context': 'Time to delay after delayed trigger is triggered before executing actions. (seconds)',
+        'type':    'number'
+      },
+      'initial': {
+        'context': 'Time to delay before initial actions are executed. (seconds)',
         'type':    'number'
       }
     }
@@ -92,9 +96,19 @@ class SimpleRule(Automation):
     if trigger_index == "delayed":
       self.delayed_event_handler(event, trigger_index)
 
-  def initial_event_handler(self, event: Event = None, trigger_index="initial", **kwargs):
+  def initial_event_handler(self, event: Event = None, trigger_index="initial", skip_delay=False, **kwargs):
+    """ Handle the initial event trigger.
+    Args:
+      event: (Event) The event that triggered the handler.
+      trigger_index: (str) Trigger index (key) in the metadata.
+      skip_delay: (bool) Skip the initial delay. This is used in case there is an initial delay, the delayed function will call this function and tell it to skip the initial delay.
+      **kwargs:
+    """
     # If it's the first time getting triggered then send the message.
     # If it has already been triggered then cancel the current delayed action timer.
+    if not skip_delay and not self.triggered and self.delays.get(trigger_index):
+      scheduler.runInS(self.delays.get(trigger_index), self.initial_event_handler, self.timer_id, True, event=event, trigger_index=trigger_index, skip_delay=True)
+      return
     if not self.triggered:
       self.send_messages(trigger_index)
       self.triggered = True
@@ -105,10 +119,12 @@ class SimpleRule(Automation):
   def delayed_event_handler(self, event: Event = None, trigger_index="delayed", **kwargs):
     # If it has not been triggered then stop.
     if not self.triggered:
+      # Cancel timer if it's currently waiting for initial delay.
+      scheduler.cancel(self.timer_id)
       return
     # If there is a delay, wait for the delay and then execute, otherwise execute.
-    if self.delays.get('delay'):
-      scheduler.runInS(self.delays.get('delay'), self.execute_delayed_actions, self.timer_id, True, trigger_index=trigger_index)
+    if self.delays.get(trigger_index):
+      scheduler.runInS(self.delays.get(trigger_index), self.execute_delayed_actions, self.timer_id, True, trigger_index=trigger_index)
     else:
       self.execute_delayed_actions(trigger_index)
 
@@ -116,4 +132,3 @@ class SimpleRule(Automation):
     self.triggered = False
     self.send_messages(trigger_index)
     self.execute_actions(trigger_index)
-

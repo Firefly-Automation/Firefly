@@ -13,6 +13,7 @@ class Action(object):
     self._force = force
     self._delay_s = kwargs.get('delay_s')
     self._delay_m = kwargs.get('delay_m')
+    self._conditions = None
 
     if type(conditions) is Conditions:
       self._conditions = conditions
@@ -30,20 +31,26 @@ class Action(object):
 
 
   def execute(self, firefly):
-    if not self._force:
-      if not self.conditions.check_conditions(firefly):
-        return False
-    command = Command(self.id, self.source, self.command, force=self._force, **self._kwargs)
-    firefly.send_command(command)
+    if self._force or self.conditions is None:
+      command = Command(self.id, self.source, self.command, force=self._force, **self._kwargs)
+      firefly.send_command(command)
+      return True
+
+    if not self.conditions.check_conditions(firefly):
+      command = Command(self.id, self.source, self.command, force=self._force, **self._kwargs)
+      firefly.send_command(command)
+      return True
+    return False
 
   def export(self) -> dict:
     export_data = {
       'ff_id': self.id,
       'command': self.command,
       'force': self._force,
-      'conditions': self.conditions.export(),
       'source': self.source
     }
+    if self.conditions:
+      export_data['conditions'] = self.conditions.export()
     export_data.update(**self._kwargs)
     return export_data
 

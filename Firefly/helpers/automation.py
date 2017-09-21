@@ -174,6 +174,8 @@ class Automation(object):
 
     interface[LABEL_TRIGGERS] = {}
     for trigger_index, trigger in self.triggers.items():
+      if trigger is None:
+        continue
       interface[LABEL_TRIGGERS][trigger_index] = trigger.export()
 
     interface[LABEL_ACTIONS] = {}
@@ -182,14 +184,20 @@ class Automation(object):
 
     interface[LABEL_CONDITIONS] = {}
     for condition_index, condition in self.conditions.items():
+      if condition is None:
+        continue
       interface[LABEL_CONDITIONS][condition_index] = condition.export()
 
     interface[LABEL_MESSAGES] = {}
     for message_index, message in self.messages.items():
+      if message is None:
+        continue
       interface[LABEL_MESSAGES][message_index] = message
 
     interface[LABEL_DELAYS] = {}
     for delay_index, delay in self.delays.items():
+      if delay is None:
+        continue
       interface[LABEL_DELAYS][delay_index] = delay
 
     return interface
