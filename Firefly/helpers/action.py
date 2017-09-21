@@ -36,7 +36,7 @@ class Action(object):
       firefly.send_command(command)
       return True
 
-    if not self.conditions.check_conditions(firefly):
+    if self.conditions.check_conditions(firefly):
       command = Command(self.id, self.source, self.command, force=self._force, **self._kwargs)
       firefly.send_command(command)
       return True
