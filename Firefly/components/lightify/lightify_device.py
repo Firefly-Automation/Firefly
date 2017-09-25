@@ -1,4 +1,4 @@
-from Firefly.const import AUTHOR, ACTION_OFF, ACTION_ON, EVENT_ACTION_ON, EVENT_ACTION_OFF, STATE, COMMAND_UPDATE, ACTION_LEVEL, LEVEL, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE
+from Firefly.const import AUTHOR, ACTION_OFF, ACTION_ON, EVENT_ACTION_ON, EVENT_ACTION_OFF, STATE, COMMAND_SET_LIGHT, COMMAND_UPDATE, ACTION_LEVEL, LEVEL, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE
 from Firefly.helpers.metadata import metaSwitch, metaDimmer
 from Firefly.helpers.device import Device
 from lightify import Luminary
@@ -27,6 +27,7 @@ class LightifyDevice(Device):
     self.add_command(EVENT_ACTION_OFF, self.off)
     self.add_command(EVENT_ACTION_ON, self.on)
     self.add_command(ACTION_LEVEL, self.level)
+    self.add_command(COMMAND_SET_LIGHT, self.set_light)
     self.add_command(COMMAND_UPDATE, self.update_lightify)
 
     self.add_request(STATE, self.get_state)
@@ -66,6 +67,11 @@ class LightifyDevice(Device):
     # TODO: Parse timing info
     self.lightify_object.set_luminance(level, 4)
     self._level = level
+
+  def set_light(self, **kwargs):
+    if kwargs.get(LEVEL):
+      self.level(**kwargs)
+
 
   def get_level(self, **kwargs):
     return self._level
