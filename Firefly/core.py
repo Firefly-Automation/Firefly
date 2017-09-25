@@ -246,11 +246,17 @@ class Firefly(object):
     package = importlib.import_module(module)
     if kwargs.get('package'):
       kwargs.pop('package')
-    return package.Setup(self, module, **kwargs)
+    setup_return =  package.Setup(self, module, **kwargs)
+    scheduler.runInS(10, self.refresh_firebase, job_id='FIREBASE_REFRESH_CORE')
+    return setup_return
 
   def send_firebase(self, event):
     if self.components.get('service_firebase'):
       self.components['service_firebase'].push(event.source, event.event_action)
+
+  def refresh_firebase(self, **kwargs):
+    if self.firebase_enabled:
+      self.components['service_firebase'].refresh_all()
 
   @asyncio.coroutine
   def async_send_event(self, event):
