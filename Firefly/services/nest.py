@@ -37,7 +37,6 @@ def Setup(firefly, package, **kwargs):
 class Nest(Service):
   def __init__(self, firefly, package, **kwargs):
     super().__init__(firefly, SERVICE_ID, package, TITLE, AUTHOR, COMMANDS, REQUESTS)
-    self.firefly = firefly
     self.enable = kwargs.get('enable')
     self.cache_file = kwargs.get('cache_file')
     self.client_id = kwargs.get('client_id')

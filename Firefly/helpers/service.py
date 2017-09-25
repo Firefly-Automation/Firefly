@@ -92,3 +92,7 @@ class Service(object):
   @property
   def type(self):
     return TYPE_SERVICE
+
+  @property
+  def firefly(self):
+    return self._firefly
