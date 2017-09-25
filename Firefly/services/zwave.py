@@ -1,6 +1,7 @@
 import asyncio
 import configparser
 import json
+from time import sleep
 
 from openzwave.network import ZWaveController, ZWaveNetwork, dispatcher
 from openzwave.option import ZWaveOption
@@ -112,7 +113,7 @@ class Zwave(Service):
 
     scheduler.runInS(5, self.initialize_zwave)
 
-    #scheduler.runEveryM(1, self.poll_nodes)
+    scheduler.runEveryM(10, self.poll_nodes)
 
   async def initialize_zwave(self):
     if self._network is not None:
@@ -153,8 +154,9 @@ class Zwave(Service):
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
     # TODO Maybe comment next line
     #### dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
-    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE)
+    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
+    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
+    #dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_ALL_NODES_QUERIED)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_CONTROLLER_COMMAND)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_SCENE_EVENT)
@@ -370,4 +372,6 @@ class Zwave(Service):
     for n in nodes:
       # n:ZWaveNode = n
       n.request_state()
-      # n.refresh_info()
+      sleep(1)
+      n.refresh_info()
+      sleep(10)
