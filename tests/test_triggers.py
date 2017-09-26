@@ -307,7 +307,6 @@ class TestTriggers(unittest.TestCase):
     })
     self.assertSetEqual(triggers.trigger_sources, {self.device})
 
-  @unittest.skip
   def test_remove_trigger_one(self):
     triggers = Triggers(self.firefly, self.trigger_id)
     trigger = Trigger(self.device, {
@@ -327,7 +326,6 @@ class TestTriggers(unittest.TestCase):
     })
     self.assertSetEqual(triggers.trigger_sources, set())
 
-  @unittest.skip
   def test_remove_trigger_shared_subscriptions_case_1(self):
     triggers = Triggers(self.firefly, self.trigger_id)
     trigger = Trigger(self.device, {
@@ -403,7 +401,6 @@ class TestTriggers(unittest.TestCase):
     })
     self.assertSetEqual(triggers.trigger_sources, {self.device, self.device_b})
 
-  @unittest.skip
   def test_remove_trigger_shared_subscriptions_case_2(self):
     triggers = Triggers(self.firefly, self.trigger_id)
     trigger = Trigger(self.device, {
@@ -473,7 +470,6 @@ class TestTriggers(unittest.TestCase):
     })
     self.assertSetEqual(triggers.trigger_sources, {self.device})
 
-  @unittest.skip
   def test_remove_trigger_non_existant(self):
     triggers = Triggers(self.firefly, self.trigger_id)
     trigger = Trigger(self.device, {
