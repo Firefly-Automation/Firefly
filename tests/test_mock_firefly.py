@@ -6,7 +6,7 @@ from Firefly.helpers.events import Event
 from Firefly.const import EVENT_TYPE_BROADCAST, SOURCE_LOCATION
 
 # Change this to false if you are not connected to the internet.
-SETUP_LOCATION = True
+SETUP_LOCATION = False
 
 
 class TestFirefly(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestFirefly(unittest.TestCase):
   def setUp(self, firefly):
     self._firefly = firefly
     self._firefly.scheduler = Scheduler()
-    self._firefly.location = Location(self._firefly, '96110', ['home', 'away'], setup=SETUP_LOCATION)
+    self._firefly.location = Location(self._firefly, '95110', ['home', 'away'], setup=SETUP_LOCATION)
 
     self._firefly.send_event = Mock(return_value=True)
 

@@ -29,3 +29,4 @@ asyncio
 aiohttp_cors
 pyrebase
 python-nest>=3
+lightify
