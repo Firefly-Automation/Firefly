@@ -2,6 +2,7 @@ from openzwave.network import ZWaveNode
 
 from Firefly import logging
 from Firefly.helpers.device import Device
+from Firefly.helpers.metadata import metaText
 
 
 class ZwaveDevice(Device):
@@ -32,7 +33,7 @@ class ZwaveDevice(Device):
     self._product_name = ''
     self._product_type = ''
 
-    self._battery = kwargs.get('battery', 'NOT REPORTED')
+
 
     self.add_command('ZWAVE_CONFIG', self.zwave_config)
     self.add_command('ZWAVE_UPDATE', self.update_from_zwave)
@@ -41,7 +42,9 @@ class ZwaveDevice(Device):
     self.add_request('PARAMS', self.get_params)
     self.add_request('RAW_VALUES', self.get_raw_values)
 
+    self._battery = kwargs.get('battery', 'NOT REPORTED')
     self.add_request('battery', self.get_battery)
+    self.add_action('battery', metaText(text_request='battery', context='Current Battery Level', title='Battery'))
 
     self._update_lock = False
     self._last_command_source = 'startup'

@@ -4,6 +4,10 @@ from Firefly.const import (COMMAND_UPDATE, DEVICE_TYPE_THERMOSTAT, LEVEL)
 from Firefly.helpers.action import Command
 from Firefly.helpers.device import Device
 from Firefly.helpers.metadata import metaButtonObject, metaButtons, metaSlider, metaText
+from Firefly import scheduler
+from uuid import uuid4
+
+# TODO(zpriddy): Add more delayed setters to help with rate limits.
 
 TITLE = 'Nest Thermostat'
 DEVICE_TYPE = DEVICE_TYPE_THERMOSTAT
@@ -73,6 +77,7 @@ class Thermostat(Device):
     self.add_action('home_away_buttons', metaButtons(title='Home Mode (nest)', buttons=[home_button, away_button], request_val='away', context='Set Nest to Home/Away'))
 
     self._alexa_export = False
+    self.timer_id = str(uuid4())
 
   def get_temperature(self, **kwargs):
     return self.temperature
@@ -137,10 +142,23 @@ class Thermostat(Device):
   @temperature.setter
   def temperature(self, value):
     if self.thermostat:
-      self.thermostat.temperature = value
       self._temperature = value
+      scheduler.runInS(5, self.set_temperature_delayed, job_id=self.timer_id, temperature=value)
     else:
       logging.error('thermostat not set yet')
+
+  def set_temperature_delayed(self, temperature=None):
+    """Set the mode after a 5 second delay. This helps with rate limiting.
+
+    Args:
+      mode: mode to be set to.
+    """
+    if temperature is not None:
+      try:
+        self.thermostat.temperature = temperature
+      except Exception as e:
+        logging.error('Error setting thermostat temperature: %s' % e)
+
 
   @property
   def humidity(self):
@@ -157,10 +175,23 @@ class Thermostat(Device):
   @mode.setter
   def mode(self, value):
     if self.thermostat:
-      self.thermostat.mode = value
       self._mode = value
+      scheduler.runInS(5, self.set_mode_delayed, job_id=self.timer_id, mode=value)
     else:
       logging.error('thermostat not set yet')
+
+  def set_mode_delayed(self, mode=None):
+    """Set the mode after a 5 second delay. This helps with rate limiting.
+
+    Args:
+      mode: mode to be set to.
+    """
+    if mode is not None:
+      try:
+        self.thermostat.mode = mode
+      except Exception as e:
+        logging.error('Error setting thermostat mode: %s' % e)
+
 
   @property
   def away(self):

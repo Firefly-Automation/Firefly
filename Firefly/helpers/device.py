@@ -72,6 +72,10 @@ class Device(object):
     self.add_command('set_room', self.set_room)
     self.add_command('delete', self.delete_device)
 
+    # Set initial values
+    for prop, val in self._initial_values.items():
+      self.__setattr__(prop, val)
+
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
 

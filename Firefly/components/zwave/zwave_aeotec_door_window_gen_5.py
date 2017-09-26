@@ -31,9 +31,7 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
     self.__dict__.update(kwargs['initial_values'])
 
-    self._state = CONTACT_CLOSED
     self._alarm = False
-
     self.add_request(STATE, self.get_state)
     self.add_request(CONTACT, self.get_state)
     self.add_request('alarm', self.get_alarm)

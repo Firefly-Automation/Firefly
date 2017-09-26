@@ -50,7 +50,6 @@ class Firebase(Service):
   def __init__(self, firefly, package, **kwargs):
     super().__init__(firefly, SERVICE_ID, package, TITLE, AUTHOR, COMMANDS, REQUESTS)
 
-    self.firefly = firefly
     self.api_key = kwargs.get('api_key')
     self.auth_domain = kwargs.get('auth_domain')
     self.database_url = kwargs.get('database_url')
@@ -191,11 +190,15 @@ class Firebase(Service):
       # TODO(zpriddy): Remove old views when new UI is done
       self.db.child("userAlexa").child(self.uid).child("devices").set(alexa_views, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('devices').update(all_values, self.id_token)
-      self.db.child("homeStatus").child(self.home_id).child('routines').set(routines, self.id_token)
+      self.db.child("homeStatus").child(self.home_id).child('routines').set(routines['config'], self.id_token)
       # End of old views
 
       routine_view = {}
-      for r in routines:
+      for r in routines['view']:
+        routine_view[r.get('ff_id')] = r
+
+      routine_config= {}
+      for r in routines['config']:
         routine_view[r.get('ff_id')] = r
 
       # This is the new location of aliases [/homeStatus/{homeId}/aliases]
@@ -207,6 +210,7 @@ class Firebase(Service):
 
       # This is the new location of routine views [/homeStatus/{homeId}/routineViews]
       self.db.child("homeStatus").child(self.home_id).child('routineViews').set(routine_view, self.id_token)
+      self.db.child("homeStatus").child(self.home_id).child('routineConfigs').set(routine_view, self.id_token)
 
       # This is the new location of location status [/homeStatus/{homeId}/locationStatus]
       self.db.child("homeStatus").child(self.home_id).child('locationStatus').set(self.get_location_status(), self.id_token)
@@ -220,18 +224,14 @@ class Firebase(Service):
     self.refresh_status()
 
   def get_routines(self):
-    routines = []
+    routines = {
+      'view': [],
+      'config': []
+    }
     for ff_id, d in self.firefly.components.items():
       if d.type == TYPE_AUTOMATION and 'routine' in d._package:
-        routines.append({
-          'alias':     d._alias,
-          'title':     d._title,
-          'ff_id':     ff_id,
-          'icon':      d.icon,
-          'mode':      d.mode,
-          'export_ui': d.export_ui,
-          'config':    d.export()
-        })
+        routines['view'].append(d.export(firebase_view=True))
+        routines['config'].append(d.export())
     return routines
 
   def get_component_view(self, ff_id, source):
@@ -308,11 +308,12 @@ class Firebase(Service):
     status_data['mode'] = self.firefly.location.mode
     status_data['last_mode'] = self.firefly.location.lastMode
 
-    for room_alias, room in self.firefly._rooms._rooms.items():
-      status_data['devices'].append({
-        'ff_id': room.id,
-        'alias': room.alias + ' (room)'
-      })
+    if self.firefly._rooms:
+      for room_alias, room in self.firefly._rooms._rooms.items():
+        status_data['devices'].append({
+          'ff_id': room.id,
+          'alias': room.alias + ' (room)'
+        })
 
     # Nasty json sanitation
     status_data = scrub(status_data)

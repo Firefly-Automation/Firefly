@@ -27,11 +27,12 @@ def Setup(firefly, package, **kwargs):
   ip = config.get(SECTION, 'ip', fallback=None)
   username = config.get(SECTION, 'username', fallback=None)
 
+  if not enable:
+    return False
+
   hue = Hue(firefly, package, enable=enable, ip=ip, username=username, **kwargs)
   firefly.components[SERVICE_ID] = hue
 
-  if not enable:
-    return False
   return True
 
 

@@ -40,6 +40,7 @@ class Firefly(object):
     self.current_state = {}
 
     self._firebase_enabled = False
+    self._rooms = None
     self._components = {}
     self.settings = settings
     self.loop = asyncio.get_event_loop()
@@ -245,11 +246,17 @@ class Firefly(object):
     package = importlib.import_module(module)
     if kwargs.get('package'):
       kwargs.pop('package')
-    return package.Setup(self, module, **kwargs)
+    setup_return =  package.Setup(self, module, **kwargs)
+    scheduler.runInS(10, self.refresh_firebase, job_id='FIREBASE_REFRESH_CORE')
+    return setup_return
 
   def send_firebase(self, event):
     if self.components.get('service_firebase'):
       self.components['service_firebase'].push(event.source, event.event_action)
+
+  def refresh_firebase(self, **kwargs):
+    if self.firebase_enabled:
+      self.components['service_firebase'].refresh_all()
 
   @asyncio.coroutine
   def async_send_event(self, event):
@@ -268,7 +275,10 @@ class Firefly(object):
     send_to = self._subscriptions.get_subscribers(event.source, event_action=event.event_action)
     for s in send_to:
       # asyncio.ensure_future(self._send_event(event, s, fut), loop=self.loop)
-      self.components[s].event(event)
+      try:
+        self.components[s].event(event)
+      except Exception as e:
+        logging.error('Error sending event %s' % str(e))
       # self.loop.run_in_executor(None,self.components[s].event, event)
     self.update_current_state(event)
     self.send_firebase(event)

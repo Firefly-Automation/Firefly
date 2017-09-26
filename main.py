@@ -7,6 +7,7 @@ from Firefly.helpers.settings import Settings
 import logging
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("pyrebase").setLevel(logging.WARNING)
+logging.getLogger("lightify").setLevel(logging.WARNING)
 
 def main():
   # Get settings for Firefly.
