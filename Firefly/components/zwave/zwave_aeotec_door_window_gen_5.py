@@ -5,7 +5,7 @@ from uuid import uuid4
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import CONTACT, CONTACT_CLOSED, CONTACT_OPEN, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF, STATE
-from Firefly.helpers.metadata import metaContact
+from Firefly.helpers.metadata import metaContact, action_contact
 
 from Firefly.util.zwave_command_class import COMMAND_CLASS_BATTERY, COMMAND_CLASS_SENSOR_BINARY, COMMAND_CLASS_ALARM
 
@@ -42,6 +42,7 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     self.add_request('alarm', self.get_alarm)
 
     self.add_action(CONTACT, metaContact(primary=True))
+    #self.add_action('new_contact', action_contact())
 
     self._alexa_export = False
 
