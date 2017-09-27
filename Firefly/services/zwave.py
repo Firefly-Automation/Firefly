@@ -78,6 +78,7 @@ def Setup(firefly, package, **kwargs):
       installed_nodes = zc.get('installed_nodes')
       if installed_nodes:
         kwargs['installed_nodes'] = installed_nodes
+      logging.message('ZWAVE DEBUG - INSTALLED NODES: %s' % str(installed_nodes))
   except Exception as e:
     logging.error(code='FF.ZWA.SET.001', args=(e))  # error reading zwave.json file
     pass
@@ -154,19 +155,37 @@ class Zwave(Service):
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
     # TODO Maybe comment next line
     #### dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
-    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
+    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_ADDED)
+    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
-    #dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE)
+    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_ALL_NODES_QUERIED)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_CONTROLLER_COMMAND)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_SCENE_EVENT)
     # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_GROUP)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_CONTROLLER_WAITING)
+    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_QUERIES_COMPLETE)
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NOTIFICATION)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
+    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
     dispatcher.connect(self.new_node, ZWaveNetwork.SIGNAL_NODE_ADDED)
 
     self._network.set_poll_interval(milliseconds=500)
+
+    # Initial refresh of all nodes
+    self.zwave_refresh()
+    scheduler.runEveryM(10, self.zwave_refresh, job_id='123-zwave_refresh')
+
+
+  def zwave_refresh(self, **kwargs):
+    # Initial refresh of all nodes
+    for node_id, node in self._network.nodes.items():
+      logging.error('ZWAVE DEBUG - node_id: %s' % str(node_id))
+      logging.error('ZWAVE DEBUG - node: %s' % str(node))
+      try:
+        # node_id = node.node_id
+        command = Command(self._installed_nodes[str(node_id)], SERVICE_ID, 'ZWAVE_UPDATE', node=node)
+        self._firefly.send_command(command)
+      except Exception as e:
+        logging.error('ZWAVE ERROR: %s' % str(e))
 
   def stop(self):
     self.export()
