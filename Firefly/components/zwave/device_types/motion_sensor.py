@@ -16,11 +16,11 @@ ULTRAVIOLET = 'ultraviolet'
 CAPABILITIES = {
   ALARM: True,
   BATTERY: True,
-  HUMIDITY: True,
-  LUX: True,
+  HUMIDITY: False,
+  LUX: False,
   MOTION: True,
-  TEMPERATURE: True,
-  ULTRAVIOLET: True
+  TEMPERATURE: False,
+  ULTRAVIOLET: False
 }
 
 COMMANDS = []
@@ -28,14 +28,10 @@ COMMANDS = []
 REQUESTS = [
   MOTION,
   ALARM,
-  LUX,
-  TEMPERATURE,
-  HUMIDITY,
-  ULTRAVIOLET,
   BATTERY
 ]
 
-class ZwaveMultiSensor(MultiSensor, ZwaveDevice):
+class ZwaveMotionSensor(MultiSensor, ZwaveDevice):
   def __init__(self, firefly, package, title='Zwave Multi Sensor', initial_values={}, **kwargs):
     logging.message('SETTING UP ZWAVE MULTI SENSOR')
     if kwargs.get('commands'):
@@ -52,7 +48,6 @@ class ZwaveMultiSensor(MultiSensor, ZwaveDevice):
 
 
     super().__init__(firefly, package, title, AUTHOR, commands, requests, DEVICE_TYPE_MULTI_SENSOR, capabilities=CAPABILITIES, initial_values=initial_values, **kwargs)
-
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, values: ZWaveValue = None, values_only=False, **kwargs):
     if node is None:
@@ -72,11 +67,3 @@ class ZwaveMultiSensor(MultiSensor, ZwaveDevice):
       self.update_values(battery=values.data)
     if label == 'Burglar':
       self.update_values(alarm=values.data)
-    if label == 'Temperature':
-      self.update_values(temperature=values.data)
-    if label == 'Luminance':
-      self.update_values(lux=values.data)
-    if label == 'Relative Humidity':
-      self.update_values(humidity=values.data)
-    if label == 'Ultraviolet':
-      self.update_values(ultraviolet=values.data)

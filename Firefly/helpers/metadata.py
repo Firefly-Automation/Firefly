@@ -222,7 +222,7 @@ def metaWaterSensor(command=False, request=True, primary=False):
 
 class ColorMap(object):
   def __init__(self, black=[], blue=[], green=[], red=[], yellow=[]):
-    self.black = black,
+    self.black = black
     self.blue = blue
     self.green = green
     self.red = red
@@ -296,7 +296,7 @@ def action_text(can_command=False, can_request=True, primary=False, title='', co
   return action_metadata
 
 
-def action_contact(primary=True, title='Contact sensor state', context='State of the door/window sensor. (Open/Close)', request=CONTACT, text_mapping={
+def action_contact(primary=True, title='Contact sensor state', context='State of the door window sensor Open Close', request=CONTACT, text_mapping={
   'Open':   [CONTACT_OPEN],
   'Closed': [CONTACT_CLOSED]
 }, color_mapping=ColorMap(green=[CONTACT_CLOSED], red=[CONTACT_OPEN])):

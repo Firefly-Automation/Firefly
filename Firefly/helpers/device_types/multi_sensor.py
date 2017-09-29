@@ -10,8 +10,9 @@ TEMPERATURE = 'temperature'
 HUMIDITY = 'humidity'
 ALARM = 'alarm'
 DEVICE_TYPE_MULTI_SENSOR = 'multi_sensor'
+ULTRAVIOLET = 'ultraviolet'
 
-
+COMMANDS = []
 
 REQUESTS = [
   ALARM,
@@ -20,6 +21,7 @@ REQUESTS = [
   LUX,
   MOTION,
   TEMPERATURE,
+  ULTRAVIOLET
 ]
 
 CAPABILITIES = {
@@ -28,7 +30,8 @@ CAPABILITIES = {
   HUMIDITY: False,
   LUX: False,
   MOTION: False,
-  TEMPERATURE: False
+  TEMPERATURE: False,
+  ULTRAVIOLET: False
 }
 
 INITIAL_VALUES = {
@@ -37,7 +40,8 @@ INITIAL_VALUES = {
   '_humidity': -1,
   '_lux': -1,
   '_motion': MOTION_INACTIVE,
-  '_temperature': -1
+  '_temperature': -1,
+  '_ultraviolet': -1
 }
 
 class MultiSensor(Device):
@@ -73,10 +77,14 @@ class MultiSensor(Device):
       self.add_request(TEMPERATURE, self.get_temperature)
       self.add_action(TEMPERATURE, metaText(title='Temperature', text_request=TEMPERATURE))
 
+    if capabilities[ULTRAVIOLET] and ULTRAVIOLET in requests:
+      self.add_request(ULTRAVIOLET, self.get_ultraviolet)
+      self.add_action(ULTRAVIOLET, metaText(title='Ultraviolet', text_request=ULTRAVIOLET))
+
     self._alexa_export = False
 
 
-  def update_values(self, alarm=None, battery=None, humidity=None, lux=None, motion=None, temperature=None, **kwargs):
+  def update_values(self, alarm=None, battery=None, humidity=None, lux=None, motion=None, temperature=None, ultraviolet=None, **kwargs):
     if alarm is not None:
       self._alarm = alarm
     if battery is not None:
@@ -92,6 +100,8 @@ class MultiSensor(Device):
         self._motion = MOTION_ACTIVE if motion else MOTION_INACTIVE
     if temperature is not None:
       self._temperature = temperature
+    if ultraviolet is not None:
+      self._ultraviolet = ultraviolet
 
   def get_battery(self, **kwargs):
     return self._battery
@@ -110,4 +120,7 @@ class MultiSensor(Device):
 
   def get_humidity(self, **kwargs):
     return self._humidity
+
+  def get_ultraviolet(self, **kwargs):
+    return self._ultraviolet
 

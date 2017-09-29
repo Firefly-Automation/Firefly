@@ -116,8 +116,11 @@ class ZwaveDevice(Device):
     logging.debug('Updating ZWave Values')
 
     # Return if no valid node object.
-    if node is None:
+    if node is None and self._node is None:
       return
+
+    if node is None:
+      node = self._node
 
     try:
       if not self._manufacturer_id:
@@ -142,19 +145,20 @@ class ZwaveDevice(Device):
 
     # Update config if device config has not been updated.
     if not self._config_updated:
-      for s, i in node.get_values().items():
-        if i.command_class == 112:
-          self._config_params[i.label.lower()] = {
-            'value': i.data,
-            'id':    i.index
-          }
-        else:
-          self._raw_values[i.label.lower()] = {
-            'value': i.data,
-            'id':    i.index,
-            'class': i.command_class
-          }
       self.update_device_config()
+
+    for s, i in node.get_values().items():
+      if i.command_class == 112:
+        self._config_params[i.label.lower()] = {
+          'value': i.data,
+          'id':    i.index
+        }
+      else:
+        self._raw_values[i.label.lower()] = {
+          'value': i.data,
+          'id':    i.index,
+          'class': i.command_class
+        }
 
     # When security data changes sometimes you need to send a request to update the sensor value
     # old_security_data = [b for a, b in self._raw_values.items() if b.get('class') == 113]

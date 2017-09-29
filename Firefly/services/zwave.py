@@ -15,7 +15,9 @@ from Firefly.helpers.service import Service
 PACKAGE_MAPPING = {
   'ZW096 Smart Switch 6':                'zwave_aeotec_smart_switch_gen_6',
   'DSC06106 Smart Energy Switch':        'zwave_aeotec_dsc06106_smart_switch',
-  'ZW100 MultiSensor 6':                 'zwave_aeotec_multi_6',
+
+  'ZW100 MultiSensor 6':                 'aeotec.zw100_multisensor_6',
+
   'ZW120 Door Window Sensor Gen5':       'zwave_aeotec_door_window_gen_5',
   'ZW112 Door Window Sensor 6':          'zwave_aeotec_door_window_gen_6',
   'ZW097 Dry Contact Sensor Gen5':       'zwave_aeotec_zw097_dry_contact',
@@ -227,6 +229,7 @@ class Zwave(Service):
       self._firefly.send_command(command)
     else:
       logging.error('node %s not found in installed nodes' % str(node.node_id))
+      self.add_child_nodes(**kwargs)
 
 
   def essential_queries_handler(self, **kwargs):
@@ -257,12 +260,12 @@ class Zwave(Service):
     if args is None:
       return
     node_id = args.get('nodeId')
-    node = self._network.nodes[node_id]
-    if str(node.node_id) in self._installed_nodes:
+    if str(node_id) in self._installed_nodes:
+      node = self._network.nodes[node_id]
       command = Command(self._installed_nodes[str(node.node_id)], SERVICE_ID, 'ZWAVE_UPDATE', node=node)
       self._firefly.send_command(command)
     else:
-      logging.error('node %s not found in installed nodes' % str(node.node_id))
+      logging.error('node %s not found in installed nodes' % str(node_id))
 
 
 
@@ -341,7 +344,7 @@ class Zwave(Service):
       #  logging.error(code='FF.ZWA.ZWA.003', args=(e))  # error sending command: %s
         # self._firefly.components[self._installed_nodes[node_id]].update_from_zwave(node, values=values)
 
-  def add_child_nodes(self, node):
+  def add_child_nodes(self, node, **kwargs):
     node_id = str(node.node_id)
     product_name = node.product_name
     config = 'node.config'
@@ -401,6 +404,13 @@ class Zwave(Service):
 
     elif 'Door/Window Sensor' in product_name:
       device_id = self._firefly.install_package('Firefly.components.zwave.window_door_sensor', alias=alias, node=node)
+      self._installed_nodes[node_id] = device_id
+      self.new_alias = None
+      self.refresh_firebase()
+      self.export()
+
+    elif 'motion sensor' in product_name.lower() or 'motion detector' in product_name.lower():
+      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_generic_devices.motion_sensor', alias=alias, node=node)
       self._installed_nodes[node_id] = device_id
       self.new_alias = None
       self.refresh_firebase()
