@@ -65,6 +65,14 @@ class Lightify(Service):
 
       self._firefly.install_package('Firefly.components.lightify.lightify_light', ff_id=ff_id, alias=light.name(), lightify_object=light)
 
+    for name, group in self.bridge.groups().items():
+      ff_id = 'lightify-group-%s' % name
+      if ff_id in self.firefly.components:
+        command = Command(ff_id, SERVICE_ID, COMMAND_UPDATE, lightify_object=group, lightify_bridge=self.bridge)
+        self.firefly.send_command(command)
+        continue
+
+      self._firefly.install_package('Firefly.components.lightify.lightify_group', ff_id=ff_id, alias=name, lightify_object=group, lightify_bridge=self.bridge)
 
 
 

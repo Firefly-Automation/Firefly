@@ -45,7 +45,7 @@ class LightifyDevice(Device):
     self.lightify_object:Luminary = kwargs.get('lightify_object')
     self.lightify_type = kwargs.get('lightify_type')
 
-    self._export_ui = True
+    self._export_ui = kwargs.get('export_ui', True)
 
   def on(self, **kwargs):
     self._state = EVENT_ACTION_ON
