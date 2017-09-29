@@ -393,7 +393,7 @@ class Zwave(Service):
       self.refresh_firebase()
       self.export()
 
-    elif 'Door/Window Sensor' in product_name:
+    elif 'door/window sensor' in product_name.lower() or 'door/window detector' in product_name.lower():
       device_id = self._firefly.install_package('Firefly.components.zwave.zwave_generic_devices.contact_sensor', alias=alias, node=node)
       self._installed_nodes[node_id] = device_id
       self.new_alias = None
