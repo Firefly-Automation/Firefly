@@ -8,6 +8,7 @@ from Firefly.const import CONTACT, CONTACT_CLOSED, CONTACT_OPEN, DEVICE_TYPE_SWI
 from Firefly.helpers.metadata import metaContact, action_contact
 
 from Firefly.util.zwave_command_class import COMMAND_CLASS_BATTERY, COMMAND_CLASS_SENSOR_BINARY, COMMAND_CLASS_ALARM
+from openzwave.value import ZWaveValue
 
 TITLE = 'Aeotec Zwave Window Door Sensor Gen5'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
@@ -37,12 +38,13 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     self.__dict__.update(kwargs['initial_values'])
 
     self._alarm = False
+
     self.add_request(STATE, self.get_state)
     self.add_request(CONTACT, self.get_state)
     self.add_request('alarm', self.get_alarm)
 
     self.add_action(CONTACT, metaContact(primary=True))
-    #self.add_action('new_contact', action_contact())
+    self.add_action('new_contact', action_contact())
 
     self._alexa_export = False
 
@@ -57,9 +59,6 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     if self.tags is []:
       self._tags = ['contact']
 
-    self.refresh_id = str(uuid4())
-    scheduler.runEveryM(5, self.refresh, self.refresh_id)
-
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
     """
@@ -70,7 +69,8 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     Args:
       **kwargs ():
     """
-    self.node.refresh_info()
+    if not self.node.is_ready:
+      return
     if self._update_try_count >= 5:
       self._config_updated = True
       return
@@ -81,7 +81,7 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     self.node.set_config_param(121, 17)  # ensor Binary and Battery Report
 
     successful = True
-    successful &= self.node.request_config_param(121) == 17
+    successful &= self._config_params['report type'] == 17
 
     self._update_try_count += 1
     self._config_updated = successful
@@ -111,40 +111,18 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
 
     if self.value_index['Burglar'] != -1 and self.value_index['Battery Level'] != -1 and self.value_index['Sensor'] != -1:
       self.refreshed = True
-      self.refresh()
 
-  def refresh(self, **kwargs):
-    if self.node is None:
-      return
-
-    logging.info('Refreshing ZWAVE')
-
-    self.node.request_state()
-    for prop, value_id in self.value_index.items():
-      new_value = self.node.refresh_value(value_id)
-
-      if prop == 'Sensor':
-        self._state = CONTACT_OPEN if new_value else CONTACT_CLOSED
-      if prop == 'Battery Level':
-        self._battery = new_value
-      if prop == 'Burglar':
-        self._alarm = new_value == 3
+    self.node.refresh_info()
 
 
-  def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
+  def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, values:ZWaveValue = None, values_only=False, **kwargs):
     logging.message('ZWAVE DEBUG INITAL: %s' % str(node))
     logging.message('ZWAVE DEBUG INITAL INITAL: %s' % str(node))
 
     if node is None:
       return
 
-    try:
-      super().update_from_zwave(node, **kwargs)
-    except Exception as e:
-      logging.message('ZWAVE ERROR: %s' % str(e))
-
-    logging.message('ZWAVE DEBUG SECOND: %s' % str(kwargs))
-
+    self._node = node
 
     if not self.refreshed:
       self.initial_refresh()
@@ -152,13 +130,52 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     if not self.refreshed:
       return
 
-    logging.error('ZWAVE DEBUG - POST INITIAL REFRESH')
+    if not values_only:
 
-    logging.message('ZWAVE DEBUG: %s' % str(self.value_index))
-    logging.message('ZWAVE DEBUG: %s' % str(node.values[self.value_index['Sensor']].data))
 
-    self._state = CONTACT_OPEN if node.values[self.value_index['Sensor']].data else CONTACT_CLOSED
-    self._alarm = True if node.values[self.value_index['Burglar']].data == 3 else False
+      try:
+        super().update_from_zwave(node, values=values, **kwargs)
+      except Exception as e:
+        logging.message('ZWAVE ERROR: %s' % str(e))
+
+      logging.message('ZWAVE DEBUG SECOND: %s' % str(kwargs))
+
+
+      if not self.refreshed:
+        self.initial_refresh()
+
+      if not self.refreshed:
+        return
+
+      logging.error('ZWAVE DEBUG - POST INITIAL REFRESH')
+
+      logging.message('ZWAVE DEBUG: %s' % str(self.value_index))
+      logging.message('ZWAVE DEBUG: %s' % str(node.values[self.value_index['Sensor']].data))
+      logging.message('ZWAVE DEBUG: %s' % str(node.values[self.value_index['Sensor']].data))
+
+      #self._state = CONTACT_OPEN if node.values[self.value_index['Sensor']].data else CONTACT_CLOSED
+      #self._alarm = True if node.values[self.value_index['Burglar']].data == 3 else False
+      #self._battery = node.values[self.value_index['Battery Level']].data
+
+    if values is None:
+      logging.error('ZWAVE ERROR NO VALUE')
+      self._battery = node.values[self.value_index['Battery Level']].data
+      self._state = CONTACT_OPEN if  node.values[self.value_index['Sensor']].data else CONTACT_CLOSED
+      self._alarm = True if node.values[self.value_index['Burglar']].data == 3 else False
+      return
+
+    logging.message('ZWAVE WINDOW/DOOR: %s' % str(values.to_dict()))
+
+    label = values.label
+    if label == 'Sensor':
+      self._state =CONTACT_OPEN if values.data else CONTACT_CLOSED
+    if label == 'Battery Level':
+      self._battery = values.data
+    if label == 'Burglar':
+      self._alarm = True if values.data == 3 else False
+
+
+    logging.message(str(node.values_to_dict()))
     self._battery = node.values[self.value_index['Battery Level']].data
 
 

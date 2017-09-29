@@ -5,6 +5,8 @@ from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import DEVICE_TYPE_MOTION, MOTION, MOTION_ACTIVE, MOTION_INACTIVE, STATE
 from Firefly.helpers.metadata import metaMotion
 
+from Firefly.components.zwave.device_types.multi_sensor import ZwaveMultiSensor
+
 TITLE = 'Aeotec Gen6 MultiSensor'
 DEVICE_TYPE = DEVICE_TYPE_MOTION
 AUTHOR = 'Zachary Priddy'
@@ -21,7 +23,7 @@ def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   # TODO: Remove this when fixed
   kwargs['tags'] = ['motion']
-  sensor = ZwaveAeotecMulti(firefly, package, **kwargs)
+  sensor = ZwaveMultiSensor(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
   firefly.components[sensor.id] = sensor
   return sensor.id
