@@ -146,19 +146,18 @@ class ZwaveDevice(Device):
     # Update config if device config has not been updated.
     if not self._config_updated:
       self.update_device_config()
-
-    for s, i in node.get_values().items():
-      if i.command_class == 112:
-        self._config_params[i.label.lower()] = {
-          'value': i.data,
-          'id':    i.index
-        }
-      else:
-        self._raw_values[i.label.lower()] = {
-          'value': i.data,
-          'id':    i.index,
-          'class': i.command_class
-        }
+      for s, i in node.get_values().items():
+        if i.command_class == 112:
+          self._config_params[i.label.lower()] = {
+            'value': i.data,
+            'id':    i.index
+          }
+        else:
+          self._raw_values[i.label.lower()] = {
+            'value': i.data,
+            'id':    i.index,
+            'class': i.command_class
+          }
 
     # When security data changes sometimes you need to send a request to update the sensor value
     # old_security_data = [b for a, b in self._raw_values.items() if b.get('class') == 113]

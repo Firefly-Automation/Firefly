@@ -64,6 +64,7 @@ class ZwaveMultiSensor(MultiSensor, ZwaveDevice):
 
     if values is None:
       logging.message('ZWAVE MULTI SENSOR NO VALUES GIVEN')
+      return
 
     label = values.label
     if label == 'Sensor':

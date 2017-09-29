@@ -1,9 +1,7 @@
 from Firefly import logging
+from Firefly.const import LUX, MOTION, MOTION_ACTIVE, MOTION_INACTIVE
 from Firefly.helpers.device import Device
-
-from Firefly.const import MOTION, STATE, LUX, MOTION_INACTIVE, MOTION_ACTIVE
-from Firefly.helpers.metadata import metaText, metaMotion
-
+from Firefly.helpers.metadata import action_motion, metaText
 
 BATTERY = 'battery'
 TEMPERATURE = 'temperature'
@@ -14,35 +12,28 @@ ULTRAVIOLET = 'ultraviolet'
 
 COMMANDS = []
 
-REQUESTS = [
-  ALARM,
-  BATTERY,
-  HUMIDITY,
-  LUX,
-  MOTION,
-  TEMPERATURE,
-  ULTRAVIOLET
-]
+REQUESTS = [ALARM, BATTERY, HUMIDITY, LUX, MOTION, TEMPERATURE, ULTRAVIOLET]
 
 CAPABILITIES = {
-  ALARM: False,
-  BATTERY: False,
-  HUMIDITY: False,
-  LUX: False,
-  MOTION: False,
+  ALARM:       False,
+  BATTERY:     False,
+  HUMIDITY:    False,
+  LUX:         False,
+  MOTION:      False,
   TEMPERATURE: False,
   ULTRAVIOLET: False
 }
 
 INITIAL_VALUES = {
-  '_alarm': False,
-  '_battery': -1,
-  '_humidity': -1,
-  '_lux': -1,
-  '_motion': MOTION_INACTIVE,
+  '_alarm':       False,
+  '_battery':     -1,
+  '_humidity':    -1,
+  '_lux':         -1,
+  '_motion':      MOTION_INACTIVE,
   '_temperature': -1,
   '_ultraviolet': -1
 }
+
 
 class MultiSensor(Device):
   def __init__(self, firefly, package, title, author, commands=[], requests=REQUESTS, device_type=DEVICE_TYPE_MULTI_SENSOR, capabilities=CAPABILITIES, initial_values=INITIAL_VALUES, **kwargs):
@@ -70,6 +61,7 @@ class MultiSensor(Device):
     if capabilities[MOTION] and MOTION in requests:
       self.add_request(MOTION, self.get_motion)
       self.add_action(MOTION, metaText(title='Motion', text_request=MOTION, primary=True))
+      self.add_action('NEW_MOTION', action_motion(False))
       if 'motion' not in self.tags:
         self._tags.append('motion')
 
@@ -82,7 +74,6 @@ class MultiSensor(Device):
       self.add_action(ULTRAVIOLET, metaText(title='Ultraviolet', text_request=ULTRAVIOLET))
 
     self._alexa_export = False
-
 
   def update_values(self, alarm=None, battery=None, humidity=None, lux=None, motion=None, temperature=None, ultraviolet=None, **kwargs):
     if alarm is not None:
@@ -123,4 +114,3 @@ class MultiSensor(Device):
 
   def get_ultraviolet(self, **kwargs):
     return self._ultraviolet
-

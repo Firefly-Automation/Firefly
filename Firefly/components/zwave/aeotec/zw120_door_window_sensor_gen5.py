@@ -1,0 +1,65 @@
+from Firefly import logging
+from Firefly.components.zwave.device_types.contact_sensor import ZwaveContactSensor
+from Firefly.const import CONTACT, CONTACT_CLOSED
+
+ALARM = 'alarm'
+BATTERY = 'battery'
+
+TITLE = 'ZW120 Aeotec Door/Window Sensor'
+
+COMMANDS = []
+REQUESTS = [ALARM, BATTERY, CONTACT]
+
+INITIAL_VALUES = {
+  '_alarm': False,
+  '_battery': -1,
+  '_conatct': CONTACT_CLOSED
+}
+
+def Setup(firefly, package, **kwargs):
+  logging.message('Entering %s setup' % TITLE)
+  sensor = ZW120(firefly, package, **kwargs)
+  # TODO: Replace this with a new firefly.add_device() function
+  firefly.components[sensor.id] = sensor
+  return sensor.id
+
+class ZW120(ZwaveContactSensor):
+  def __init__(self, firefly, package, **kwargs):
+    if kwargs.get('initial_values') is not None:
+      INITIAL_VALUES.update(kwargs['initial_values'])
+    kwargs.update({
+      'initial_values': INITIAL_VALUES,
+      'commands':       COMMANDS,
+      'requests':       REQUESTS
+    })
+    print(str(kwargs))
+    super().__init__(firefly, package, TITLE, **kwargs)
+
+  def update_device_config(self, **kwargs):
+    # TODO: Pull these out into config values
+    """
+    Updated the devices to the desired config params. This will be useful to make new default devices configs.
+
+    For example when there is a gen6 multisensor I want it to always report every 5 minutes and timeout to be 30
+    seconds.
+    Args:
+      **kwargs ():
+    """
+    if self.node is None:
+      return
+    if not self.node.is_ready:
+      return
+    if self._update_try_count >= 5:
+      self._config_updated = True
+      return
+
+    # TODO: self._sensitivity ??
+    # https://github.com/OpenZWave/open-zwave/blob/master/config/aeotec/zw120.xml
+    # self.node.set_config_param(2, 0)  # Disable 10 min wake up time
+    self.node.set_config_param(121, 17)  # #ensor Binary and Battery Report
+
+    successful = True
+    successful &= self._config_params['report type'] == 17
+
+    self._update_try_count += 1
+    self._config_updated = successful

@@ -78,7 +78,7 @@ class ZwaveAeotecDoorWindow5(ZwaveDevice):
     # TODO: self._sensitivity ??
     # https://github.com/OpenZWave/open-zwave/blob/master/config/aeotec/zw120.xml
     # self.node.set_config_param(2, 0)  # Disable 10 min wake up time
-    self.node.set_config_param(121, 17)  # ensor Binary and Battery Report
+    self.node.set_config_param(121, 17)  # #ensor Binary and Battery Report
 
     successful = True
     successful &= self._config_params['report type'] == 17

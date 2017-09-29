@@ -1,4 +1,4 @@
-from Firefly.const import (CONTACT_CLOSED, CONTACT_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, MOTION_ACTIVE, MOTION_INACTIVE, NOT_PRESENT, PRESENT, CONTACT)
+from Firefly.const import (CONTACT_CLOSED, CONTACT_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, MOTION_ACTIVE, MOTION_INACTIVE, NOT_PRESENT, PRESENT, CONTACT, MOTION)
 
 
 def metaDimmer(min=0, max=100, command=True, request=False, primary=False):
@@ -300,5 +300,12 @@ def action_contact(primary=True, title='Contact sensor state', context='State of
   'Open':   [CONTACT_OPEN],
   'Closed': [CONTACT_CLOSED]
 }, color_mapping=ColorMap(green=[CONTACT_CLOSED], red=[CONTACT_OPEN])):
+  action_meta = action_text(primary=primary, title=title, context=context, request=request, text_mapping=text_mapping, color_mapping=color_mapping)
+  return action_meta
+
+def action_motion(primary=True, title='Motion', context='State of the motion sensor', request=MOTION, text_mapping={
+  'Active':   [MOTION_ACTIVE],
+  'Inactive': [MOTION_INACTIVE]
+}, color_mapping=ColorMap(blue=[MOTION_INACTIVE], red=[MOTION_ACTIVE])):
   action_meta = action_text(primary=primary, title=title, context=context, request=request, text_mapping=text_mapping, color_mapping=color_mapping)
   return action_meta

@@ -1,30 +1,20 @@
 from Firefly import logging
 from Firefly.components.zwave.device_types.multi_sensor import ZwaveMultiSensor
-from Firefly.const import DEVICE_TYPE_MOTION, MOTION, LUX
+from Firefly.const import DEVICE_TYPE_MOTION, LUX, MOTION
 from Firefly.helpers.metadata import metaSlider
 
-TITLE = 'Aeotec Gen6 MultiSensor'
-DEVICE_TYPE = DEVICE_TYPE_MOTION
-AUTHOR = 'Zachary Priddy'
 COMMANDS = ['set_sensitivity']
+DEVICE_TYPE = DEVICE_TYPE_MOTION
+TITLE = 'Aeotec Gen6 MultiSensor'
 
-BATTERY = 'battery'
-TEMPERATURE = 'temperature'
-HUMIDITY = 'humidity'
 ALARM = 'alarm'
+BATTERY = 'battery'
 DEVICE_TYPE_MULTI_SENSOR = 'multi_sensor'
+HUMIDITY = 'humidity'
+TEMPERATURE = 'temperature'
 ULTRAVIOLET = 'ultraviolet'
 
-REQUESTS = [
-  MOTION,
-  ALARM,
-  LUX,
-  TEMPERATURE,
-  HUMIDITY,
-  ULTRAVIOLET,
-  BATTERY,
-  'sensitivity'
-]
+REQUESTS = [MOTION, ALARM, LUX, TEMPERATURE, HUMIDITY, ULTRAVIOLET, BATTERY, 'sensitivity']
 
 INITIAL_VALUES = {
   '_sensitivity': 3,
