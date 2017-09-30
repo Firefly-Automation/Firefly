@@ -1,577 +1,484 @@
 [
     {
-        "actions": [
-            {
-                "command": "set_light",
-                "conditions": {
-                    "is_dark": true
-                },
-                "ct": "3200k",
-                "ff_id": "hue-group-device-3",
-                "force": false,
-                "level": 100,
-                "source": "temp_routine_home"
-            },
-            {
-                "command": "set_light",
-                "conditions": {
-                    "is_dark": false
-                },
-                "ct": "6500k",
-                "ff_id": "hue-group-device-3",
-                "force": false,
-                "level": 100,
-                "source": "temp_routine_home"
-            }
-        ],
-        "alias": "home",
-        "conditions": {
-            "is_not_mode": [
-                "home",
-                "night"
-            ]
-        },
-        "ff_id": "temp_routine_home",
-        "initial_values": "TODO INITIAL VALUES",
-        "message": "Home routine executed",
-        "mode": "home",
-        "package": "Firefly.automation.routine",
-        "triggers": [
-            [
-                {
-                    "event_action": [
-                        {
-                            "contact": [
-                                "open"
+        "alias": "Test new simple rule",
+        "ff_id": "0b7febb1-02c2-4ba2-8d94-7bbde58b86b0",
+        "interface": {
+            "actions": {
+                "delayed": [
+                    {
+                        "command": "off",
+                        "conditions": {},
+                        "ff_id": "a0c1147f-f8e7-4b40-a99c-0aeddcd9b80f",
+                        "force": false,
+                        "source": "0b7febb1-02c2-4ba2-8d94-7bbde58b86b0",
+                        "tags": [
+                            "light"
+                        ]
+                    }
+                ],
+                "initial": [
+                    {
+                        "command": "set_light",
+                        "conditions": {
+                            "is_mode": "night"
+                        },
+                        "ff_id": "a0c1147f-f8e7-4b40-a99c-0aeddcd9b80f",
+                        "force": false,
+                        "level": 10,
+                        "source": "0b7febb1-02c2-4ba2-8d94-7bbde58b86b0",
+                        "tags": [
+                            "light"
+                        ]
+                    },
+                    {
+                        "command": "set_light",
+                        "conditions": {
+                            "is_not_mode": [
+                                "night",
+                                "away"
                             ]
-                        }
-                    ],
-                    "listen_id": "42c0c3e1-75bb-4729-917c-f1935c59b46a",
-                    "source": "SOURCE_TRIGGER"
+                        },
+                        "ff_id": "a0c1147f-f8e7-4b40-a99c-0aeddcd9b80f",
+                        "force": false,
+                        "level": 100,
+                        "source": "0b7febb1-02c2-4ba2-8d94-7bbde58b86b0",
+                        "tags": [
+                            "light"
+                        ]
+                    }
+                ]
+            },
+            "conditions": {
+                "initial": {
+                    "is_not_mode": [
+                        "away"
+                    ]
                 }
-            ]
-        ],
-        "type": "TYPE_AUTOMATION"
-    },
-    {
-        "actions": [
-            {
-                "command": "off",
-                "conditions": {},
-                "ff_id": "hue-group-device-3",
-                "force": false,
-                "source": "temp_routine_away"
             },
-            {
-                "command": "off",
-                "conditions": {},
-                "ff_id": "2f4bd64d-5f2f-4284-a0bc-35d1580efc71",
-                "force": false,
-                "source": "temp_routine_away"
+            "delays": {
+                "delayed": 300
             },
-            {
-                "command": "set_light",
-                "conditions": {
-                    "is_dark": true
-                },
-                "delay_s": 2,
-                "ff_id": "00:17:88:01:00:fa:bf:3c-0b",
-                "force": false,
-                "hue": 54736,
-                "level": 20,
-                "source": "temp_routine_away"
-            },
-            {
-                "command": "set_light",
-                "conditions": {
-                    "is_dark": true
-                },
-                "delay_s": 2,
-                "ff_id": "00:17:88:01:01:1a:54:72-0b",
-                "force": false,
-                "hue": 54049,
-                "level": 20,
-                "source": "temp_routine_away"
+            "messages": {},
+            "triggers": {
+                "delayed": [
+                    [
+                        {
+                            "listen_id": "a0c1147f-f8e7-4b40-a99c-0aeddcd9b80f",
+                            "source": "SOURCE_TRIGGER",
+                            "trigger_action": [
+                                {
+                                    "motion": [
+                                        "inactive"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listen_id": "6cd1d295-c005-4888-9350-229ecf3ae58a",
+                            "source": "SOURCE_TRIGGER",
+                            "trigger_action": [
+                                {
+                                    "contact": [
+                                        "close"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                ],
+                "initial": [
+                    [
+                        {
+                            "listen_id": "a0c1147f-f8e7-4b40-a99c-0aeddcd9b80f",
+                            "source": "SOURCE_TRIGGER",
+                            "trigger_action": [
+                                {
+                                    "motion": [
+                                        "active"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "listen_id": "6cd1d295-c005-4888-9350-229ecf3ae58a",
+                            "source": "SOURCE_TRIGGER",
+                            "trigger_action": [
+                                {
+                                    "contact": [
+                                        "open"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                ]
             }
-        ],
-        "alias": "away",
-        "conditions": {
-            "is_mode": [
-                "home",
-                "away",
-                "arriving"
-            ]
         },
-        "ff_id": "temp_routine_away",
-        "initial_values": "TODO INITIAL VALUES",
-        "message": "Away routine executed",
-        "mode": "away",
-        "package": "Firefly.automation.routine",
-        "triggers": [
-            [
-                {
-                    "event_action": [
-                        {
-                            "presence": [
-                                "not_present"
-                            ]
-                        }
-                    ],
-                    "listen_id": "372c02fd-5dde-4d82-8ad3-880c143575da",
-                    "source": "SOURCE_TRIGGER"
-                },
-                {
-                    "event_action": [
-                        {
-                            "presence": [
-                                "not_present"
-                            ]
-                        }
-                    ],
-                    "listen_id": "1cefbe5d-fa17-41db-b1ad-6011e70a954a",
-                    "source": "SOURCE_TRIGGER"
-                }
+        "metadata": {
+            "author": "Zachary Priddy (me@zpriddy.com)",
+            "commands": [
+                "execute"
             ],
-            [
-                {
-                    "event_action": [
-                        {
-                            "presence": [
-                                "not_present"
-                            ]
-                        }
-                    ],
-                    "listen_id": "372c02fd-5dde-4d82-8ad3-880c143575da",
-                    "source": "SOURCE_TRIGGER"
+            "interface": {
+                "actions": {
+                    "delayed": {
+                        "context": "Actions to be executed when on delayed trigger.",
+                        "type": "commandList"
+                    },
+                    "initial": {
+                        "context": "Actions to be executed when on initial trigger.",
+                        "type": "commandList"
+                    }
                 },
-                {
-                    "event_action": [
-                        {
-                            "location": [
-                                "sunrise",
-                                "sunset"
-                            ]
-                        }
-                    ],
-                    "listen_id": "location",
-                    "source": "SOURCE_TRIGGER"
-                },
-                {
-                    "event_action": [
-                        {
-                            "presence": [
-                                "not_present"
-                            ]
-                        }
-                    ],
-                    "listen_id": "1cefbe5d-fa17-41db-b1ad-6011e70a954a",
-                    "source": "SOURCE_TRIGGER"
-                }
-            ]
-        ],
-        "type": "TYPE_AUTOMATION"
-    },
-    {
-        "actions": [
-            {
-                "command": "set_light",
-                "conditions": {},
-                "ct": "6500k",
-                "ff_id": "hue-group-device-3",
-                "force": false,
-                "level": 100,
-                "source": "temp_routine_art"
-            }
-        ],
-        "alias": "art",
-        "conditions": {},
-        "ff_id": "temp_routine_art",
-        "initial_values": "TODO INITIAL VALUES",
-        "message": "Art routine executed",
-        "mode": "art",
-        "package": "Firefly.automation.routine",
-        "triggers": [
-            []
-        ],
-        "type": "TYPE_AUTOMATION"
-    },
-    {
-        "actions": [],
-        "alias": "arriving",
-        "conditions": {
-            "is_mode": [
-                "away"
-            ]
-        },
-        "ff_id": "temp_routine_arriving",
-        "initial_values": "TODO INITIAL VALUES",
-        "message": "arriving routine executed",
-        "mode": "arriving",
-        "package": "Firefly.automation.routine",
-        "triggers": [
-            [
-                {
-                    "event_action": [
-                        {
-                            "presence": [
-                                "present"
-                            ]
-                        }
-                    ],
-                    "listen_id": "372c02fd-5dde-4d82-8ad3-880c143575da",
-                    "source": "SOURCE_TRIGGER"
-                }
-            ],
-            [
-                {
-                    "event_action": [
-                        {
-                            "presence": [
-                                "present"
-                            ]
-                        }
-                    ],
-                    "listen_id": "1cefbe5d-fa17-41db-b1ad-6011e70a954a",
-                    "source": "SOURCE_TRIGGER"
-                }
-            ]
-        ],
-        "type": "TYPE_AUTOMATION"
-    },
-    {
-        "actions": [
-            {
-                "command": "ct_fade",
-                "conditions": {},
-                "end_k": "6500k",
-                "end_level": 100,
-                "fade_sec": 1500,
-                "ff_id": "hue-group-device-3",
-                "force": false,
-                "source": "temp_routine_morning",
-                "start_k": "2700k",
-                "start_level": 0
-            }
-        ],
-        "alias": "morning",
-        "conditions": {
-            "is_mode": [
-                "night"
-            ]
-        },
-        "ff_id": "temp_routine_morning",
-        "initial_values": "TODO INITIAL VALUES",
-        "message": "morning routine executed",
-        "mode": "morning",
-        "package": "Firefly.automation.routine",
-        "triggers": [
-            [
-                {
-                    "event_action": [
-                        {
-                            "hour": 9,
-                            "minute": 30,
-                            "weekdays": [
-                                1,
-                                2,
-                                3,
-                                7
-                            ]
-                        }
-                    ],
-                    "listen_id": "time",
-                    "source": "SOURCE_TRIGGER"
-                }
-            ],
-            [
-                {
-                    "event_action": [
-                        {
-                            "hour": 9,
-                            "minute": 30,
-                            "weekdays": [
-                                4,
-                                5,
-                                6
-                            ]
-                        }
-                    ],
-                    "listen_id": "time",
-                    "source": "SOURCE_TRIGGER"
-                }
-            ]
-        ],
-        "type": "TYPE_AUTOMATION"
-    },
-    {
-        "actions": [
-            {
-                "command": "off",
-                "conditions": {},
-                "ff_id": "hue-group-device-3",
-                "force": false,
-                "source": "temp_routine_night"
-            },
-            {
-                "command": "off",
-                "conditions": {},
-                "ff_id": "2f4bd64d-5f2f-4284-a0bc-35d1580efc71",
-                "force": false,
-                "source": "temp_routine_night"
-            },
-            {
-                "command": "set_light",
                 "conditions": {
-                    "is_dark": true
+                    "delayed": {
+                        "context": "Condition for delayed trigger.",
+                        "type": "condition"
+                    },
+                    "initial": {
+                        "context": "Condition for initial trigger.",
+                        "type": "condition"
+                    }
                 },
-                "delay_s": 2,
-                "ff_id": "00:17:88:01:01:1a:54:72-0b",
-                "force": false,
-                "hue": 54049,
-                "level": 10,
-                "source": "temp_routine_night"
-            }
-        ],
-        "alias": "night",
-        "conditions": {},
-        "ff_id": "temp_routine_night",
-        "initial_values": "TODO INITIAL VALUES",
-        "message": "night routine executed",
-        "mode": "night",
-        "package": "Firefly.automation.routine",
-        "triggers": [],
-        "type": "TYPE_AUTOMATION"
-    },
-    {
-        "actions": [
-            {
-                "command": "on",
-                "conditions": {},
-                "ff_id": "11681cd6-7fcf-4c70-a873-5f821b913cbd",
-                "force": false,
-                "source": "temp_event_based_action"
-            }
-        ],
-        "delayed_actions": [
-            {
-                "command": "off",
-                "conditions": {},
-                "ff_id": "11681cd6-7fcf-4c70-a873-5f821b913cbd",
-                "force": false,
-                "source": "temp_event_based_action"
-            }
-        ],
-        "alias": "event_based_action",
-        "conditions": {},
-        "ff_id": "temp_event_based_action",
-        "initial_values": "TODO INITIAL VALUES",
-        "package": "Firefly.automation.event_based_action",
-        "delay_s": 10,
-        "triggers": [
-            [
-                {
-                    "event_action": [
-                        {
-                            "contact": [
-                                "open"
-                            ]
-                        }
-                    ],
-                    "listen_id": "1c5c1e8f-dee0-480d-accf-e661a0db090b",
-                    "source": "SOURCE_TRIGGER"
-                }
-            ]
-        ],
-        "delayed_triggers": [
-            [
-                {
-                    "event_action": [
-                        {
-                            "contact": [
-                                "close"
-                            ]
-                        }
-                    ],
-                    "listen_id": "1c5c1e8f-dee0-480d-accf-e661a0db090b",
-                    "source": "SOURCE_TRIGGER"
-                }
-            ]
-        ],
-        "type": "TYPE_AUTOMATION"
-    },
-    {
-        "actions": [
-            {
-                "command": "on",
-                "conditions": {},
-                "ff_id": "00:17:88:01:00:fa:bf:3c-0b",
-                "force": false,
-                "source": "temp_entry_automation"
-            }
-        ],
-        "delayed_actions": [
-            {
-                "command": "off",
-                "conditions": {},
-                "ff_id": "00:17:88:01:00:fa:bf:3c-0b",
-                "force": false,
-                "source": "temp_entry_automation"
-            }
-        ],
-        "alias": "Front Door Lights",
-        "conditions": {},
-        "ff_id": "temp_entry_automation",
-        "initial_values": "TODO INITIAL VALUES",
-        "package": "Firefly.automation.event_based_action",
-        "delay_s": 10,
-        "triggers": [
-            [
-                {
-                    "event_action": [
-                        {
-                            "contact": [
-                                "open"
-                            ]
-                        }
-                    ],
-                    "listen_id": "42c0c3e1-75bb-4729-917c-f1935c59b46a",
-                    "source": "SOURCE_TRIGGER"
-                }
-            ]
-        ],
-        "delayed_triggers": [
-            [
-                {
-                    "event_action": [
-                        {
-                            "contact": [
-                                "close"
-                            ]
-                        }
-                    ],
-                    "listen_id": "42c0c3e1-75bb-4729-917c-f1935c59b46a",
-                    "source": "SOURCE_TRIGGER"
-                }
-            ]
-        ],
-        "type": "TYPE_AUTOMATION"
-    },
-    {
-        "actions": [
-            {
-                "command": "on",
-                "conditions": {
-                    "is_mode": "home"
+                "delays": {
+                    "delayed": {
+                        "context": "Time to delay after delayed trigger is triggered before executing actions. (seconds)",
+                        "type": "number"
+                    },
+                    "initial": {
+                        "context": "Time to delay before initial actions are executed. (seconds)",
+                        "type": "number"
+                    }
                 },
-                "tags": ["light"],
-                "ff_id": "653911d9-132b-4cc7-b9b0-f6ef2c21af9e",
-                "force": false,
-                "source": "temp_kitchen_motion_light"
-            }
-        ],
-        "delayed_actions": [
-            {
-                "command": "off",
-                "tags": ["light"],
-                "conditions": {},
-                "ff_id": "653911d9-132b-4cc7-b9b0-f6ef2c21af9e",
-                "force": false,
-                "source": "temp_kitchen_motion_light"
-            }
-        ],
-        "alias": "Kitchen Motion",
-        "conditions": {},
-        "ff_id": "temp_kitchen_motion_light",
-        "initial_values": "TODO INITIAL VALUES",
-        "package": "Firefly.automation.event_based_action",
-        "delay_s": 300,
-        "triggers": [
-            [
-                {
-                    "event_action": [
-                        {
-                            "motion": [
-                                "active"
-                            ]
-                        }
-                    ],
-                    "listen_id": "653911d9-132b-4cc7-b9b0-f6ef2c21af9e",
-                    "source": "SOURCE_TRIGGER"
+                "messages": {
+                    "delayed": {
+                        "context": "Message to be sent on delayed trigger.",
+                        "type": "string"
+                    },
+                    "initial": {
+                        "context": "Message to be sent on initial trigger.",
+                        "type": "string"
+                    }
+                },
+                "triggers": {
+                    "delayed": {
+                        "context": "Triggers to trigger the delayed actions.",
+                        "type": "triggerList"
+                    },
+                    "initial": {
+                        "context": "Triggers to initially trigger the initial actions.",
+                        "type": "triggerList"
+                    }
                 }
-            ]
-        ],
-        "delayed_triggers": [
-            [
-                {
-                    "event_action": [
-                        {
-                            "motion": [
-                                "inactive"
-                            ]
-                        }
-                    ],
-                    "listen_id": "653911d9-132b-4cc7-b9b0-f6ef2c21af9e",
-                    "source": "SOURCE_TRIGGER"
-                }
-            ]
-        ],
-        "type": "TYPE_AUTOMATION"
-    },
-    {
-        "actions": [
-            {
-                "command": "ct_fade",
-                "conditions": {},
-                "end_k": "3500k",
-                "end_level": 100,
-                "fade_sec": 1500,
-                "ff_id": "hue-group-device-3",
-                "force": false,
-                "source": "temp_routine_sunset",
-                "start_k": "6500k",
-                "start_level": 100
-            }
-        ],
-        "alias": "sunset",
-        "conditions": {
-            "is_mode": [
-                "home"
-            ]
+            },
+            "title": "Firefly Simple Rule"
         },
-        "ff_id": "temp_routine_sunset",
-        "initial_values": "TODO INITIAL VALUES",
-        "message": "Sunset Executed",
-        "mode": "sunset",
-        "package": "Firefly.automation.routine",
-        "triggers": [
-            [
-                {
-                    "event_action": [
-                        {"location": ["sunset"]}
-                    ],
-                    "listen_id": "location",
-                    "source": "SOURCE_TRIGGER"
-                }
-            ]
-        ],
+        "package": "Firefly.automation.simple_rule",
         "type": "TYPE_AUTOMATION"
     },
     {
-        "ff_id": "temp_routine_sunrise",
-        "initial_values": "TODO INITIAL VALUES",
-        "message": "Sunrise or Dawn Executed",
-        "package": "Firefly.automation.routine",
-        "triggers": [
-            [
-                {
-                    "event_action": [
-                        {"location": ["sunrise", "dawn"]}
-                    ],
-                    "listen_id": "location",
-                    "source": "SOURCE_TRIGGER"
+        "alias": "Fridge door alert",
+        "ff_id": "dcc50f69-ae99-4692-8499-7da6f1de4edd",
+        "interface": {
+            "actions": {
+                "delayed": [
+                    {
+                        "command": "off",
+                        "conditions": {},
+                        "ff_id": "00:17:88:01:00:1c:70:ab-0b",
+                        "force": false,
+                        "source": "dcc50f69-ae99-4692-8499-7da6f1de4edd",
+                        "tags": [
+                            "light"
+                        ]
+                    }
+                ],
+                "initial": [
+                    {
+                        "command": "on",
+                        "conditions": {},
+                        "ff_id": "00:17:88:01:00:1c:70:ab-0b",
+                        "force": false,
+                        "source": "dcc50f69-ae99-4692-8499-7da6f1de4edd",
+                        "tags": [
+                            "light"
+                        ]
+                    }
+                ]
+            },
+            "conditions": {},
+            "delays": {},
+            "messages": {},
+            "triggers": {
+                "delayed": [
+                    [
+                        {
+                            "listen_id": "2ef1a123-b44e-425c-bf15-dd9977fbf486",
+                            "source": "SOURCE_TRIGGER",
+                            "trigger_action": [
+                                {
+                                    "contact": [
+                                        "close"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                ],
+                "initial": [
+                    [
+                        {
+                            "listen_id": "2ef1a123-b44e-425c-bf15-dd9977fbf486",
+                            "source": "SOURCE_TRIGGER",
+                            "trigger_action": [
+                                {
+                                    "contact": [
+                                        "open"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                ]
+            }
+        },
+        "metadata": {
+            "author": "Zachary Priddy (me@zpriddy.com)",
+            "commands": [
+                "execute"
+            ],
+            "interface": {
+                "actions": {
+                    "delayed": {
+                        "context": "Actions to be executed when on delayed trigger.",
+                        "type": "commandList"
+                    },
+                    "initial": {
+                        "context": "Actions to be executed when on initial trigger.",
+                        "type": "commandList"
+                    }
+                },
+                "conditions": {
+                    "delayed": {
+                        "context": "Condition for delayed trigger.",
+                        "type": "condition"
+                    },
+                    "initial": {
+                        "context": "Condition for initial trigger.",
+                        "type": "condition"
+                    }
+                },
+                "delays": {
+                    "delayed": {
+                        "context": "Time to delay after delayed trigger is triggered before executing actions. (seconds)",
+                        "type": "number"
+                    },
+                    "initial": {
+                        "context": "Time to delay before initial actions are executed. (seconds)",
+                        "type": "number"
+                    }
+                },
+                "messages": {
+                    "delayed": {
+                        "context": "Message to be sent on delayed trigger.",
+                        "type": "string"
+                    },
+                    "initial": {
+                        "context": "Message to be sent on initial trigger.",
+                        "type": "string"
+                    }
+                },
+                "triggers": {
+                    "delayed": {
+                        "context": "Triggers to trigger the delayed actions.",
+                        "type": "triggerList"
+                    },
+                    "initial": {
+                        "context": "Triggers to initially trigger the initial actions.",
+                        "type": "triggerList"
+                    }
                 }
-            ]
-        ],
+            },
+            "title": "Firefly Simple Rule"
+        },
+        "package": "Firefly.automation.simple_rule",
+        "type": "TYPE_AUTOMATION"
+    },
+    {
+        "alias": "Set Nest to Eco when window is open for more than 30 seconds",
+        "ff_id": "951c12a9-f7dc-4df8-b61a-9825c1650d37",
+        "interface": {
+            "actions": {
+                "delayed": [
+                    {
+                        "command": "mode",
+                        "ff_id": "DEeN7ocRD7_SNNN5DVo3tx8nXHqywKxR",
+                        "force": false,
+                        "mode": "cool",
+                        "source": "951c12a9-f7dc-4df8-b61a-9825c1650d37"
+                    }
+                ],
+                "initial": [
+                    {
+                        "command": "mode",
+                        "ff_id": "DEeN7ocRD7_SNNN5DVo3tx8nXHqywKxR",
+                        "force": false,
+                        "mode": "eco",
+                        "source": "951c12a9-f7dc-4df8-b61a-9825c1650d37"
+                    }
+                ]
+            },
+            "conditions": {},
+            "delays": {
+                "initial": 30
+            },
+            "messages": {
+                "delayed": "Windows are now closed. Setting nest to cool.",
+                "initial": "Window open. Setting nest to Eco"
+            },
+            "triggers": {
+                "delayed": [
+                    [
+                        {
+                            "listen_id": "47b709fd-8a70-44ba-bdaa-aa4b18541ee1",
+                            "source": "SOURCE_TRIGGER",
+                            "trigger_action": [
+                                {
+                                    "contact": [
+                                        "close"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listen_id": "0cca5af1-cf7f-4318-9584-0af7851f1c73",
+                            "source": "SOURCE_TRIGGER",
+                            "trigger_action": [
+                                {
+                                    "contact": [
+                                        "close"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listen_id": "eb70f5ee-86d8-48f6-bb27-8f903ae4c2d9",
+                            "source": "SOURCE_TRIGGER",
+                            "trigger_action": [
+                                {
+                                    "contact": [
+                                        "close"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                ],
+                "initial": [
+                    [
+                        {
+                            "listen_id": "47b709fd-8a70-44ba-bdaa-aa4b18541ee1",
+                            "source": "SOURCE_TRIGGER",
+                            "trigger_action": [
+                                {
+                                    "contact": [
+                                        "open"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "listen_id": "0cca5af1-cf7f-4318-9584-0af7851f1c73",
+                            "source": "SOURCE_TRIGGER",
+                            "trigger_action": [
+                                {
+                                    "contact": [
+                                        "open"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "listen_id": "eb70f5ee-86d8-48f6-bb27-8f903ae4c2d9",
+                            "source": "SOURCE_TRIGGER",
+                            "trigger_action": [
+                                {
+                                    "contact": [
+                                        "open"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                ]
+            }
+        },
+        "metadata": {
+            "author": "Zachary Priddy (me@zpriddy.com)",
+            "commands": [
+                "execute"
+            ],
+            "interface": {
+                "actions": {
+                    "delayed": {
+                        "context": "Actions to be executed when on delayed trigger.",
+                        "type": "commandList"
+                    },
+                    "initial": {
+                        "context": "Actions to be executed when on initial trigger.",
+                        "type": "commandList"
+                    }
+                },
+                "conditions": {
+                    "delayed": {
+                        "context": "Condition for delayed trigger.",
+                        "type": "condition"
+                    },
+                    "initial": {
+                        "context": "Condition for initial trigger.",
+                        "type": "condition"
+                    }
+                },
+                "delays": {
+                    "delayed": {
+                        "context": "Time to delay after delayed trigger is triggered before executing actions. (seconds)",
+                        "type": "number"
+                    },
+                    "initial": {
+                        "context": "Time to delay before initial actions are executed. (seconds)",
+                        "type": "number"
+                    }
+                },
+                "messages": {
+                    "delayed": {
+                        "context": "Message to be sent on delayed trigger.",
+                        "type": "string"
+                    },
+                    "initial": {
+                        "context": "Message to be sent on initial trigger.",
+                        "type": "string"
+                    }
+                },
+                "triggers": {
+                    "delayed": {
+                        "context": "Triggers to trigger the delayed actions.",
+                        "type": "triggerList"
+                    },
+                    "initial": {
+                        "context": "Triggers to initially trigger the initial actions.",
+                        "type": "triggerList"
+                    }
+                }
+            },
+            "title": "Firefly Simple Rule"
+        },
+        "package": "Firefly.automation.simple_rule",
         "type": "TYPE_AUTOMATION"
     }
 ]
