@@ -70,8 +70,8 @@ def Setup(firefly, package, **kwargs):
 
   enable = config.getboolean(SECTION, 'enable', fallback=False)
   port = config.get(SECTION, 'port', fallback=None)
-  # path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
-  path = config.get(SECTION, 'path', fallback=None)
+  path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
+  # path = config.get(SECTION, 'path', fallback=None)
   security = config.getboolean(SECTION, 'security', fallback=True)
   if not enable or port is None:
     return False
@@ -117,6 +117,36 @@ class Zwave(Service):
     self.new_alias = None
     self.healed = False
 
+    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_ADDED)
+    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_OFF)
+    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_ON)
+    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
+    # TODO Maybe comment next line
+    #### dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
+    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_ADDED)
+    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
+    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
+    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE)
+    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_ALL_NODES_QUERIED)
+
+    dispatcher.connect(self.zwave_controller_command, ZWaveNetwork.SIGNAL_CONTROLLER_COMMAND)
+    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_SCENE_EVENT)
+    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_GROUP)
+    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_QUERIES_COMPLETE)
+
+    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
+    dispatcher.connect(self.new_node, ZWaveNetwork.SIGNAL_NODE_ADDED)
+
+    dispatcher.connect(self.node_handler, ZWaveNetwork.SIGNAL_NODE)
+    dispatcher.connect(self.value_handler, ZWaveNetwork.SIGNAL_VALUE)
+    dispatcher.connect(self.value_added_handler, ZWaveNetwork.SIGNAL_VALUE_ADDED)
+    dispatcher.connect(self.notification_handler, ZWaveNetwork.SIGNAL_NOTIFICATION)
+    dispatcher.connect(self.node_queries_handler, ZWaveNetwork.SIGNAL_NODE_QUERIES_COMPLETE)
+    dispatcher.connect(self.essential_queries_handler, ZWaveNetwork.SIGNAL_ESSENTIAL_NODE_QUERIES_COMPLETE)
+    dispatcher.connect(self.nodes_queried_dead_handler, ZWaveNetwork.SIGNAL_ALL_NODES_QUERIED_SOME_DEAD)
+
+    dispatcher.connect(self.group_handler, ZWaveNetwork.SIGNAL_GROUP)
+
     scheduler.runInS(5, self.initialize_zwave)
 
     scheduler.runEveryM(10, self.poll_nodes)
@@ -154,33 +184,6 @@ class Zwave(Service):
       else:
         await asyncio.sleep(1)
 
-    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_ADDED)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_OFF)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_ON)
-    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
-    # TODO Maybe comment next line
-    #### dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
-    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_ADDED)
-    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_ALL_NODES_QUERIED)
-
-    dispatcher.connect(self.zwave_controller_command, ZWaveNetwork.SIGNAL_CONTROLLER_COMMAND)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_SCENE_EVENT)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_GROUP)
-    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_QUERIES_COMPLETE)
-
-    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
-    dispatcher.connect(self.new_node, ZWaveNetwork.SIGNAL_NODE_ADDED)
-
-    dispatcher.connect(self.node_handler, ZWaveNetwork.SIGNAL_NODE)
-    dispatcher.connect(self.value_handler, ZWaveNetwork.SIGNAL_VALUE)
-    dispatcher.connect(self.value_added_handler, ZWaveNetwork.SIGNAL_VALUE_ADDED)
-    dispatcher.connect(self.notification_handler, ZWaveNetwork.SIGNAL_NOTIFICATION)
-    dispatcher.connect(self.node_queries_handler, ZWaveNetwork.SIGNAL_NODE_QUERIES_COMPLETE)
-    dispatcher.connect(self.essential_queries_handler, ZWaveNetwork.SIGNAL_ESSENTIAL_NODE_QUERIES_COMPLETE)
-
     # self._network.set_poll_interval(milliseconds=500)
 
     # Initial refresh of all nodes
@@ -208,6 +211,14 @@ class Zwave(Service):
   def node_handler(self, **kwargs):
     '''Called when a node is changed, added, removed'''
     logging.message('ZWAVE NODE HANDLER: %s' % str(kwargs))
+
+  def group_handler(self, **kwargs):
+    '''Called when a node is changed, added, removed'''
+    logging.message('ZWAVE GROUP HANDLER: %s' % str(kwargs))
+
+  def nodes_queried_dead_handler(self, **kwargs):
+    '''Called when a node is changed, added, removed'''
+    logging.message('ZWAVE DEAD NODES: %s' % str(kwargs))
 
   def value_added_handler(self, **kwargs):
     '''Called when a node is changed, added, removed'''
@@ -339,7 +350,7 @@ class Zwave(Service):
         #  logging.error(code='FF.ZWA.ZWA.003', args=(e))  # error sending command: %s
         # self._firefly.components[self._installed_nodes[node_id]].update_from_zwave(node, values=values)
 
-  def add_child_nodes(self, node, **kwargs):
+  def add_child_nodes(self, node: ZWaveNode, **kwargs):
     node_id = str(node.node_id)
     product_name = node.product_name
     config = 'node.config'
@@ -422,7 +433,7 @@ class Zwave(Service):
       }, f, sort_keys=True, indent=4)
 
   def new_node(self, *args, **kwargs):
-    logging.notify('New Node Added: %s' % kwargs)
+    logging.notify('New Node Added: %s' % str(kwargs['node'].to_dict()))
     self.refresh_firebase()
     scheduler.cancel('zwave_cancel_pairing')
     pass

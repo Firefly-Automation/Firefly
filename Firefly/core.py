@@ -60,9 +60,11 @@ class Firefly(object):
 
     # self.install_package('Firefly.components.notification.pushover', alias='Pushover', api_key='KEY', user_key='KEY')
 
-    self.install_services()
+
     for c in COMPONENT_MAP:
       self.import_devices(c['file'])
+
+    self.install_services()
 
     # TODO: Building rooms will have to happen whenever a devices is added
     self._rooms = Rooms(self)
@@ -171,7 +173,8 @@ class Firefly(object):
 
     try:
       logging.message('Stopping zwave service')
-      self.components['service_zwave'].stop()
+      if self.components.get('service_zwave'):
+        self.components['service_zwave'].stop()
     except Exception as e:
       logging.notify(e)
 
