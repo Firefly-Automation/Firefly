@@ -5,6 +5,7 @@ from time import sleep
 
 from openzwave.network import ZWaveController, ZWaveNetwork, ZWaveNode, dispatcher
 from openzwave.option import ZWaveOption
+from openzwave.value import ZWaveValue
 
 from Firefly import logging, scheduler
 from Firefly.const import SERVICE_CONFIG_FILE, ZWAVE_FILE
@@ -69,8 +70,8 @@ def Setup(firefly, package, **kwargs):
 
   enable = config.getboolean(SECTION, 'enable', fallback=False)
   port = config.get(SECTION, 'port', fallback=None)
-  path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
-  # path = config.get(SECTION, 'path', fallback=None)
+  # path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
+  path = config.get(SECTION, 'path', fallback=None)
   security = config.getboolean(SECTION, 'security', fallback=True)
   if not enable or port is None:
     return False
@@ -283,8 +284,11 @@ class Zwave(Service):
         # node_id = node.node_id
         # if node.is_ready:
         logging.message('ZWAVE INFO: NODE %s IS READY: %s' % (str(node_id), str(node.is_ready)))
-        command = Command(self._installed_nodes[str(node_id)], SERVICE_ID, 'ZWAVE_UPDATE', node=node)
-        self._firefly.send_command(command)
+        for value_id, value in node.get_sensors().items():
+          #value: ZWaveValue = value
+          logging.message('ZWAVE VALUE %s ' % str(value.to_dict()))
+          command = Command(self._installed_nodes[str(node_id)], SERVICE_ID, 'ZWAVE_UPDATE', node=node, values=value)
+          self._firefly.send_command(command)
         # else:
       except Exception as e:
         logging.error('ZWAVE ERROR: %s' % str(e))
