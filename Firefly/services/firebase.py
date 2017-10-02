@@ -172,7 +172,7 @@ class Firebase(Service):
     all_values = {}
     for ff_id, device in self.firefly.components.items():
       try:
-        all_values[ff_id] = device.device.get_all_request_values()
+        all_values[ff_id] = device.get_all_request_values()
       except:
         pass
 
