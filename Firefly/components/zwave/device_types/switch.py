@@ -98,6 +98,8 @@ class ZwaveSwitch(Switch, ZwaveDevice):
         self.update_values(watts=values.data)
       if label == 'Voltage':
         self.update_values(voltage=values.data)
+      if label == 'Current':
+        self.update_values(power_current=values.data)
 
     if label== 'Level' and values.command_class == COMMAND_CLASS_SWITCH_MULTILEVEL:
       self.update_values(level=values.data)
