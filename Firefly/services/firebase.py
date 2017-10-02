@@ -172,7 +172,7 @@ class Firebase(Service):
     all_values = {}
     for ff_id, device in self.firefly.components.items():
       try:
-        all_values[ff_id] = device.get_all_request_values()
+        all_values[ff_id] = device.device.get_all_request_values()
       except:
         pass
 
@@ -368,11 +368,11 @@ class Firebase(Service):
         # The lines below pop unneeded zwave data.
         # TODO(zpriddy): Find a better way to do this
         if 'PARAMS' in action.keys():
-          action.pop('PARAMS')
+          return
         if 'RAW_VALUES' in action.keys():
-          action.pop('RAW_VALUES')
+          return
         if 'SENSORS' in action.keys():
-          action.pop('SENSORS')
+          return
 
         self.db.child("homeStatus").child(self.home_id).child('deviceStatus').child(source).update(action, self.id_token)
 
