@@ -70,8 +70,8 @@ def Setup(firefly, package, **kwargs):
 
   enable = config.getboolean(SECTION, 'enable', fallback=False)
   port = config.get(SECTION, 'port', fallback=None)
-  path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
-  # path = config.get(SECTION, 'path', fallback=None)
+  # path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
+  path = config.get(SECTION, 'path', fallback=None)
   security = config.getboolean(SECTION, 'security', fallback=True)
   if not enable or port is None:
     return False
@@ -79,9 +79,10 @@ def Setup(firefly, package, **kwargs):
   try:
     with open(ZWAVE_FILE) as f:
       zc = json.loads(f.read())
-      installed_nodes = zc.get('installed_nodes')
-      if installed_nodes:
-        kwargs['installed_nodes'] = installed_nodes
+      installed_nodes = zc.get('installed_nodes', {})
+      ignore_nodes = zc.get('ignore_nodes', [])
+      kwargs['installed_nodes'] = installed_nodes
+      kwargs['ignore_nodes'] = ignore_nodes
       logging.message('ZWAVE DEBUG - INSTALLED NODES: %s' % str(installed_nodes))
   except Exception as e:
     logging.error(code='FF.ZWA.SET.001', args=(e))  # error reading zwave.json file
@@ -102,6 +103,9 @@ class Zwave(Service):
     self._zwave_option = None
     self._network: ZWaveNetwork = None
     self._installed_nodes = kwargs.get('installed_nodes', {})
+
+    self.ignore_nodes = kwargs.get('ignore_nodes', [])
+
 
     # TODO: Enable zwave security
     self._security_enable = kwargs.get('security')
@@ -135,7 +139,7 @@ class Zwave(Service):
     ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_QUERIES_COMPLETE)
 
     ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
-    dispatcher.connect(self.new_node, ZWaveNetwork.SIGNAL_NODE_ADDED)
+    dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_ADDED)
 
     dispatcher.connect(self.node_handler, ZWaveNetwork.SIGNAL_NODE)
     dispatcher.connect(self.value_handler, ZWaveNetwork.SIGNAL_VALUE)
@@ -193,6 +197,9 @@ class Zwave(Service):
 
     for node_id, node in self._network.nodes.items():
       try:
+        if node.node_id in self.ignore_nodes:
+          logging.debug('ZWAVE HANDLER: Node %d in ignored nodes. Skipping' % node.node_id)
+          continue
         if str(node.node_id) in self._installed_nodes:
           command = Command(self._installed_nodes[str(node.node_id)], SERVICE_ID, 'ZWAVE_UPDATE', node=node)
           self._firefly.send_command(command)
@@ -229,13 +236,23 @@ class Zwave(Service):
     '''Called when a node is changed, added, removed'''
     logging.message('ZWAVE VALUE HANDLER: %s' % str(kwargs))
     logging.message('ZWAVE VALUE HANDLER: %s' % str(kwargs['value'].to_dict()))
+
     node: ZWaveNode = kwargs.get('node')
+
+    if node is None:
+      return
+
     if str(node.node_id) in self._installed_nodes:
       command = Command(self._installed_nodes[str(node.node_id)], SERVICE_ID, 'ZWAVE_UPDATE', node=node, values=kwargs['value'], values_only=True)
       self._firefly.send_command(command)
-    else:
-      logging.error('node %s not found in installed nodes' % str(node.node_id))
-      self.add_child_nodes(**kwargs)
+      return
+
+    if node.node_id in self.ignore_nodes:
+      logging.debug('ZWAVE HANDLER: Node %d in ignored nodes. Skipping' % node.node_id)
+      return
+
+    logging.error('node %s not found in installed nodes' % str(node.node_id))
+    self.add_child_nodes(**kwargs)
 
   def essential_queries_handler(self, **kwargs):
     logging.message('ZWAVE ESSENTIAL NODE QUERIES: %s' % str(kwargs))
@@ -312,19 +329,30 @@ class Zwave(Service):
     if kwargs.get('node') is None:
       return
 
+    node: ZWaveNode = kwargs['node']
+
     if type(kwargs.get('node')) is ZWaveController:
+      return
+
+    if node.node_id in self.ignore_nodes:
+      logging.debug('ZWAVE HANDLER: Node %d in ignored nodes. Skipping' % node.node_id)
       return
 
     logging.debug('zwave change received %s' % kwargs.get('node').node_id)
     node_id = str(kwargs.get('node').node_id)
+
+
     if node_id not in self._installed_nodes:
       node = kwargs.get('node')
       try:
+        #logging.notify('ZWAVE HANDLER - NOT NOT FOUND IN INSTALLED NODES %s' % node_id)
+        #logging.notify('Is Failed: %s' % str(node.is_failed))
         self.add_child_nodes(node)
       except Exception as e:
         logging.error(code='FF.ZWA.ZWA.001', args=(node, e))  # error installing node %s: %s
 
     elif self._installed_nodes[node_id] not in self._firefly.components:
+      logging.notify('ZWAVE HANDLER - NODE NOT FOUND IN FIREFLY DEVICES: %s' % self._installed_nodes[node_id])
       self._installed_nodes.pop(node_id)
       node = kwargs.get('node')
       try:
@@ -429,7 +457,8 @@ class Zwave(Service):
   def export(self):
     with open(ZWAVE_FILE, 'w') as f:
       json.dump({
-        'installed_nodes': self._installed_nodes
+        'installed_nodes': self._installed_nodes,
+        'ignore_nodes': self.ignore_nodes
       }, f, sort_keys=True, indent=4)
 
   def new_node(self, *args, **kwargs):

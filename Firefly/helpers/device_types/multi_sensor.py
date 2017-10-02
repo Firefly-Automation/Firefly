@@ -36,7 +36,7 @@ INITIAL_VALUES = {
 
 
 class MultiSensor(Device):
-  def __init__(self, firefly, package, title, author, commands=[], requests=REQUESTS, device_type=DEVICE_TYPE_MULTI_SENSOR, capabilities=CAPABILITIES, initial_values=INITIAL_VALUES, **kwargs):
+  def __init__(self, firefly, package, title, author, commands=COMMANDS, requests=REQUESTS, device_type=DEVICE_TYPE_MULTI_SENSOR, capabilities=CAPABILITIES, initial_values=INITIAL_VALUES, **kwargs):
     logging.message('SETTING UP MULTI_SENSOR')
     INITIAL_VALUES.update(initial_values)
     initial_values = INITIAL_VALUES

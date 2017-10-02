@@ -152,6 +152,8 @@ class Firebase(Service):
           else:
             myCommand = Command(ff_id, 'webapi', list(command.keys())[0], **dict(list(command.values())[0]))
             refresh = list(command.keys())[0] == 'set_alias' or list(command.keys())[0] == 'set_room'
+        logging.info('FIREBASE MESSAGE: %s ' % str(message))
+        logging.info('FIREBASE SENDING COMMAND: %s '% str(myCommand))
         self.firefly.send_command(myCommand)
         self.db.child('homeStatus').child(self.home_id).child('commands').child(ff_id).remove(self.id_token)
         if refresh:
@@ -461,6 +463,8 @@ def scrub(x):
       ret[k] = scrub(v)
 
   if isinstance(x, (list, tuple)):
+    if isinstance(x, (tuple)):
+      logging.notify(str(x))
     for k, v in enumerate(ret):
       ret[k] = scrub(v)
   # Handle None

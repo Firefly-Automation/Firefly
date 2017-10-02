@@ -13,7 +13,7 @@ REQUESTS = [ALARM, BATTERY, CONTACT]
 INITIAL_VALUES = {
   '_alarm': False,
   '_battery': -1,
-  '_conatct': CONTACT_CLOSED
+  '_contact': CONTACT_CLOSED
 }
 
 def Setup(firefly, package, **kwargs):
@@ -45,6 +45,8 @@ class ZW120(ZwaveContactSensor):
     Args:
       **kwargs ():
     """
+    # https://github.com/OpenZWave/open-zwave/blob/master/config/aeotec/zw120.xml
+
     if self.node is None:
       return
     if not self.node.is_ready:
@@ -53,8 +55,7 @@ class ZW120(ZwaveContactSensor):
       self._config_updated = True
       return
 
-    # TODO: self._sensitivity ??
-    # https://github.com/OpenZWave/open-zwave/blob/master/config/aeotec/zw120.xml
+
     # self.node.set_config_param(2, 0)  # Disable 10 min wake up time
     self.node.set_config_param(121, 17)  # #ensor Binary and Battery Report
 
