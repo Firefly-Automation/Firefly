@@ -13,12 +13,13 @@ from Firefly.helpers.events import Command
 from Firefly.helpers.service import Service
 
 PACKAGE_MAPPING = {
-  'ZW096 Smart Switch 6':                'zwave_aeotec_smart_switch_gen_6',
+
   'DSC06106 Smart Energy Switch':        'zwave_aeotec_dsc06106_smart_switch',
 
   'ZW100 MultiSensor 6':                 'aeotec.zw100_multisensor_6',
   'ZW120 Door Window Sensor Gen5':       'aeotec.zw120_door_window_sensor_gen5',
-  'Unknown: type=0004, id=0002':         'zwave_generic_devices.contact_senso',
+  'Unknown: type=0004, id=0002':         'zwave_generic_devices.contact_sensor',
+  'ZW096 Smart Switch 6':                'aeotec.zw096_smart_switch_6',
 
   'ZW112 Door Window Sensor 6':          'zwave_aeotec_door_window_gen_6',
   'ZW097 Dry Contact Sensor Gen5':       'zwave_aeotec_zw097_dry_contact',

@@ -1,4 +1,4 @@
-from Firefly.const import (CONTACT_CLOSED, CONTACT_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, MOTION_ACTIVE, MOTION_INACTIVE, NOT_PRESENT, PRESENT, CONTACT, MOTION)
+from Firefly.const import CONTACT, CONTACT_CLOSED, CONTACT_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, MOTION, MOTION_ACTIVE, MOTION_INACTIVE, NOT_PRESENT, PRESENT
 
 
 def metaDimmer(min=0, max=100, command=True, request=False, primary=False):
@@ -221,12 +221,13 @@ def metaWaterSensor(command=False, request=True, primary=False):
 
 
 class ColorMap(object):
-  def __init__(self, black=[], blue=[], green=[], red=[], yellow=[]):
+  def __init__(self, black=[], blue=[], green=[], red=[], yellow=[], grey=[]):
     self.black = black
     self.blue = blue
     self.green = green
     self.red = red
     self.yellow = yellow
+    self.grey = grey
 
   def to_dict(self):
     return {
@@ -234,7 +235,8 @@ class ColorMap(object):
       COLOR_BLUE:   self.blue,
       COLOR_GREEN:  self.green,
       COLOR_RED:    self.red,
-      COLOR_YELLOW: self.yellow
+      COLOR_YELLOW: self.yellow,
+      COLOR_GREY:   self.grey
     }
 
 
@@ -248,19 +250,68 @@ CONTEXT = 'context'
 PRIMARY = 'primary'
 REQUEST = 'request'
 TEXT = 'text'
+SWITCH = 'switch'
 TEXT_MAPPING = 'text_mapping'
 TITLE = 'title'
 TYPE = 'type'
+ICON = 'icon'
+
+ON_COMMAND = 'on_command'
+OFF_COMMAND = 'off_command'
 
 COLOR_BLACK = 'black'
 COLOR_BLUE = 'blue'
 COLOR_GREEN = 'green'
 COLOR_RED = 'red'
 COLOR_YELLOW = 'yellow'
+COLOR_GREY = 'grey'
 
 
-def action_text(can_command=False, can_request=True, primary=False, title='', context='', request='', command='', command_prop='', command_val='', text_mapping={},
-                color_mapping: ColorMap = ColorMap()):
+def action_switch(can_command=True, can_request=True, primary=False, title='', context='', request='', on_command=EVENT_ACTION_ON, off_command=EVENT_ACTION_OFF, color_mapping: ColorMap = ColorMap(),
+                  icon='', **kwargs):
+  """Builds the action metadata for a text action.
+
+  Args:
+    can_command: Can you send a command to this kinda of action.
+    can_request: Can you use this action in a trigger.
+    primary: Is this the primary action.
+    title: Title fot this action.
+    context: Help context for this action.
+    request: Request property for this action. (device.request_values[request])
+    on_command: command to send when setting on. (simple command)
+    off_command: command to send when setting off. (simple command)
+    color_mapping: Color mapping object.
+    icon: string of icon to display for device.
+
+  Returns: dict of action.
+
+  """
+
+  action_metadata = {
+    CAN_COMMAND:   can_command,
+    CAN_REQUEST:   can_request,
+    COLOR_MAPPING: color_mapping.to_dict(),
+    CONTEXT:       context,
+    ICON:          icon,
+    OFF_COMMAND:   off_command,
+    ON_COMMAND:    on_command,
+    PRIMARY:       primary,
+    REQUEST:       request,
+    TITLE:         title,
+    TYPE:          SWITCH
+  }
+
+  return action_metadata
+
+
+def action_on_off_switch(primary=True, title='Switch', context='On Off Controls for the switch', on_command=EVENT_ACTION_ON, off_command=EVENT_ACTION_OFF,
+                         color_mapping: ColorMap = ColorMap(green=[EVENT_ACTION_ON], grey=[EVENT_ACTION_OFF]), icon='ion-ios-bolt', **kwargs):
+
+  return action_switch(primary=primary, title=title, context=context, on_command=on_command, off_command=off_command, color_mapping=color_mapping, icon=icon, **kwargs)
+
+
+def action_text(can_command=False, can_request=True, primary=False, title='', context='', request='', command='', command_prop='', command_val='', text_mapping={}, icon='',
+                color_mapping: ColorMap = ColorMap(), **kwargs):
   """Builds the action metadata for a text action.
 
   Args:
@@ -275,23 +326,25 @@ def action_text(can_command=False, can_request=True, primary=False, title='', co
     command_val: Reference to data to send with command.
     text_mapping: Text mapping dict.
     color_mapping: Color mapping object.
+    icon: string of icon to display for device.
 
   Returns: dict of action.
 
   """
   action_metadata = {
-    TYPE:          TEXT,
     CAN_COMMAND:   can_command,
     CAN_REQUEST:   can_request,
-    PRIMARY:       primary,
-    TITLE:         title,
-    CONTEXT:       context,
-    REQUEST:       request,
+    COLOR_MAPPING: color_mapping.to_dict(),
     COMMAND:       command,
     COMMAND_PROP:  command_prop,
     COMMAND_VAL:   command_val,
+    CONTEXT:       context,
+    ICON:          icon,
+    PRIMARY:       primary,
+    REQUEST:       request,
     TEXT_MAPPING:  text_mapping,
-    COLOR_MAPPING: color_mapping.to_dict()
+    TITLE:         title,
+    TYPE:          TEXT
   }
   return action_metadata
 
@@ -302,6 +355,7 @@ def action_contact(primary=True, title='Contact sensor state', context='State of
 }, color_mapping=ColorMap(green=[CONTACT_CLOSED], red=[CONTACT_OPEN])):
   action_meta = action_text(primary=primary, title=title, context=context, request=request, text_mapping=text_mapping, color_mapping=color_mapping)
   return action_meta
+
 
 def action_motion(primary=True, title='Motion', context='State of the motion sensor', request=MOTION, text_mapping={
   'Active':   [MOTION_ACTIVE],
