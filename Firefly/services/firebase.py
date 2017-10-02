@@ -208,6 +208,12 @@ class Firebase(Service):
 
       # This is the new location of device status [/homeStatus/{homeId}/deviceStatus]
       # TODO: POP ZWAVE PARAMS, VALUES etc from this.
+      if 'PARAMS' in all_values.keys():
+        all_values.pop('PARAMS')
+      if 'RAW_VALUES' in all_values.keys():
+        all_values.pop('RAW_VALUES')
+      if 'SENSORS' in all_values.keys():
+        all_values.pop('SENSORS')
       self.db.child("homeStatus").child(self.home_id).child('deviceStatus').set(all_values, self.id_token)
 
       # This is the new location of routine views [/homeStatus/{homeId}/routineViews]
