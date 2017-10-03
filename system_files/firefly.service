@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 WorkingDirectory=/opt/firefly_system/Firefly
-KillMode=process
+KillMode=mixed
 ExecStart=/bin/sh -c '/usr/local/bin/python3.6 /opt/firefly_system/Firefly/main.py >> /opt/firefly_system/logs/firefly.log 2>&1'
 
 [Install]
