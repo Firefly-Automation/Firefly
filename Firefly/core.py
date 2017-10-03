@@ -32,7 +32,7 @@ class Firefly(object):
     signal.signal(signal.SIGTERM, sigterm_handler)
     signal.signal(signal.SIGHUP, sigterm_handler)
     signal.signal(signal.SIGQUIT, sigterm_handler)
-    signal.signal(signal.SIGKILL, sigterm_handler)
+
     # TODO: Most of this should be in startup not init.
     logging.Startup(self)
     logging.message('Initializing Firefly')
