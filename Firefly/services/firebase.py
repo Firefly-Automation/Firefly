@@ -230,6 +230,16 @@ class Firebase(Service):
       # This is the new location of alexa api data [/homeStatus/{homeId}/alexaAPIView]
       self.db.child("homeStatus").child(self.home_id).child('alexaAPIViews').set(alexa_views, self.id_token)
 
+
+
+      groups = {}
+      for ff_id, group in self.firefly.components.items():
+        if group.type != 'GROUP':
+          continue
+        groups[ff_id] = group.get_metadata()
+
+      self.db.child("homeStatus").child(self.home_id).child('groupViews').set(groups, self.id_token)
+
     except Exception as e:
       logging.notify("Firebase 177: %s" % str(e))
 

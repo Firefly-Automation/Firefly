@@ -70,6 +70,10 @@ class Firefly(object):
     self._rooms = Rooms(self)
     self._rooms.build_rooms()
 
+    # Import Groups
+    import_groups(self)
+
+
     # TODO: MOST OF WHATS BELOW IS FOR TESTING
     # self.install_package('Firefly.components.virtual_devices.switch', alias='Test Device', initial_values={
     # '_state': 'UNKNOWN'})

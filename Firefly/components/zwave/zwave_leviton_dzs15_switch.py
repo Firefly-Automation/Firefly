@@ -51,7 +51,7 @@ class ZwaveSwitch(ZwaveDevice):
     if self.tags is []:
       self._tags = ['switch']
 
-    scheduler.runEveryS(20, self.poll_zwave)
+    #scheduler.runEveryS(20, self.poll_zwave)
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     if node is None:
@@ -69,7 +69,9 @@ class ZwaveSwitch(ZwaveDevice):
     if self._switches is None:
       self._switches = list(self._node.get_switches().keys())
 
-    node.values[self._switches[0]].enable_poll()
+
+    if not node.values[self._switches[0]].is_polled:
+      node.values[self._switches[0]].enable_poll()
 
     if node.get_switch_state(self._switches[0]):
       self._state = EVENT_ACTION_ON
