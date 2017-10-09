@@ -1,34 +1,50 @@
-from Firefly import aliases, logging, scheduler
-from uuid import uuid4
-from Firefly.const import EVENT_TYPE_BROADCAST, CONTACT, SWITCH, LEVEL, STATE, MOTION, GROUPS_CONFIG_FILE, ACTION_ON, ACTION_OFF
-from Firefly.helpers.events import Command, Event, Request
 import json
-from typing import Any, Callable
+from typing import Callable
+from uuid import uuid4
+
+from Firefly import aliases, logging
+from Firefly.const import ACTION_OFF, ACTION_ON, CONTACT, EVENT_TYPE_BROADCAST, GROUPS_CONFIG_FILE, LEVEL, MOTION, STATE, SWITCH
+from Firefly.helpers.events import Command, Event, Request
 
 '''
 devices[ff_id] = {tags: [tags], values: {prop: value}}
 '''
 
 TAG_MAP = {
-  'switch': [SWITCH, STATE],
-  'light': [SWITCH, STATE, LEVEL],
-  'dimmer': [SWITCH, STATE, LEVEL],
-  'outlet': [SWITCH, STATE],
-  'fan': [SWITCH, STATE, LEVEL],
+  'switch':  [SWITCH, STATE],
+  'light':   [SWITCH, STATE, LEVEL],
+  'dimmer':  [SWITCH, STATE, LEVEL],
+  'outlet':  [SWITCH, STATE],
+  'fan':     [SWITCH, STATE, LEVEL],
 
   # Contact sensors
   'contact': [CONTACT, 'alarm'],
-  'window': [CONTACT, 'alarm'],
-  'door': [CONTACT, 'alarm'],
+  'window':  [CONTACT, 'alarm'],
+  'door':    [CONTACT, 'alarm'],
 
   # Motion
-  'motion': [MOTION, 'alarm']
+  'motion':  [MOTION, 'alarm']
+
+  # TODO: Items below
+  # lux
+  # battery
+  # security - Contact/Motion sensors can also be tagged security
 
 }
 
 
+# TODO: New sample groups config
+# TODO: add groups export to shutdown
+# TODO: After adding flag to refresh metadata for firebase, refresh when capabilities change.
+
 
 def import_groups(firefly, config_file=GROUPS_CONFIG_FILE):
+  """Simple function to import groups into firefly from config file
+
+  Args:
+    firefly: firefly object
+    config_file: groups config file (defaalt in config folder)
+  """
   with open(config_file) as gc:
     groups_config = json.loads(gc.read())
     for ff_id, group in groups_config.items():
@@ -37,7 +53,13 @@ def import_groups(firefly, config_file=GROUPS_CONFIG_FILE):
 
 
 def export_groups(firefly, config_file=GROUPS_CONFIG_FILE):
-  export_data ={}
+  """Simple function to export groups.
+
+  Args:
+    firefly: firefly object
+    config_file: path to config file (default to config folder)
+  """
+  export_data = {}
   for ff_id, component in firefly.components.items():
     if component.type != 'GROUP':
       continue
@@ -48,6 +70,11 @@ def export_groups(firefly, config_file=GROUPS_CONFIG_FILE):
 
 
 def make_group(firefly, alias):
+  """ Function to make group.
+
+  Returns:
+    group_id: ff_id of new group
+  """
   new_group = Group(firefly, alias)
   firefly.components[new_group.id] = new_group
   return new_group.id
@@ -63,12 +90,22 @@ class Group(object):
     self.command_mapping = {}
     self.request_mapping = {}
 
-
-
     self.add_request('switch', self.get_switch_switch)
     self.add_request('light', self.get_light_switch)
     self.add_request('dimmer', self.get_dimmer)
 
+    # TODO: the requests below and lux, water sensor, presence.
+    # TODO: current state of these requests need to be uploaded to GroupStatus
+    # TODO: Documentation on groups
+
+    # self.add_request('contact', self.get_contact)
+    # self.add_request('door', self.get_door)
+    # self.add_request('window', self.get_window)
+
+    # self.add_request('alarm', self.get_alarm)
+
+    # Warnings (low battery etc)
+    # self.add_request('warnings', self.get_warnings)
 
 
     if kwargs.get('ff_id') is not None:
@@ -86,8 +123,6 @@ class Group(object):
     for d in self.device_list:
       self.add_device(d)
 
-
-
   def get_switch(self, tag, **kwargs):
     '''Get switch states for lights'''
     switch_state = False
@@ -95,7 +130,6 @@ class Group(object):
     for device in devices:
       switch_state |= self.devices[device]['state'].get('switch') == 'on'
     return ACTION_ON if switch_state else ACTION_OFF
-
 
   def get_switch_switch(self, **kwargs):
     '''Get switch states for lights'''
@@ -110,26 +144,24 @@ class Group(object):
     light_level = 0
     devices = self.get_devices_by_tags(['dimmer'])
     for device in devices:
-      light_level +=  self.devices[device]['state'].get('level')
-    return light_level/len(devices)
+      light_level += self.devices[device]['state'].get('level')
+    return light_level / len(devices)
 
   def export(self, **kwargs):
     export_data = {
-      'ff_id': self.id,
-      'alias': self.alias,
+      'ff_id':   self.id,
+      'alias':   self.alias,
       'devices': list(self.devices.keys())
     }
     return export_data
 
-
   def get_metadata(self, **kwargs):
     metadata = {
-      'ff_id': self.id,
-      'alias': self.alias,
+      'ff_id':   self.id,
+      'alias':   self.alias,
       'devices': self.devices
     }
     return metadata
-
 
   def add_device(self, ff_id):
     if ff_id not in self.firefly.components:
@@ -137,12 +169,14 @@ class Group(object):
       return
     try:
       tags = self.firefly.components[ff_id].tags
-      self.devices[ff_id] = {'tags': tags, 'state': {}}
+      self.devices[ff_id] = {
+        'tags':  tags,
+        'state': {}
+      }
       self.get_device_values(ff_id)
       self.firefly.subscriptions.add_subscriber(self.id, ff_id)
     except Exception as e:
       logging.error('[GROUP] tags function not found for ff_id: %s - %s' % (ff_id, str(e)))
-
 
   def get_device_values(self, ff_id, **kwargs):
     tags = self.devices[ff_id]['tags']
@@ -156,7 +190,6 @@ class Group(object):
       if value:
         self.devices[ff_id]['state'][r] = value
 
-
   def command(self, command: Command) -> bool:
     """
     Function that is called to send a command to a ff_id.
@@ -167,10 +200,10 @@ class Group(object):
       (bool): Command successful.
     """
     logging.debug('%s: Got Command: %s' % (self.id, command.command))
-    #if command.command in self.command_map.keys():
-      #self._last_command_source = command.source
-      #self._last_update_time = self.firefly.location.now
-      # TODO Clean up whats not used here
+    # if command.command in self.command_map.keys():
+    # self._last_command_source = command.source
+    # self._last_update_time = self.firefly.location.now
+    # TODO Clean up whats not used here
     self.execute_command(command)
     return True
 
@@ -186,8 +219,6 @@ class Group(object):
       c = Command(device, command.source, command.command, **command.args)
       self.firefly.send_command(c)
 
-
-
   def get_devices_by_tags(self, tags, **kwargs):
     devices = set()
     for tag in tags:
@@ -195,7 +226,6 @@ class Group(object):
         if tag in device['tags']:
           devices.add(ff_id)
     return list(devices)
-
 
   def get_device_list(self, **kwargs):
     return list(self.devices.keys())
@@ -206,10 +236,8 @@ class Group(object):
 
     self.devices[event.source]['state'].update(event.event_action)
 
-
     state_after = self.get_all_request_values()
     self.broadcast_changes(state_before, state_after)
-
 
   def get_all_request_values(self) -> dict:
     """Function to get all requestable values.
