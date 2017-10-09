@@ -47,6 +47,7 @@ class ContactSensor(Device):
         self._tags.append('contact')
 
     self._alexa_export = False
+    self.capabilities = CAPABILITIES
 
   def update_values(self, alarm=None, battery=None, contact=None, **kwargs):
     if alarm is not None:

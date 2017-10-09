@@ -316,7 +316,10 @@ class Device(object):
     """
     request_values = {}
     for r in self._requests:
-      request_values[r] = self.request_map[r]()
+      try:
+        request_values[r] = self.request_map[r]()
+      except:
+        pass
     return request_values
 
   def member_set(self, key: str, val: Any) -> None:

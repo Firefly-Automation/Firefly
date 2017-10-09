@@ -1,7 +1,7 @@
 from Firefly import logging
-from Firefly.const import ACTION_OFF, ACTION_ON, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, DEVICE_TYPE_SWITCH, LEVEL, SWITCH, STATE
+from Firefly.const import ACTION_OFF, ACTION_ON, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, DEVICE_TYPE_SWITCH, LEVEL, STATE, SWITCH
 from Firefly.helpers.device import Device
-from Firefly.helpers.metadata import action_text, metaSlider, metaSwitch, metaText, action_on_off_switch
+from Firefly.helpers.metadata import action_on_off_switch, action_text, metaSlider, metaSwitch, metaText
 
 BATTERY = 'battery'
 ALARM = 'alarm'
@@ -35,7 +35,8 @@ INITIAL_VALUES = {
   '_previous_energy_reading': -1,
   '_switch':                  ACTION_OFF,
   '_voltage':                 -1,
-  '_watts':                   -1
+  '_watts':                   -1,
+  '_min_level':               -1,
 }
 
 
@@ -83,7 +84,6 @@ class Switch(Device):
       self.add_action(LEVEL, metaSlider(title='Set Level', set_command=LEVEL, command_param=LEVEL))
       self.add_alexa_action(ALEXA_SET_PERCENTAGE)
 
-
     if capabilities[POWER_METER]:
       if VOLTAGE in requests:
         self.add_request(VOLTAGE, self.get_voltage)
@@ -101,8 +101,9 @@ class Switch(Device):
 
     self._alexa_export = True
 
+    self.capabilities = CAPABILITIES
 
-  def update_values(self, alarm=None, battery=None, voltage=None, power_current=None, watts=None, level=None, switch=None, previous_energy_reading= None, current_energy_reading=None, **kwargs):
+  def update_values(self, alarm=None, battery=None, voltage=None, power_current=None, watts=None, level=None, switch=None, previous_energy_reading=None, current_energy_reading=None, **kwargs):
 
     if alarm is not None:
       self._alarm = alarm
@@ -126,6 +127,13 @@ class Switch(Device):
         self._switch = switch
 
     if level is not None:
+      if type(level) is not int:
+        self._level = -1
+
+      # Fix rounding errors for 100%
+      if level == 99:
+        level = 100
+
       self._level = level
 
     if previous_energy_reading is not None:
@@ -133,8 +141,6 @@ class Switch(Device):
 
     if current_energy_reading is not None:
       self._current_energy_reading = current_energy_reading
-
-
 
   def get_battery(self, **kwargs):
     return self._battery

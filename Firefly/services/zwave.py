@@ -5,39 +5,12 @@ from time import sleep
 
 from openzwave.network import ZWaveController, ZWaveNetwork, ZWaveNode, dispatcher
 from openzwave.option import ZWaveOption
-from openzwave.value import ZWaveValue
 
 from Firefly import logging, scheduler
+from Firefly.components.zwave.package_lookup import get_package
 from Firefly.const import SERVICE_CONFIG_FILE, ZWAVE_FILE
 from Firefly.helpers.events import Command
 from Firefly.helpers.service import Service
-
-PACKAGE_MAPPING = {
-
-  'DSC06106 Smart Energy Switch':        'zwave_aeotec_dsc06106_smart_switch',
-
-  'ZW100 MultiSensor 6':                 'aeotec.zw100_multisensor_6',
-  'ZW120 Door Window Sensor Gen5':       'aeotec.zw120_door_window_sensor_gen5',
-  'Unknown: type=0004, id=0002':         'zwave_generic_devices.contact_sensor',
-  'ZW096 Smart Switch 6':                'aeotec.zw096_smart_switch_6',
-
-  'ZW112 Door Window Sensor 6':          'zwave_aeotec_door_window_gen_6',
-  'ZW097 Dry Contact Sensor Gen5':       'zwave_aeotec_zw097_dry_contact',
-  'DSB45 Water Sensor':                  'zwave_aeotec_dsb45_water',
-  '12730 Fan Control Switch':            'zwave_ge_12724_dimmer',
-  '12729 3-Way Dimmer Switch':           'zwave_ge_12724_dimmer',
-  '12724 3-Way Dimmer Switch':           'zwave_ge_12724_dimmer',
-  '14294 In-Wall Smart Dimmer':          'zwave_ge_12724_dimmer',
-  '12727 In-Wall Smart Switch (Toggle)': 'zwave_switch',
-  'DSB05 Multisensor':                   'zwave_aeotec_dsb05_multi_sensor',
-  'DSC11 Smart Strip':                   'zwave_aeotec_dsc11_smart_strip',
-  'ZW080 Siren Gen5':                    'zwave_aeotec_zw080',
-
-  'ZW111 Nano Dimmer':                   'zwave_aeotec_zw111_dimmer'
-}
-CONFIG_MAPPING = {
-  'ge/12724-dimmer.xml': 'zwave_ge_12724_dimmer'
-}
 
 '''
 The ZWAVE service is the background service for zwave.
@@ -71,7 +44,6 @@ def Setup(firefly, package, **kwargs):
 
   enable = config.getboolean(SECTION, 'enable', fallback=False)
   port = config.get(SECTION, 'port', fallback=None)
-  # path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
   path = config.get(SECTION, 'path', fallback=None)
   security = config.getboolean(SECTION, 'security', fallback=True)
   if not enable or port is None:
@@ -107,7 +79,6 @@ class Zwave(Service):
 
     self.ignore_nodes = kwargs.get('ignore_nodes', [])
 
-
     # TODO: Enable zwave security
     self._security_enable = kwargs.get('security')
 
@@ -123,25 +94,9 @@ class Zwave(Service):
     self.healed = False
 
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_ADDED)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_OFF)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_BUTTON_ON)
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
-    # TODO Maybe comment next line
-    #### dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
-    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_ADDED)
-    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_ALL_NODES_QUERIED)
-
     dispatcher.connect(self.zwave_controller_command, ZWaveNetwork.SIGNAL_CONTROLLER_COMMAND)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_SCENE_EVENT)
-    # dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_GROUP)
-    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_QUERIES_COMPLETE)
-
-    ##dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_ADDED)
-
     dispatcher.connect(self.node_handler, ZWaveNetwork.SIGNAL_NODE)
     dispatcher.connect(self.value_handler, ZWaveNetwork.SIGNAL_VALUE)
     dispatcher.connect(self.value_added_handler, ZWaveNetwork.SIGNAL_VALUE_ADDED)
@@ -149,12 +104,13 @@ class Zwave(Service):
     dispatcher.connect(self.node_queries_handler, ZWaveNetwork.SIGNAL_NODE_QUERIES_COMPLETE)
     dispatcher.connect(self.essential_queries_handler, ZWaveNetwork.SIGNAL_ESSENTIAL_NODE_QUERIES_COMPLETE)
     dispatcher.connect(self.nodes_queried_dead_handler, ZWaveNetwork.SIGNAL_ALL_NODES_QUERIED_SOME_DEAD)
-
     dispatcher.connect(self.group_handler, ZWaveNetwork.SIGNAL_GROUP)
+    dispatcher.connect(self.button_handler, ZWaveNetwork.SIGNAL_BUTTON_ON)
+    dispatcher.connect(self.scene_handler, ZWaveNetwork.SIGNAL_SCENE_EVENT)
 
     scheduler.runInS(5, self.initialize_zwave)
 
-    scheduler.runEveryM(10, self.poll_nodes)
+    scheduler.runEveryH(2, self.poll_nodes)
 
   async def initialize_zwave(self):
     if self._network is not None:
@@ -163,6 +119,7 @@ class Zwave(Service):
     try:
       self._zwave_option = ZWaveOption(self._port, self._path)
       self._zwave_option.set_console_output(False)
+      self._zwave_option.set_poll_interval(30)
       self._zwave_option.lock()
 
       self._network = ZWaveNetwork(self._zwave_option)  # , autostart=False)
@@ -189,11 +146,11 @@ class Zwave(Service):
       else:
         await asyncio.sleep(1)
 
-    # self._network.set_poll_interval(milliseconds=500)
+    self._network.set_poll_interval(milliseconds=500)
 
     # Initial refresh of all nodes
     self.zwave_refresh()
-    scheduler.runEveryM(10, self.zwave_refresh, job_id='123-zwave_refresh')
+    scheduler.runEveryH(72, self.zwave_refresh, job_id='123-zwave_refresh')
     scheduler.runEveryH(10, self.find_dead_nodes, job_id='123-find-dead-nodes')
 
     for node_id, node in self._network.nodes.items():
@@ -223,6 +180,14 @@ class Zwave(Service):
   def group_handler(self, **kwargs):
     '''Called when a node is changed, added, removed'''
     logging.message('ZWAVE GROUP HANDLER: %s' % str(kwargs))
+
+  def button_handler(self, **kwargs):
+    '''Called when a node is changed, added, removed'''
+    logging.message('ZWAVE BUTTON HANDLER: %s' % str(kwargs))
+
+  def scene_handler(self, **kwargs):
+    '''Called when a node is changed, added, removed'''
+    logging.message('ZWAVE SCENE HANDLER: %s' % str(kwargs))
 
   def nodes_queried_dead_handler(self, **kwargs):
     '''Called when a node is changed, added, removed'''
@@ -314,11 +279,11 @@ class Zwave(Service):
         # if node.is_ready:
         logging.message('ZWAVE INFO: NODE %s IS READY: %s' % (str(node_id), str(node.is_ready)))
         for value_id, value in node.get_sensors().items():
-          #value: ZWaveValue = value
+          # value: ZWaveValue = value
           logging.message('ZWAVE VALUE %s ' % str(value.to_dict()))
           command = Command(self._installed_nodes[str(node_id)], SERVICE_ID, 'ZWAVE_UPDATE', node=node, values=value)
           self._firefly.send_command(command)
-        # else:
+          # else:
       except Exception as e:
         logging.error('ZWAVE ERROR: %s' % str(e))
 
@@ -342,12 +307,11 @@ class Zwave(Service):
     logging.debug('zwave change received %s' % kwargs.get('node').node_id)
     node_id = str(kwargs.get('node').node_id)
 
-
     if node_id not in self._installed_nodes:
       node = kwargs.get('node')
       try:
-        #logging.notify('ZWAVE HANDLER - NOT NOT FOUND IN INSTALLED NODES %s' % node_id)
-        #logging.notify('Is Failed: %s' % str(node.is_failed))
+        # logging.notify('ZWAVE HANDLER - NOT NOT FOUND IN INSTALLED NODES %s' % node_id)
+        # logging.notify('Is Failed: %s' % str(node.is_failed))
         self.add_child_nodes(node)
       except Exception as e:
         logging.error(code='FF.ZWA.ZWA.001', args=(node, e))  # error installing node %s: %s
@@ -360,10 +324,9 @@ class Zwave(Service):
         self.add_child_nodes(node)
       except:
         logging.error(code='FF.ZWA.ZWA.002', args=(node))  # error installing node %s
-
-
         # TODO: Change this to a send_command -> This will then do an update and broadcast
         # TODO: Pass all kwargs not just node
+
 
     else:
       node = kwargs.get('node')
@@ -380,76 +343,15 @@ class Zwave(Service):
         # self._firefly.components[self._installed_nodes[node_id]].update_from_zwave(node, values=values)
 
   def add_child_nodes(self, node: ZWaveNode, **kwargs):
-    node_id = str(node.node_id)
-    product_name = node.product_name
-    config = 'node.config'
+    zwave_package = get_package(node)
 
-    print('******************************************')
-    print(node_id)
-    print(node.to_dict())
-    print(product_name)
-    print(node.product_type)
-    print(node.product_id)
-    print(node.product_type)
-    print(node.manufacturer_id)
-    print(node.manufacturer_name)
-    print('******************************************')
+    if not zwave_package:
+      return
 
-    alias = product_name
-    if self.new_alias is not None:
-      alias = self.new_alias
-
-    if product_name in PACKAGE_MAPPING:
-      package = 'Firefly.components.zwave.%s' % PACKAGE_MAPPING[product_name]
-      device_id = self._firefly.install_package(package, alias=alias, node=node)
-      self._installed_nodes[node_id] = device_id
-      self.new_alias = None
-      self.refresh_firebase()
-      self.export()
-
-    elif config in CONFIG_MAPPING:
-      package = 'Firefly.components.zwave.%s' % CONFIG_MAPPING[config]
-      device_id = self._firefly.install_package(package, alias=alias, node=node)
-      self._installed_nodes[node_id] = device_id
-      self.new_alias = None
-      self.refresh_firebase()
-      self.export()
-
-    elif 'On/Off Power Switch' in node.device_type or 'On/Off Relay Switch' in node.device_type:
-      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_switch', alias=alias, node=node)
-      self._installed_nodes[node_id] = device_id
-      self.new_alias = None
-      self.refresh_firebase()
-      self.export()
-
-    elif 'On/Off Power Switch' in product_name or 'On/Off Relay Switch' in product_name:
-      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_switch', alias=alias, node=node)
-      self._installed_nodes[node_id] = device_id
-      self.new_alias = None
-      self.refresh_firebase()
-      self.export()
-
-    # TODO: update openzwave and see if this fixes this or create a new fix
-    elif node.manufacturer_name == 'Leviton' and node.product_type == '0x1c02':
-      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_leviton_dzs15_switch', alias='Leviton Zwave Switch', node=node)
-      self._installed_nodes[node_id] = device_id
-      self.new_alias = None
-      self.refresh_firebase()
-      self.export()
-
-    elif 'door/window sensor' in product_name.lower() or 'door/window detector' in product_name.lower():
-      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_generic_devices.contact_sensor', alias=alias, node=node)
-      self._installed_nodes[node_id] = device_id
-      self.new_alias = None
-      self.refresh_firebase()
-      self.export()
-
-    elif 'motion sensor' in product_name.lower() or 'motion detector' in product_name.lower():
-      device_id = self._firefly.install_package('Firefly.components.zwave.zwave_generic_devices.motion_sensor', alias=alias, node=node)
-      self._installed_nodes[node_id] = device_id
-      self.new_alias = None
-      self.refresh_firebase()
-      self.export()
+    device_id = self._firefly.install_package(**zwave_package)
+    self._installed_nodes[str(node.node_id)] = device_id
+    self.refresh_firebase()
+    self.export()
 
   def refresh_firebase(self):
     refresh_command = Command('service_firebase', 'zwave', 'refresh')
@@ -459,7 +361,7 @@ class Zwave(Service):
     with open(ZWAVE_FILE, 'w') as f:
       json.dump({
         'installed_nodes': self._installed_nodes,
-        'ignore_nodes': self.ignore_nodes
+        'ignore_nodes':    self.ignore_nodes
       }, f, sort_keys=True, indent=4)
 
   def new_node(self, *args, **kwargs):

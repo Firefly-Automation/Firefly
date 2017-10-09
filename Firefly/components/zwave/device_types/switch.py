@@ -3,10 +3,9 @@ from openzwave.value import ZWaveValue
 
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.const import ACTION_OFF, ACTION_ON, AUTHOR, DEVICE_TYPE_MOTION, LEVEL, SWITCH, DEVICE_TYPE_SWITCH
+from Firefly.const import ACTION_OFF, ACTION_ON, AUTHOR, DEVICE_TYPE_SWITCH, LEVEL, SWITCH
 from Firefly.helpers.device_types.switch import Switch
-
-from Firefly.util.zwave_command_class import COMMAND_CLASS_SWITCH_MULTILEVEL, COMMAND_CLASS_METER
+from Firefly.util.zwave_command_class import COMMAND_CLASS_METER, COMMAND_CLASS_SWITCH_MULTILEVEL
 
 BATTERY = 'battery'
 ALARM = 'alarm'
@@ -21,7 +20,7 @@ WATTS = 'watts'
 
 COMMANDS = [ACTION_OFF, ACTION_ON, LEVEL]
 
-REQUESTS = [ALARM, BATTERY, SWITCH, CURRENT, VOLTAGE, WATTS, LEVEL ]
+REQUESTS = [ALARM, BATTERY, SWITCH, CURRENT, VOLTAGE, WATTS, LEVEL]
 
 CAPABILITIES = {
   ALARM:       False,
@@ -42,6 +41,7 @@ INITIAL_VALUES = {
   '_voltage':                 -1,
   '_watts':                   -1
 }
+
 
 class ZwaveSwitch(Switch, ZwaveDevice):
   def __init__(self, firefly, package, title='Zwave Switch', initial_values={}, **kwargs):
@@ -66,6 +66,11 @@ class ZwaveSwitch(Switch, ZwaveDevice):
     super().__init__(firefly, package, title, AUTHOR, commands, requests, DEVICE_TYPE_SWITCH, capabilities=capabilities, initial_values=initial_values, **kwargs)
 
     self.value_map = {}
+
+  def export(self, current_values: bool = True, api_view: bool = False, **kwargs):
+    export_data = super().export(current_values, api_view)
+    export_data['value_map'] = self.value_map
+    return export_data
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, values: ZWaveValue = None, values_only=False, **kwargs):
     if node is None:
@@ -101,18 +106,46 @@ class ZwaveSwitch(Switch, ZwaveDevice):
       if label == 'Current':
         self.update_values(power_current=values.data)
 
-    if label== 'Level' and values.command_class == COMMAND_CLASS_SWITCH_MULTILEVEL:
-      self.update_values(level=values.data)
-
+    if label == 'Level' and values.command_class == COMMAND_CLASS_SWITCH_MULTILEVEL:
+      self.value_map[values.label] = values.value_id
+      level = node.get_dimmer_level(self.value_map[values.label])
+      self.update_values(level=level)
+      if values.data > 0:
+        self.update_values(switch=True)
+      else:
+        self.update_values(switch=False)
 
   def set_switch(self, switch=None, **kwargs):
     if switch is None:
       return
+    on = switch == ACTION_ON
+    # Now do the switching
+    if self.value_map.get('Switch') is not None:
+      switch_id = self.value_map['Switch']
+      self._node.set_switch(switch_id, on)
 
-    if self.value_map.get('Switch') is None:
+    # For dimmers you have to set the dimmer to what it was before then turn on switch
+    if self.capabilities[LEVEL]:
+      if self.value_map.get('Level') is None:
+        return
+      dimmer_id = self.value_map['Level']
+      if on:
+        self._node.set_dimmer(dimmer_id, 255)
+      else:
+        self._node.set_dimmer(dimmer_id, 0)
+      self._node.refresh_value(dimmer_id)
+
+  def set_level(self, level=None, **kwargs):
+    logging.debug('LEVEL: %s' % str(level))
+    if level is None:
       return
 
-    switch_id = self.value_map['Switch']
+    if type(level) is not int:
+      return
 
-    on = switch == ACTION_ON
-    self._node.set_switch(switch_id, on)
+    if self.value_map.get('Level') is None:
+      return
+
+    dimmer_id = self.value_map['Level']
+
+    self._node.set_dimmer(dimmer_id, level)

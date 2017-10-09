@@ -74,6 +74,7 @@ class MultiSensor(Device):
       self.add_action(ULTRAVIOLET, metaText(title='Ultraviolet', text_request=ULTRAVIOLET))
 
     self._alexa_export = False
+    self.capabilities = CAPABILITIES
 
   def update_values(self, alarm=None, battery=None, humidity=None, lux=None, motion=None, temperature=None, ultraviolet=None, **kwargs):
     if alarm is not None:

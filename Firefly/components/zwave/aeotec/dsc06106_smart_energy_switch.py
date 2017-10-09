@@ -2,7 +2,7 @@ from Firefly import logging
 from Firefly.components.zwave.device_types.switch import ZwaveSwitch
 from Firefly.const import ACTION_OFF, ACTION_ON, SWITCH
 
-TITLE = 'Aeotec Smart Switch 6'
+TITLE = 'Aeotec Smart Switch 5'
 
 BATTERY = 'battery'
 ALARM = 'alarm'
@@ -28,13 +28,13 @@ CAPABILITIES = {
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
-  sensor = ZwaveAeotecSwitch6(firefly, package, **kwargs)
+  sensor = ZwaveAeotecSwitch5(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
   firefly.components[sensor.id] = sensor
   return sensor.id
 
 
-class ZwaveAeotecSwitch6(ZwaveSwitch):
+class ZwaveAeotecSwitch5(ZwaveSwitch):
   def __init__(self, firefly, package, **kwargs):
     if kwargs.get('initial_values') is not None:
       INITIAL_VALUES.update(kwargs['initial_values'])

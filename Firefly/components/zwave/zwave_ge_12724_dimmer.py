@@ -1,27 +1,82 @@
 from openzwave.network import ZWaveNode
+from openzwave.value import ZWaveValue
 
 from Firefly import logging, scheduler
 from Firefly.components.zwave.zwave_device import ZwaveDevice
+from Firefly.components.zwave.device_types.switch import ZwaveSwitch
 from Firefly.const import ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, DEVICE_TYPE_DIMMER, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE, SWITCH
 from Firefly.helpers.metadata import metaDimmer, metaSwitch
 
 TITLE = 'Firefly GE Dimmer'
 DEVICE_TYPE = DEVICE_TYPE_DIMMER
 AUTHOR = 'Zachary Priddy'
-COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, LEVEL, COMMAND_SET_LIGHT]
-REQUESTS = [STATE, LEVEL]
+#COMMANDS = [ACTION_OFF, ACTION_ON, ACTION_TOGGLE, LEVEL, COMMAND_SET_LIGHT]
+#REQUESTS = [STATE, LEVEL]
 INITIAL_VALUES = {
   '_state': EVENT_ACTION_OFF,
   '_level': 0
 }
 
 
+
+BATTERY = 'battery'
+ALARM = 'alarm'
+POWER_METER = 'power_meter'
+VOLTAGE_METER = 'voltage_meter'
+
+CURRENT = 'power_current'
+CURRENT_ENERGY_READING = 'current_energy_reading'
+PREVIOUS_ENERGY_READING = 'previous_energy_reading'
+VOLTAGE = 'voltage'
+WATTS = 'watts'
+
+COMMANDS = [ACTION_OFF, ACTION_ON, LEVEL, COMMAND_SET_LIGHT]
+
+REQUESTS = [ SWITCH, LEVEL, STATE]
+
+CAPABILITIES = {
+  LEVEL:       True,
+  SWITCH:      True,
+}
+
+
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
-  new_switch = GEDimmer(firefly, package, **kwargs)
+  new_switch = TestDimmer(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
   firefly.components[new_switch.id] = new_switch
   return new_switch.id
+
+
+class TestDimmer(ZwaveSwitch):
+  def __init__(self, firefly, package, **kwargs):
+    if kwargs.get('initial_values') is not None:
+      INITIAL_VALUES.update(kwargs['initial_values'])
+    kwargs.update({
+      'initial_values': INITIAL_VALUES,
+      'commands':       COMMANDS,
+      'requests':       REQUESTS
+    })
+    super().__init__(firefly, package, TITLE, capabilities=CAPABILITIES, **kwargs)
+
+    self.add_command(COMMAND_SET_LIGHT, self.set_light)
+    self.add_action('LEVEL_OLD', metaDimmer())
+
+  def set_light(self, **kwargs):
+    self.set_level(**kwargs)
+
+  def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, values: ZWaveValue = None, values_only=False, **kwargs):
+    logging.debug('***********************************************')
+    logging.debug('***********************************************')
+    logging.debug(str(node.to_dict()))
+    logging.debug(str(node.get_values()))
+    logging.debug(str(node.get_switches()))
+    logging.debug(str(node.get_switches_all()))
+    logging.debug('***********************************************')
+    logging.debug('***********************************************')
+    super().update_from_zwave(node, ignore_update, values, values_only, **kwargs)
+
+
 
 
 class GEDimmer(ZwaveDevice):
