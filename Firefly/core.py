@@ -16,6 +16,8 @@ from Firefly.helpers.location import Location
 from Firefly.helpers.room import Rooms
 from Firefly.helpers.subscribers import Subscriptions
 
+from Firefly.helpers.groups.groups import import_groups
+
 app = web.Application()
 
 

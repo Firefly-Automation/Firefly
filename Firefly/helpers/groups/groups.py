@@ -3,27 +3,31 @@ from typing import Callable
 from uuid import uuid4
 
 from Firefly import aliases, logging
-from Firefly.const import ACTION_OFF, ACTION_ON, CONTACT, EVENT_TYPE_BROADCAST, GROUPS_CONFIG_FILE, LEVEL, MOTION, STATE, SWITCH
+from Firefly.const import ACTION_OFF, ACTION_ON, CONTACT, CONTACT_CLOSED, CONTACT_OPEN, EVENT_TYPE_BROADCAST, GROUPS_CONFIG_FILE, LEVEL, MOTION, MOTION_ACTIVE, MOTION_INACTIVE, STATE, SWITCH
 from Firefly.helpers.events import Command, Event, Request
+from Firefly.helpers.metadata import action_on_off_switch, action_motion, action_contact
 
 '''
 devices[ff_id] = {tags: [tags], values: {prop: value}}
 '''
 
 TAG_MAP = {
-  'switch':  [SWITCH, STATE],
-  'light':   [SWITCH, STATE, LEVEL],
-  'dimmer':  [SWITCH, STATE, LEVEL],
-  'outlet':  [SWITCH, STATE],
-  'fan':     [SWITCH, STATE, LEVEL],
+  'switch':   [SWITCH, STATE],
+  'light':    [SWITCH, STATE, LEVEL],
+  'dimmer':   [SWITCH, STATE, LEVEL],
+  'outlet':   [SWITCH, STATE],
+  'fan':      [SWITCH, STATE, LEVEL],
 
   # Contact sensors
-  'contact': [CONTACT, 'alarm'],
-  'window':  [CONTACT, 'alarm'],
-  'door':    [CONTACT, 'alarm'],
+  'contact':  [CONTACT, 'alarm'],
+  'window':   [CONTACT, 'alarm'],
+  'door':     [CONTACT, 'alarm'],
 
   # Motion
-  'motion':  [MOTION, 'alarm']
+  'motion':   [MOTION, 'alarm'],
+
+  # Security
+  'security': [MOTION, CONTACT, STATE]
 
   # TODO: Items below
   # lux
@@ -89,18 +93,36 @@ class Group(object):
     self.requests = []
     self.command_mapping = {}
     self.request_mapping = {}
+    self.metadata = {
+      'actions': {}
+    }
 
-    self.add_request('switch', self.get_switch_switch)
+    self.add_request(SWITCH, self.get_switch_switch)
+    self.add_action(SWITCH, action_on_off_switch(False, 'Switches'))
+
     self.add_request('light', self.get_light_switch)
+    self.add_action('light', action_on_off_switch(False, 'Lights', request='light'))
+
     self.add_request('dimmer', self.get_dimmer)
+
 
     # TODO: the requests below and lux, water sensor, presence.
     # TODO: current state of these requests need to be uploaded to GroupStatus
     # TODO: Documentation on groups
 
-    # self.add_request('contact', self.get_contact)
-    # self.add_request('door', self.get_door)
-    # self.add_request('window', self.get_window)
+    self.add_request('contact', self.get_contact_contact)
+    self.add_action('contact', action_contact(False, 'Contact Sensors'))
+
+    self.add_request('door', self.get_door_contact)
+    self.add_action('door', action_contact(False, 'Door Sensors', request='door'))
+
+    self.add_request('window', self.get_window_contact)
+    self.add_action('window', action_contact(False, 'Window Sensors', request='window'))
+
+    self.add_request('motion', self.get_motion_motion)
+    self.add_action('motion', action_motion(False))
+
+    self.add_request('security', self.get_security)
 
     # self.add_request('alarm', self.get_alarm)
 
@@ -123,12 +145,13 @@ class Group(object):
     for d in self.device_list:
       self.add_device(d)
 
+  # Functions to get switch states
   def get_switch(self, tag, **kwargs):
     '''Get switch states for lights'''
     switch_state = False
     devices = self.get_devices_by_tags([tag])
     for device in devices:
-      switch_state |= self.devices[device]['state'].get('switch') == 'on'
+      switch_state |= self.devices[device]['state'].get(SWITCH) == ACTION_ON
     return ACTION_ON if switch_state else ACTION_OFF
 
   def get_switch_switch(self, **kwargs):
@@ -139,10 +162,52 @@ class Group(object):
     '''Get switch states for lights'''
     return self.get_switch('light')
 
+  # Functions for contact sensors
+  def get_contact(self, tag, **kwargs):
+    contact_state = True
+    devices = self.get_devices_by_tags([tag])
+    for device in devices:
+      if 'contact' not in self.devices[device]['tags'] and 'window' not in self.devices[device]['tags'] and 'door' not in self.devices[device]['tags']:
+        continue
+      contact_state &= self.devices[device]['state'].get(CONTACT) == CONTACT_CLOSED
+    return CONTACT_CLOSED if contact_state else CONTACT_OPEN
+
+  def get_window_contact(self, **kwargs):
+    return self.get_contact('window')
+
+  def get_door_contact(self, **kwargs):
+    return self.get_contact('door')
+
+  def get_contact_contact(self, **kwargs):
+    return self.get_contact(CONTACT)
+
+  # Function to get motion
+  def get_motion(self, tag, **kwargs):
+    motion_state = False
+    devices = self.get_devices_by_tags([tag])
+    for device in devices:
+      if MOTION not in self.devices[device]['tags']:
+        continue
+      motion_state |= self.devices[device]['state'].get(MOTION) == MOTION_ACTIVE
+    return MOTION_ACTIVE if motion_state else MOTION_INACTIVE
+
+  def get_motion_motion(self, **kwargs):
+    return self.get_motion(MOTION)
+
+  # Security functions
+  def get_security(self, **kwargs):
+    secured = True
+    secured &= self.get_motion('security') == MOTION_INACTIVE
+    secured &= self.get_contact('security') == CONTACT_CLOSED
+    return secured
+
+  # Functions for dimmers
   def get_dimmer(self, **kwargs):
     '''Get avg light level for all lights'''
     light_level = 0
     devices = self.get_devices_by_tags(['dimmer'])
+    if len(devices) == 0:
+      return 0
     for device in devices:
       light_level += self.devices[device]['state'].get('level')
     return light_level / len(devices)
@@ -159,7 +224,9 @@ class Group(object):
     metadata = {
       'ff_id':   self.id,
       'alias':   self.alias,
-      'devices': self.devices
+      'devices': self.devices,
+      'tags': self.get_all_tags(),
+      'metadata': self.metadata
     }
     return metadata
 
@@ -167,16 +234,17 @@ class Group(object):
     if ff_id not in self.firefly.components:
       logging.error('[GROUP] ff_id: %s not found in components' % ff_id)
       return
-    try:
-      tags = self.firefly.components[ff_id].tags
-      self.devices[ff_id] = {
-        'tags':  tags,
-        'state': {}
-      }
-      self.get_device_values(ff_id)
-      self.firefly.subscriptions.add_subscriber(self.id, ff_id)
-    except Exception as e:
-      logging.error('[GROUP] tags function not found for ff_id: %s - %s' % (ff_id, str(e)))
+    # try:
+    tags = self.firefly.components[ff_id].tags
+    logging.message(str(tags))
+    self.devices[ff_id] = {
+      'tags':  tags,
+      'state': {}
+    }
+    self.get_device_values(ff_id)
+    self.firefly.subscriptions.add_subscriber(self.id, ff_id)
+    # except Exception as e:
+    #  logging.error('[GROUP] tags function not found for ff_id: %s - %s' % (ff_id, str(e)))
 
   def get_device_values(self, ff_id, **kwargs):
     tags = self.devices[ff_id]['tags']
@@ -226,6 +294,13 @@ class Group(object):
         if tag in device['tags']:
           devices.add(ff_id)
     return list(devices)
+
+
+  def get_all_tags(self, **kwargs):
+    tags = set()
+    for ff_id, device in self.devices.items():
+      tags.update(device['tags'])
+    return list(tags)
 
   def get_device_list(self, **kwargs):
     return list(self.devices.keys())
@@ -294,6 +369,11 @@ class Group(object):
     """
     self.requests.append(request)
     self.request_mapping[request] = function
+
+  def add_action(self, action, action_meta):
+    self.metadata['actions'][action] = action_meta
+    if action_meta.get('primary') is True:
+      self.metadata['primary'] = action
 
   @property
   def id(self):
