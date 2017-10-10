@@ -2,9 +2,8 @@ from Firefly import logging
 # from rgb_cie import Converter
 from Firefly.components.hue.ct_fade import CTFade
 from Firefly.components.virtual_devices import AUTHOR
-from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ALEXA_OFF, ALEXA_ON, ALEXA_SET_COLOR,
-                           ALEXA_SET_COLOR_TEMP, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, COMMAND_UPDATE,
-                           DEVICE_TYPE_COLOR_LIGHT, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE, SWITCH)
+from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ALEXA_OFF, ALEXA_ON, ALEXA_SET_COLOR, ALEXA_SET_COLOR_TEMP, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, COMMAND_UPDATE,
+                           DEVICE_TYPE_COLOR_LIGHT, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE, SWITCH, action_on_off_switch)
 from Firefly.helpers.device import Device
 from Firefly.helpers.events import Command
 from Firefly.helpers.metadata import metaDimmer, metaSwitch
@@ -75,7 +74,8 @@ class HueDevice(Device):
     self.add_request('hue', self.get_hue)
     self.add_request('sat', self.get_sat)
 
-    self.add_action(STATE, metaSwitch(primary=True))
+    # self.add_action(STATE, metaSwitch(primary=True))
+    self.add_action(SWITCH, action_on_off_switch(primary=False))
     self.add_action(LEVEL, metaDimmer())
 
     self.add_alexa_action(ALEXA_OFF)
@@ -102,7 +102,6 @@ class HueDevice(Device):
     self._modelid = kwargs.get('modelid', '')
     self._bri = 0
     self._ct_fade = None
-
 
     if kwargs.get(self.hue_noun):
       self._on = kwargs.get(self.hue_noun).get('on', False)
@@ -258,7 +257,7 @@ class HueDevice(Device):
         self._on = True
         hue_value.update({
           'bri': bri,
-          'on': True
+          'on':  True
         })
       else:
         bri = 0
@@ -287,7 +286,7 @@ class HueDevice(Device):
         self._level = int(bri / 255.0 * 100.0)
       hue_value.update({
         'bri': bri,
-        'on': True
+        'on':  True
       })
       self._bri = bri
 
@@ -338,7 +337,7 @@ class HueDevice(Device):
         })
       else:
         hue_value.update({
-          'on':  on
+          'on': on
         })
       self._on = on
 
@@ -370,7 +369,7 @@ class HueDevice(Device):
   def set_ct_fade(self, **kwargs):
     """
     Set color temperature fade over time.
-    
+
     Args:
       start_k: (str) Start color temp in k (2700k)
       end_k: (str) End color temp in k (2700k)
