@@ -3,10 +3,10 @@ from Firefly import logging
 from Firefly.components.hue.ct_fade import CTFade
 from Firefly.components.virtual_devices import AUTHOR
 from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ALEXA_OFF, ALEXA_ON, ALEXA_SET_COLOR, ALEXA_SET_COLOR_TEMP, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, COMMAND_UPDATE,
-                           DEVICE_TYPE_COLOR_LIGHT, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE, SWITCH, action_on_off_switch)
+                           DEVICE_TYPE_COLOR_LIGHT, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE, SWITCH)
 from Firefly.helpers.device import Device
 from Firefly.helpers.events import Command
-from Firefly.helpers.metadata import metaDimmer, metaSwitch
+from Firefly.helpers.metadata import metaDimmer, metaSwitch, action_on_off_switch
 
 TITLE = 'Firefly Hue Device'
 DEVICE_TYPE = DEVICE_TYPE_COLOR_LIGHT
