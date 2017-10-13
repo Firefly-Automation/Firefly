@@ -29,7 +29,7 @@ of what node number they are for sending commands.
 TITLE = 'Z-Wave service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
 SERVICE_ID = 'service_zwave'
-COMMANDS = ['send_command', 'stop', 'add_node', 'cancel']
+COMMANDS = ['send_command', 'stop', 'add_node', 'remove_node', 'cancel']
 REQUESTS = ['get_nodes', 'get_orphans']
 
 SECTION = 'ZWAVE'
@@ -84,7 +84,9 @@ class Zwave(Service):
 
     self.add_command('send_command', self.send_command)
     self.add_command('stop', self.stop)
+
     self.add_command('add_node', self.add_device)
+    self.add_command('remove_node', self.remove_device)
     self.add_command('cancel', self.cancel_command)
 
     self.add_request('get_nodes', self.get_nodes)
@@ -94,6 +96,9 @@ class Zwave(Service):
     self.healed = False
 
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_ADDED)
+    dispatcher.connect(self.zwave_node_removed_handler, ZWaveNetwork.SIGNAL_NODE_REMOVED)
+
+
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
     dispatcher.connect(self.zwave_controller_command, ZWaveNetwork.SIGNAL_CONTROLLER_COMMAND)
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_ADDED)
@@ -146,7 +151,7 @@ class Zwave(Service):
       else:
         await asyncio.sleep(1)
 
-    self._network.set_poll_interval(milliseconds=500)
+    self._network.set_poll_interval(milliseconds=10000)
 
     # Initial refresh of all nodes
     self.zwave_refresh()
@@ -172,6 +177,9 @@ class Zwave(Service):
 
   def zwave_controller_command(self, **kwargs):
     logging.message('ZWAVE CONTROLLER COMMAND: %s' % str(kwargs))
+
+  def zwave_node_removed_handler(self, **kwargs):
+    logging.notify('ZWAVE NODE REMOVED %s Node %s' % (str(kwargs), str(kwargs['node'].to_dict())))
 
   def node_handler(self, **kwargs):
     '''Called when a node is changed, added, removed'''
@@ -348,6 +356,8 @@ class Zwave(Service):
     if not zwave_package:
       return
 
+    logging.notify('INSTALLING ZWAVE NODE %s' % str(zwave_package))
+
     device_id = self._firefly.install_package(**zwave_package)
     self._installed_nodes[str(node.node_id)] = device_id
     self.refresh_firebase()
@@ -409,7 +419,11 @@ class Zwave(Service):
     Returns:
 
     '''
+    logging.notify('Ready to remove zwave device.')
     self._network.controller.remove_node()
+    scheduler.runInM(3, self.cancel_command, job_id='zwave_cancel_pairing')
+
+
 
   def send_command(self):
     '''
