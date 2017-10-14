@@ -69,7 +69,6 @@ class Switch(Device):
       self.add_command(ACTION_ON, self.set_on)
       self.add_request(SWITCH, self.get_switch)
 
-      self.add_action('NEW_SWITCH', action_on_off_switch(primary=False))
       self.add_alexa_action(ALEXA_OFF)
       self.add_alexa_action(ALEXA_ON)
 
