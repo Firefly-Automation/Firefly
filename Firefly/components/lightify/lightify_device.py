@@ -1,5 +1,5 @@
 from Firefly.const import AUTHOR, ACTION_OFF, ACTION_ON, EVENT_ACTION_ON, EVENT_ACTION_OFF, STATE, COMMAND_SET_LIGHT, COMMAND_UPDATE, ACTION_LEVEL, LEVEL, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, SWITCH
-from Firefly.helpers.metadata import metaSwitch, metaDimmer
+from Firefly.helpers.metadata import metaSwitch, metaDimmer, action_on_off_switch
 from Firefly.helpers.device import Device
 from lightify import Luminary
 from Firefly import logging
@@ -34,7 +34,7 @@ class LightifyDevice(Device):
     self.add_request(STATE, self.get_state)
     self.add_request(LEVEL, self.get_level)
 
-    self.add_action(STATE, metaSwitch())
+    self.add_action(SWITCH, action_on_off_switch())
     self.add_action(LEVEL, metaDimmer())
 
     self.add_alexa_action(ALEXA_OFF)

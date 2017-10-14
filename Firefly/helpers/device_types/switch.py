@@ -75,7 +75,7 @@ class Switch(Device):
 
       # TODO: Remove this when new ui is done
       self.add_request(STATE, self.get_switch)
-      self.add_action(SWITCH, metaSwitch(title='Switch', primary=True, control_type='switch'))
+      self.add_action(SWITCH, action_on_off_switch())
 
     if capabilities[LEVEL] and LEVEL in requests and LEVEL in commands:
       self.add_request(LEVEL, self.get_level)

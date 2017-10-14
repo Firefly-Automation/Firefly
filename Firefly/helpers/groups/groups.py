@@ -101,7 +101,7 @@ class Group(object):
     self.add_action(SWITCH, action_on_off_switch(False, 'Switches'))
 
     self.add_request('light', self.get_light_switch)
-    self.add_action('light', action_on_off_switch(False, 'Lights', request='light'))
+    self.add_action('light', action_on_off_switch(True, 'Lights', request='light'))
 
     self.add_request('dimmer', self.get_dimmer)
 
