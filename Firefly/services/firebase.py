@@ -10,6 +10,11 @@ from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SERVICE_CONFIG_FILE
 from Firefly.helpers.service import Command, Request, Service
 from Firefly.services.api_ai import apiai_command_reply
 
+from os import system
+
+def internet_up():
+  return system("ping -c 1 8.8.8.8") == 0
+
 TITLE = 'Firebase Service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
 SERVICE_ID = 'service_firebase'
@@ -114,6 +119,11 @@ class Firebase(Service):
     logging.info('Config file for hue has been updated.')
 
   def refresh_stream(self):
+    if not internet_up():
+      logging.notify('[FIREBASE REFRESH STREAM] Internet is down')
+      scheduler.runInM(1, self.refresh_stream, 'firebase_internet_down_refresh_stream')
+      return
+
     self.stream.close()
     self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler, self.id_token)
     self.commandReplyStream.close()
@@ -133,9 +143,51 @@ class Firebase(Service):
     except Exception as e:
       print(str(e))
 
+
+  def firebase_send_command(self, ff_id, command):
+    logging.info('[FIREBASE SEND COMMAND] : %s:%s' % (str(ff_id), str(command)))
+    if type(command) is str:
+      send_command = Command(ff_id, 'web_api', command)
+      logging.info('FIREBASE SENDING COMMAND: %s ' % str(send_command))
+      self.firefly.send_command(send_command)
+      return
+
+    if type(command) is dict:
+      for command_string, command_args in command.items():
+        send_command = Command(ff_id, 'web_api', command_string, command_args)
+        logging.info('FIREBASE SENDING COMMAND: %s ' % str(send_command))
+        self.firefly.send_command(send_command)
+        return
+
+
   def stream_handler(self, message):
     refresh = False
     try:
+      logging.message('FIREBASE MESSAGE: %s ' % str(message))
+      # Return if no data
+      if message['data'] is None:
+        return
+
+      if message['path'] == '/':
+        for ff_id, command in message['data'].items():
+          self.firebase_send_command(ff_id, command)
+          self.db.child('homeStatus').child(self.home_id).child('commands').child(ff_id).remove(self.id_token)
+
+      else:
+        ff_id = message['path'][1:]
+        command = message['data']
+        self.firebase_send_command(ff_id, command)
+        self.db.child('homeStatus').child(self.home_id).child('commands').child(ff_id).remove(self.id_token)
+
+    except Exception as e:
+      logging.notify('Firebase Stream Error: %s' % str(e))
+
+
+    # TODO: Remove this when proven to work
+    '''
+    return
+    try:
+      logging.message(str(message))
       if message['data']:
         path = message['path']
         ff_id = path[1:]
@@ -165,6 +217,7 @@ class Firebase(Service):
         logging.notify(list(message['data'].keys())[0])
       self.refresh_all()
       self.db.child('homeStatus').child(self.home_id).child('commands').remove(self.id_token)
+    '''
 
   def refresh_all(self, **kwargs):
     # Hard-coded refresh all device values
@@ -243,7 +296,7 @@ class Firebase(Service):
       self.db.child("homeStatus").child(self.home_id).child('groupViews').set(groups, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('groupStatus').set(groups_state, self.id_token)
 
-
+      self.db.child("homeStatus").child(self.home_id).child('lastUpdated').set(self.firefly.location.now.timestamp(), self.id_token)
 
     except Exception as e:
       logging.notify("Firebase 177: %s" % str(e))
@@ -366,6 +419,11 @@ class Firebase(Service):
       logging.notify("Firebase 263: %s" % str(e))
 
   def refresh_user(self):
+    if not internet_up():
+      logging.notify('[FIREBASE REFRESH] Internet seems to be down')
+      scheduler.runInM(1, self.refresh_user, 'refresh_user_internet_down')
+      return
+
     try:
       try:
         self.stream.close()
