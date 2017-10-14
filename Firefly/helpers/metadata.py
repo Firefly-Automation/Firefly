@@ -247,14 +247,18 @@ COMMAND = 'command'
 COMMAND_PROP = 'command_prop'
 COMMAND_VAL = 'command_val'
 CONTEXT = 'context'
+ICON = 'icon'
+LEVEL_STEP = 'level_step'
+MAX_LEVEL = 'max_level'
+MIN_LEVEL = 'min_level'
 PRIMARY = 'primary'
 REQUEST = 'request'
-TEXT = 'text'
+SLIDER = 'slider'
 SWITCH = 'switch'
+TEXT = 'text'
 TEXT_MAPPING = 'text_mapping'
 TITLE = 'title'
 TYPE = 'type'
-ICON = 'icon'
 
 ON_COMMAND = 'on_command'
 OFF_COMMAND = 'off_command'
@@ -306,7 +310,6 @@ def action_switch(can_command=True, can_request=True, primary=False, title='', c
 
 def action_on_off_switch(primary=True, title='Switch', context='On Off Controls for the switch', on_command=EVENT_ACTION_ON, off_command=EVENT_ACTION_OFF,
                          color_mapping: ColorMap = ColorMap(green=[EVENT_ACTION_ON], grey=[EVENT_ACTION_OFF]), icon='ion-ios-bolt', **kwargs):
-
   return action_switch(primary=primary, title=title, context=context, on_command=on_command, off_command=off_command, color_mapping=color_mapping, icon=icon, **kwargs)
 
 
@@ -363,3 +366,67 @@ def action_motion(primary=True, title='Motion', context='State of the motion sen
 }, color_mapping=ColorMap(blue=[MOTION_INACTIVE], red=[MOTION_ACTIVE])):
   action_meta = action_text(primary=primary, title=title, context=context, request=request, text_mapping=text_mapping, color_mapping=color_mapping)
   return action_meta
+
+
+def action_level(can_command=True, can_request=True, primary=False, title='', context='', command='', command_prop='', request='', min_level=0, max_level=100, level_step=1, icon='', **kwargs):
+  """Builds the action metadata for a text action.
+
+  Args:
+    can_command: Can you send a command to this kinda of action.
+    can_request: Can you use this action in a trigger.
+    command: Command to send
+    command_prop: Key to send with slider level
+    context: Help context for this action.
+    icon: string of icon to display for device.
+    primary: Is this the primary action.
+    request: Request property for this action. (device.request_values[request])
+    title: Title fot this action.
+    level_min: min level of slider.
+    level_max: max level of slider.
+    level_step: step increment of slider.
+
+  Returns: dict of action.
+
+  """
+
+  action_metadata = {
+    CAN_COMMAND:  can_command,
+    CAN_REQUEST:  can_request,
+    COMMAND:      command,
+    COMMAND_PROP: command_prop,
+    CONTEXT:      context,
+    ICON:         icon,
+    LEVEL_STEP:   level_step,
+    MAX_LEVEL:    max_level,
+    MIN_LEVEL:    min_level,
+    PRIMARY:      primary,
+    REQUEST:      request,
+    TITLE:        title,
+    TYPE:         SLIDER,
+  }
+
+  return action_metadata
+
+
+def action_dimmer(can_command=True, can_request=True, primary=False, title='Light Level', context='Set the level of the light', command='set_light', command_prop='level', request='level', min_level=0,
+                  max_level=100, level_step=5, icon='', **kwargs):
+  """Builds the action metadata for a text action.
+
+  Args:
+    can_command: Can you send a command to this kinda of action.
+    can_request: Can you use this action in a trigger.
+    command: Command to send
+    command_prop: Key to send with slider level
+    context: Help context for this action.
+    icon: string of icon to display for device.
+    primary: Is this the primary action.
+    request: Request property for this action. (device.request_values[request])
+    title: Title fot this action.
+    level_min: min level of slider.
+    level_max: max level of slider.
+    level_step: step increment of slider.
+
+  Returns: dict of action.
+
+  """
+  return action_level(can_command, can_request, primary, title, context, command, command_prop, request, min_level, max_level, level_step, icon, **kwargs)

@@ -6,7 +6,7 @@ from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, A
                            DEVICE_TYPE_COLOR_LIGHT, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE, SWITCH)
 from Firefly.helpers.device import Device
 from Firefly.helpers.events import Command
-from Firefly.helpers.metadata import metaDimmer, metaSwitch, action_on_off_switch
+from Firefly.helpers.metadata import metaDimmer, metaSwitch, action_on_off_switch, action_dimmer
 
 TITLE = 'Firefly Hue Device'
 DEVICE_TYPE = DEVICE_TYPE_COLOR_LIGHT
@@ -75,7 +75,7 @@ class HueDevice(Device):
     self.add_request('sat', self.get_sat)
 
     self.add_action(SWITCH, action_on_off_switch())
-    self.add_action(LEVEL, metaDimmer())
+    self.add_action(LEVEL, action_dimmer())
 
     self.add_alexa_action(ALEXA_OFF)
     self.add_alexa_action(ALEXA_ON)

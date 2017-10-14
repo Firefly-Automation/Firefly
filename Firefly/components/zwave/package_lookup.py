@@ -15,7 +15,7 @@ PACKAGE_BASE = 'Firefly.components.zwave'
 WORK_AROUND_MAPPING = {
   # Leviton DZS15 Zwave Switch
   'unknown:_type=1c02,_id=0334': {
-    PACKAGE: 'zwave_leviton_dzs15_switch',
+    PACKAGE: 'leviton.dzs15',
     ALIAS:   'Levition Zwave Switch'
   },  # Ecolink Door Window Plus Sensor
   'unknown:_type=0004,_id=0002': {
