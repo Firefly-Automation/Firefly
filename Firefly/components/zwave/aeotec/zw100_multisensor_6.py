@@ -109,6 +109,31 @@ class ZwaveAeotecMulti(ZwaveMultiSensor):
     # Send binary sensor report when motion triggered.
     self.node.set_config_param(5, 1, 1)
 
+
+    # Limit event messages to only be threshold triggered
+    threshold_enable_idx = 40
+    enabled = 1
+    disabled = 0
+    self.node.set_config_param(threshold_enable_idx, enabled)
+
+    # Set the threshold to trigger update for temperature (20 = 2.0 degree - default)
+    temperature_threshold_idx = 41
+    temperature_threshold = 5 # .5 degree
+    self.node.set_config_param(temperature_threshold_idx, temperature_threshold)
+
+    # Set the threshold to trigger update humidity (10 = 10% - default)
+    humidity_threshold_idx = 42
+    humidity_threshold = 2
+    self.node.set_config_param(humidity_threshold_idx, humidity_threshold)
+
+    # Set the threshold to trigger update luminance
+    luminance_threshold_idx = 43
+    luminance_threshold = 10
+    self.node.set_config_param(luminance_threshold_idx, luminance_threshold)
+
+
+    # TODO: Other config values
+
     successful = True
     successful &= self.node.request_config_param(4) == sensitivity
     successful &= self.node.request_config_param(3) == timeout

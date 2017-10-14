@@ -74,7 +74,7 @@ class HueDevice(Device):
     self.add_request('hue', self.get_hue)
     self.add_request('sat', self.get_sat)
 
-    # self.add_action(STATE, metaSwitch(primary=True))
+    #self.add_action(STATE, metaSwitch(primary=True))
     self.add_action(SWITCH, action_on_off_switch(primary=False))
     self.add_action(LEVEL, metaDimmer())
 

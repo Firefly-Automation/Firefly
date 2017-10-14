@@ -56,7 +56,7 @@ class ZW120(ZwaveContactSensor):
       return
 
 
-    # self.node.set_config_param(2, 0)  # Disable 10 min wake up time
+    self.node.set_config_param(2, 0)  # Disable 10 min wake up time
     self.node.set_config_param(121, 17)  # Sensor Binary and Battery Report
 
     successful = True

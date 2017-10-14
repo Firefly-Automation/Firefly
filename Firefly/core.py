@@ -16,6 +16,8 @@ from Firefly.helpers.location import Location
 from Firefly.helpers.room import Rooms
 from Firefly.helpers.subscribers import Subscriptions
 
+from Firefly.helpers.groups.groups import import_groups
+
 app = web.Application()
 
 
@@ -69,6 +71,10 @@ class Firefly(object):
     # TODO: Building rooms will have to happen whenever a devices is added
     self._rooms = Rooms(self)
     self._rooms.build_rooms()
+
+    # Import Groups
+    import_groups(self)
+
 
     # TODO: MOST OF WHATS BELOW IS FOR TESTING
     # self.install_package('Firefly.components.virtual_devices.switch', alias='Test Device', initial_values={
