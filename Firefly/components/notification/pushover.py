@@ -66,9 +66,13 @@ class Pushover(Device):
       post_data['device'] = device
 
     # TODO: handel response and emergency types of notifications
-    r = requests.post('https://api.pushover.net/1/messages.json', data=post_data)
+    try:
+      r = requests.post('https://api.pushover.net/1/messages.json', data=post_data, timeout=10)
 
-    return True if r.status_code == 200 else False
+      return True if r.status_code == 200 else False
+    #TODO: Find better way
+    except:
+      pass
 
   def export(self, current_values: bool = True, api_view: bool = False):
     data = super().export(current_values)

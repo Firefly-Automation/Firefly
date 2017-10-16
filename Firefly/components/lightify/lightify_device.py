@@ -1,62 +1,51 @@
-from Firefly.const import AUTHOR, ACTION_OFF, ACTION_ON, EVENT_ACTION_ON, EVENT_ACTION_OFF, STATE, COMMAND_SET_LIGHT, COMMAND_UPDATE, ACTION_LEVEL, LEVEL, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, SWITCH
-from Firefly.helpers.metadata import metaSwitch, metaDimmer, action_on_off_switch, action_dimmer
-from Firefly.helpers.device import Device
 from lightify import Luminary
+
 from Firefly import logging
+from Firefly.const import ACTION_LEVEL, AUTHOR, COMMAND_UPDATE, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, SWITCH, COMMAND_SET_LIGHT
+from Firefly.helpers.device_types.light import Light
 
 TITLE = 'Lightify Device'
-COMMANDS = [EVENT_ACTION_ON, EVENT_ACTION_OFF, ACTION_LEVEL, COMMAND_UPDATE]
+COMMANDS = [EVENT_ACTION_ON, EVENT_ACTION_OFF, ACTION_LEVEL, COMMAND_UPDATE, COMMAND_SET_LIGHT]
 INITIAL_VALUES = {
   '_state': EVENT_ACTION_OFF,
   '_level': 0
 }
 
-class LightifyDevice(Device):
-  def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
-    if not kwargs.get('initial_values'):
-      kwargs['initial_values'] = INITIAL_VALUES
-    else:
-      INITIAL_VALUES.update(kwargs['initial_values'])
-      kwargs['initial_values'] = INITIAL_VALUES
-    if commands:
-      c = set(commands)
-      c.update(COMMANDS)
-      commands = list(c)
-    super().__init__(firefly, package, title, author, commands, requests, device_type, **kwargs)
+CAPABILITIES = {
+  LEVEL:  True,
+  SWITCH: True,
+  COMMAND_SET_LIGHT: True
+}
 
-    self.add_command(EVENT_ACTION_OFF, self.off)
-    self.add_command(EVENT_ACTION_ON, self.on)
-    self.add_command(ACTION_LEVEL, self.level)
-    self.add_command(COMMAND_SET_LIGHT, self.set_light)
+REQUESTS = [SWITCH, LEVEL]
+
+
+class LightifyDevice(Light):
+  def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
+    if kwargs.get('initial_values') is not None:
+      INITIAL_VALUES.update(kwargs['initial_values'])
+    kwargs.update({
+      'initial_values': INITIAL_VALUES,
+      'commands':       COMMANDS,
+      'requests':       REQUESTS
+    })
+    super().__init__(firefly, package, TITLE, AUTHOR, capabilities=CAPABILITIES, **kwargs)
     self.add_command(COMMAND_UPDATE, self.update_lightify)
 
-    self.add_request(SWITCH, self.get_state)
-    self.add_request(STATE, self.get_state)
-    self.add_request(LEVEL, self.get_level)
-
-    self.add_action(SWITCH, action_on_off_switch())
-    self.add_action(LEVEL, action_dimmer())
-
-    self.add_alexa_action(ALEXA_OFF)
-    self.add_alexa_action(ALEXA_ON)
-    self.add_alexa_action(ALEXA_SET_PERCENTAGE)
-    #self.add_alexa_action(ALEXA_SET_COLOR_TEMP)
-    #self.add_alexa_action(ALEXA_SET_COLOR)
-
-    self.lightify_object:Luminary = kwargs.get('lightify_object')
+    self.lightify_object: Luminary = kwargs.get('lightify_object')
     self.lightify_type = kwargs.get('lightify_type')
 
     self._export_ui = kwargs.get('export_ui', True)
 
-  def on(self, **kwargs):
-    self._state = EVENT_ACTION_ON
+  def set_on(self, **kwargs):
     self.lightify_object.set_onoff(True)
+    self.update_values(switch=True)
 
-  def off(self, **kwargs):
-    self._state = EVENT_ACTION_OFF
+  def set_off(self, **kwargs):
     self.lightify_object.set_onoff(False)
+    self.update_values(switch=False)
 
-  def level(self, **kwargs):
+  def set_level(self, **kwargs):
     level = kwargs.get('level')
     if level is None:
       return
@@ -67,18 +56,11 @@ class LightifyDevice(Device):
       return
     # TODO: Parse timing info
     self.lightify_object.set_luminance(level, 4)
-    self._level = level
+    self.update_values(level=level)
 
   def set_light(self, **kwargs):
     if kwargs.get(LEVEL):
-      self.level(**kwargs)
-
-
-  def get_level(self, **kwargs):
-    return self._level
-
-  def get_state(self, **kwargs):
-    return self._state
+      self.set_level(**kwargs)
 
   def update_lightify(self, **kwargs):
     pass
