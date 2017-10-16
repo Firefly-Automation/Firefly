@@ -52,11 +52,11 @@ class MultiSensor(Device):
 
     if capabilities[HUMIDITY] and HUMIDITY in requests:
       self.add_request(HUMIDITY, self.get_humidity)
-      self.add_action(HUMIDITY, metaText(title='Humidity Level', text_request=HUMIDITY))
+      self.add_action(HUMIDITY, action_text(title='Humidity Level', text_request=HUMIDITY))
 
     if capabilities[LUX] and LUX in requests:
       self.add_request(LUX, self.get_lux)
-      self.add_action(LUX, metaText(title='Lux Level', text_request=LUX))
+      self.add_action(LUX, action_text(title='Lux Level', text_request=LUX))
 
     if capabilities[MOTION] and MOTION in requests:
       self.add_request(MOTION, self.get_motion)
@@ -66,11 +66,11 @@ class MultiSensor(Device):
 
     if capabilities[TEMPERATURE] and TEMPERATURE in requests:
       self.add_request(TEMPERATURE, self.get_temperature)
-      self.add_action(TEMPERATURE, metaText(title='Temperature', text_request=TEMPERATURE))
+      self.add_action(TEMPERATURE, action_text(title='Temperature', text_request=TEMPERATURE))
 
     if capabilities[ULTRAVIOLET] and ULTRAVIOLET in requests:
       self.add_request(ULTRAVIOLET, self.get_ultraviolet)
-      self.add_action(ULTRAVIOLET, metaText(title='Ultraviolet', text_request=ULTRAVIOLET))
+      self.add_action(ULTRAVIOLET, action_text(title='Ultraviolet', text_request=ULTRAVIOLET))
 
     self._alexa_export = False
     self.capabilities = CAPABILITIES
