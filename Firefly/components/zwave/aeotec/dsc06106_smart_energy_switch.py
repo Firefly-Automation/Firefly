@@ -72,6 +72,7 @@ class ZwaveAeotecSwitch5(ZwaveSwitch):
 
     # Configure what kind of reports to send and when to send them.
     self.node.set_config_param(101, 4)
+    self.node.set_config_param(102, 4)
     self.node.set_config_param(111, 30)
 
     # What kind of report to send

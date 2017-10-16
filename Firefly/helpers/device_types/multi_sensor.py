@@ -44,11 +44,11 @@ class MultiSensor(Device):
 
     if capabilities[ALARM] and ALARM in requests:
       self.add_request(ALARM, self.get_alarm)
-      self.add_action(ALARM, metaText(title='Alarm', text_request=ALARM))
+      self.add_action(ALARM, action_text(title='Alarm Code', context='Alarm code from device', request=ALARM))
 
     if capabilities[BATTERY] and BATTERY in requests:
       self.add_request(BATTERY, self.get_battery)
-      self.add_action(BATTERY, metaText(title='Battery Level', text_request=BATTERY))
+      self.add_action(BATTERY, action_text(title='Battery',context='Battery Level', request=BATTERY))
 
     if capabilities[HUMIDITY] and HUMIDITY in requests:
       self.add_request(HUMIDITY, self.get_humidity)
@@ -60,8 +60,7 @@ class MultiSensor(Device):
 
     if capabilities[MOTION] and MOTION in requests:
       self.add_request(MOTION, self.get_motion)
-      self.add_action(MOTION, metaText(title='Motion', text_request=MOTION, primary=True))
-      self.add_action('NEW_MOTION', action_motion(False))
+      self.add_action(MOTION, action_motion(primary=True))
       if 'motion' not in self.tags:
         self._tags.append('motion')
 

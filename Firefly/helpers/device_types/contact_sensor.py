@@ -1,7 +1,7 @@
 from Firefly import logging
 from Firefly.const import CONTACT, CONTACT_CLOSED, CONTACT_OPEN
 from Firefly.helpers.device import Device
-from Firefly.helpers.metadata import action_contact, metaText
+from Firefly.helpers.metadata import action_contact, action_text
 
 BATTERY = 'battery'
 ALARM = 'alarm'
@@ -33,16 +33,15 @@ class ContactSensor(Device):
 
     if capabilities[ALARM] and ALARM in requests:
       self.add_request(ALARM, self.get_alarm)
-      self.add_action(ALARM, metaText(title='Alarm', text_request=ALARM))
+      self.add_action(ALARM, action_text(title='Alarm Code', context='Alarm code from device', request=ALARM))
 
     if capabilities[BATTERY] and BATTERY in requests:
       self.add_request(BATTERY, self.get_battery)
-      self.add_action(BATTERY, metaText(title='Battery Level', text_request=BATTERY))
+      self.add_action(BATTERY, action_text(title='Battery',context='Battery Level', request=BATTERY))
 
     if capabilities[CONTACT] and CONTACT in requests:
       self.add_request(CONTACT, self.get_contact)
-      self.add_action(CONTACT, metaText(title='Contact', text_request=CONTACT, primary=True))
-      self.add_action('NEW_CONTACT', action_contact(False))
+      self.add_action(CONTACT, action_contact(primary=True))
       if 'contact' not in self.tags:
         self._tags.append('contact')
 
