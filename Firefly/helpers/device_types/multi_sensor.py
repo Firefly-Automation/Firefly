@@ -1,7 +1,7 @@
 from Firefly import logging
 from Firefly.const import LUX, MOTION, MOTION_ACTIVE, MOTION_INACTIVE
 from Firefly.helpers.device import Device
-from Firefly.helpers.metadata import action_motion, metaText
+from Firefly.helpers.metadata import action_motion, metaText, action_text
 
 BATTERY = 'battery'
 TEMPERATURE = 'temperature'
