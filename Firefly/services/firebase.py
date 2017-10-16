@@ -120,7 +120,7 @@ class Firebase(Service):
 
   def refresh_stream(self):
     if not internet_up():
-      logging.notify('[FIREBASE REFRESH STREAM] Internet is down')
+      logging.error('[FIREBASE REFRESH STREAM] Internet is down')
       scheduler.runInM(1, self.refresh_stream, 'firebase_internet_down_refresh_stream')
       return
 
@@ -420,7 +420,7 @@ class Firebase(Service):
 
   def refresh_user(self):
     if not internet_up():
-      logging.notify('[FIREBASE REFRESH] Internet seems to be down')
+      logging.error('[FIREBASE REFRESH] Internet seems to be down')
       scheduler.runInM(1, self.refresh_user, 'refresh_user_internet_down')
       return
 
