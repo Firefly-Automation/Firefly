@@ -18,7 +18,7 @@ def Setup(firefly, package, **kwargs):
   enable = config.getboolean(FOOBOT_SECTION, 'enable', fallback=False)
   username = config.get(FOOBOT_SECTION, 'username', fallback=None)
   api_key = config.get(FOOBOT_SECTION, 'api_key', fallback=None)
-  refresh_interval =  config.getint(FOOBOT_SECTION, 'refresh_interval', fallback=15)
+  refresh_interval = config.getint(FOOBOT_SECTION, 'refresh_interval', fallback=15)
 
   if not enable or not api_key or not username:
     return False
