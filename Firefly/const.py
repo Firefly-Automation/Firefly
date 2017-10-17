@@ -27,6 +27,11 @@ LOCATION_FILE = 'dev_config/location.json'
 ZWAVE_FILE = 'dev_config/zwave.json'
 
 
+# FOOBOT SERVICE
+SERVICE_FOOBOT = 'service_foobot'
+FOOBOT_SECTION = 'FOOBOT'
+
+
 GROUPS_CONFIG_FILE = 'dev_config/groups.json'
 
 TYPE_ZWAVE_SERVICE = 'zwave_service'

@@ -221,13 +221,14 @@ def metaWaterSensor(command=False, request=True, primary=False):
 
 
 class ColorMap(object):
-  def __init__(self, black=[], blue=[], green=[], red=[], yellow=[], grey=[]):
+  def __init__(self, black=[], blue=[], green=[], red=[], yellow=[], grey=[], orange=[]):
     self.black = black
     self.blue = blue
     self.green = green
     self.red = red
     self.yellow = yellow
     self.grey = grey
+    self.orange = orange
 
   def to_dict(self):
     return {
@@ -236,7 +237,8 @@ class ColorMap(object):
       COLOR_GREEN:  self.green,
       COLOR_RED:    self.red,
       COLOR_YELLOW: self.yellow,
-      COLOR_GREY:   self.grey
+      COLOR_GREY:   self.grey,
+      COLOR_ORANGE: self.orange
     }
 
 
@@ -269,6 +271,7 @@ COLOR_GREEN = 'green'
 COLOR_RED = 'red'
 COLOR_YELLOW = 'yellow'
 COLOR_GREY = 'grey'
+COLOR_ORANGE = 'orange'
 
 
 def action_switch(can_command=True, can_request=True, primary=False, title='', context='', request='', on_command=EVENT_ACTION_ON, off_command=EVENT_ACTION_OFF, color_mapping: ColorMap = ColorMap(),
