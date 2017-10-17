@@ -8,7 +8,7 @@ import requests
 TITLE = 'Foobot Air Sensor'
 DEVICE_TYPE = 'air_sensor'
 REQUESTS = ['air_quality', 'pm', 'temperature', 'humidity', 'c02', 'voc', 'allpollu']
-COMMANDS = []
+COMMANDS = ['set_temp_scale']
 
 INITIAL_VALUES = {
   'air_quality':  'unknown',
@@ -17,7 +17,8 @@ INITIAL_VALUES = {
   '_humidity':    -1,
   '_c02':         -1,
   '_voc':         -1,
-  '_allpollu':    -1
+  '_allpollu':    -1,
+  '_temp_scale': 'f'
 }
 
 SCORE_MAP = {
@@ -94,6 +95,8 @@ class Foobot(Device):
     self.add_request('voc', self.get_voc)
     self.add_request('allpillu', self.get_allpollu)
 
+    self.add_command('set_temp_scale', self.set_scale)
+
     text_mapping = {
       'Great':      ['great'],
       'Good':       ['good'],
@@ -108,6 +111,11 @@ class Foobot(Device):
     scheduler.runEveryM(self.refresh_interval, self.update, job_id=self.id)
 
 
+  def set_scale(self, **kwargs):
+    scale = kwargs.get('scale', 'f')
+    if scale == 'f' or scale =='c':
+      self._temp_scale = scale
+
   def get_air_quality(self, **kwargs):
     score = max([self.voc_score(), self.c02_score(), self.pm_score()])
     return SCORE_MAP[score]
@@ -116,7 +124,9 @@ class Foobot(Device):
     return self._pm
 
   def get_temperature(self, **kwargs):
-    return self._temperature
+    if self._temp_scale == 'c':
+      return self._temperature
+    return 9.0/5.0 * self._temperature + 32
 
   def get_humidity(self, **kwargs):
     return self._humidity
