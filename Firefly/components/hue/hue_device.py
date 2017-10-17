@@ -100,7 +100,7 @@ class HueDevice(Device):
     self._swversion = kwargs.get('swversion', '')
     self._modelid = kwargs.get('modelid', '')
     self._bri = 0
-    self._ct_fade = None
+    self._ct_fade = False
 
     if kwargs.get(self.hue_noun):
       self._on = kwargs.get(self.hue_noun).get('on', False)
@@ -111,7 +111,9 @@ class HueDevice(Device):
       self._colormode = kwargs.get(self.hue_noun).get('colormode', '')
       self._alert = kwargs.get(self.hue_noun).get('alert', False)
       self._bri = kwargs.get(self.hue_noun).get('bri', 0)
-      self._reachable = kwargs.get(self.hue_noun).get('reachable', '-1')
+      self._reachable = kwargs.get(self.hue_noun).get('reachable', False)
+      if self._reachable is None:
+        self._reachable = False
       self._ct = kwargs.get(self.hue_noun).get('ct', 0)
 
     self._level = int(self._bri / 255.0 * 100.0)
