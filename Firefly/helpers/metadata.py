@@ -269,7 +269,7 @@ COLOR_BLACK = 'black'
 COLOR_BLUE = 'blue'
 COLOR_GREEN = 'green'
 COLOR_RED = 'red'
-COLOR_YELLOW = 'yellow'
+COLOR_YELLOW = 'goldenrod'
 COLOR_GREY = 'grey'
 COLOR_ORANGE = 'orange'
 
