@@ -3,7 +3,7 @@ from Firefly.components.virtual_devices import AUTHOR
 from Firefly.const import (ACTION_SET_DELAY, ACTION_SET_PRESENCE, DEVICE_TYPE_PRESENCE, NOT_PRESENT, PRESENCE, PRESENT)
 from Firefly.helpers.action import Command
 from Firefly.helpers.device import Device
-from Firefly.helpers.metadata import metaOwntracks, metaPresence, metaQR, metaText
+from Firefly.helpers.metadata import metaOwntracks, metaPresence, metaQR, metaText, action_presence
 
 TITLE = 'Firefly Virtual Presence Device'
 DEVICE_TYPE = DEVICE_TYPE_PRESENCE
@@ -60,7 +60,7 @@ class VirtualPresence(Device):
     self.add_request('zone', self.get_zone)
     self.add_request('firebase_api_key', self.get_firebase_api_key)
 
-    self.add_action(PRESENCE, metaPresence(primary=True))
+    self.add_action(PRESENCE, action_presence())
     self.add_action('presenceText', metaText(title='Presence New', text_request=PRESENCE, context='Presence of the device.'))
     self.add_action('zone', metaText(title='Current Zone', text_request='zone', context='Current Zone'))
 

@@ -154,7 +154,7 @@ class Firebase(Service):
 
     if type(command) is dict:
       for command_string, command_args in command.items():
-        send_command = Command(ff_id, 'web_api', command_string, command_args)
+        send_command = Command(ff_id, 'web_api', command_string, **command_args)
         logging.info('FIREBASE SENDING COMMAND: %s ' % str(send_command))
         self.firefly.send_command(send_command)
         return

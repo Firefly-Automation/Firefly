@@ -25,7 +25,7 @@ WORK_AROUND_MAPPING = {
 }
 
 AVAILABLE_PACKAGES = {
-  'aeotec': ['dsc06106_smart_energy_switch', 'zw096_smart_switch_6', 'zw100_multisensor_6', 'zw100_multisensor_6', 'zw120_door_window_sensor_gen5']
+  'aeotec': ['dsc06106_smart_energy_switch', 'zw096_smart_switch_6', 'zw100_multisensor_6', 'zw100_multisensor_6', 'zw120_door_window_sensor_gen5', 'zw112_door_window_sensor_6']
 }
 
 LINKED_PACKAGES = {

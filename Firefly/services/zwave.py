@@ -3,6 +3,9 @@ import configparser
 import json
 from time import sleep
 
+import logging as pyLogging
+from logging.handlers import RotatingFileHandler
+
 from openzwave.network import ZWaveController, ZWaveNetwork, ZWaveNode, dispatcher
 from openzwave.option import ZWaveOption
 
@@ -11,6 +14,9 @@ from Firefly.components.zwave.package_lookup import get_package
 from Firefly.const import SERVICE_CONFIG_FILE, ZWAVE_FILE
 from Firefly.helpers.events import Command
 from Firefly.helpers.service import Service
+
+
+
 
 '''
 The ZWAVE service is the background service for zwave.
@@ -63,6 +69,15 @@ def Setup(firefly, package, **kwargs):
 
   zwave = Zwave(firefly, package, enable=enable, port=port, path=path, security=security, **kwargs)
   firefly.components[SERVICE_ID] = zwave
+
+  FORMAT = '%(asctime)s\t%(levelname)s:\t%(message)s'
+  zwave_logger = pyLogging.getLogger("openzwave")
+  zwave_logger.setLevel(pyLogging.DEBUG)
+  handler = RotatingFileHandler('/opt/firefly_system/firefly_zwave.log', maxBytes=100000000, backupCount=5)
+  fmt = pyLogging.Formatter(FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
+  handler.setFormatter(fmt)
+  zwave_logger.addHandler(handler)
+
   return True
 
 

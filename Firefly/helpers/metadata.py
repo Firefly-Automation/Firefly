@@ -1,4 +1,4 @@
-from Firefly.const import CONTACT, CONTACT_CLOSED, CONTACT_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, MOTION, MOTION_ACTIVE, MOTION_INACTIVE, NOT_PRESENT, PRESENT
+from Firefly.const import CONTACT, CONTACT_CLOSED, CONTACT_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, MOTION, MOTION_ACTIVE, MOTION_INACTIVE, NOT_PRESENT, PRESENCE, PRESENT
 
 
 def metaDimmer(min=0, max=100, command=True, request=False, primary=False):
@@ -356,6 +356,14 @@ def action_contact(primary=True, title='Contact sensor state', context='State of
   'Open':   [CONTACT_OPEN],
   'Closed': [CONTACT_CLOSED]
 }, color_mapping=ColorMap(green=[CONTACT_CLOSED], red=[CONTACT_OPEN])):
+  action_meta = action_text(primary=primary, title=title, context=context, request=request, text_mapping=text_mapping, color_mapping=color_mapping)
+  return action_meta
+
+
+def action_presence(primary=True, title='Presence', context='Is this person at home', request=PRESENCE, text_mapping={
+  'Home':     [PRESENT],
+  'Not Home': [NOT_PRESENT]
+}, color_mapping=ColorMap(green=[PRESENT], blue=[NOT_PRESENT])):
   action_meta = action_text(primary=primary, title=title, context=context, request=request, text_mapping=text_mapping, color_mapping=color_mapping)
   return action_meta
 
