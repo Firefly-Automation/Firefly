@@ -419,10 +419,12 @@ class Firebase(Service):
       logging.notify("Firebase 263: %s" % str(e))
 
   def refresh_user(self):
+    logging.info('[FIREBASE] REFRESHING USER')
     if not internet_up():
       logging.error('[FIREBASE REFRESH] Internet seems to be down')
       scheduler.runInM(1, self.refresh_user, 'refresh_user_internet_down')
       return
+
 
     try:
       try:
@@ -439,6 +441,7 @@ class Firebase(Service):
       pass
 
   def push(self, source, action):
+    logging.info('[FIREBASE PUSH] Pusing Data: %s' % str(action))
     try:
       if self.firefly.components[source].type == 'GROUP':
         self.db.child("homeStatus").child(self.home_id).child('groupStatus').child(source).update(action, self.id_token)
@@ -476,7 +479,7 @@ class Firebase(Service):
           'time':      now_time
         }, self.id_token)
     except Exception as e:
-      logging.error('[FIREBASE PUSH] ERROR: %s' % str(e))
+      logging.info('[FIREBASE PUSH] ERROR: %s' % str(e))
       self.refresh_user()
       self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
       if source != 'time':
