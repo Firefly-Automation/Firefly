@@ -317,9 +317,13 @@ class Zwave(Service):
         logging.message('ZWAVE INFO: NODE %s IS READY: %s' % (str(node_id), str(node.is_ready)))
         for value_id, value in node.get_sensors().items():
           # value: ZWaveValue = value
-          logging.message('ZWAVE VALUE %s ' % str(value.to_dict()))
-          command = Command(self._installed_nodes[str(node_id)], SERVICE_ID, 'ZWAVE_UPDATE', node=node, values=value)
-          self._firefly.send_command(command)
+          if node_id in self._installed_nodes:
+            logging.message('ZWAVE VALUE %s ' % str(value.to_dict()))
+            command = Command(self._installed_nodes[str(node_id)], SERVICE_ID, 'ZWAVE_UPDATE', node=node, values=value)
+            self._firefly.send_command(command)
+          else:
+            logging.info('[ZWAVE REFRESH] NEW NODE FOUND.')
+            self.zwave_handler(node=node)
           # else:
       except Exception as e:
         logging.error('ZWAVE ERROR: %s' % str(e))
