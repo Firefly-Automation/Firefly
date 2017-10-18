@@ -218,3 +218,11 @@ ALEXA_ON_REQUEST = 'TurnOnRequest'
 ALEXA_OFF_REQUEST = 'TurnOffRequest'
 ALEXA_SET_COLOR_TEMP_REQUEST = 'SetColorTemperatureRequest'
 ALEXA_SET_COLOR_REQUEST = 'SetColorRequest'
+
+
+
+# WATER SENSOR
+WATER = 'water'
+SENSOR_DRY = 'dry'
+SENSOR_WET = 'wet'
+DEVICE_TYPE_WATER_SENSOR = 'water_sensor'

@@ -2,9 +2,9 @@
 package_lookup contains tools to lookup packages for new zwave devices. This includes workarounds for devices not in openzwave
 '''
 
-from Firefly import logging
-
 from openzwave.network import ZWaveNode
+
+from Firefly import logging
 
 PACKAGE = 'package'
 ALIAS = 'alias'
@@ -19,13 +19,13 @@ WORK_AROUND_MAPPING = {
     ALIAS:   'Levition Zwave Switch'
   },  # Ecolink Door Window Plus Sensor
   'unknown:_type=0004,_id=0002': {
-    PACKAGE: 'zwave_generic_devices.contact_sensor',
+    PACKAGE: 'ecolink.contact_sensor',
     ALIAS:   'Ecolink Door/Window'
   }
 }
 
 AVAILABLE_PACKAGES = {
-  'aeotec': ['dsc06106_smart_energy_switch', 'zw096_smart_switch_6', 'zw100_multisensor_6', 'zw100_multisensor_6', 'zw120_door_window_sensor_gen5', 'zw112_door_window_sensor_6']
+  'aeotec': ['dsc06106_smart_energy_switch', 'zw096_smart_switch_6', 'zw100_multisensor_6', 'zw100_multisensor_6', 'zw120_door_window_sensor_gen5', 'zw112_door_window_sensor_6', 'dsb45_water_sensor']
 }
 
 LINKED_PACKAGES = {

@@ -128,6 +128,9 @@ class Zwave(Service):
     dispatcher.connect(self.button_handler, ZWaveNetwork.SIGNAL_BUTTON_ON)
     dispatcher.connect(self.scene_handler, ZWaveNetwork.SIGNAL_SCENE_EVENT)
 
+    #TODO: Is this best? This will cause devices to get configed on node events
+    dispatcher.connect(self.node_event_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
+
     scheduler.runInS(5, self.initialize_zwave)
 
     scheduler.runEveryH(2, self.poll_nodes)
@@ -215,6 +218,17 @@ class Zwave(Service):
   def nodes_queried_dead_handler(self, **kwargs):
     '''Called when a node is changed, added, removed'''
     logging.message('ZWAVE DEAD NODES: %s' % str(kwargs))
+
+  def node_event_handler(self, **kwargs):
+    '''Called when a node is changed, added, removed'''
+    logging.message('ZWAVE NODE EVENT HANDLER: %s' % str(kwargs))
+    node_id = kwargs.get('node').node_id
+    if str(node_id) in self._installed_nodes:
+      node = self._network.nodes[node_id]
+      command = Command(self._installed_nodes[str(node.node_id)], SERVICE_ID, 'ZWAVE_UPDATE', node=node)
+      self._firefly.send_command(command)
+    else:
+      logging.error('node %s not found in installed nodes' % str(node_id))
 
   def value_added_handler(self, **kwargs):
     '''Called when a node is changed, added, removed'''
