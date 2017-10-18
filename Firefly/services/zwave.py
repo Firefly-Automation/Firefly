@@ -177,6 +177,8 @@ class Zwave(Service):
     scheduler.runEveryH(10, self.find_dead_nodes, job_id='123-find-dead-nodes')
 
     for node_id, node in self._network.nodes.items():
+      node.refresh_info()
+      node.request_all_config_params()
       try:
         if node.node_id in self.ignore_nodes:
           logging.debug('ZWAVE HANDLER: Node %d in ignored nodes. Skipping' % node.node_id)
