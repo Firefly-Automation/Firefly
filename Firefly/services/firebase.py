@@ -494,26 +494,23 @@ class Firebase(Service):
       'time':      now_time
     }, self.id_token)
 
-  def push_notification(self, message, priority):
+  def push_notification(self, message, priority, retry=True):
     try:
-      now = self.firefly.location.now
-      now_time = now.strftime("%B %d %Y %I:%M:%S %p")
-      self.db.child("homeStatus").child(self.home_id).child('notifications').push({
-        'message':   message,
-        'priority':  priority,
-        'timestamp': now.timestamp(),
-        'time':      now_time
-      }, self.id_token)
+      self.send_notification(message, priority)
     except:
       self.refresh_user()
-      now = self.firefly.location.now
-      now_time = now.strftime("%B %d %Y %I:%M:%S %p")
-      self.db.child("homeStatus").child(self.home_id).child('notifications').push({
-        'message':   message,
-        'priority':  priority,
-        'timestamp': now.timestamp(),
-        'time':      now_time
-      }, self.id_token)
+      if retry:
+        self.push_notification(message, priority, False)
+
+  def send_notification(self, message, priority):
+    now = self.firefly.location.now
+    now_time = now.strftime("%B %d %Y %I:%M:%S %p")
+    self.db.child("homeStatus").child(self.home_id).child('notifications').push({
+      'message':   message,
+      'priority':  priority,
+      'timestamp': now.timestamp(),
+      'time':      now_time
+    }, self.id_token)
 
   def get_api_id(self, **kwargs):
     ff_id = kwargs.get('api_ff_id')
