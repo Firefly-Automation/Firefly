@@ -475,7 +475,8 @@ class Firebase(Service):
           'timestamp': now.timestamp(),
           'time':      now_time
         }, self.id_token)
-    except:
+    except Exception as e:
+      logging.error('[FIREBASE PUSH] ERROR: %s' % str(e))
       self.refresh_user()
       self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
       if source != 'time':
