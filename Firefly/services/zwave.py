@@ -284,6 +284,7 @@ class Zwave(Service):
   def notification_handler(self, **kwargs):
     logging.message('ZWAVE NOTIFICATION HANDLER: %s' % str(kwargs))
     args = kwargs.get('args')
+    logging.message('[ZWAVE NOTIFICATION] %s' % str(args))
     if args is None:
       return
     node_id = args.get('nodeId')
