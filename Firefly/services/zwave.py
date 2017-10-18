@@ -128,6 +128,9 @@ class Zwave(Service):
     dispatcher.connect(self.button_handler, ZWaveNetwork.SIGNAL_BUTTON_ON)
     dispatcher.connect(self.scene_handler, ZWaveNetwork.SIGNAL_SCENE_EVENT)
 
+    #TODO: Is this best? This will cause devices to get configed on node events
+    dispatcher.connect(self.node_event_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
+
     scheduler.runInS(5, self.initialize_zwave)
 
     scheduler.runEveryH(2, self.poll_nodes)
@@ -216,6 +219,17 @@ class Zwave(Service):
     '''Called when a node is changed, added, removed'''
     logging.message('ZWAVE DEAD NODES: %s' % str(kwargs))
 
+  def node_event_handler(self, **kwargs):
+    '''Called when a node is changed, added, removed'''
+    logging.message('ZWAVE NODE EVENT HANDLER: %s' % str(kwargs))
+    node_id = kwargs.get('node').node_id
+    if str(node_id) in self._installed_nodes:
+      node = self._network.nodes[node_id]
+      command = Command(self._installed_nodes[str(node.node_id)], SERVICE_ID, 'ZWAVE_UPDATE', node=node)
+      self._firefly.send_command(command)
+    else:
+      logging.error('node %s not found in installed nodes' % str(node_id))
+
   def value_added_handler(self, **kwargs):
     '''Called when a node is changed, added, removed'''
     logging.message('ZWAVE VALUE ADDED HANDLER: %s' % str(kwargs))
@@ -303,9 +317,13 @@ class Zwave(Service):
         logging.message('ZWAVE INFO: NODE %s IS READY: %s' % (str(node_id), str(node.is_ready)))
         for value_id, value in node.get_sensors().items():
           # value: ZWaveValue = value
-          logging.message('ZWAVE VALUE %s ' % str(value.to_dict()))
-          command = Command(self._installed_nodes[str(node_id)], SERVICE_ID, 'ZWAVE_UPDATE', node=node, values=value)
-          self._firefly.send_command(command)
+          if node_id in self._installed_nodes:
+            logging.message('ZWAVE VALUE %s ' % str(value.to_dict()))
+            command = Command(self._installed_nodes[str(node_id)], SERVICE_ID, 'ZWAVE_UPDATE', node=node, values=value)
+            self._firefly.send_command(command)
+          else:
+            logging.info('[ZWAVE REFRESH] NEW NODE FOUND.')
+            self.zwave_handler(node=node)
           # else:
       except Exception as e:
         logging.error('ZWAVE ERROR: %s' % str(e))

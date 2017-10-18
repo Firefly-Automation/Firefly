@@ -419,10 +419,12 @@ class Firebase(Service):
       logging.notify("Firebase 263: %s" % str(e))
 
   def refresh_user(self):
+    logging.info('[FIREBASE] REFRESHING USER')
     if not internet_up():
       logging.error('[FIREBASE REFRESH] Internet seems to be down')
       scheduler.runInM(1, self.refresh_user, 'refresh_user_internet_down')
       return
+
 
     try:
       try:
@@ -438,76 +440,77 @@ class Firebase(Service):
       logging.notify("Firebase 266: %s" % str(e))
       pass
 
-  def push(self, source, action):
+  def push(self, source, action, retry=True):
+    logging.info('[FIREBASE PUSH] Pushing Data: %s: %s' % (str(source), str(action)))
     try:
+      if source == 'time':
+        self.db.child("homeStatus").child(self.home_id).child('locationStatus').child(source).update(action, self.id_token)
+        # TODO(zpriddy): Remove this when new UI is done.
+        self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
+        return
+
+      if source == 'location':
+        self.db.child("homeStatus").child(self.home_id).child('locationStatus').update(action, self.id_token)
+        self.send_event(source, action)
+        return
+
       if self.firefly.components[source].type == 'GROUP':
         self.db.child("homeStatus").child(self.home_id).child('groupStatus').child(source).update(action, self.id_token)
+        self.send_event(source, action)
         return
 
 
       # New device status location
-      if source != 'time':
-        # The lines below pop unneeded zwave data.
-        # TODO(zpriddy): Find a better way to do this
-        if 'PARAMS' in action.keys():
-          return
-        if 'RAW_VALUES' in action.keys():
-          return
-        if 'SENSORS' in action.keys():
-          return
+      # The lines below pop unneeded zwave data.
+      # TODO(zpriddy): Find a better way to do this
+      if 'PARAMS' in action.keys():
+        return
+      if 'RAW_VALUES' in action.keys():
+        return
+      if 'SENSORS' in action.keys():
+        return
 
-        self.db.child("homeStatus").child(self.home_id).child('deviceStatus').child(source).update(action, self.id_token)
+      self.db.child("homeStatus").child(self.home_id).child('deviceStatus').child(source).update(action, self.id_token)
 
-        # TODO(zpriddy): Remove this when new UI is done.
-        self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
-      else:
-        self.db.child("homeStatus").child(self.home_id).child('locationStatus').child(source).update(action, self.id_token)
-
-        # TODO(zpriddy): Remove this when new UI is done.
-        self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
-
-      if source != 'time':
-        now = self.firefly.location.now
-        now_time = now.strftime("%B %d %Y %I:%M:%S %p")
-        self.db.child("homeStatus").child(self.home_id).child('events').push({
-          'ff_id':     source,
-          'event':     action,
-          'timestamp': now.timestamp(),
-          'time':      now_time
-        }, self.id_token)
-    except:
-      self.refresh_user()
+      # TODO(zpriddy): Remove this when new UI is done.
       self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
-      if source != 'time':
-        now = self.firefly.location.now
-        now_time = now.strftime("%B %d %Y %I:%M:%S %p")
-        self.db.child("homeStatus").child(self.home_id).child('events').push({
-          'ff_id':     source,
-          'event':     action,
-          'timestamp': now.timestamp(),
-          'time':      now_time
-        }, self.id_token)
 
-  def push_notification(self, message, priority):
+      self.send_event(source, action)
+
+    except Exception as e:
+      logging.info('[FIREBASE PUSH] ERROR: %s' % str(e))
+      self.refresh_user()
+      if retry:
+        self.push(source, action, False)
+
+
+  def send_event(self, source, action):
+    now = self.firefly.location.now
+    now_time = now.strftime("%B %d %Y %I:%M:%S %p")
+    self.db.child("homeStatus").child(self.home_id).child('events').push({
+      'ff_id':     source,
+      'event':     action,
+      'timestamp': now.timestamp(),
+      'time':      now_time
+    }, self.id_token)
+
+  def push_notification(self, message, priority, retry=True):
     try:
-      now = self.firefly.location.now
-      now_time = now.strftime("%B %d %Y %I:%M:%S %p")
-      self.db.child("homeStatus").child(self.home_id).child('notifications').push({
-        'message':   message,
-        'priority':  priority,
-        'timestamp': now.timestamp(),
-        'time':      now_time
-      }, self.id_token)
+      self.send_notification(message, priority)
     except:
       self.refresh_user()
-      now = self.firefly.location.now
-      now_time = now.strftime("%B %d %Y %I:%M:%S %p")
-      self.db.child("homeStatus").child(self.home_id).child('notifications').push({
-        'message':   message,
-        'priority':  priority,
-        'timestamp': now.timestamp(),
-        'time':      now_time
-      }, self.id_token)
+      if retry:
+        self.push_notification(message, priority, False)
+
+  def send_notification(self, message, priority):
+    now = self.firefly.location.now
+    now_time = now.strftime("%B %d %Y %I:%M:%S %p")
+    self.db.child("homeStatus").child(self.home_id).child('notifications').push({
+      'message':   message,
+      'priority':  priority,
+      'timestamp': now.timestamp(),
+      'time':      now_time
+    }, self.id_token)
 
   def get_api_id(self, **kwargs):
     ff_id = kwargs.get('api_ff_id')
