@@ -437,7 +437,8 @@ class Firebase(Service):
       self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler, self.id_token)
       self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
     except Exception as e:
-      logging.notify("Firebase 266: %s" % str(e))
+      logging.info("Firebase 266: %s" % str(e))
+      scheduler.runInH(1, self.refresh_user, 'firebase_refresh_user')
       pass
 
   def push(self, source, action, retry=True):
