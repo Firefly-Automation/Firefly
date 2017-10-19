@@ -25,17 +25,24 @@ DEVICE_FILE = 'dev_config/devices.json'
 AUTOMATION_FILE = 'dev_config/automation.json'
 LOCATION_FILE = 'dev_config/location.json'
 ZWAVE_FILE = 'dev_config/zwave.json'
+GROUPS_CONFIG_FILE = 'dev_config/groups.json'
 
+REQUIRED_FILES = {
+  ALIAS_FILE:          {},
+  AUTOMATION_FILE:     [],
+  CONFIG_FILE:         None,
+  DEVICE_FILE:         [],
+  GROUPS_CONFIG_FILE:  {},
+  LOCATION_FILE:       {},
+  SERVICE_CONFIG_FILE: None,
+  ZWAVE_FILE:          {}
+}
 
 # FOOBOT SERVICE
 SERVICE_FOOBOT = 'service_foobot'
 FOOBOT_SECTION = 'FOOBOT'
 
-
-GROUPS_CONFIG_FILE = 'dev_config/groups.json'
-
 TYPE_ZWAVE_SERVICE = 'zwave_service'
-
 
 SERVICE_NOTIFICATION = 'FIREFLY_NOTIFICATION_SERVICE'
 NOTIFY_DEFAULT = 'DEFAULT'
@@ -43,8 +50,6 @@ PRIORITY_NORMAL = 0
 PRIORITY_LOW = -1
 PRIORITY_HIGH = 1
 PRIORITY_EMERGENCY = 2
-
-
 
 # #### EVENT TYPES ####
 EVENT_TYPE_ANY = 'ANY'
@@ -66,7 +71,6 @@ EVENT_ACTION_MODE = 'mode'
 
 EVENT_PROPERTY_ANY = 'ANY'
 
-
 TYPE_AUTOMATION = 'TYPE_AUTOMATION'
 TYPE_DEVICE = 'TYPE_DEVICE'
 TYPE_SERVICE = 'TYPE_SERVICE'
@@ -75,8 +79,6 @@ TYPE_LOCATION = 'TYPE_LOCATION'
 API_INFO_REQUEST = 'API_INFO_REQUEST'
 API_FIREBASE_VIEW = 'API_FIREBASE_VIEW'
 API_ALEXA_VIEW = 'API_ALEXA_VIEW'
-
-
 
 EVENT_DAWN = 'dawn'
 EVENT_SUNRISE = 'sunrise'
@@ -121,8 +123,6 @@ ENABLED = True
 STATE_CLOSED = 'close'
 STATE_OPEN = 'open'
 
-
-
 # ### TAG VALUES ###
 SWITCH_OFF = EVENT_ACTION_OFF
 SWITCH_ON = EVENT_ACTION_ON
@@ -133,12 +133,9 @@ CONTACT_OPEN = STATE_OPEN
 MOTION_ACTIVE = EVENT_ACTION_ACTIVE
 MOTION_INACTIVE = EVENT_ACTION_INACTIVE
 
-
-
 # ### PRESENCE ####
 PRESENT = 'present'
 NOT_PRESENT = 'not_present'
-
 
 # #### DEVICE TYPES ####
 DEVICE_TYPE_SWITCH = 'switch'
@@ -149,7 +146,6 @@ DEVICE_TYPE_NOTIFICATION = 'NOTIFICATION'
 DEVICE_TYPE_MOTION = 'MOTION'
 DEVICE_TYPE_PRESENCE = 'presence'
 
-
 SOURCE_LOCATION = 'location'
 SOURCE_TIME = 'time'
 
@@ -159,7 +155,6 @@ COMMAND_UPDATE = 'UPDATE'
 
 TIME = 'time'
 
-
 # #### CONDITIONS ####
 IS_DARK = 'IS_DARK'
 IS_LIGHT = 'IS_LIGHT'
@@ -168,16 +163,13 @@ IS_NOT_MODE = 'IS_NOT_MODE'
 IS_TIME_RANGE = 'TIME_RANGE'
 IS_NOT_TIME_RANGE = 'NOT_TIME_RANGE'
 
-COMPONENT_MAP = [
-  {
-    'type': TYPE_AUTOMATION,
-    'file': AUTOMATION_FILE
-  },
-  {
-    'type': TYPE_DEVICE,
-    'file': DEVICE_FILE
-  }
-]
+COMPONENT_MAP = [{
+  'type': TYPE_AUTOMATION,
+  'file': AUTOMATION_FILE
+}, {
+  'type': TYPE_DEVICE,
+  'file': DEVICE_FILE
+}]
 
 # TODO: This may not be needed
 SENSORS = {
@@ -195,8 +187,6 @@ SENSORS = {
   'Ultraviolet':       'ULTRAVIOLET'
 }
 
-
-
 # ALEXA
 ALEXA_DEC_PERCENTAGE = "decrementPercentage"
 ALEXA_DEC_COLOR_TEMP = "decrementColorTemperature"
@@ -206,7 +196,7 @@ ALEXA_GET_COLOR_TEMP = "getTargetTemperature"
 ALEXA_GET_TEMP = "getTemperatureReading"
 ALEXA_INC_PERCENTAGE = "incrementPercentage"
 ALEXA_INC_COLOR_TEMP = "incrementColorTemperature"
-ALEXA_INC_TEMP ="incrementTargetTemperature"
+ALEXA_INC_TEMP = "incrementTargetTemperature"
 ALEXA_SET_COLOR = "setColor"
 ALEXA_SET_COLOR_TEMP = "setColorTemperature"
 ALEXA_SET_LOCK = "setLockState"
@@ -221,11 +211,8 @@ ALEXA_OFF_REQUEST = 'TurnOffRequest'
 ALEXA_SET_COLOR_TEMP_REQUEST = 'SetColorTemperatureRequest'
 ALEXA_SET_COLOR_REQUEST = 'SetColorRequest'
 
-
-
 # WATER SENSOR
 WATER = 'water'
 SENSOR_DRY = 'dry'
 SENSOR_WET = 'wet'
 DEVICE_TYPE_WATER_SENSOR = 'water_sensor'
-

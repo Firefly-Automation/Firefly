@@ -4,13 +4,15 @@ import importlib
 import json
 import signal
 import sys
+from os import path
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
+from pathlib import Path
 
 from aiohttp import web
 
 from Firefly import aliases, logging, scheduler
-from Firefly.const import COMPONENT_MAP, DEVICE_FILE, EVENT_TYPE_BROADCAST, LOCATION_FILE, SERVICE_CONFIG_FILE, TIME, TYPE_DEVICE, VERSION
+from Firefly.const import COMPONENT_MAP, DEVICE_FILE, EVENT_TYPE_BROADCAST, LOCATION_FILE, SERVICE_CONFIG_FILE, TIME, TYPE_DEVICE, VERSION, REQUIRED_FILES
 from Firefly.helpers.events import (Event, Request)
 from Firefly.helpers.groups.groups import import_groups
 from Firefly.helpers.location import Location
@@ -37,6 +39,8 @@ class Firefly(object):
     logging.Startup(self)
     logging.message('Initializing Firefly')
 
+    self.check_required_files()
+
     # TODO (zpriddy): Add import and export of current state.
     self.current_state = {}
 
@@ -51,7 +55,7 @@ class Firefly(object):
 
     self._subscriptions = Subscriptions()
 
-    self.location = self.set_location()
+    self.location = self.import_location()
 
     # Get the beacon ID.
     self.beacon_id = settings.beacon_id
@@ -100,23 +104,42 @@ class Firefly(object):
     except Exception as e:
       logging.error('[CORE INSTALL COMPONENT] ERROR INSTALLING: %s' % str(e))
 
-  def set_location(self) -> Location:
-    try:
-      with open(LOCATION_FILE) as file:
-        l = json.loads(file.read())
-        return Location(self, l['zipcode'], l['modes'], l['mode'], l['last_mode'])
-    except KeyError:
-      return Location(self, self.settings.postal_code, self.settings.modes)
-    except FileNotFoundError:
-      return Location(self, self.settings.postal_code, self.settings.modes)
-    except Exception as e:
-      logging.critical('Error importing location data. Exiting. - %s' % str(e))
-      exit(1)
+
+  def import_location(self) -> Location:
+    ''' Import location data.
+
+    Returns:
+
+    '''
+    return Location(self, LOCATION_FILE)
 
   def export_location(self) -> None:
-    location_data = self.location.export()
-    with open(LOCATION_FILE, 'w') as file:
-      json.dump(location_data, file, indent=4, sort_keys=True)
+    ''' Export location data.
+
+    Returns:
+
+    '''
+    self.location.export_to_file()
+
+  def check_required_files(self, **kwargs):
+    ''' Make sure all required files are there. If not set to default content.
+
+    Args:
+      **kwargs:
+
+    Returns:
+
+    '''
+    logging.info('[CORE] checking required files')
+    for file_path, default_content in REQUIRED_FILES.items():
+      if not path.isfile(file_path):
+        if default_content is None:
+          Path.touch(file_path)
+        elif type(default_content) is dict or type(default_content) is list:
+          with open(file_path, 'rw') as new_file:
+            json.dump(default_content, new_file)
+
+
 
   def install_services(self) -> None:
     config = configparser.ConfigParser()

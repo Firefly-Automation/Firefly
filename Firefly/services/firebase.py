@@ -163,6 +163,15 @@ class Firebase(Service):
 
     '''
     logging.info('[FIREBASE SEND COMMAND] : %s:%s' % (str(ff_id), str(command)))
+
+    # Location is a special case.
+    if ff_id == 'location':
+      if type(command) is not dict:
+        return
+      for command_string, command_args in command.items():
+        send_command = Command(ff_id, 'web_api', command_string, **command_args)
+        self.firefly.location.process_command(send_command)
+
     if type(command) is str:
       send_command = Command(ff_id, 'web_api', command)
       logging.info('FIREBASE SENDING COMMAND: %s ' % str(send_command))
@@ -172,7 +181,7 @@ class Firebase(Service):
         scheduler.runInS(10, self.update_device_views, job_id='firebase_refresh')
       return
 
-    #TODO Handle install package command
+    # TODO Handle install package command
     # if list(command.keys())[0] == 'install_package':
     #   self.firefly.install_package(**dict(list(command.values())[0]))
 
@@ -277,7 +286,6 @@ class Firebase(Service):
 
     except Exception as e:
       logging.notify("Firebase 271: %s" % str(e))
-
 
   def update_last_metadata_timestamp(self):
     ''' Update the lastMetadataUpdate timestamp
@@ -429,7 +437,6 @@ class Firebase(Service):
     '''
     self.set_home_status(FIREBASE_ALIASES, aliases.aliases)
 
-
   def get_routines(self):
     routines = {
       'view':   [],
@@ -484,18 +491,25 @@ class Firebase(Service):
     now = self.firefly.location.now
     return_data = {
       'time':           {
-        'epoch':  now.timestamp(),
-        'day':    now.day,
-        'month':  now.month,
-        'year':   now.year,
-        'hour':   now.hour,
-        'minute': now.minute,
-        'str':    str(now)
+        'epoch':    now.timestamp(),
+        'day':      now.day,
+        'month':    now.month,
+        'year':     now.year,
+        'hour':     now.hour,
+        'minute':   now.minute,
+        'str':      str(now),
+        'timeZone': self.firefly.location.geolocation.timezone
+      },
+      'location':       {
+        'lat':     self.firefly.location.latitude,
+        'lon':     self.firefly.location.longitude,
+        'address': self.firefly.location.address
       },
       'isDark':         self.firefly.location.isDark,
       'mode':           self.firefly.location.mode,
       'lastMode':       self.firefly.location.lastMode,
-      'statusMessages': self.firefly.location.status_messages
+      'statusMessages': self.firefly.location.status_messages,
+      'modes':          self.firefly.location.modes
     }
     return return_data
 
@@ -550,7 +564,6 @@ class Firebase(Service):
         self.db.child("homeStatus").child(self.home_id).child('groupStatus').child(source).update(action, self.id_token)
         self.send_event(source, action)
         return
-
 
       self.update_device_status(source, action)
 
