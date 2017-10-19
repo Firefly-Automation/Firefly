@@ -10,13 +10,12 @@ from typing import Any
 from aiohttp import web
 
 from Firefly import aliases, logging, scheduler
-from Firefly.const import COMPONENT_MAP, DEVICE_FILE, LOCATION_FILE, SERVICE_CONFIG_FILE, TIME, VERSION, TYPE_DEVICE, EVENT_TYPE_BROADCAST
+from Firefly.const import COMPONENT_MAP, DEVICE_FILE, EVENT_TYPE_BROADCAST, LOCATION_FILE, SERVICE_CONFIG_FILE, TIME, TYPE_DEVICE, VERSION
 from Firefly.helpers.events import (Event, Request)
+from Firefly.helpers.groups.groups import import_groups
 from Firefly.helpers.location import Location
 from Firefly.helpers.room import Rooms
 from Firefly.helpers.subscribers import Subscriptions
-
-from Firefly.helpers.groups.groups import import_groups
 
 app = web.Application()
 
@@ -75,7 +74,6 @@ class Firefly(object):
     # Import Groups
     import_groups(self)
 
-
     # TODO: MOST OF WHATS BELOW IS FOR TESTING
     # self.install_package('Firefly.components.virtual_devices.switch', alias='Test Device', initial_values={
     # '_state': 'UNKNOWN'})
@@ -105,12 +103,10 @@ class Firefly(object):
     # TODO: Leave In.
     scheduler.runEveryH(1, self.export_all_components)
 
-
     # Set the current state for all devices.
     # TODO (zpriddy): Remove this when import and export is done.
     all_devices = set([c_id for c_id, c in self.components.items() if (c.type == TYPE_DEVICE or c.type == 'ROOM')])
     self.current_state = self.get_device_states(all_devices)
-
 
   def install_component(self, component):
     ''' Install a component into the core components.
@@ -125,7 +121,6 @@ class Firefly(object):
       self.components[component.id] = component
     except Exception as e:
       logging.error('[CORE INSTALL COMPONENT] ERROR INSTALLING: %s' % str(e))
-
 
   def set_location(self) -> Location:
     try:
@@ -270,7 +265,7 @@ class Firefly(object):
     package = importlib.import_module(module)
     if kwargs.get('package'):
       kwargs.pop('package')
-    setup_return =  package.Setup(self, module, **kwargs)
+    setup_return = package.Setup(self, module, **kwargs)
     scheduler.runInS(10, self.refresh_firebase, job_id='FIREBASE_REFRESH_CORE')
     return setup_return
 
@@ -303,7 +298,7 @@ class Firefly(object):
         self.components[s].event(event)
       except Exception as e:
         logging.error('Error sending event %s' % str(e))
-      # self.loop.run_in_executor(None,self.components[s].event, event)
+        # self.loop.run_in_executor(None,self.components[s].event, event)
     self.update_current_state(event)
     self.send_firebase(event)
     return True
@@ -339,7 +334,7 @@ class Firefly(object):
         fut = asyncio.run_coroutine_threadsafe(self.new_send_command(command, None, self.loop), self.loop)
         return fut.result(10)
       else:
-        #asyncio.run_coroutine_threadsafe(self.send_command_no_wait(command, self.loop), self.loop)
+        # asyncio.run_coroutine_threadsafe(self.send_command_no_wait(command, self.loop), self.loop)
         self.components[command.device].command(command)
         return True
     except Exception as e:
@@ -391,7 +386,6 @@ class Firefly(object):
       current_state[device] = self.components[device].get_all_request_values()
     return current_state
 
-
   def update_current_state(self, event: Event) -> None:
     """
     Update the global current state when a broadcast event is sent.
@@ -414,7 +408,6 @@ class Firefly(object):
 
   def get_current_states(self):
     return self.current_state
-
 
   @property
   def components(self):
