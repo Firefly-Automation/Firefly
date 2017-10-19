@@ -151,6 +151,8 @@ DEVICE_TYPE_PRESENCE = 'presence'
 
 
 SOURCE_LOCATION = 'location'
+SOURCE_TIME = 'time'
+
 SOURCE_TRIGGER = 'SOURCE_TRIGGER'
 
 COMMAND_UPDATE = 'UPDATE'
@@ -226,3 +228,4 @@ WATER = 'water'
 SENSOR_DRY = 'dry'
 SENSOR_WET = 'wet'
 DEVICE_TYPE_WATER_SENSOR = 'water_sensor'
+

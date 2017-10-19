@@ -20,10 +20,12 @@ class ContactSensor(ZwaveContactSensor):
     super().__init__(firefly, package, TITLE, **kwargs)
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, values: ZWaveValue = None, values_only=False, **kwargs):
-    super().update_from_zwave(node, ignore_update, values, values_only, **kwargs)
-
     if node is None:
       return
 
     if not node.values[self.value_map['Sensor']].is_polled:
       node.values[self.value_map['Sensor']].enable_poll()
+
+    super().update_from_zwave(node, ignore_update, values, values_only, **kwargs)
+
+

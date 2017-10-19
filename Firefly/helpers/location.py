@@ -17,6 +17,9 @@ class Location(object):
     self._isDark = True
     self._city = None
 
+    # Status messages are information for the ui. Each is given an ID so that it can be removed later on.
+    self.status_messages = {}
+
     if mode:
       self._mode = mode
     else:
@@ -158,6 +161,21 @@ class Location(object):
       'weekday': now.isoweekday()
     })
     self.firefly.send_event(event)
+
+  def add_status_message(self, message_id, message):
+    self.status_messages[message_id] = message
+    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={
+      'status_message': 'updated'
+    })
+    self._firefly.send_event(event)
+
+  def remove_status_message(self, message_id):
+    if message_id in self.status_messages:
+      self.status_messages.pop(message_id)
+      event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={
+        'status_message': 'updated'
+      })
+      self._firefly.send_event(event)
 
   @property
   def longitude(self) -> int:

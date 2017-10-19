@@ -153,6 +153,9 @@ class Zwave(Service):
       self._enable = False
       return
 
+    self.firefly.location.add_status_message('zwave_startup', 'ZWave service is starting up. This can take 5 minutes.')
+    scheduler.runInM(5, self.firefly.location.remove_status_message, job_id='zwave_startup_message', message_id='zwave_startup')
+
     logging.message('Starting ZWAVE - This can take up to 5 minutes.. Will notify when finished')
 
     for i in range(STARTUP_TIMEOUT):
