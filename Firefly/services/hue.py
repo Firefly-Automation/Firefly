@@ -31,8 +31,7 @@ def Setup(firefly, package, **kwargs):
     return False
 
   hue = Hue(firefly, package, enable=enable, ip=ip, username=username, **kwargs)
-  firefly.components[SERVICE_ID] = hue
-
+  firefly.install_component(hue)
   return True
 
 

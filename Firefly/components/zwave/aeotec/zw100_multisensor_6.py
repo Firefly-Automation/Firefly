@@ -25,9 +25,7 @@ INITIAL_VALUES = {
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   sensor = ZwaveAeotecMulti(firefly, package, **kwargs)
-  # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[sensor.id] = sensor
-  return sensor.id
+  firefly.install_component(sensor)
 
 
 class ZwaveAeotecMulti(ZwaveMultiSensor):

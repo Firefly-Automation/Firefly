@@ -33,7 +33,7 @@ def Setup(firefly, package, **kwargs):
     return False
 
   lighify = Lightify(firefly, package, enable=enable, ip=ip,  **kwargs)
-  firefly.components[SERVICE_ID] = lighify
+  firefly.install_component(lighify)
 
   return True
 

@@ -17,8 +17,7 @@ REQUESTS = ['default_list']
 
 def Setup(firefly, package, **kwargs):
   notify = Notify(firefly, package, **kwargs)
-  firefly.components[SERVICE_ID] = notify
-  return True
+  firefly.install_component(notify)
 
 
 class Notify(Service):

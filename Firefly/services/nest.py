@@ -30,7 +30,7 @@ def Setup(firefly, package, **kwargs):
     return False
 
   newNest = Nest(firefly, package, enable=enable, cache_file=cache_file, client_id=client_id, client_secret=client_secret, **kwargs)
-  firefly.components[SERVICE_ID] = newNest
+  firefly.install_component(newNest)
 
 
 class Nest(Service):

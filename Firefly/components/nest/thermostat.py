@@ -28,8 +28,7 @@ MODE_LIST = ['off', 'eco', 'cool', 'heat', 'heat-cool']
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   thermostat = Thermostat(firefly, package, **kwargs)
-  # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[thermostat.id] = thermostat
+  firefly.install_component(thermostat)
 
   refresh_command = Command('service_firebase', 'nest', 'refresh')
   firefly.send_command(refresh_command)

@@ -112,6 +112,21 @@ class Firefly(object):
     self.current_state = self.get_device_states(all_devices)
 
 
+  def install_component(self, component):
+    ''' Install a component into the core components.
+
+    Args:
+      component: Component object
+
+    Returns:
+
+    '''
+    try:
+      self.components[component.id] = component
+    except Exception as e:
+      logging.error('[CORE INSTALL COMPONENT] ERROR INSTALLING: %s' % str(e))
+
+
   def set_location(self) -> Location:
     try:
       with open(LOCATION_FILE) as file:

@@ -58,7 +58,7 @@ def Setup(firefly, package, **kwargs):
     logging.error('firebase error')  # TODO Make this error code
     return False
   firebase = Firebase(firefly, package, api_key=api_key, auth_domain=auth_domain, database_url=database_url, email=email, password=password, storage_bucket=storage_bucket, home_id=home_id)
-  firefly.components[SERVICE_ID] = firebase
+  firefly.install_component(firebase)
   return True
 
 

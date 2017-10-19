@@ -68,16 +68,7 @@ def Setup(firefly, package, **kwargs):
     pass
 
   zwave = Zwave(firefly, package, enable=enable, port=port, path=path, security=security, **kwargs)
-  firefly.components[SERVICE_ID] = zwave
-
-  FORMAT = '%(asctime)s\t%(levelname)s:\t%(message)s'
-  zwave_logger = pyLogging.getLogger("openzwave")
-  zwave_logger.setLevel(pyLogging.DEBUG)
-  handler = RotatingFileHandler('/opt/firefly_system/firefly_zwave.log', maxBytes=100000000, backupCount=5)
-  fmt = pyLogging.Formatter(FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
-  handler.setFormatter(fmt)
-  zwave_logger.addHandler(handler)
-
+  firefly.install_component(zwave)
   return True
 
 

@@ -73,7 +73,7 @@ Sample response:
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   foobot = Foobot(firefly, package, **kwargs)
-  firefly.components[foobot.id] = foobot
+  firefly.install_component(foobot)
 
 
 class Foobot(Device):
