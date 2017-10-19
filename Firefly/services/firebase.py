@@ -362,7 +362,10 @@ class Firebase(Service):
 
     '''
     logging.info('[FIREBASE DEVICE VIEW UPDATE] updating all device views')
-    device_views = self.get_all_component_views('firebase_refresh', filter=TYPE_DEVICE)
+    device_views = {}
+    devices = self.get_all_component_views('firebase_refresh', filter=TYPE_DEVICE)
+    for device in devices:
+      device_views[device.id] = device
     self.set_home_status(FIREBASE_DEVICE_VIEWS, device_views)
     self.update_aliases()
     self.update_last_metadata_timestamp()
