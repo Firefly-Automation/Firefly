@@ -63,41 +63,19 @@ class Firefly(object):
 
 
     for c in COMPONENT_MAP:
-      self.import_devices(c['file'])
+      self.import_components(c['file'])
 
     self.install_services()
 
-    # TODO: Building rooms will have to happen whenever a devices is added
+    # TODO: Rooms will be replaced by groups subclass rooms.
     self._rooms = Rooms(self)
     self._rooms.build_rooms()
 
     # Import Groups
     import_groups(self)
 
-    # TODO: MOST OF WHATS BELOW IS FOR TESTING
-    # self.install_package('Firefly.components.virtual_devices.switch', alias='Test Device', initial_values={
-    # '_state': 'UNKNOWN'})
-
-    # self.install_package('Firefly.components.virtual_devices.presence', alias='Ariel Presence')
-    # self.install_package('Firefly.components.virtual_devices.presence', alias='Zach Presence')
-
-    # for _, ff_id in self._devices.items():
-    #  print(ff_id.export())
-
-    # TODO: Test of routines
-    # from Firefly.automation.routine import Routine
-    # from Firefly.automation.triggers import Trigger
-    # self._devices['test_routine'] = Routine(self, 'test_routine')
-    # self._devices['test_routine'].add_trigger(Trigger('66fdff0a-1fa5-4234-91bc-465c72aafb23',EVENT_ACTION_ANY))
-    # self._devices['test_routine'].add_trigger(Trigger('3b11cea9-a148-49d5-9467-bddb9f4ad937', EVENT_ACTION_LEVEL))
-    # self._devices['test_routine'].add_trigger(Trigger('3b11cea9-a148-49d5-9467-bddb9f4ad937', EVENT_ACTION_ANY))
-    # self._devices['test_routine'].add_trigger(Trigger(SOURCE_LOCATION, EVENT_ACTION_ANY))
-
-    # self.install_package('Firefly.automation.routine', alias='Test Routines', ff_id='test_routine')
-    # self.components['test_routine'].add_trigger(Trigger('66fdff0a-1fa5-4234-91bc-465c72aafb23',EVENT_ACTION_ANY))
 
     logging.error(code='FF.COR.INI.001')  # this is a test error message
-    # logging.notify('Firefly is starting up')
     logging.notify('Firefly is starting up in mode: %s' % self.location.mode)
 
     # TODO: Leave In.
@@ -141,7 +119,6 @@ class Firefly(object):
       json.dump(location_data, file, indent=4, sort_keys=True)
 
   def install_services(self) -> None:
-    # logging.notify('Installing Services')
     config = configparser.ConfigParser()
     config.read(SERVICE_CONFIG_FILE)
     services = config.sections()
@@ -166,7 +143,6 @@ class Firefly(object):
     """
     Start up Firefly.
     """
-    # TODO: Import current state of components on boot.
     try:
       web.run_app(app, host=self.settings.firefly_host, port=self.settings.firefly_port)
     except KeyboardInterrupt:
@@ -181,7 +157,6 @@ class Firefly(object):
 
     Shutdown process should export the current state of all components so it can be imported on reboot and startup.
     '''
-    # TODO: Export current state of components on shutdown
     logging.message('Stopping Firefly')
 
     self.export_all_components()
@@ -220,11 +195,17 @@ class Firefly(object):
       self.export_components(c['file'], c['type'])
     aliases.export_aliases()
 
-  # TODO: Rename this import_omponents
-  def import_devices(self, config_file=DEVICE_FILE):
+
+  def import_components(self, config_file=DEVICE_FILE):
+    ''' Import all components from the devices file
+
+    Args:
+      config_file: json file of all components
+
+    Returns:
+
+    '''
     logging.message('Importing components from config file.')
-    # TODO: Check for duplicate alias and or IDs.
-    devices = {}
     try:
       with open(config_file) as file:
         devices = json.loads(file.read())
@@ -269,7 +250,15 @@ class Firefly(object):
     scheduler.runInS(10, self.refresh_firebase, job_id='FIREBASE_REFRESH_CORE')
     return setup_return
 
-  def send_firebase(self, event):
+  def send_firebase(self, event: Event):
+    ''' Send and event to firebase
+
+    Args:
+      event: event to be sent
+
+    Returns:
+
+    '''
     if self.components.get('service_firebase'):
       self.components['service_firebase'].push(event.source, event.event_action)
 
