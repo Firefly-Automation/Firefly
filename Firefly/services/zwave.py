@@ -68,16 +68,7 @@ def Setup(firefly, package, **kwargs):
     pass
 
   zwave = Zwave(firefly, package, enable=enable, port=port, path=path, security=security, **kwargs)
-  firefly.components[SERVICE_ID] = zwave
-
-  FORMAT = '%(asctime)s\t%(levelname)s:\t%(message)s'
-  zwave_logger = pyLogging.getLogger("openzwave")
-  zwave_logger.setLevel(pyLogging.DEBUG)
-  handler = RotatingFileHandler('/opt/firefly_system/firefly_zwave.log', maxBytes=100000000, backupCount=5)
-  fmt = pyLogging.Formatter(FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
-  handler.setFormatter(fmt)
-  zwave_logger.addHandler(handler)
-
+  firefly.install_component(zwave)
   return True
 
 
@@ -152,6 +143,9 @@ class Zwave(Service):
       logging.error(code='FF.ZWA.INI.001', args=e)  # error opening zwave port. are you running as sudo? is the port correct? error: %s
       self._enable = False
       return
+
+    self.firefly.location.add_status_message('zwave_startup', 'ZWave service is starting up. This can take 5 minutes.')
+    scheduler.runInM(5, self.firefly.location.remove_status_message, job_id='zwave_startup_message', message_id='zwave_startup')
 
     logging.message('Starting ZWAVE - This can take up to 5 minutes.. Will notify when finished')
 

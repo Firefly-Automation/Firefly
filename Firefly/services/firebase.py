@@ -1,19 +1,30 @@
 import configparser
 import copy
 import json
+from os import system
 
 import pyrebase
 import requests
 
 from Firefly import aliases, logging, scheduler
-from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SERVICE_CONFIG_FILE, TYPE_AUTOMATION, TYPE_DEVICE
+from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SERVICE_CONFIG_FILE, SOURCE_LOCATION, SOURCE_TIME, TYPE_AUTOMATION, TYPE_DEVICE
 from Firefly.helpers.service import Command, Request, Service
 from Firefly.services.api_ai import apiai_command_reply
 
-from os import system
+FIREBASE_LOCATION_STATUS_PATH = 'locationStatus'
+FIREBASE_DEVICE_VIEWS = 'deviceViews'
+FIREBASE_DEVICE_STATUS = 'deviceStatus'
+FIREBASE_ALIASES = 'aliases'
+
+# This is the action when status messages are updated
+STATUS_MESSAGE_UPDATED = {
+  'status_message': 'updated'
+}
+
 
 def internet_up():
   return system("ping -c 1 8.8.8.8") == 0
+
 
 TITLE = 'Firebase Service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
@@ -47,7 +58,7 @@ def Setup(firefly, package, **kwargs):
     logging.error('firebase error')  # TODO Make this error code
     return False
   firebase = Firebase(firefly, package, api_key=api_key, auth_domain=auth_domain, database_url=database_url, email=email, password=password, storage_bucket=storage_bucket, home_id=home_id)
-  firefly.components[SERVICE_ID] = firebase
+  firefly.install_component(firebase)
   return True
 
 
@@ -92,12 +103,10 @@ class Firebase(Service):
       self.register_home()
 
     scheduler.runEveryM(30, self.refresh_user)
-    scheduler.runEveryM(5, self.refresh_all)
+    scheduler.runEveryM(20, self.refresh_all)
     scheduler.runInS(20, self.refresh_all)
-    scheduler.runEveryM(20, self.refresh_status)
-    scheduler.runInS(20, self.refresh_status)
 
-    self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler, self.id_token)
+    self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.command_stream_handler, self.id_token)
     self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
 
   def register_home(self):
@@ -125,7 +134,7 @@ class Firebase(Service):
       return
 
     self.stream.close()
-    self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler, self.id_token)
+    self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.command_stream_handler, self.id_token)
     self.commandReplyStream.close()
     self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
 
@@ -143,14 +152,38 @@ class Firebase(Service):
     except Exception as e:
       print(str(e))
 
-
   def firebase_send_command(self, ff_id, command):
+    ''' process and send command from firebase commands
+
+    Args:
+      ff_id: device to send command to
+      command: command to be sent
+
+    Returns:
+
+    '''
     logging.info('[FIREBASE SEND COMMAND] : %s:%s' % (str(ff_id), str(command)))
+
+    # Location is a special case.
+    if ff_id == 'location':
+      if type(command) is not dict:
+        return
+      for command_string, command_args in command.items():
+        send_command = Command(ff_id, 'web_api', command_string, **command_args)
+        self.firefly.location.process_command(send_command)
+
     if type(command) is str:
       send_command = Command(ff_id, 'web_api', command)
       logging.info('FIREBASE SENDING COMMAND: %s ' % str(send_command))
       self.firefly.send_command(send_command)
+
+      if command == 'delete':
+        scheduler.runInS(10, self.update_device_views, job_id='firebase_refresh')
       return
+
+    # TODO Handle install package command
+    # if list(command.keys())[0] == 'install_package':
+    #   self.firefly.install_package(**dict(list(command.values())[0]))
 
     if type(command) is dict:
       for command_string, command_args in command.items():
@@ -159,9 +192,15 @@ class Firebase(Service):
         self.firefly.send_command(send_command)
         return
 
+  def command_stream_handler(self, message):
+    ''' Handle commands sent from the ui
 
-  def stream_handler(self, message):
-    refresh = False
+    Args:
+      message: message from command stream
+
+    Returns:
+
+    '''
     try:
       logging.message('FIREBASE MESSAGE: %s ' % str(message))
       # Return if no data
@@ -180,44 +219,7 @@ class Firebase(Service):
         self.db.child('homeStatus').child(self.home_id).child('commands').child(ff_id).remove(self.id_token)
 
     except Exception as e:
-      logging.notify('Firebase Stream Error: %s' % str(e))
-
-
-    # TODO: Remove this when proven to work
-    '''
-    return
-    try:
-      logging.message(str(message))
-      if message['data']:
-        path = message['path']
-        ff_id = path[1:]
-        command = message['data']
-        myCommand = None
-        if type(command) is str:
-          myCommand = Command(ff_id, 'webapi', command)
-          refresh = command == 'delete'
-        elif type(command) is dict:
-          # TODO: Make this more structured.
-          if list(command.keys())[0] == 'install_package':
-            self.firefly.install_package(**dict(list(command.values())[0]))
-            refresh = True
-          else:
-            myCommand = Command(ff_id, 'webapi', list(command.keys())[0], **dict(list(command.values())[0]))
-            refresh = list(command.keys())[0] == 'set_alias' or list(command.keys())[0] == 'set_room'
-        logging.info('FIREBASE MESSAGE: %s ' % str(message))
-        logging.info('FIREBASE SENDING COMMAND: %s '% str(myCommand))
-        self.firefly.send_command(myCommand)
-        self.db.child('homeStatus').child(self.home_id).child('commands').child(ff_id).remove(self.id_token)
-        if refresh:
-          self.refresh_all()
-    except Exception as e:
-      logging.notify("Firebase 153: %s" % str(e))
-      logging.notify(str(message['data']))
-      if type(message['data']):
-        logging.notify(list(message['data'].keys())[0])
-      self.refresh_all()
-      self.db.child('homeStatus').child(self.home_id).child('commands').remove(self.id_token)
-    '''
+      logging.error('Firebase Stream Error: %s' % str(e))
 
   def refresh_all(self, **kwargs):
     # Hard-coded refresh all device values
@@ -252,38 +254,22 @@ class Firebase(Service):
       for r in routines['view']:
         routine_view[r.get('ff_id')] = r
 
-      routine_config= {}
+      routine_config = {}
       for r in routines['config']:
-        routine_view[r.get('ff_id')] = r
+        routine_config[r.get('ff_id')] = r
 
-      # This is the new location of aliases [/homeStatus/{homeId}/aliases]
-      self.db.child("homeStatus").child(self.home_id).child('aliases').set(aliases.aliases, self.id_token)
-
-      # This is the new location of device status [/homeStatus/{homeId}/deviceStatus]
-      # TODO: POP ZWAVE PARAMS, VALUES etc from this.
-      for device, device_view in all_values.items():
-        try:
-          if 'PARAMS' in device_view.keys():
-            device_view.pop('PARAMS')
-          if 'RAW_VALUES' in device_view.keys():
-            device_view.pop('RAW_VALUES')
-          if 'SENSORS' in device_view.keys():
-            device_view.pop('SENSORS')
-        except:
-          pass
-      self.db.child("homeStatus").child(self.home_id).child('deviceStatus').set(all_values, self.id_token)
+      # Update all devices statuses
+      self.update_all_device_status(overwrite=True)
 
       # This is the new location of routine views [/homeStatus/{homeId}/routineViews]
       self.db.child("homeStatus").child(self.home_id).child('routineViews').set(routine_view, self.id_token)
-      self.db.child("homeStatus").child(self.home_id).child('routineConfigs').set(routine_view, self.id_token)
+      self.db.child("homeStatus").child(self.home_id).child('routineConfigs').set(routine_config, self.id_token)
 
       # This is the new location of location status [/homeStatus/{homeId}/locationStatus]
-      self.db.child("homeStatus").child(self.home_id).child('locationStatus').set(self.get_location_status(), self.id_token)
+      self.update_location_status(overwrite=True, update_metadata_timestamp=False)
 
       # This is the new location of alexa api data [/homeStatus/{homeId}/alexaAPIView]
       self.db.child("homeStatus").child(self.home_id).child('alexaAPIViews').set(alexa_views, self.id_token)
-
-
 
       groups = {}
       groups_state = {}
@@ -296,16 +282,164 @@ class Firebase(Service):
       self.db.child("homeStatus").child(self.home_id).child('groupViews').set(groups, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('groupStatus').set(groups_state, self.id_token)
 
-      self.db.child("homeStatus").child(self.home_id).child('lastUpdated').set(self.firefly.location.now.timestamp(), self.id_token)
+      self.update_device_views()
 
     except Exception as e:
-      logging.notify("Firebase 177: %s" % str(e))
+      logging.notify("Firebase 271: %s" % str(e))
 
-    self.refresh_status()
+  def update_last_metadata_timestamp(self):
+    ''' Update the lastMetadataUpdate timestamp
+
+    Returns:
+
+    '''
+    self.set_home_status('locationStatus/lastMetadataUpdate', self.firefly.location.now.timestamp())
+
+  def set_home_status(self, path, data, retry=True, **kwargs):
+    ''' Function to set homeStatus in firebase
+
+    Args:
+      path: path from homeStatus/{homeID}/ that will be set.
+      data: data that will be set.
+
+    Returns:
+
+    '''
+    try:
+      self.db.child("homeStatus").child(self.home_id).child(path).set(data, self.id_token)
+      return True
+    except Exception as e:
+      if not retry:
+        return False
+      logging.error('[FIREBASE SET HOME STATUS] ERROR: %s' % str(e))
+      self.refresh_user()
+      return self.set_home_status(path, data, False)
+
+  def update_home_status(self, path, data, retry=True, **kwargs):
+    ''' Function to update homeStatus in firebase
+
+    Args:
+      path: path from homeStatus/{homeID}/ that will be updateed.
+      data: data that will be updateed.
+
+    Returns:
+
+    '''
+    try:
+      self.db.child("homeStatus").child(self.home_id).child(path).update(data, self.id_token)
+      return True
+    except Exception as e:
+      if not retry:
+        return False
+      logging.error('[FIREBASE UPDATE HOME STATUS] ERROR: %s' % str(e))
+      self.refresh_user()
+      return self.update_home_status(path, data, False)
+
+  def update_location_status(self, overwrite=False, update_metadata_timestamp=False, update_status_message=False, **kwargs):
+    ''' update the location status in firebase.
+
+    Args:
+      overwrite: if true calls set instead of update.
+      update_metadata_timestamp: also update metadata timestamp. When calling set without updating the timestamp the timestamp will be removed.
+      update_status_message: clear all status messages and inset current status messages
+      **kwargs:
+
+    Returns:
+
+    '''
+    location_status = self.get_location_status()
+
+    if overwrite:
+      self.set_home_status(FIREBASE_LOCATION_STATUS_PATH, location_status)
+      if update_metadata_timestamp:
+        self.update_last_metadata_timestamp()
+      return
+
+    if update_status_message:
+      self.set_home_status('%s/statusMessages' % FIREBASE_LOCATION_STATUS_PATH, {})
+
+    self.update_home_status(FIREBASE_LOCATION_STATUS_PATH, location_status)
+
+  def update_device_views(self, **kwargs):
+    ''' Update device views metadata for all devices
+
+    Args:
+      **kwargs:
+
+    Returns:
+
+    '''
+    logging.info('[FIREBASE DEVICE VIEW UPDATE] updating all device views')
+    device_views = {}
+    devices = self.get_all_component_views('firebase_refresh', filter=TYPE_DEVICE)
+    for device in devices:
+      device_views[device.get('ff_id', 'unknown')] = device
+    self.set_home_status(FIREBASE_DEVICE_VIEWS, device_views)
+    self.update_aliases()
+    self.update_last_metadata_timestamp()
+
+  def update_all_device_status(self, overwrite=False, **kwargs):
+    # TODO use core api for this.
+    all_values = {}
+    for ff_id, device in self.firefly.components.items():
+      try:
+        all_values[ff_id] = device.get_all_request_values()
+      except:
+        pass
+
+    for device, device_view in all_values.items():
+      try:
+        if 'PARAMS' in device_view.keys():
+          device_view.pop('PARAMS')
+        if 'RAW_VALUES' in device_view.keys():
+          device_view.pop('RAW_VALUES')
+        if 'SENSORS' in device_view.keys():
+          device_view.pop('SENSORS')
+      except:
+        pass
+
+    if overwrite:
+      self.set_home_status(FIREBASE_DEVICE_STATUS, all_values)
+      return
+
+    self.update_home_status(FIREBASE_DEVICE_STATUS, all_values)
+
+  def update_device_status(self, ff_id, action, **kwargs):
+    ''' Update a single device status
+
+    Args:
+      ff_id: ff_id of the device to update
+      action: the action data to update
+      **kwargs:
+
+    Returns:
+
+    '''
+    # TODO(zpriddy): Find a better way to do this
+    if 'PARAMS' in action.keys():
+      return
+    if 'RAW_VALUES' in action.keys():
+      return
+    if 'SENSORS' in action.keys():
+      return
+
+    path = '%s/%s' % (FIREBASE_DEVICE_STATUS, ff_id)
+    self.update_home_status(path, action)
+
+  def update_aliases(self, **kwargs):
+    ''' update all device aliases from firefly.
+
+    Args:
+      **kwargs:
+
+    Returns:
+
+    '''
+    self.set_home_status(FIREBASE_ALIASES, aliases.aliases)
 
   def get_routines(self):
     routines = {
-      'view': [],
+      'view':   [],
       'config': []
     }
     for ff_id, d in self.firefly.components.items():
@@ -356,75 +490,40 @@ class Firebase(Service):
     """
     now = self.firefly.location.now
     return_data = {
-      'time':      {
-        'epoch':  now.timestamp(),
-        'day':    now.day,
-        'month':  now.month,
-        'year':   now.year,
-        'hour':   now.hour,
-        'minute': now.minute,
-        'str':    str(now)
+      'time':           {
+        'epoch':    now.timestamp(),
+        'day':      now.day,
+        'month':    now.month,
+        'year':     now.year,
+        'hour':     now.hour,
+        'minute':   now.minute,
+        'str':      str(now),
+        'timeZone': self.firefly.location.geolocation.timezone
       },
-      'is_dark':   self.firefly.location.isDark,
-      'mode':      self.firefly.location.mode,
-      'last_mode': self.firefly.location.lastMode
+      'location':       {
+        'lat':     self.firefly.location.latitude,
+        'lon':     self.firefly.location.longitude,
+        'address': self.firefly.location.address
+      },
+      'isDark':         self.firefly.location.isDark,
+      'mode':           self.firefly.location.mode,
+      'lastMode':       self.firefly.location.lastMode,
+      'statusMessages': self.firefly.location.status_messages,
+      'modes':          self.firefly.location.modes
     }
     return return_data
 
-  def refresh_status(self, **kwargs):
-    status_data = {}
-    status_data['devices'] = self.get_all_component_views('firebase_refresh', filter=TYPE_DEVICE)
-    now = self.firefly.location.now
-    status_data['time'] = {
-      'epoch':  now.timestamp(),
-      'day':    now.day,
-      'month':  now.month,
-      'year':   now.year,
-      'hour':   now.hour,
-      'minute': now.minute,
-      'str':    str(now)
-    }
-    status_data['is_dark'] = self.firefly.location.isDark
-    status_data['mode'] = self.firefly.location.mode
-    status_data['last_mode'] = self.firefly.location.lastMode
-
-    if self.firefly._rooms:
-      for room_alias, room in self.firefly._rooms._rooms.items():
-        status_data['devices'].append({
-          'ff_id': room.id,
-          'alias': room.alias + ' (room)'
-        })
-
-    # Nasty json sanitation
-    status_data = scrub(status_data)
-    status_data = json.dumps(status_data)
-    status_data = status_data.replace('null', '')
-    status_data = status_data.replace('$', '')
-    status_data = status_data.replace('#', '')
-    status_data = status_data.replace('/', '_-_')
-    status_data = json.loads(status_data)
-
-    try:
-      # TODO(zpriddy) remove this when new UI is done.
-      self.db.child("homeStatus").child(self.home_id).child('status').set(status_data, self.id_token)
-
-      # This is the new location of device metadata [/homeStatus/{homeId}/deviceViews]
-      device_views = {}
-      for d in status_data['devices']:
-        device_views[d.get('ff_id')] = d
-      self.db.child("homeStatus").child(self.home_id).child('deviceViews').set(device_views, self.id_token)
-
-
-    except Exception as e:
-      logging.notify("Firebase 263: %s" % str(e))
-
   def refresh_user(self):
+    ''' Refresh user token and auth
+
+    Returns:
+
+    '''
     logging.info('[FIREBASE] REFRESHING USER')
     if not internet_up():
       logging.error('[FIREBASE REFRESH] Internet seems to be down')
       scheduler.runInM(1, self.refresh_user, 'refresh_user_internet_down')
       return
-
 
     try:
       try:
@@ -434,7 +533,7 @@ class Firebase(Service):
         pass
       self.user = self.auth.sign_in_with_email_and_password(self.email, self.password)
       self.id_token = self.user['idToken']
-      self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.stream_handler, self.id_token)
+      self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.command_stream_handler, self.id_token)
       self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
     except Exception as e:
       logging.info("Firebase 266: %s" % str(e))
@@ -444,15 +543,21 @@ class Firebase(Service):
   def push(self, source, action, retry=True):
     logging.info('[FIREBASE PUSH] Pushing Data: %s: %s' % (str(source), str(action)))
     try:
-      if source == 'time':
-        self.db.child("homeStatus").child(self.home_id).child('locationStatus').child(source).update(action, self.id_token)
-        # TODO(zpriddy): Remove this when new UI is done.
-        self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
+
+      # Update time events
+      if source == SOURCE_TIME:
+        self.update_location_status()
         return
 
-      if source == 'location':
-        self.db.child("homeStatus").child(self.home_id).child('locationStatus').update(action, self.id_token)
+      # Update location events
+      if source == SOURCE_LOCATION:
+        update_status_message = action == STATUS_MESSAGE_UPDATED
+        self.update_location_status(update_status_message=update_status_message)
         self.send_event(source, action)
+        return
+
+      if source not in self.firefly.components:
+        logging.error('[FIREBASE PUSH] ERROR: Source not in firefly components.')
         return
 
       if self.firefly.components[source].type == 'GROUP':
@@ -460,20 +565,15 @@ class Firebase(Service):
         self.send_event(source, action)
         return
 
+      self.update_device_status(source, action)
 
-      # New device status location
-      # The lines below pop unneeded zwave data.
-      # TODO(zpriddy): Find a better way to do this
+      # TODO(zpriddy): Remove this when new UI is done.
       if 'PARAMS' in action.keys():
         return
       if 'RAW_VALUES' in action.keys():
         return
       if 'SENSORS' in action.keys():
         return
-
-      self.db.child("homeStatus").child(self.home_id).child('deviceStatus').child(source).update(action, self.id_token)
-
-      # TODO(zpriddy): Remove this when new UI is done.
       self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
 
       self.send_event(source, action)
@@ -484,8 +584,16 @@ class Firebase(Service):
       if retry:
         self.push(source, action, False)
 
-
   def send_event(self, source, action):
+    ''' add new event in the event log
+
+    Args:
+      source: ff_id of the device
+      action: action to enter into event log
+
+    Returns:
+
+    '''
     now = self.firefly.location.now
     now_time = now.strftime("%B %d %Y %I:%M:%S %p")
     self.db.child("homeStatus").child(self.home_id).child('events').push({

@@ -22,8 +22,7 @@ def Setup(firefly, package, **kwargs):
   # TODO: Remove this in the future
   kwargs['tags'] = ['light', 'dimmer']
   hue_light = HueLight(firefly, package, **kwargs)
-  # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[hue_light.id] = hue_light
+  firefly.install_component(hue_light)
 
 
 class HueLight(HueDevice):

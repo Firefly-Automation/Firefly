@@ -28,10 +28,8 @@ CAPABILITIES = {
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
-  sensor = ZwaveAeotecSwitch5(firefly, package, **kwargs)
-  # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[sensor.id] = sensor
-  return sensor.id
+  switch = ZwaveAeotecSwitch5(firefly, package, **kwargs)
+  firefly.install_component(switch)
 
 
 class ZwaveAeotecSwitch5(ZwaveSwitch):

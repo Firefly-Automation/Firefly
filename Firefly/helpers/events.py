@@ -124,7 +124,7 @@ class Command(Event):
 class Request(Event):
   def __init__(self, ff_id, source: str, request, **kwargs):
     Event.__init__(self, source, EVENT_TYPE_REQUEST)
-    self._device = aliases.get_device_id(ff_id)
+    self._device = ff_id
     self._request = request
     self._args = kwargs
 

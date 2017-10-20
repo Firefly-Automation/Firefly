@@ -30,9 +30,7 @@ CAPABILITIES = {
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   switch = ZwaveLevitonSwitch(firefly, package, **kwargs)
-  # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[switch.id] = switch
-  return switch.id
+  firefly.install_component(switch)
 
 
 class ZwaveLevitonSwitch(ZwaveSwitch):

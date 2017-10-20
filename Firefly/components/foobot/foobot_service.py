@@ -24,7 +24,7 @@ def Setup(firefly, package, **kwargs):
     return False
 
   foobot = Foobot(firefly, package, enable=enable, username=username, api_key=api_key, refresh_interval=refresh_interval, **kwargs)
-  firefly.components[SERVICE_FOOBOT] = foobot
+  firefly.install_component(foobot)
 
 
 class Foobot(Service):

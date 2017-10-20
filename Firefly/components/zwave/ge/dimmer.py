@@ -29,9 +29,7 @@ CAPABILITIES = {
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   dimmer = GEDimmer(firefly, package, **kwargs)
-  # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[dimmer.id] = dimmer
-  return dimmer.id
+  firefly.install_component(dimmer)
 
 class GEDimmer(ZwaveSwitch):
   def __init__(self, firefly, package, **kwargs):

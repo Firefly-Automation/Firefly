@@ -73,7 +73,7 @@ Sample response:
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   foobot = Foobot(firefly, package, **kwargs)
-  firefly.components[foobot.id] = foobot
+  firefly.install_component(foobot)
 
 
 class Foobot(Device):
@@ -110,6 +110,16 @@ class Foobot(Device):
 
     self.update()
     scheduler.runEveryM(self._refresh_interval, self.update, job_id=self.id)
+
+  def export(self, current_values: bool = True, api_view: bool = False) -> dict:
+    export_data = super().export(current_values, api_view)
+    if not api_view:
+      export_data.update({
+        'foobot_device': self.device,
+        'api_key': self.api_key,
+        'username': self.username
+      })
+    return export_data
 
   def set_scale(self, **kwargs):
     scale = kwargs.get('scale', 'f')

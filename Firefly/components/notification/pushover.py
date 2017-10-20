@@ -22,8 +22,7 @@ def Setup(firefly, package, **kwargs):
     return False
 
   pushover = Pushover(firefly, package, **kwargs)
-  # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[pushover.id] = pushover
+  firefly.install_component(pushover)
 
   # We are going to use the hard-coded link_device function of the notification service here.
   firefly.components[SERVICE_NOTIFICATION].link_device(pushover.id)

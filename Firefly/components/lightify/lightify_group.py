@@ -16,9 +16,8 @@ def Setup(firefly, package, **kwargs):
   logging.message(str(kwargs))
   # TODO: Remove this in the future
   kwargs['tags'] = ['light']
-  lightify_light = LightifyGroup(firefly, package, **kwargs)
-  # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[lightify_light.id] = lightify_light
+  lightify_group = LightifyGroup(firefly, package, **kwargs)
+  firefly.install_component(lightify_group)
 
 
 class LightifyGroup(LightifyDevice):
