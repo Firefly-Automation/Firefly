@@ -21,6 +21,10 @@ WORK_AROUND_MAPPING = {
   'unknown:_type=0004,_id=0002': {
     PACKAGE: 'ecolink.contact_sensor',
     ALIAS:   'Ecolink Door/Window'
+  },
+  'zw080_siren_gen5': {
+    PACKAGE: 'zwave_aeotec_zw080',
+    ALIAS:   'ZW080 Siren'
   }
 }
 
