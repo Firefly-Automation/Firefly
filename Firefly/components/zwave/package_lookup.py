@@ -91,7 +91,7 @@ def get_package(node: ZWaveNode) -> dict:
       }
 
   if product_name in WORK_AROUND_MAPPING:
-    package_info = LINKED_PACKAGES[manufacturer_name][product_name]
+    package_info = WORK_AROUND_MAPPING[product_name]
     return {
       MODULE:            '%s.%s' % (PACKAGE_BASE, package_info[PACKAGE]),
       ALIAS: package_info[ALIAS],
