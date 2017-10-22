@@ -23,11 +23,13 @@ def Setup(firefly, package, **kwargs):
   kwargs['tags'] = ['light', 'dimmer']
   hue_light = HueLight(firefly, package, **kwargs)
   firefly.install_component(hue_light)
+  return hue_light.id
 
 
 class HueLight(HueDevice):
   """
   """
+
   def __init__(self, firefly, package, **kwargs):
     """
 

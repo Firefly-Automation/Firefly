@@ -26,6 +26,7 @@ def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   sensor = ZwaveAeotecMulti(firefly, package, **kwargs)
   firefly.install_component(sensor)
+  return sensor.id
 
 
 class ZwaveAeotecMulti(ZwaveMultiSensor):
@@ -107,7 +108,6 @@ class ZwaveAeotecMulti(ZwaveMultiSensor):
     # Send binary sensor report when motion triggered.
     self.node.set_config_param(5, 1, 1)
 
-
     # Limit event messages to only be threshold triggered
     threshold_enable_idx = 40
     enabled = 1
@@ -116,7 +116,7 @@ class ZwaveAeotecMulti(ZwaveMultiSensor):
 
     # Set the threshold to trigger update for temperature (20 = 2.0 degree - default)
     temperature_threshold_idx = 41
-    temperature_threshold = 5 # .5 degree
+    temperature_threshold = 5  # .5 degree
     self.node.set_config_param(temperature_threshold_idx, temperature_threshold)
 
     # Set the threshold to trigger update humidity (10 = 10% - default)
@@ -128,7 +128,6 @@ class ZwaveAeotecMulti(ZwaveMultiSensor):
     luminance_threshold_idx = 43
     luminance_threshold = 10
     self.node.set_config_param(luminance_threshold_idx, luminance_threshold)
-
 
     # TODO: Other config values
 

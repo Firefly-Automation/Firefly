@@ -74,6 +74,7 @@ def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   foobot = Foobot(firefly, package, **kwargs)
   firefly.install_component(foobot)
+  return foobot.id
 
 
 class Foobot(Device):
@@ -116,8 +117,8 @@ class Foobot(Device):
     if not api_view:
       export_data.update({
         'foobot_device': self.device,
-        'api_key': self.api_key,
-        'username': self.username
+        'api_key':       self.api_key,
+        'username':      self.username
       })
     return export_data
 

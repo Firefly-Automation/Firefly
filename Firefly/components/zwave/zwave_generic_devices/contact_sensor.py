@@ -8,6 +8,7 @@ def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   sensor = ContactSensor(firefly, package, **kwargs)
   firefly.install_component(sensor)
+  return sensor.id
 
 
 class ContactSensor(ZwaveContactSensor):

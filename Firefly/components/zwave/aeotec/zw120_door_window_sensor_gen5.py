@@ -11,15 +11,18 @@ COMMANDS = []
 REQUESTS = [ALARM, BATTERY, CONTACT]
 
 INITIAL_VALUES = {
-  '_alarm': False,
+  '_alarm':   False,
   '_battery': -1,
   '_contact': CONTACT_CLOSED
 }
+
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   sensor = ZW120(firefly, package, **kwargs)
   firefly.install_component(sensor)
+  return sensor.id
+
 
 class ZW120(ZwaveContactSensor):
   def __init__(self, firefly, package, **kwargs):
@@ -52,7 +55,6 @@ class ZW120(ZwaveContactSensor):
     if self._update_try_count >= 5:
       self._config_updated = True
       return
-
 
     self.node.set_config_param(2, 0)  # Disable 10 min wake up time
     self.node.set_config_param(121, 17)  # Sensor Binary and Battery Report

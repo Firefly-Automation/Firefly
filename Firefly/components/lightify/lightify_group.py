@@ -1,8 +1,9 @@
+from lightify import Group, Lightify
+
 from Firefly import logging
 from Firefly.components.lightify.lightify_device import LightifyDevice
 from Firefly.components.virtual_devices import AUTHOR
-from Firefly.const import ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, DEVICE_TYPE_SWITCH, LEVEL, STATE, SWITCH, COMMAND_UPDATE
-from lightify import Group, Lightify
+from Firefly.const import ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, COMMAND_UPDATE, DEVICE_TYPE_SWITCH, LEVEL, SWITCH
 
 TITLE = 'Lightify Group'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
@@ -18,6 +19,7 @@ def Setup(firefly, package, **kwargs):
   kwargs['tags'] = ['light']
   lightify_group = LightifyGroup(firefly, package, **kwargs)
   firefly.install_component(lightify_group)
+  return lightify_group.id
 
 
 class LightifyGroup(LightifyDevice):
@@ -25,8 +27,7 @@ class LightifyGroup(LightifyDevice):
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
     self.lightify_type = 'GROUP'
 
-
-  def update_lightify(self, lightify_object:Group = None, lightify_bridge:Lightify = None, **kwargs):
+  def update_lightify(self, lightify_object: Group = None, lightify_bridge: Lightify = None, **kwargs):
     logging.debug('[LIGHTIFY GROUP] : UPDATE LIGHTIFY')
     if lightify_object is None:
       return
