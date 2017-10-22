@@ -398,6 +398,9 @@ class Firebase(Service):
       except:
         pass
 
+    #TODO Remove this
+    self.update_home_status('devices', all_values)
+
     if overwrite:
       self.set_home_status(FIREBASE_DEVICE_STATUS, all_values)
       return
