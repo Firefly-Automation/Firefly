@@ -22,7 +22,7 @@ WORK_AROUND_MAPPING = {
     PACKAGE: 'ecolink.contact_sensor',
     ALIAS:   'Ecolink Door/Window'
   },
-  'zw080_siren_gen5': {
+  'zw080_siren_gen5':            {
     PACKAGE: 'zwave_aeotec_zw080',
     ALIAS:   'ZW080 Siren'
   }
@@ -34,17 +34,21 @@ AVAILABLE_PACKAGES = {
 
 LINKED_PACKAGES = {
   'ge': {
-    '14294_in-wall_smart_dimmer': {
+    '14294_in-wall_smart_dimmer':  {
       PACKAGE: 'ge.dimmer',
       ALIAS:   'GE Dimmer'
     },
-    '12724_3-way_dimmer-Switch':  {
+    '12724_3-way_dimmer-Switch':   {
       PACKAGE: 'ge.dimmer',
       ALIAS:   'GE Dimmer'
     },
-    '12729_3-way_dimmer-Switch':  {
+    '12729_3-way_dimmer-Switch':   {
       PACKAGE: 'ge.dimmer',
       ALIAS:   'GE Dimmer'
+    },
+    'unknown: type=4953, id=3133': {
+      PACKAGE: 'zwave_generic_devices.motion_sensor',
+      ALIAS:   'GE ZW6302 Motion Sensor'
     }
   }
 }
