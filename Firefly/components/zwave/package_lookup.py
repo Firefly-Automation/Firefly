@@ -25,6 +25,10 @@ WORK_AROUND_MAPPING = {
   'zw080_siren_gen5':            {
     PACKAGE: 'zwave_aeotec_zw080',
     ALIAS:   'ZW080 Siren'
+  },
+  'unknown: type=4953, id=3133': {
+    PACKAGE: 'zwave_generic_devices.motion_sensor',
+    ALIAS:   'GE ZW6302 Motion Sensor'
   }
 }
 
@@ -34,28 +38,24 @@ AVAILABLE_PACKAGES = {
 
 LINKED_PACKAGES = {
   'ge': {
-    '14294_in-wall_smart_dimmer':  {
+    '14294_in-wall_smart_dimmer': {
       PACKAGE: 'ge.dimmer',
       ALIAS:   'GE Dimmer'
     },
-    '12724_3-way_dimmer-Switch':   {
+    '12724_3-way_dimmer-Switch':  {
       PACKAGE: 'ge.dimmer',
       ALIAS:   'GE Dimmer'
     },
-    '12729_3-way_dimmer-Switch':   {
+    '12729_3-way_dimmer-Switch':  {
       PACKAGE: 'ge.dimmer',
       ALIAS:   'GE Dimmer'
-    },
-    'unknown: type=4953, id=3133': {
-      PACKAGE: 'zwave_generic_devices.motion_sensor',
-      ALIAS:   'GE ZW6302 Motion Sensor'
     }
   }
 }
 
 DEVICE_TYPE_MAPPING = {
-  'on/off relay switch':  'zwave_switch',
-  'on/off power switch':  'zwave_switch',
+  #'on/off relay switch':  'zwave_switch',
+  #'on/off power switch':  'zwave_switch',
   'door/window sensor':   'zwave_generic_devices.contact_sensor',
   'door/window detector': 'zwave_generic_devices.contact_sensor',
   'motion sensor':        'zwave_generic_devices.motion_sensor',
