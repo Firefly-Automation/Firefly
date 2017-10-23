@@ -39,7 +39,6 @@ class ZwaveContactSensor(ContactSensor, ZwaveDevice):
     self.value_map = value_map
     self.refreshed = False
 
-
   def export(self, current_values: bool = True, api_view: bool = False, **kwargs):
     export_data = super().export(current_values, api_view)
     export_data['value_map'] = self.value_map

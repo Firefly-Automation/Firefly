@@ -1,10 +1,10 @@
-from Firefly import logging
-
-from Firefly.helpers.device_types.multi_sensor import MultiSensor
-from Firefly.components.zwave.zwave_device import ZwaveDevice
 from openzwave.network import ZWaveNode
-from Firefly.const import MOTION, STATE, LUX, MOTION_INACTIVE, MOTION_ACTIVE, AUTHOR
 from openzwave.value import ZWaveValue
+
+from Firefly import logging
+from Firefly.components.zwave.zwave_device import ZwaveDevice
+from Firefly.const import AUTHOR, LUX, MOTION
+from Firefly.helpers.device_types.multi_sensor import MultiSensor
 
 BATTERY = 'battery'
 TEMPERATURE = 'temperature'
@@ -14,26 +14,19 @@ DEVICE_TYPE_MULTI_SENSOR = 'multi_sensor'
 ULTRAVIOLET = 'ultraviolet'
 
 CAPABILITIES = {
-  ALARM: True,
-  BATTERY: True,
-  HUMIDITY: True,
-  LUX: True,
-  MOTION: True,
+  ALARM:       True,
+  BATTERY:     True,
+  HUMIDITY:    True,
+  LUX:         True,
+  MOTION:      True,
   TEMPERATURE: True,
   ULTRAVIOLET: True
 }
 
 COMMANDS = []
 
-REQUESTS = [
-  MOTION,
-  ALARM,
-  LUX,
-  TEMPERATURE,
-  HUMIDITY,
-  ULTRAVIOLET,
-  BATTERY
-]
+REQUESTS = [MOTION, ALARM, LUX, TEMPERATURE, HUMIDITY, ULTRAVIOLET, BATTERY]
+
 
 class ZwaveMultiSensor(MultiSensor, ZwaveDevice):
   def __init__(self, firefly, package, title='Zwave Multi Sensor', initial_values={}, **kwargs):
@@ -50,9 +43,7 @@ class ZwaveMultiSensor(MultiSensor, ZwaveDevice):
     else:
       requests = REQUESTS
 
-
     super().__init__(firefly, package, title, AUTHOR, commands, requests, DEVICE_TYPE_MULTI_SENSOR, capabilities=CAPABILITIES, initial_values=initial_values, **kwargs)
-
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, values: ZWaveValue = None, values_only=False, **kwargs):
     if node is None:
