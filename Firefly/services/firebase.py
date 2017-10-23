@@ -375,6 +375,10 @@ class Firebase(Service):
     for device in devices:
       device_views[device.get('ff_id', 'unknown')] = device
     self.set_home_status(FIREBASE_DEVICE_VIEWS, device_views)
+
+    #TODO: Remove this
+    self.set_home_status('devices', device_views)
+
     self.update_aliases()
     self.update_last_metadata_timestamp()
 
@@ -397,6 +401,9 @@ class Firebase(Service):
           device_view.pop('SENSORS')
       except:
         pass
+
+    #TODO Remove this
+    self.update_home_status('devices', all_values)
 
     if overwrite:
       self.set_home_status(FIREBASE_DEVICE_STATUS, all_values)

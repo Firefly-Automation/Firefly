@@ -1,7 +1,6 @@
 from Firefly import logging
-from Firefly.const import (EVENT_ACTION_OFF, EVENT_ACTION_ON, ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF,
-                           EVENT_ACTION_ON, ACTION_TOGGLE, DEVICE_TYPE_DIMMER, ACTION_LEVEL, LEVEL, EVENT_ACTION_LEVEL)
 from Firefly.components.virtual_devices import AUTHOR
+from Firefly.const import ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, DEVICE_TYPE_DIMMER, EVENT_ACTION_LEVEL, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE
 from Firefly.helpers.device import Device
 from Firefly.helpers.metadata import metaDimmer, metaSwitch
 
@@ -26,13 +25,14 @@ def Setup(firefly, package, **kwargs):
   """
   logging.message('Entering %s setup' % TITLE)
   new_switch = VirtualSwitch(firefly, package, **kwargs)
-  # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[new_switch.id] = new_switch
+  firefly.install_component(new_switch)
+  return new_switch.id
 
 
 class VirtualSwitch(Device):
   """
   """
+
   def __init__(self, firefly, package, **kwargs):
     """
 

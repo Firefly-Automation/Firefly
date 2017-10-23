@@ -19,6 +19,7 @@ def Setup(firefly, package, **kwargs):
   kwargs['tags'] = ['light']
   lightify_light = LightifyLight(firefly, package, **kwargs)
   firefly.install_component(lightify_light)
+  return lightify_light.id
 
 
 class LightifyLight(LightifyDevice):

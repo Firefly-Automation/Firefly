@@ -59,9 +59,6 @@ class ZW080(ZwaveDevice):
     self.add_action('alarm4', metaSwitch(on_action='alarm4', title='Alarm 4', control_type='switch'))
     self.add_action('alarm5', metaSwitch(on_action='alarm5', title='Alarm 5', control_type='switch'))
 
-    self.add_alexa_action(ALEXA_OFF)
-    self.add_alexa_action(ALEXA_ON)
-
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     if node is None:
       return

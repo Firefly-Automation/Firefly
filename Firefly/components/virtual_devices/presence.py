@@ -1,10 +1,11 @@
+from geopy.distance import vincenty
+
 from Firefly import logging, scheduler
 from Firefly.components.virtual_devices import AUTHOR
 from Firefly.const import (ACTION_SET_DELAY, ACTION_SET_PRESENCE, DEVICE_TYPE_PRESENCE, NOT_PRESENT, PRESENCE, PRESENT)
 from Firefly.helpers.action import Command
 from Firefly.helpers.device import Device
-from Firefly.helpers.metadata import metaOwntracks, metaPresence, metaQR, metaText, action_presence
-from geopy.distance import vincenty
+from Firefly.helpers.metadata import action_presence, metaOwntracks, metaQR, metaText
 
 TITLE = 'Firefly Virtual Presence Device'
 DEVICE_TYPE = DEVICE_TYPE_PRESENCE
@@ -32,8 +33,8 @@ def Setup(firefly, package, **kwargs):
   """
   logging.message('Entering %s setup' % TITLE)
   new_presence = VirtualPresence(firefly, package, **kwargs)
-  # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[new_presence.id] = new_presence
+  firefly.install_component(new_presence)
+  return new_presence.id
 
 
 class VirtualPresence(Device):
@@ -115,7 +116,6 @@ class VirtualPresence(Device):
     self.add_action('owntracksWaypoint', metaOwntracks(data=ownTracksBeaconData, title='OwnTracks Config (Android) Download and open with OwnTracks (waypoints may not be shown)',
                                                        context="Beacon: %s | major: 1 | minor: 1 | lat: 0 | lon: 0 | name: -Firefly-Home-Beacon" % beacon))
 
-
   def get_lat(self, **kwargs):
     return self._lat
 
@@ -150,7 +150,6 @@ class VirtualPresence(Device):
       # TODO: Generate error code.
       logging.error('error setting lat and lon: %s' % e)
 
-
     if presence is None and lat and lon:
       home = (self.firefly.location.latitude, self.firefly.location.longitude)
       device = (lat, lon)
@@ -163,8 +162,6 @@ class VirtualPresence(Device):
       # If over 3 miles away - set beacon presence too.
       if distance > 5000:
         self.set_beacon_presence(NOT_PRESENT)
-
-
 
     if zone is not None:
       if 'firefly-home' in zone.lower():

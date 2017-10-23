@@ -1,8 +1,7 @@
 from Firefly import logging
 from Firefly.components.hue.hue_device import HueDevice
 from Firefly.components.virtual_devices import AUTHOR
-from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF,
-                           LEVEL, STATE, SWITCH)
+from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF, LEVEL, STATE, SWITCH)
 
 TITLE = 'Firefly Hue Group'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
@@ -27,11 +26,13 @@ def Setup(firefly, package, **kwargs):
   kwargs['tags'] = ['light']
   hue_group = HueGroup(firefly, package, **kwargs)
   firefly.install_component(hue_group)
+  return hue_group.id
 
 
 class HueGroup(HueDevice):
   """
   """
+
   def __init__(self, firefly, package, **kwargs):
     """
 

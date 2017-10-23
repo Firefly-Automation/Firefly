@@ -21,6 +21,10 @@ WORK_AROUND_MAPPING = {
   'unknown:_type=0004,_id=0002': {
     PACKAGE: 'ecolink.contact_sensor',
     ALIAS:   'Ecolink Door/Window'
+  },
+  'zw080_siren_gen5': {
+    PACKAGE: 'zwave_aeotec_zw080',
+    ALIAS:   'ZW080 Siren'
   }
 }
 
@@ -87,7 +91,7 @@ def get_package(node: ZWaveNode) -> dict:
       }
 
   if product_name in WORK_AROUND_MAPPING:
-    package_info = LINKED_PACKAGES[manufacturer_name][product_name]
+    package_info = WORK_AROUND_MAPPING[product_name]
     return {
       MODULE:            '%s.%s' % (PACKAGE_BASE, package_info[PACKAGE]),
       ALIAS: package_info[ALIAS],

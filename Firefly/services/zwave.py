@@ -290,6 +290,7 @@ class Zwave(Service):
       self._firefly.send_command(command)
     else:
       logging.error('node %s not found in installed nodes' % str(node_id))
+      self.add_child_nodes(self._network.nodes[node_id], **kwargs)
 
   def zwave_refresh(self, **kwargs):
     if self._network.state >= 7 and not self.healed:

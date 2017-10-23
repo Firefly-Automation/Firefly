@@ -1,11 +1,11 @@
-from Firefly import logging
+from uuid import uuid4
+
+from Firefly import logging, scheduler
 from Firefly.components.virtual_devices import AUTHOR
 from Firefly.const import (COMMAND_UPDATE, DEVICE_TYPE_THERMOSTAT, LEVEL)
 from Firefly.helpers.action import Command
 from Firefly.helpers.device import Device
 from Firefly.helpers.metadata import metaButtonObject, metaButtons, metaSlider, metaText
-from Firefly import scheduler
-from uuid import uuid4
 
 # TODO(zpriddy): Add more delayed setters to help with rate limits.
 
@@ -32,6 +32,7 @@ def Setup(firefly, package, **kwargs):
 
   refresh_command = Command('service_firebase', 'nest', 'refresh')
   firefly.send_command(refresh_command)
+  return thermostat.id
 
 
 class Thermostat(Device):
@@ -158,7 +159,6 @@ class Thermostat(Device):
       except Exception as e:
         logging.error('Error setting thermostat temperature: %s' % e)
 
-
   @property
   def humidity(self):
     if self.thermostat:
@@ -190,7 +190,6 @@ class Thermostat(Device):
         self.thermostat.mode = mode
       except Exception as e:
         logging.error('Error setting thermostat mode: %s' % e)
-
 
   @property
   def away(self):

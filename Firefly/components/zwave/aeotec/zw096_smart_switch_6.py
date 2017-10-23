@@ -30,6 +30,7 @@ def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   switch = ZwaveAeotecSwitch6(firefly, package, **kwargs)
   firefly.install_component(switch)
+  return switch.id
 
 
 class ZwaveAeotecSwitch6(ZwaveSwitch):

@@ -1,8 +1,8 @@
-from Firefly import logging
-from Firefly.components.zwave.device_types.contact_sensor import ZwaveContactSensor
 from openzwave.network import ZWaveNode
 from openzwave.value import ZWaveValue
 
+from Firefly import logging
+from Firefly.components.zwave.device_types.contact_sensor import ZwaveContactSensor
 
 TITLE = 'Ecolink Contact Sensor'
 
@@ -11,6 +11,7 @@ def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   sensor = ContactSensor(firefly, package, **kwargs)
   firefly.install_component(sensor)
+  return sensor.id
 
 
 class ContactSensor(ZwaveContactSensor):
@@ -25,5 +26,3 @@ class ContactSensor(ZwaveContactSensor):
       node.values[self.value_map['Sensor']].enable_poll()
 
     super().update_from_zwave(node, ignore_update, values, values_only, **kwargs)
-
-

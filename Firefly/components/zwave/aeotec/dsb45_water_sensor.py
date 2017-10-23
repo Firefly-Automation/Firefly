@@ -21,6 +21,7 @@ def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   sensor = DSB45(firefly, package, **kwargs)
   firefly.install_component(sensor)
+  return sensor.id
 
 
 class DSB45(ZwaveWaterSensor):
