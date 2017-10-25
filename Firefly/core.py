@@ -136,7 +136,7 @@ class Firefly(object):
         if default_content is None:
           Path.touch(file_path)
         elif type(default_content) is dict or type(default_content) is list:
-          with open(file_path, 'rw') as new_file:
+          with open(file_path, 'rb') as new_file:
             json.dump(default_content, new_file)
 
 
