@@ -108,11 +108,12 @@ def get_package(node: ZWaveNode) -> dict:
 
   # Generic device types
   product_name = node.product_name.lower()
-  if product_name in DEVICE_TYPE_MAPPING:
-    return {
-      MODULE: '%s.%s' % (PACKAGE_BASE, DEVICE_TYPE_MAPPING[product_name]),
-      ALIAS:  node.product_name
-    }
+  for node_type, package in DEVICE_TYPE_MAPPING:
+    if node_type in product_name:
+      return {
+        MODULE: '%s.%s' % (PACKAGE_BASE, package),
+        ALIAS:  node.product_name
+      }
 
   print('******************************************')
   print(node.node_id)
