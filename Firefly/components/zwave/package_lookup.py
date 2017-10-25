@@ -29,7 +29,8 @@ WORK_AROUND_MAPPING = {
 }
 
 AVAILABLE_PACKAGES = {
-  'aeotec': ['dsc06106_smart_energy_switch', 'zw096_smart_switch_6', 'zw100_multisensor_6', 'zw100_multisensor_6', 'zw120_door_window_sensor_gen5', 'zw112_door_window_sensor_6', 'dsb45_water_sensor']
+  'aeotec': ['dsc06106_smart_energy_switch', 'zw096_smart_switch_6', 'zw100_multisensor_6', 'zw100_multisensor_6', 'zw120_door_window_sensor_gen5', 'zw112_door_window_sensor_6', 'dsb45_water_sensor',
+    'dsb04100_door_window_sensor']
 }
 
 LINKED_PACKAGES = {
@@ -71,7 +72,7 @@ def get_package(node: ZWaveNode) -> dict:
 
   Returns: dict (module, alias) The module and alias for the zwave device
   '''
-  product_name = node.product_name.lower().replace(' ', '_')
+  product_name = node.product_name.lower().replace(' ', '_').replace('/', '_')
   product_type = node.product_type.lower()
   manufacturer_name = node.manufacturer_name.lower().replace(' ', '_')
   product_id = node.product_id.lower()
