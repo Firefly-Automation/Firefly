@@ -113,7 +113,7 @@ def get_package(node: ZWaveNode) -> dict:
     if node_type in product_name:
       return {
         MODULE: '%s.%s' % (PACKAGE_BASE, package),
-        ALIAS:  node.product_name
+        ALIAS:  node.product_name.replace('/',' ')
       }
 
   print('******************************************')
