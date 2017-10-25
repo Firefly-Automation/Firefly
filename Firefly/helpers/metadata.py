@@ -262,6 +262,10 @@ TEXT = 'text'
 TEXT_MAPPING = 'text_mapping'
 TITLE = 'title'
 TYPE = 'type'
+SELECTED_VALUE = 'selected_value'
+BUTTON = 'button'
+BUTTON_GROUP = 'button_group'
+BUTTON_LIST = 'button_list'
 
 ON_COMMAND = 'on_command'
 OFF_COMMAND = 'off_command'
@@ -450,3 +454,63 @@ def action_dimmer(can_command=True, can_request=True, primary=False, title='Ligh
 
   """
   return action_level(can_command, can_request, primary, title, context, command, command_prop, request, min_level, max_level, level_step, icon, **kwargs)
+
+
+
+
+
+
+
+######################################
+# BUTTONS
+######################################
+
+def action_button_object(text='Button', command='', command_prop='', command_value='', selected_value='', **kwargs):
+  ''' Create a button object.
+
+  Args:
+    text: Button text
+    command: Command on press
+    command_prop: Command pop to set
+    command_value: Command value to set
+    selected_value: Highlight button when request is this value
+    **kwargs:
+
+  Returns:
+
+  '''
+  button_object = {
+    TEXT: text,
+    COMMAND: command,
+    COMMAND_PROP: command_prop,
+    COMMAND_VAL: command_value,
+    SELECTED_VALUE: selected_value
+  }
+  return button_object
+
+
+def action_button_group(can_command=True, can_request=True, primary=False, title='Button Group', request='', buttons=[], **kwargs):
+  ''' Make a button group
+
+  Args:
+    can_command: can send command
+    can_request: can trigger
+    primary: primary display
+    title: title for buttons
+    request: request value for selected button
+    buttons: list of button objects
+    **kwargs:
+
+  Returns:
+
+  '''
+  action = {
+    CAN_COMMAND: can_command,
+    CAN_REQUEST: can_request,
+    PRIMARY: primary,
+    TITLE: title,
+    REQUEST: request,
+    TYPE: BUTTON_GROUP,
+    BUTTON_LIST: buttons
+  }
+  return action
