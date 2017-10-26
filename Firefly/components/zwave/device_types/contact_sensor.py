@@ -3,7 +3,7 @@ from openzwave.value import ZWaveValue
 
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.const import AUTHOR, CONTACT, DEVICE_TYPE_MOTION
+from Firefly.const import AUTHOR, CONTACT, DEVICE_TYPE_CONTACT
 from Firefly.helpers.device_types.contact_sensor import ContactSensor
 
 ALARM = 'alarm'
@@ -34,7 +34,7 @@ class ZwaveContactSensor(ContactSensor, ZwaveDevice):
     else:
       requests = REQUESTS
 
-    super().__init__(firefly, package, title, AUTHOR, commands, requests, DEVICE_TYPE_MOTION, capabilities=CAPABILITIES, initial_values=initial_values, **kwargs)
+    super().__init__(firefly, package, title, AUTHOR, commands, requests, DEVICE_TYPE_CONTACT, capabilities=CAPABILITIES, initial_values=initial_values, **kwargs)
 
     self.value_map = value_map
     self.refreshed = False

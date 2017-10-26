@@ -245,8 +245,8 @@ class Firebase(Service):
       routines = self.get_routines()
 
       # TODO(zpriddy): Remove old views when new UI is done
-      self.db.child("userAlexa").child(self.uid).child("devices").set(alexa_views, self.id_token)
-      self.db.child("homeStatus").child(self.home_id).child('devices').update(all_values, self.id_token)
+      #self.db.child("userAlexa").child(self.uid).child("devices").set(alexa_views, self.id_token)
+      #self.db.child("homeStatus").child(self.home_id).child('devices').update(all_values, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('routines').set(routines['config'], self.id_token)
       # End of old views
 
@@ -377,7 +377,7 @@ class Firebase(Service):
     self.set_home_status(FIREBASE_DEVICE_VIEWS, device_views)
 
     #TODO: Remove this
-    self.set_home_status('devices', device_views)
+    #self.set_home_status('devices', device_views)
 
     self.update_aliases()
     self.update_last_metadata_timestamp()
@@ -403,7 +403,7 @@ class Firebase(Service):
         pass
 
     #TODO Remove this
-    self.update_home_status('devices', all_values)
+    #self.update_home_status('devices', all_values)
 
     if overwrite:
       self.set_home_status(FIREBASE_DEVICE_STATUS, all_values)
