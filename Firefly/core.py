@@ -101,8 +101,10 @@ class Firefly(object):
     '''
     try:
       self.components[component.id] = component
+      return component.id
     except Exception as e:
       logging.error('[CORE INSTALL COMPONENT] ERROR INSTALLING: %s' % str(e))
+      return None
 
 
   def import_location(self) -> Location:
