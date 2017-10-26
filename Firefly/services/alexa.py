@@ -1,4 +1,5 @@
 from difflib import get_close_matches
+from Firefly import logging
 
 from Firefly import aliases
 from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ALEXA_OFF_REQUEST, ALEXA_ON_REQUEST,
@@ -9,10 +10,14 @@ from Firefly.helpers.events import Command
 
 class AlexaRequest(object):
   def __init__(self, request: dict):
+    logging.debug('[ALEXA REQUEST] request: %s' % str(request))
+
     self._raw_request = request
     self._slots = {}
     for name, slot in self.request.get('intent', {}).get('slots', {}).items():
       self._slots[name] = AlexaSlot(slot)
+
+    logging.debug('[ALEXA REQUEST] intent: %s' % str(self.intent))
 
   @property
   def type(self):
@@ -20,7 +25,7 @@ class AlexaRequest(object):
 
   @property
   def request(self):
-    return self._raw_request.get('request', {})
+    return self._raw_request if self._raw_request else {}
 
   @property
   def intent(self):
@@ -49,6 +54,9 @@ def process_alexa_request(firefly, request):
 
 def alexa_handler(firefly, request: AlexaRequest):
   devices = [device._alias for _, device in firefly.components.items() if device.type == TYPE_DEVICE]
+
+  logging.debug('[ALEXA HANDLER] intent: %s' % str(request.intent))
+
 
   if request.intent == 'Switch':
     d = get_close_matches(request.parameters['device'].value, devices)
