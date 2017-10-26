@@ -55,8 +55,8 @@ LINKED_PACKAGES = {
 }
 
 DEVICE_TYPE_MAPPING = {
-  'on/off relay switch':  'zwave_switch',
-  'on/off power switch':  'zwave_switch',
+  'on/off relay switch':  'zwave_generic_devices.switch',
+  'on/off power switch':  'zwave_generic_devices.switch',
   'door/window sensor':   'zwave_generic_devices.contact_sensor',
   'door/window detector': 'zwave_generic_devices.contact_sensor',
   'motion sensor':        'zwave_generic_devices.motion_sensor',
