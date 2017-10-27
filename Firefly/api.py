@@ -8,7 +8,7 @@ import aiohttp_cors
 from Firefly import logging
 from Firefly.const import API_ALEXA_VIEW, API_INFO_REQUEST, TYPE_AUTOMATION, TYPE_DEVICE
 from Firefly.helpers.events import Command, Request
-from Firefly.services.alexa import AlexaHomeRequest, process_alexa_request
+#from Firefly.services.alexa import AlexaHomeRequest, process_alexa_request
 from Firefly.services.api_ai import process_api_ai_request
 
 
@@ -231,8 +231,11 @@ class FireflyCoreAPI:
     # return views
     return web.Response(text=json.dumps(views), content_type='application/json')
 
+
   @asyncio.coroutine
   def alexa_home_command(self, request: webRequest):
+    return web.Response(text='', content_type='application/json')
+  '''
     request_data = yield from request.json()
     alexa_home = AlexaHomeRequest(request_data)
     response = alexa_home.process_command(self.firefly)
@@ -241,6 +244,7 @@ class FireflyCoreAPI:
                                           'success': response.success,
                                           'payload': response.payload
                                         }), content_type='application/json')
+  '''
 
   @asyncio.coroutine
   def api_all_components(self, request):
@@ -279,10 +283,13 @@ class FireflyCoreAPI:
 
   @asyncio.coroutine
   def process_alexa_request(self, request):
+    return web.Response(text='', content_type='application/json')
+    '''
     request_data = yield from request.json()
     r = process_alexa_request(self.firefly, request_data)
     data = json.dumps(r)
     return web.Response(text=data, content_type='application/json')
+    '''
 
   @asyncio.coroutine
   def get_subscriptions(self, request):

@@ -10,7 +10,7 @@ from Firefly import aliases, logging, scheduler
 from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SERVICE_CONFIG_FILE, SOURCE_LOCATION, SOURCE_TIME, TYPE_AUTOMATION, TYPE_DEVICE
 from Firefly.helpers.service import Command, Request, Service
 from Firefly.services.api_ai import apiai_command_reply
-from Firefly.services.alexa import AlexaRequest, alexa_handler, process_alexa_request
+from Firefly.services.alexa.alexa import process_alexa_request
 
 FIREBASE_LOCATION_STATUS_PATH = 'locationStatus'
 FIREBASE_DEVICE_VIEWS = 'deviceViews'
@@ -438,7 +438,8 @@ class Firebase(Service):
     self.update_device_min_views(device_views)
 
     #TODO: Remove this
-    #self.set_home_status('devices', device_views)
+    check_all_keys(device_views)
+    self.set_home_status('devices', device_views)
 
     self.update_aliases()
     self.update_last_metadata_timestamp()
