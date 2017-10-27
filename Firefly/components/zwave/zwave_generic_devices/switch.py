@@ -4,10 +4,6 @@ from Firefly.const import SWITCH
 
 TITLE = 'Zwave Switch'
 
-CAPABILITIES = {
-  SWITCH:      True,
-}
-
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   switch = Switch(firefly, package, **kwargs)
@@ -16,5 +12,4 @@ def Setup(firefly, package, **kwargs):
 
 class Switch(ZwaveSwitch):
   def __init__(self, firefly, package, **kwargs):
-    kwargs['capabilities'] = CAPABILITIES
     super().__init__(firefly, package, TITLE, **kwargs)

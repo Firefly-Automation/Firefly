@@ -27,7 +27,7 @@ CAPABILITIES = {
   BATTERY:     False,
   LEVEL:       False,
   POWER_METER: False,
-  SWITCH:      False,
+  SWITCH:      True,
 }
 
 
