@@ -233,12 +233,11 @@ class Firefly(object):
     logging.message('Importing components from config file.')
     try:
       with open(config_file) as file:
-        devices = json.loads(file.read())
-
-      for device in devices:
-        self.install_package(device.get('package'), **device)
+        components = json.loads(file.read())
+      for component in components:
+        self.install_package(component.get('package'), **component)
     except Exception as e:
-      logging.notify('Error importing data from: %s - %s' % (DEVICE_FILE, str(e)))
+      logging.error('Error importing data from: %s - %s' % (config_file, str(e)))
 
   def export_components(self, config_file: str, component_type: str, current_values: bool = True) -> None:
     """

@@ -27,19 +27,7 @@ CAPABILITIES = {
   BATTERY:     False,
   LEVEL:       False,
   POWER_METER: False,
-  SWITCH:      False,
-}
-
-INITIAL_VALUES = {
-  '_alarm':                   False,
-  '_battery':                 -1,
-  '_current':                 -1,
-  '_current_energy_reading':  -1,
-  '_level':                   -1,
-  '_previous_energy_reading': -1,
-  '_switch':                  ACTION_OFF,
-  '_voltage':                 -1,
-  '_watts':                   -1
+  SWITCH:      True,
 }
 
 

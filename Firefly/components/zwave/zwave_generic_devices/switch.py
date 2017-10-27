@@ -1,8 +1,8 @@
 from Firefly import logging
 from Firefly.components.zwave.device_types.switch import ZwaveSwitch
+from Firefly.const import SWITCH
 
 TITLE = 'Zwave Switch'
-
 
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)

@@ -1,0 +1,4 @@
+ROUTINE_MODE = 'mode'
+ROUTINE_ICON ='icon'
+ROUTINE_ROUTINE = 'routine'
+ROUTINE_EXECUTE = 'execute'

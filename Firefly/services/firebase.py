@@ -10,11 +10,16 @@ from Firefly import aliases, logging, scheduler
 from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SERVICE_CONFIG_FILE, SOURCE_LOCATION, SOURCE_TIME, TYPE_AUTOMATION, TYPE_DEVICE
 from Firefly.helpers.service import Command, Request, Service
 from Firefly.services.api_ai import apiai_command_reply
+from Firefly.services.alexa.alexa import process_alexa_request
 
 FIREBASE_LOCATION_STATUS_PATH = 'locationStatus'
 FIREBASE_DEVICE_VIEWS = 'deviceViews'
 FIREBASE_DEVICE_STATUS = 'deviceStatus'
+FIREBASE_HOME_STATUS = 'homeStatus'
+FIREBASE_COMMAND_REPLY = 'commandReply'
 FIREBASE_ALIASES = 'aliases'
+
+ALEXA_CUSTOM_SKILL_ID = 'firefly-alexa'
 
 # This is the action when status messages are updated
 STATUS_MESSAGE_UPDATED = {
@@ -139,6 +144,35 @@ class Firebase(Service):
     self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
 
   def command_reply(self, message):
+
+
+    data = message['data']
+    # Take path and split it. we are only going to process top level paths. This should be the clientID.
+    raw_path = message['path']
+    path_list = raw_path[1:].split('/')
+    path_depth = len(path_list)
+
+    if path_depth > 1 or data is None:
+      logging.debug('[FIREBASE COMMAND REPLY] message was updated or deleted')
+      return
+
+    path = path_list[0]
+    client_id = path
+    logging.debug('[FIREBASE COMMAND REPLY] processing for client: %s' % client_id)
+
+    response = {}
+    if path == ALEXA_CUSTOM_SKILL_ID:
+      alexa_request = data['service_alexa']
+      response = process_alexa_request(self.firefly, alexa_request)
+
+    if response:
+      logging.debug('[FIREBASE COMMAND REPLY] sending response : %s' % str(response))
+      self.db.child(FIREBASE_HOME_STATUS).child(self.home_id).child(FIREBASE_COMMAND_REPLY).child(client_id).child('reply').set(response, self.id_token)
+      return
+
+
+
+     # TODO: Remove this after upgrading all cloud functions
     if not message['data']:
       return
     if message['data'].get('reply') is not None or message.get('reply') is not None:
@@ -360,6 +394,31 @@ class Firebase(Service):
 
     self.update_home_status(FIREBASE_LOCATION_STATUS_PATH, location_status)
 
+
+  def update_device_min_views(self, device_views, **kwargs):
+    device_min_view = {}
+    for ff_id, device_view in device_views.items():
+      try:
+        primary_action = device_view['metadata']['primary']
+        device_min_view[ff_id] = {
+          'ff_id': device_view['ff_id'],
+          'alias': device_view['alias'],
+          # TODO: Update this to hidden_by_user or hidden_by_firefly when ready.
+          'export_ui': device_view['export_ui'],
+          'metadata' : {
+            'primary': primary_action,
+            'actions' : {
+              primary_action: device_view['metadata']['actions'][primary_action]
+            }
+          }
+        }
+      except Exception as e:
+        logging.error('[FIREBASE DEVICE MIN VIEW] error: %s' % str(e))
+    logging.debug('[FIREBASE DEVICE MIN VIEW] setting min view: %s' % str(device_min_view))
+    self.set_home_status('deviceMinView', device_min_view)
+
+
+
   def update_device_views(self, **kwargs):
     ''' Update device views metadata for all devices
 
@@ -376,8 +435,11 @@ class Firebase(Service):
       device_views[device.get('ff_id', 'unknown')] = device
     self.set_home_status(FIREBASE_DEVICE_VIEWS, device_views)
 
+    self.update_device_min_views(device_views)
+
     #TODO: Remove this
-    #self.set_home_status('devices', device_views)
+    check_all_keys(device_views)
+    self.set_home_status('devices', device_views)
 
     self.update_aliases()
     self.update_last_metadata_timestamp()
@@ -403,6 +465,7 @@ class Firebase(Service):
         pass
 
     #TODO Remove this
+    check_all_keys(all_values)
     #self.update_home_status('devices', all_values)
 
     if overwrite:
@@ -679,3 +742,20 @@ def scrub(x):
     ret = ''
   # Finished scrubbing
   return ret
+
+
+FIREBASE_INVALID_CHARS = ['/', '\\', '$', '#']
+
+def has_invalid_char(string_to_check):
+  for c in FIREBASE_INVALID_CHARS:
+    if c in string_to_check:
+      return True
+  return False
+
+
+def check_all_keys(firebase_dict):
+  for key in firebase_dict:
+    if has_invalid_char(key):
+      logging.critical('[FIREBASE CHECK ALL KEYS] ****************** BAD KEY: %s' % key)
+    if type(firebase_dict[key]) is dict:
+      check_all_keys(firebase_dict[key])
