@@ -30,18 +30,6 @@ CAPABILITIES = {
   SWITCH:      False,
 }
 
-INITIAL_VALUES = {
-  '_alarm':                   False,
-  '_battery':                 -1,
-  '_current':                 -1,
-  '_current_energy_reading':  -1,
-  '_level':                   -1,
-  '_previous_energy_reading': -1,
-  '_switch':                  ACTION_OFF,
-  '_voltage':                 -1,
-  '_watts':                   -1
-}
-
 
 class ZwaveSwitch(Switch, ZwaveDevice):
   def __init__(self, firefly, package, title='Zwave Switch', initial_values={}, **kwargs):
