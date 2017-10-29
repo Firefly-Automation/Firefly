@@ -14,8 +14,8 @@ class VirtualSwitch(Switch):
   def __init__(self, firefly, package, **kwargs):
     super().__init__(firefly, package, TITLE, AUTHOR, **kwargs)
 
-  def on(self, **kwargs):
+  def set_on(self, **kwargs):
     self.update_values(switch='on')
 
-  def off(self, **kwargs):
+  def set_off(self, **kwargs):
     self.update_values(switch='off')
