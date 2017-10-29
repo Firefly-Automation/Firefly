@@ -1,6 +1,6 @@
 from Firefly import logging
 from Firefly.helpers.device_types.switch import Switch
-from Firefly.const import SWITCH, LEVEL
+from Firefly.const import SWITCH, LEVEL, AUTHOR
 
 CAPABILITIES = {
   LEVEL:       True,
@@ -17,4 +17,13 @@ def Setup(firefly, package, **kwargs):
 
 class VirtualSwitch(Switch):
   def __init__(self, firefly, package, **kwargs):
-    super().__init__(firefly, package, TITLE, capabilities=CAPABILITIES, **kwargs)
+    super().__init__(firefly, package, TITLE, AUTHOR, capabilities=CAPABILITIES, **kwargs)
+
+  def on(self, **kwargs):
+    self.update_values(switch='on')
+
+  def off(self, **kwargs):
+    self.update_values(switch='off')
+
+  def set_level(self, level=-1, **kwargs):
+    self.update_values(level=int(level))
