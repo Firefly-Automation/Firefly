@@ -316,9 +316,9 @@ def action_switch(can_command=True, can_request=True, primary=False, title='', c
   return action_metadata
 
 
-def action_on_off_switch(primary=True, title='Switch', context='On Off Controls for the switch', on_command=EVENT_ACTION_ON, off_command=EVENT_ACTION_OFF,
+def action_on_off_switch(primary=True, title='Switch', context='On Off Controls for the switch', request='switch', on_command=EVENT_ACTION_ON, off_command=EVENT_ACTION_OFF,
                          color_mapping: ColorMap = ColorMap(green=[EVENT_ACTION_ON], grey=[EVENT_ACTION_OFF]), icon='ion-ios-bolt', **kwargs):
-  return action_switch(primary=primary, title=title, context=context, on_command=on_command, off_command=off_command, color_mapping=color_mapping, icon=icon, **kwargs)
+  return action_switch(primary=primary, title=title, context=context, request=request, on_command=on_command, off_command=off_command, color_mapping=color_mapping, icon=icon, **kwargs)
 
 
 def action_text(can_command=False, can_request=True, primary=False, title='', context='', request='', command='', command_prop='', command_val='', text_mapping={}, icon='',
