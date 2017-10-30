@@ -4,7 +4,7 @@ from typing import Any, Callable
 from Firefly import aliases, logging
 from Firefly.const import API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE, API_ALEXA_VIEW, API_FIREBASE_VIEW
 from Firefly.helpers.events import Command, Event, Request
-
+from Firefly.helpers.metadata import PRIMARY_ACTION, FF_ID, HIDDEN_BY_USER, EXPORT_UI
 
 class Device(object):
   def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
@@ -297,13 +297,14 @@ class Device(object):
 
     """
     return_data = {
-      'ff_id': self.id,
+      FF_ID: self.id,
       'alias': self._alias,
       'metadata': self._metadata,
-      'device_type': self._device_type,
+      'deviceType': self._device_type,
       'tags': self._tags,
       'room': self._room,
-      'export_ui': self._export_ui
+      EXPORT_UI: self._export_ui,
+      HIDDEN_BY_USER: self._export_ui
     }
     return return_data
 

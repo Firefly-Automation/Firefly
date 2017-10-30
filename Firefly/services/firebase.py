@@ -12,6 +12,9 @@ from Firefly.helpers.service import Command, Request, Service
 from Firefly.services.api_ai import apiai_command_reply
 from Firefly.services.alexa.alexa import process_alexa_request
 
+
+from Firefly.helpers.metadata import PRIMARY_ACTION, FF_ID, HIDDEN_BY_USER, EXPORT_UI
+
 FIREBASE_LOCATION_STATUS_PATH = 'locationStatus'
 FIREBASE_DEVICE_VIEWS = 'deviceViews'
 FIREBASE_DEVICE_STATUS = 'deviceStatus'
@@ -434,15 +437,17 @@ class Firebase(Service):
       try:
         primary_action = device_view['metadata']['primary']
         device_min_view[ff_id] = {
-          'ff_id': device_view['ff_id'],
+          FF_ID: device_view[FF_ID],
           'alias': device_view['alias'],
           # TODO: Update this to hidden_by_user or hidden_by_firefly when ready.
-          'export_ui': device_view['export_ui'],
-          'metadata' : {
-            'primary': primary_action,
-            'actions' : {
+          EXPORT_UI: device_view[EXPORT_UI],
+          HIDDEN_BY_USER: device_view[EXPORT_UI],
+
+          PRIMARY_ACTION : {
+
+
               primary_action: device_view['metadata']['actions'][primary_action]
-            }
+
           }
         }
       except Exception as e:
@@ -465,7 +470,7 @@ class Firebase(Service):
     device_views = {}
     devices = self.get_all_component_views('firebase_refresh', filter=TYPE_DEVICE)
     for device in devices:
-      device_views[device.get('ff_id', 'unknown')] = device
+      device_views[device.get(FF_ID, 'unknown')] = device
     self.set_home_status(FIREBASE_DEVICE_VIEWS, device_views)
 
     self.update_device_min_views(device_views)
