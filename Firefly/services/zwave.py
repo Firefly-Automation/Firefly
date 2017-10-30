@@ -356,7 +356,7 @@ class Zwave(Service):
         logging.error(code='FF.ZWA.ZWA.001', args=(node, e))  # error installing node %s: %s
 
     elif self._installed_nodes[node_id] not in self._firefly.components:
-      logging.notify('ZWAVE HANDLER - NODE NOT FOUND IN FIREFLY DEVICES: %s' % self._installed_nodes[node_id])
+      logging.notify('ZWAVE HANDLER - NODE NOT FOUND IN FIREFLY DEVICES: %s - %s' % (self._installed_nodes[node_id], node_id))
       self._installed_nodes.pop(node_id)
       node = kwargs.get('node')
       try:

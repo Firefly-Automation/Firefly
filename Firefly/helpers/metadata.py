@@ -243,32 +243,36 @@ class ColorMap(object):
     }
 
 
-CAN_COMMAND = 'can_command'
-CAN_REQUEST = 'can_request'
-COLOR_MAPPING = 'color_mapping'
+CAN_COMMAND = 'canCommand'
+CAN_REQUEST = 'canRequest'
+COLOR_MAPPING = 'colorMapping'
 COMMAND = 'command'
-COMMAND_PROP = 'command_prop'
-COMMAND_VAL = 'command_val'
+COMMAND_PROP = 'commandProp'
+COMMAND_VAL = 'commandVal'
 CONTEXT = 'context'
 ICON = 'icon'
-LEVEL_STEP = 'level_step'
-MAX_LEVEL = 'max_level'
-MIN_LEVEL = 'min_level'
+LEVEL_STEP = 'levelStep'
+MAX_LEVEL = 'maxLevel'
+MIN_LEVEL = 'minLevel'
 PRIMARY = 'primary'
 REQUEST = 'request'
 SLIDER = 'slider'
 SWITCH = 'switch'
 TEXT = 'text'
-TEXT_MAPPING = 'text_mapping'
+TEXT_MAPPING = 'textMapping'
 TITLE = 'title'
 TYPE = 'type'
-SELECTED_VALUE = 'selected_value'
+SELECTED_VALUE = 'selectedValue'
 BUTTON = 'button'
-BUTTON_GROUP = 'button_group'
-BUTTON_LIST = 'button_list'
+BUTTON_GROUP = 'buttonGroup'
+BUTTON_LIST = 'buttonList'
 
-ON_COMMAND = 'on_command'
-OFF_COMMAND = 'off_command'
+ON_COMMAND = 'onCommand'
+OFF_COMMAND = 'offCommand'
+
+HIDDEN_BY_USER = 'hiddenByUser'
+HIDDEN_BY_SYSTEM = 'hiddenBySystem'
+EXPORT_UI = 'exportUI' # Will be deprecated by HIDDEN_BY_USER & HIDDEN_BY_SYSTEM
 
 COLOR_BLACK = 'black'
 COLOR_BLUE = 'blue'
@@ -277,6 +281,9 @@ COLOR_RED = 'red'
 COLOR_YELLOW = 'goldenrod'
 COLOR_GREY = 'grey'
 COLOR_ORANGE = 'orange'
+
+PRIMARY_ACTION = 'primaryAction'
+FF_ID = 'ffUid'
 
 
 def action_switch(can_command=True, can_request=True, primary=False, title='', context='', request='', on_command=EVENT_ACTION_ON, off_command=EVENT_ACTION_OFF, color_mapping: ColorMap = ColorMap(),
