@@ -59,10 +59,12 @@ def Setup(firefly, package, **kwargs):
   password = config.get(SECTION, 'password', fallback=None)
   storage_bucket = config.get(SECTION, 'storage_bucket', fallback=None)
   home_id = config.get(SECTION, 'home_id', fallback=None)
+  #TODO: Move facebook somewhere better
+  facebook = config.getboolean(SECTION, 'facebook', fallback=False)
   if api_key is None:
     logging.error('firebase error')  # TODO Make this error code
     return False
-  firebase = Firebase(firefly, package, api_key=api_key, auth_domain=auth_domain, database_url=database_url, email=email, password=password, storage_bucket=storage_bucket, home_id=home_id)
+  firebase = Firebase(firefly, package, api_key=api_key, auth_domain=auth_domain, database_url=database_url, email=email, password=password, storage_bucket=storage_bucket, home_id=home_id, facebook=facebook)
   firefly.install_component(firebase)
   return True
 
@@ -77,6 +79,7 @@ class Firebase(Service):
     self.storage_bucket = kwargs.get('storage_bucket')
     self.email = kwargs.get('email')
     self.password = kwargs.get('password')
+    self.facebook = kwargs.get('facebook')
 
     self.home_id = kwargs.get('home_id')
 
@@ -131,6 +134,31 @@ class Firebase(Service):
     with open(SERVICE_CONFIG_FILE, 'w') as configfile:
       config.write(configfile)
     logging.info('Config file for hue has been updated.')
+
+
+  def process_settings(self, message, **kwargs):
+    logging.info('[FIREBASE] PROCESSING SETTINGS: %s' % str(message))
+    if message.get('notification', {}).get('facebook') is not None:
+      enable = bool(message.get('notification', {}).get('facebook'))
+      self.set_facebook_settings(enable)
+
+
+
+  def set_facebook_settings(self, enable, **kwargs):
+    self.facebook = enable
+    logging.info('[FIREBASE] Enabling/Disabling Facebook. %s' % str(enable))
+    config = configparser.ConfigParser()
+    config.read(SERVICE_CONFIG_FILE)
+    config.set(SECTION, r'facebook', str(enable))
+    with open(SERVICE_CONFIG_FILE, 'w') as configfile:
+      config.write(configfile)
+    if enable:
+      self.send_facebook_notification("Facebook notifications for firefly are now enabled.")
+    else:
+      self.send_facebook_notification("Facebook notifications for firefly are now disabled.")
+
+    logging.info('Config file for hue has been updated.')
+
 
   def refresh_stream(self):
     if not internet_up():
@@ -205,6 +233,11 @@ class Firebase(Service):
       for command_string, command_args in command.items():
         send_command = Command(ff_id, 'web_api', command_string, **command_args)
         self.firefly.location.process_command(send_command)
+        return
+
+    if ff_id == 'settings':
+      self.process_settings(command)
+      return
 
     if type(command) is str:
       send_command = Command(ff_id, 'web_api', command)
@@ -676,6 +709,8 @@ class Firebase(Service):
   def push_notification(self, message, priority, retry=True):
     try:
       self.send_notification(message, priority)
+      if self.facebook:
+        self.send_facebook_notification(message)
     except:
       self.refresh_user()
       if retry:
@@ -690,6 +725,11 @@ class Firebase(Service):
       'timestamp': now.timestamp(),
       'time':      now_time
     }, self.id_token)
+
+  def send_facebook_notification(self, message, **kwargs):
+    logging.info("[FIREBASE FACEBOOK] SENDING NOTIFICATION")
+    self.db.child("homeStatus").child(self.home_id).child("facebookNotifcations").push(message, self.id_token)
+
 
   def get_api_id(self, **kwargs):
     ff_id = kwargs.get('api_ff_id')
