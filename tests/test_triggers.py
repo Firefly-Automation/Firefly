@@ -1689,7 +1689,6 @@ class TestTriggers(unittest.TestCase):
     trigger_added = triggers.add_trigger([trigger])
     self.assertTrue(trigger_added)
     triggers.add_trigger([trigger_b])
-    print(triggers.export())
     self.firefly.current_state = data
     event = Event(self.device, EVENT_TYPE_BROADCAST, {
       TEMPERATURE: 60
