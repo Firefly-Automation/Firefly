@@ -79,6 +79,8 @@ class Trigger(object):
       if EVENT_ACTION_ANY in trigger_action:
         return True
       for item, value in event.event_action.items():
+        if item in trigger_action and type(trigger_action[item][0]) is dict:
+          return self.check_number_compare_trigger(item, value)
         if item in trigger_action and value in trigger_action[item]:
           return True
         if item in trigger_action and EVENT_ACTION_ANY in trigger_action[item]:
@@ -89,6 +91,8 @@ class Trigger(object):
 
     try:
       prop = list(trigger_action.keys())[0]
+      if type(trigger_action[prop][0]) is dict:
+        return self.check_number_compare_trigger(prop, current_states[self.listen_id][prop])
       if current_states[self.listen_id][prop] in trigger_action[prop]:
         return True
       if EVENT_ACTION_ANY in trigger_action[prop]:
@@ -97,6 +101,26 @@ class Trigger(object):
       return False
 
     return False
+
+  def check_number_compare_trigger(self, event_prop, event_value) -> bool:
+    logging.info('checking number trigger: %s' % self.trigger_action)
+    number_compares = self.trigger_action[0][event_prop]
+    valid_trigger = True
+    for number_compare in number_compares:
+      (operator, value), = number_compare.items()
+      if operator == 'gt' and event_value > value:
+        valid_trigger &= True
+      elif operator == 'ge' and event_value >= value:
+        valid_trigger &= True
+      elif operator == 'lt' and event_value < value:
+        valid_trigger &= True
+      elif operator == 'le' and event_value <= value:
+        valid_trigger &= True
+      elif operator == 'eq' and event_value == value:
+        valid_trigger &= True
+      else:
+        return False
+    return valid_trigger
 
   def check_time_trigger(self, event: Event) -> bool:
     # If the event source is not time then it cant match any.
@@ -145,9 +169,9 @@ class Trigger(object):
 
   def export(self):
     return {
-      'listen_id':      self.listen_id,
+      'listen_id': self.listen_id,
       'trigger_action': self.trigger_action,
-      'source':         self.source
+      'source': self.source
     }
 
 
@@ -178,7 +202,7 @@ class TriggerSet(object):
 
   def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
     # Event source is not in TriggerSet sources -> return False.
-    if event.source not in self.trigger_sources:
+    if event.source not in self.trigger_sources and not ignore_event:
       return False
     for trigger in self.trigger_set:
       if not trigger.check_trigger(self.firefly, event, ignore_event, **kwargs):
@@ -195,6 +219,8 @@ class TriggerSet(object):
 
     self.trigger_sources.add(trigger.listen_id)
     self.trigger_set.append(trigger)
+    if self.check_for_number_compare(trigger.trigger_action):
+      return self.add_number_compare_trigger(trigger)
     if trigger.listen_id != TIME:
       logging.debug('Adding subscription: %s %s %s' % (self.subscriber_id, trigger.listen_id, trigger.trigger_action))
       self.firefly.subscriptions.add_subscriber(self.subscriber_id, trigger.listen_id, trigger.trigger_action)
@@ -208,6 +234,32 @@ class TriggerSet(object):
   def import_trigger_set(self, trigger_set, **kwargs):
     for trigger in trigger_set:
       self.add_trigger(trigger)
+
+  def add_number_compare_trigger(self, trigger):
+    logging.debug('adding number compare trigger: %s' % trigger)
+    try:
+      (trigger_prop, trigger_value), = trigger.trigger_action[0].items()
+    except:
+      logging.error('too many triggers in number compare trigger')
+      return False
+
+    self.firefly.subscriptions.add_subscriber(self.subscriber_id, trigger.listen_id, {
+      trigger_prop: EVENT_ACTION_ANY
+    })
+    return True
+
+  def check_for_number_compare(self, trigger_action):
+    for action in trigger_action:
+      for trigger_prop, trigger_values in action.items():
+        if type(trigger_values) is not list:
+          return False
+        for trigger_value in trigger_values:
+          if type(trigger_value) is not dict:
+            return False
+          for action_key in trigger_value.keys():
+            if action_key not in ['lt', 'gt', 'le', 'ge']:
+              return False
+    return True
 
 
 """
@@ -262,7 +314,6 @@ class Triggers(TriggerList):
     super().__init__(firefly, source_id)
 
   def add_trigger(self, trigger) -> bool:
-    print('Adding trigger: %s' % trigger)
     if type(trigger) is not list:
       trigger = [trigger]
     if set(trigger) in [set(t.trigger_set) for t in self.trigger_list]:
@@ -287,5 +338,4 @@ class Triggers(TriggerList):
 
   @property
   def triggers(self):
-    print(self.export())
     return self.export()
