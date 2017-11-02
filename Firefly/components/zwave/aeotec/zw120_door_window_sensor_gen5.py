@@ -48,19 +48,13 @@ class ZW120(ZwaveContactSensor):
     """
     # https://github.com/OpenZWave/open-zwave/blob/master/config/aeotec/zw120.xml
 
-    if self.node is None:
-      return
-    if not self.node.is_ready:
-      return
-    if self._update_try_count >= 5:
-      self._config_updated = True
-      return
 
-    self.node.set_config_param(2, 0)  # Disable 10 min wake up time
-    self.node.set_config_param(121, 17)  # Sensor Binary and Battery Report
 
-    successful = True
-    successful &= self.zwave_values[121]['value'] == 17
+
+    successful = self.verify_set_zwave_params([
+      (2, 0),  # Disable 10 min wake up time
+      (121, 17)  # Sensor Binary and Battery Report
+    ])
 
     self._update_try_count += 1
     self._config_updated = successful

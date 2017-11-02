@@ -4,7 +4,37 @@ from Firefly import logging, scheduler
 from Firefly.helpers.device.device import Device
 from Firefly.helpers.device import *
 from Firefly.helpers.metadata import action_battery
-from Firefly.util.zwave_command_class import COMMAND_CLASS_BATTERY
+from Firefly.util.zwave_command_class import COMMAND_CLASS_BATTERY, COMMAND_CLASS_DESC
+
+
+class ZwavePrarmValue(object):
+  #TODO: Maybe set better defaults
+  def __init__(self, index=None, label=None, ref=None, value=None, command_class=None, value_type=None, genre=None):
+    self.index = index
+    try:
+      self.label = self.label.lower()
+    except:
+      self.label = label
+    self.ref = ref
+    self.value = value
+    try:
+      self.command_class = COMMAND_CLASS_DESC[command_class]
+    except:
+      self.command_class = command_class
+    self.type = value_type
+    self.genre = genre
+
+
+
+  def __repr__(self):
+    return '<[ZWAVE VALUE] %(label)s: %(value)s [index: %(index)s, command class: %(command_class)s, genre: %(genre)s] %(ref)s>' % {
+      'label': self.label,
+      'value': self.value,
+      'index': self.index,
+      'command_class': self.command_class,
+      'genre': self.genre,
+      'ref': self.ref
+    }
 
 
 class ZwaveDevice(Device):
@@ -90,7 +120,10 @@ class ZwaveDevice(Device):
     return export_data
 
   def get_zwave_values(self, **kwargs):
-    return self.zwave_values
+    return_data = []
+    for idx, value in self.zwave_values.items():
+      return_data.append(value.__dict__)
+    return return_data
 
   def get_sensors(self, **kwargs):
     sensor = kwargs.get('sensor')
@@ -152,31 +185,56 @@ class ZwaveDevice(Device):
 
     # Update config if device config has not been updated.
     if not self._config_updated:
-      try:
-        for s, i in node.get_values().items():
-          self.zwave_values[i.index] = {
-            'label': i.label.lower(),
-            'class': i.command_class,
-            'value': i.data,
-            'ref': s,
-            'index': i.index,
-            'genre': i.genre,
-            'type': i.type
-          }
-      except:
-        pass
+      for s, i in node.get_values().items():
+        self.zwave_values[i.index] = ZwavePrarmValue(i.index, i.label, s, i.data, i.command_class, i.type, i.genre)
+
 
     if node.has_command_class(COMMAND_CLASS_BATTERY) and BATTERY not in self.request_map:
       self.add_request(BATTERY, self.get_battery)
       self.add_action(BATTERY, action_battery())
 
-    scheduler.runInS(5, self.update_device_config, '%s-update_config' % self.id, max_instances=1)
+
+    if self._node.is_ready and self._update_try_count <= 5 and not self._config_updated:
+      scheduler.runInS(5, self.update_device_config, '%s-update_config' % self.id, max_instances=1)
+    if self._update_try_count >6:
+      self._config_updated = True
     logging.debug('Done updating ZWave Values')
 
 
   def get_battery(self):
     return self._battery
 
+  def get_zwave_value(self, value_id: int) -> ZwavePrarmValue:
+    try:
+      return self.zwave_values[value_id]
+    except KeyError:
+      return ZwavePrarmValue()
+    except Exception as e:
+      logging.error('[ZWAVE DEVICE] unknown error: %s' % e)
+      return ZwavePrarmValue()
+
+
+  def verify_set_zwave_param(self, param_index, param_value, size=2) -> bool:
+    if self.get_zwave_value(param_index) != param_value:
+      self.node.set_config_param(param_index, param_value, size)
+      return False
+    return True
+
+  def verify_set_zwave_params(self, param_list) -> bool:
+    successful = True
+    for param in param_list:
+      if len(param) == 3:
+        successful &= self.verify_set_zwave_param(param[0], param[1], param[3])
+      elif len(param) == 2:
+        successful &= self.verify_set_zwave_param(param[0], param[1])
+      else:
+        logging.error('[ZWAVE DEVICE] unknown param length')
+    return successful
+
   @property
   def node(self):
     return self._node
+
+
+
+
