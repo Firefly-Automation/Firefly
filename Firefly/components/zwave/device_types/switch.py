@@ -70,11 +70,11 @@ class ZwaveSwitch(Switch, ZwaveDevice):
       self.update_values(switch=values.data)
       self.value_map[values.label] = values.value_id
 
-    if label == 'Battery Level':
+    elif label == 'Battery Level':
       self.update_values(battery=values.data)
       self.value_map[values.label] = values.value_id
 
-    if values.command_class == COMMAND_CLASS_METER:
+    elif values.command_class == COMMAND_CLASS_METER:
       self.value_map[values.label] = values.value_id
       if label == 'Energy':
         self.update_values(current_energy_reading=values.data)
@@ -87,7 +87,7 @@ class ZwaveSwitch(Switch, ZwaveDevice):
       if label == 'Current':
         self.update_values(power_current=values.data)
 
-    if label == 'Level' and values.command_class == COMMAND_CLASS_SWITCH_MULTILEVEL and LEVEL in self.capabilities:
+    elif label == 'Level' and values.command_class == COMMAND_CLASS_SWITCH_MULTILEVEL and self.capabilities[LEVEL] is True:
       self.value_map[values.label] = values.value_id
       level = node.get_dimmer_level(self.value_map[values.label])
       self.update_values(level=level)
@@ -95,6 +95,9 @@ class ZwaveSwitch(Switch, ZwaveDevice):
         self.update_values(switch=True)
       else:
         self.update_values(switch=False)
+
+    else:
+      logging.info('[ZWAVE DEVICE] recieved data for label: %s' % label)
 
     super().update_from_zwave(node, **kwargs)
 
@@ -108,7 +111,7 @@ class ZwaveSwitch(Switch, ZwaveDevice):
       self._node.set_switch(switch_id, on)
 
     # For dimmers you have to set the dimmer to what it was before then turn on switch
-    if self.capabilities[LEVEL]:
+    elif self.capabilities[LEVEL] is True:
       if self.value_map.get('Level') is None:
         return
       dimmer_id = self.value_map['Level']

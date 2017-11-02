@@ -2,7 +2,6 @@ from Firefly import logging
 from Firefly.components.zwave.device_types.multi_sensor import ZwaveMultiSensor
 from Firefly.const import DEVICE_TYPE_MOTION, MOTION
 from Firefly.helpers.device import *
-from Firefly.helpers.metadata import metaSlider
 
 COMMANDS = ['set_sensitivity']
 DEVICE_TYPE = DEVICE_TYPE_MOTION
@@ -40,9 +39,9 @@ class ZwaveAeotecMulti(ZwaveMultiSensor):
 
     self.add_request('sensitivity', self.get_sensitivity)
     self.add_command('set_sensitivity', self.set_sensitivity)
-    self.add_action('sensitivity',
-                    metaSlider(min=0, max=5, request_param='sensitivity', context='Set motion sensitivity (5 is most sensitive)', title='Motion sensitivity', set_command='set_sensitivity',
-                               command_param='sensitivity'))
+    # self.add_action('sensitivity',
+    #                metaSlider(min=0, max=5, request_param='sensitivity', context='Set motion sensitivity (5 is most sensitive)', title='Motion sensitivity', set_command='set_sensitivity',
+    #                           command_param='sensitivity'))
 
   def set_sensitivity(self, **kwargs):
     try:
@@ -71,79 +70,72 @@ class ZwaveAeotecMulti(ZwaveMultiSensor):
       **kwargs ():
     """
 
-    if self._node is None:
-      return
-    if not self._node.is_ready:
-      logging.warn('ZWAVE NODE NOT READY FOR CONFIG')
-      #self._update_try_count = 0
-      return
-
-    if self._update_try_count >= 5 or self._config_updated:
-      self._config_updated = True
-      return
-
     # Spec Sheet
     # https://aeotec.freshdesk.com/helpdesk/attachments/6028954764
 
-    # TODO: self._sensitivity ??
-    # sensitivity = 3 # index 4
-    # timeout = 10 # index 8
-    sensitivity = self._sensitivity
-    timeout = self._initial_values.get('_timeout', 300)
-    self.node.set_config_param(4, sensitivity, 1)
-    self.node.set_config_param(3, timeout)
 
-    scale = 1  # index 64 - This is the temp scale, 1 = F 0 = C
-    self.node.set_config_param(64, scale, size=1)  # THIS BROKE THINGS
+    # sensitivity index 4
+    sensitivity_idx = 4
+    sensitivity_val = self._sensitivity
+    sensitivity = (sensitivity_idx, sensitivity_val)
+
+    # timeout = 10 # index 8
+    timeout_idx = 3
+    timeout_val = self._timeout
+    timeout = (timeout_idx, timeout_val)
+
+    # index 64 - This is the temp scale, 1 = F 0 = C
+    scale_idx = 64
+    scale_val = 1
+    scale = (scale_idx, scale_val)
 
     # group1 is the data that should be broadcast with group1 241 = everything
-    group1 = 241  # index 101
-    self.node.set_config_param(101, group1)
+    group1_idx = 101
+    group1_val = 241  # index 101
+    group1 = (group1_idx, group1_val)
 
-    interval = 300  # index 111 - How often the group1 should be sent
-    self.node.set_config_param(111, interval)
+    g1_interval_idx = 111
+    g1_interval_val = 300  # index 111 - How often the group1 should be sent
+    g1_interval = (g1_interval_idx, g1_interval_val)
 
     # Send binary sensor report when motion triggered.
-    self.node.set_config_param(5, 1, 1)
+    binary_sensor_idx = 5
+    binary_sensor_val = 1
+    binary_sensor = (binary_sensor_idx, binary_sensor_val, 1)
 
     # Limit event messages to only be threshold triggered
     threshold_enable_idx = 40
     enabled = 1
     disabled = 0
-    self.node.set_config_param(threshold_enable_idx, enabled)
+    threshold_enable = (threshold_enable_idx, enabled)
 
     # Set the threshold to trigger update for temperature (20 = 2.0 degree - default)
     temperature_threshold_idx = 41
-    temperature_threshold = 5  # .5 degree
-    self.node.set_config_param(temperature_threshold_idx, temperature_threshold)
+    temperature_threshold_val = 5  # .5 degree
+    temperature_threshold = (temperature_threshold_idx, temperature_threshold_val)
 
     # Set the threshold to trigger update humidity (10 = 10% - default)
     humidity_threshold_idx = 42
-    humidity_threshold = 2
-    self.node.set_config_param(humidity_threshold_idx, humidity_threshold)
+    humidity_threshold_val = 2
+    humidity_threshold = (humidity_threshold_idx, humidity_threshold_val)
 
     # Set the threshold to trigger update luminance
     luminance_threshold_idx = 43
-    luminance_threshold = 10
-    self.node.set_config_param(luminance_threshold_idx, luminance_threshold)
+    luminance_threshold_val = 5
+    luminance_threshold = (luminance_threshold_idx, luminance_threshold_val)
 
-    # TODO: Other config values
-
-
-    successful = True
-    try:
-      successful &= self.zwave_values[3]['value'] == timeout
-      successful &= self.zwave_values[4]['value'] == sensitivity
-      successful &= self.zwave_values[5]['value'] == 1
-      successful &= self.zwave_values[64]['value'] == scale
-      successful &= self.zwave_values[241]['value'] == group1
-      successful &= self.zwave_values[111]['value'] == interval
-      successful &= self.zwave_values[temperature_threshold_idx]['value'] == temperature_threshold
-      successful &= self.zwave_values[humidity_threshold_idx]['value'] == humidity_threshold
-      successful &= self.zwave_values[luminance_threshold_idx]['value'] == luminance_threshold
-    except:
-      logging.error('[ZW100] ERROR confirming zwave values')
-      successful = False
+    successful_config = self.verify_set_zwave_params([
+      binary_sensor,
+      g1_interval,
+      group1,
+      humidity_threshold,
+      luminance_threshold,
+      scale,
+      sensitivity,
+      temperature_threshold,
+      threshold_enable,
+      timeout
+    ])
 
     self._update_try_count += 1
-    self._config_updated = successful
+    self._config_updated = successful_config

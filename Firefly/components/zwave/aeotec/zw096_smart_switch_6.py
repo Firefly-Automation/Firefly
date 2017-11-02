@@ -32,7 +32,6 @@ def Setup(firefly, package, **kwargs):
   return firefly.install_component(switch)
 
 
-
 class ZwaveAeotecSwitch6(ZwaveSwitch):
   def __init__(self, firefly, package, **kwargs):
     if kwargs.get('initial_values') is not None:
@@ -56,33 +55,17 @@ class ZwaveAeotecSwitch6(ZwaveSwitch):
       **kwargs ():
     """
 
-    if self._node is None:
-      return
-    if not self._node.is_ready:
-      logging.warn('ZWAVE NODE NOT READY FOR CONFIG')
-      self._update_try_count = 0
-      return
-
-    if self._update_try_count >= 5:
-      self._config_updated = True
-      return
-
     # Spec Sheet
     # TODO: Find spec sheet
 
     # TODO: Document These
     report = 2  # 1=hail 2=basic
-    self.node.set_config_param(110, 1)
-    self.node.set_config_param(100, 1)
-    self.node.set_config_param(80, report)
-    self.node.set_config_param(102, 15)
-    self.node.set_config_param(111, 30)
-
-    # TODO: Find a good way to check these.
-    successful = False
-    #successful = True
-    #successful &= self.node.request_config_param(80) == report
-    #successful &= self.node.request_config_param(102) == 15
-
+    successful = self.verify_set_zwave_params([
+      (110, 1),
+      (100, 1),
+      (80, report),
+      (102, 15),
+      (111, 30)
+    ])
     self._update_try_count += 1
     self._config_updated = successful
