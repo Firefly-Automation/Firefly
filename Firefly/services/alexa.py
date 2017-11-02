@@ -4,7 +4,7 @@ from Firefly import logging
 from Firefly import aliases
 from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ALEXA_OFF_REQUEST, ALEXA_ON_REQUEST,
                            ALEXA_SET_COLOR_REQUEST, ALEXA_SET_COLOR_TEMP_REQUEST, ALEXA_SET_PERCENTAGE_REQUEST,
-                           COMMAND_SET_LIGHT, LEVEL, TYPE_AUTOMATION, TYPE_DEVICE)
+                           COMMAND_SET_LIGHT, LEVEL, TYPE_AUTOMATION, TYPE_DEVICE, TYPE_ROUTINE)
 from Firefly.helpers.events import Command
 
 
@@ -85,7 +85,7 @@ def alexa_handler(firefly, request: AlexaRequest):
   if request.intent == 'ChangeMode':
     routines = {}
     for id, c in firefly.components.items():
-      if c.type == TYPE_AUTOMATION and 'routine' in c._package:
+      if c.type == TYPE_ROUTINE:
         routines[c._alias] = id
     r_alias = get_close_matches(request.parameters['mode'].value, routines.keys())
     if len(r_alias) == 0:

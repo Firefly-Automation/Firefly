@@ -4,7 +4,7 @@ from Firefly import aliases
 from difflib import get_close_matches
 from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ALEXA_OFF_REQUEST, ALEXA_ON_REQUEST,
                            ALEXA_SET_COLOR_REQUEST, ALEXA_SET_COLOR_TEMP_REQUEST, ALEXA_SET_PERCENTAGE_REQUEST,
-                           COMMAND_SET_LIGHT, LEVEL, TYPE_AUTOMATION, TYPE_DEVICE)
+                           COMMAND_SET_LIGHT, LEVEL, TYPE_AUTOMATION, TYPE_DEVICE, TYPE_ROUTINE)
 
 from Firefly.services.alexa.alexa_const import (DEVICE, DIMMER_INTENT, HELP_INTENT, HELP_RESPONSE, MODE, MODE_INTENT,
                                    REQUEST_SLOT_FILLING, STATE, STOP_INTENT, STOP_RESPONSE, SUPPORTED_INTENTS,
@@ -108,7 +108,7 @@ class AlexaRequest(object):
     if self.intent == MODE_INTENT:
       routines = {}
       for id, c in firefly.components.items():
-        if c.type == TYPE_AUTOMATION and 'routine' in c._package:
+        if c.type == TYPE_ROUTINE:
           routines[c._alias] = id
       r_alias = get_close_matches(self.slots[MODE].value, routines.keys())
       if len(r_alias) == 0:

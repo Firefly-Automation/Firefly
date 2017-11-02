@@ -87,7 +87,7 @@ class ZwaveSwitch(Switch, ZwaveDevice):
       if label == 'Current':
         self.update_values(power_current=values.data)
 
-    if label == 'Level' and values.command_class == COMMAND_CLASS_SWITCH_MULTILEVEL:
+    if label == 'Level' and values.command_class == COMMAND_CLASS_SWITCH_MULTILEVEL and LEVEL in self.capabilities:
       self.value_map[values.label] = values.value_id
       level = node.get_dimmer_level(self.value_map[values.label])
       self.update_values(level=level)
