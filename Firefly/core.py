@@ -230,7 +230,7 @@ class Firefly(object):
     Returns:
 
     '''
-    logging.message('Importing components from config file.')
+    logging.message('Importing components from config file: %s' % config_file)
     try:
       with open(config_file) as file:
         components = json.loads(file.read())
