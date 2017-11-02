@@ -1,6 +1,7 @@
 from Firefly import logging
 from Firefly.components.zwave.device_types.multi_sensor import ZwaveMultiSensor
-from Firefly.const import DEVICE_TYPE_MOTION, LUX, MOTION
+from Firefly.const import DEVICE_TYPE_MOTION, MOTION
+from Firefly.helpers.device import *
 from Firefly.helpers.metadata import metaSlider
 
 COMMANDS = ['set_sensitivity']
@@ -10,9 +11,6 @@ TITLE = 'Aeotec Gen6 MultiSensor'
 ALARM = 'alarm'
 BATTERY = 'battery'
 DEVICE_TYPE_MULTI_SENSOR = 'multi_sensor'
-HUMIDITY = 'humidity'
-TEMPERATURE = 'temperature'
-ULTRAVIOLET = 'ultraviolet'
 
 REQUESTS = [MOTION, ALARM, LUX, TEMPERATURE, HUMIDITY, ULTRAVIOLET, BATTERY, 'sensitivity']
 
@@ -77,10 +75,10 @@ class ZwaveAeotecMulti(ZwaveMultiSensor):
       return
     if not self._node.is_ready:
       logging.warn('ZWAVE NODE NOT READY FOR CONFIG')
-      self._update_try_count = 0
+      #self._update_try_count = 0
       return
 
-    if self._update_try_count >= 5:
+    if self._update_try_count >= 5 or self._config_updated:
       self._config_updated = True
       return
 
@@ -131,9 +129,21 @@ class ZwaveAeotecMulti(ZwaveMultiSensor):
 
     # TODO: Other config values
 
+
     successful = True
-    successful &= self.node.request_config_param(4) == sensitivity
-    successful &= self.node.request_config_param(3) == timeout
+    try:
+      successful &= self.zwave_values[3]['value'] == timeout
+      successful &= self.zwave_values[4]['value'] == sensitivity
+      successful &= self.zwave_values[5]['value'] == 1
+      successful &= self.zwave_values[64]['value'] == scale
+      successful &= self.zwave_values[241]['value'] == group1
+      successful &= self.zwave_values[111]['value'] == interval
+      successful &= self.zwave_values[temperature_threshold_idx]['value'] == temperature_threshold
+      successful &= self.zwave_values[humidity_threshold_idx]['value'] == humidity_threshold
+      successful &= self.zwave_values[luminance_threshold_idx]['value'] == luminance_threshold
+    except:
+      logging.error('[ZW100] ERROR confirming zwave values')
+      successful = False
 
     self._update_try_count += 1
     self._config_updated = successful

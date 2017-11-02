@@ -1,9 +1,9 @@
 from Firefly import logging
 from Firefly.const import ACTION_OFF, ACTION_ON, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, DEVICE_TYPE_SWITCH, LEVEL, STATE, SWITCH
-from Firefly.helpers.device import Device
+from Firefly.helpers.device import *
+from Firefly.helpers.device.device import Device
 from Firefly.helpers.metadata import action_on_off_switch, action_text, metaSlider, metaSwitch, metaText
 
-BATTERY = 'battery'
 ALARM = 'alarm'
 POWER_METER = 'power_meter'
 VOLTAGE_METER = 'voltage_meter'
@@ -49,10 +49,6 @@ class Switch(Device):
 
     CAPABILITIES.update(capabilities)
     capabilities = CAPABILITIES
-
-    # TODO: Remove this when new ui is done
-    if STATE not in requests:
-      requests.append(STATE)
 
     super().__init__(firefly, package, title, author, commands, requests, device_type, initial_values=initial_values, **kwargs)
 

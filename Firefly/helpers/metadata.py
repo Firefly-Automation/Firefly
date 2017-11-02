@@ -1,6 +1,8 @@
 from Firefly.const import (CONTACT, CONTACT_CLOSED, CONTACT_OPEN, EVENT_ACTION_OFF, EVENT_ACTION_ON, MOTION, MOTION_ACTIVE, MOTION_INACTIVE, NOT_PRESENT, PRESENCE, PRESENT, SENSOR_DRY, SENSOR_WET,
                            WATER)
 
+from Firefly.helpers.device import *
+
 
 def metaDimmer(min=0, max=100, command=True, request=False, primary=False):
   meta = {
@@ -266,13 +268,14 @@ SELECTED_VALUE = 'selectedValue'
 BUTTON = 'button'
 BUTTON_GROUP = 'buttonGroup'
 BUTTON_LIST = 'buttonList'
+UNITS = 'units'
 
 ON_COMMAND = 'onCommand'
 OFF_COMMAND = 'offCommand'
 
 HIDDEN_BY_USER = 'hiddenByUser'
 HIDDEN_BY_SYSTEM = 'hiddenBySystem'
-EXPORT_UI = 'exportUI' # Will be deprecated by HIDDEN_BY_USER & HIDDEN_BY_SYSTEM
+EXPORT_UI = 'exportUI'  # Will be deprecated by HIDDEN_BY_USER & HIDDEN_BY_SYSTEM
 
 COLOR_BLACK = 'black'
 COLOR_BLUE = 'blue'
@@ -329,7 +332,7 @@ def action_on_off_switch(primary=True, title='Switch', context='On Off Controls 
 
 
 def action_text(can_command=False, can_request=True, primary=False, title='', context='', request='', command='', command_prop='', command_val='', text_mapping={}, icon='',
-                color_mapping: ColorMap = ColorMap(), **kwargs):
+                color_mapping: ColorMap = ColorMap(), units='', **kwargs):
   """Builds the action metadata for a text action.
 
   Args:
@@ -362,7 +365,8 @@ def action_text(can_command=False, can_request=True, primary=False, title='', co
     REQUEST:       request,
     TEXT_MAPPING:  text_mapping,
     TITLE:         title,
-    TYPE:          TEXT
+    TYPE:          TEXT,
+    UNITS:         units
   }
   return action_metadata
 
@@ -374,6 +378,9 @@ def action_contact(primary=True, title='Contact sensor state', context='State of
   action_meta = action_text(primary=primary, title=title, context=context, request=request, text_mapping=text_mapping, color_mapping=color_mapping)
   return action_meta
 
+def action_battery(primary=False, title='Battery', context='Last reported battery level', request=BATTERY, units='%'):
+  action_meta = action_text(primary=primary, title=title, context=context, request=request, units=units)
+  return action_meta
 
 def action_water_dry(primary=True, title='Water sensor state', context='Water detected? (Dry is Good)', request=WATER, text_mapping={
   'Dry': [SENSOR_DRY],
@@ -463,11 +470,6 @@ def action_dimmer(can_command=True, can_request=True, primary=False, title='Ligh
   return action_level(can_command, can_request, primary, title, context, command, command_prop, request, min_level, max_level, level_step, icon, **kwargs)
 
 
-
-
-
-
-
 ######################################
 # BUTTONS
 ######################################
@@ -487,10 +489,10 @@ def action_button_object(text='Button', command='', command_prop='', command_val
 
   '''
   button_object = {
-    TEXT: text,
-    COMMAND: command,
-    COMMAND_PROP: command_prop,
-    COMMAND_VAL: command_value,
+    TEXT:           text,
+    COMMAND:        command,
+    COMMAND_PROP:   command_prop,
+    COMMAND_VAL:    command_value,
     SELECTED_VALUE: selected_value
   }
   return button_object
@@ -514,10 +516,10 @@ def action_button_group(can_command=True, can_request=True, primary=False, title
   action = {
     CAN_COMMAND: can_command,
     CAN_REQUEST: can_request,
-    PRIMARY: primary,
-    TITLE: title,
-    REQUEST: request,
-    TYPE: BUTTON_GROUP,
+    PRIMARY:     primary,
+    TITLE:       title,
+    REQUEST:     request,
+    TYPE:        BUTTON_GROUP,
     BUTTON_LIST: buttons
   }
   return action

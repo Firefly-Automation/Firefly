@@ -1696,3 +1696,23 @@ class TestTriggers(unittest.TestCase):
     self.firefly.update_current_state(event)
     triggered = triggers.check_triggers(event, ignore_event=True)
     self.assertTrue(triggered)
+
+  def test_low_battery(self):
+    """Test number test two triggers"""
+
+    BATTERY = 'battery'
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      BATTERY: [{
+        'le': 10
+      }]
+    })
+
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      BATTERY: 5
+    })
+    self.firefly.update_current_state(event)
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)

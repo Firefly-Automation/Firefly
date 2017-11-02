@@ -2,9 +2,10 @@ import uuid
 from typing import Any, Callable
 
 from Firefly import aliases, logging
-from Firefly.const import API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE, API_ALEXA_VIEW, API_FIREBASE_VIEW
+from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE
 from Firefly.helpers.events import Command, Event, Request
-from Firefly.helpers.metadata import PRIMARY_ACTION, FF_ID, HIDDEN_BY_USER, EXPORT_UI
+from Firefly.helpers.metadata import EXPORT_UI, FF_ID, HIDDEN_BY_USER
+
 
 class Device(object):
   def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
@@ -53,6 +54,7 @@ class Device(object):
 
     self._habridge_export = kwargs.get('habridge_export', True)
     self._habridge_alias = kwargs.get('habridge_alias', self._alias)
+
     self._homekit_export = kwargs.get('homekit_export', True)
     self._homekit_alias = kwargs.get('homekit_alias', self._alias)
     self._homekit_types = {}
@@ -96,7 +98,6 @@ class Device(object):
 
     self._room = new_room
     self.firefly._rooms.build_rooms()
-
 
   def delete_device(self):
     self.firefly.delete_device(self.id)
@@ -171,6 +172,9 @@ class Device(object):
       command (str): The string of the command
       function (Callable): The function to be executed.
     """
+    # TODO: Remove this, just use command_map for verification
+    if command not in self._commands:
+      self._commands.append(command)
     self._command_mapping[command] = function
 
   def add_request(self, request: str, function: Callable) -> None:
@@ -181,6 +185,9 @@ class Device(object):
       request (str): The string of the request
       function (Callable): The function to be executed.
     """
+    # TODO: Remove this, just use request_map for verification
+    if request not in self._requests:
+      self._requests.append(request)
     self._request_mapping[request] = function
 
   def add_action(self, action, action_meta):
@@ -200,7 +207,7 @@ class Device(object):
     Returns:
       (bool): Command successful.
     """
-    state_before = self.get_all_request_values()
+    state_before = self.get_all_request_values(True)
     logging.debug('%s: Got Command: %s' % (self.id, command.command))
     if command.command in self.command_map.keys():
       self._last_command_source = command.source
@@ -209,7 +216,7 @@ class Device(object):
         self.command_map[command.command](**command.args)
       except:
         return False
-      state_after = self.get_all_request_values()
+      state_after = self.get_all_request_values(True)
       self.broadcast_changes(state_before, state_after)
       return True
     return False
@@ -297,28 +304,37 @@ class Device(object):
 
     """
     return_data = {
-      FF_ID: self.id,
-      'alias': self._alias,
-      'metadata': self._metadata,
-      'deviceType': self._device_type,
-      'tags': self._tags,
-      'room': self._room,
-      EXPORT_UI: self._export_ui,
+      FF_ID:          self.id,
+      'alias':        self._alias,
+      'metadata':     self._metadata,
+      'deviceType':   self._device_type,
+      'tags':         self._tags,
+      'room':         self._room,
+      EXPORT_UI:      self._export_ui,
       HIDDEN_BY_USER: self._export_ui
     }
     return return_data
 
-
-  def get_all_request_values(self) -> dict:
+  def get_all_request_values(self, min_data=False, **kwargs) -> dict:
     """Function to get all requestable values.
 
     Returns (dict): All requests and values.
+
+    Args:
+      min_data (bool): only get requests that are lowercase. This is used for firebase and filtering out unneeded data.
 
     """
     request_values = {}
     for r in self._requests:
       try:
-        request_values[r] = self.request_map[r]()
+        if not min_data:
+          request_values[r] = self.request_map[r]()
+          continue
+        if min_data and r.islower():
+          value = self.request_map[r]()
+          if type(value) is float:
+            value = round(value, 2)
+          request_values[r] = value
       except:
         pass
     return request_values
@@ -336,9 +352,9 @@ class Device(object):
 
     """
     logging.info("Setting %s to %s" % (key, val))
-    state_before = self.get_all_request_values()
+    state_before = self.get_all_request_values(True)
     self.__setattr__(key, val)
-    state_after = self.get_all_request_values()
+    state_after = self.get_all_request_values(True)
     self.broadcast_changes(state_before, state_after)
 
   # TODO: Add runInX functions to devices. These functions have to be similar to member_set and should be able to

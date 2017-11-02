@@ -71,7 +71,7 @@ class DSB45(ZwaveWaterSensor):
 
     # TODO: Make config params index by id
     successful = True
-    successful &= self._config_params.get('report type to send', {}).get('value') == report_to_send
+    successful &= self.zwave_values[121]['value'] == report_to_send
     #successful &= self._config_params.get('wake up on power on') == wake_up_on_power_on
 
     self._update_try_count += 1

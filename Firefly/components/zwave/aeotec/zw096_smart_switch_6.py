@@ -29,8 +29,8 @@ CAPABILITIES = {
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   switch = ZwaveAeotecSwitch6(firefly, package, **kwargs)
-  firefly.install_component(switch)
-  return switch.id
+  return firefly.install_component(switch)
+
 
 
 class ZwaveAeotecSwitch6(ZwaveSwitch):
@@ -78,9 +78,11 @@ class ZwaveAeotecSwitch6(ZwaveSwitch):
     self.node.set_config_param(102, 15)
     self.node.set_config_param(111, 30)
 
-    successful = True
-    successful &= self.node.request_config_param(80) == report
-    successful &= self.node.request_config_param(102) == 15
+    # TODO: Find a good way to check these.
+    successful = False
+    #successful = True
+    #successful &= self.node.request_config_param(80) == report
+    #successful &= self.node.request_config_param(102) == 15
 
     self._update_try_count += 1
     self._config_updated = successful

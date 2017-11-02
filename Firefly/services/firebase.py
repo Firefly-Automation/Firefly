@@ -297,7 +297,7 @@ class Firebase(Service):
     all_values = {}
     for ff_id, device in self.firefly.components.items():
       try:
-        all_values[ff_id] = device.get_all_request_values()
+        all_values[ff_id] = device.get_all_request_values(True)
       except:
         pass
 
@@ -347,7 +347,7 @@ class Firebase(Service):
         if group.type != 'GROUP':
           continue
         groups[ff_id] = group.get_metadata()
-        groups_state[ff_id] = group.get_all_request_values()
+        groups_state[ff_id] = group.get_all_request_values(True)
 
       self.db.child("homeStatus").child(self.home_id).child('groupViews').set(groups, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('groupStatus').set(groups_state, self.id_token)
@@ -487,7 +487,7 @@ class Firebase(Service):
     all_values = {}
     for ff_id, device in self.firefly.components.items():
       try:
-        all_values[ff_id] = device.get_all_request_values()
+        all_values[ff_id] = device.get_all_request_values(True)
       except:
         pass
 
@@ -499,6 +499,8 @@ class Firebase(Service):
           device_view.pop('RAW_VALUES')
         if 'SENSORS' in device_view.keys():
           device_view.pop('SENSORS')
+        if 'ZWAVE_VALUES' in device_view.keys():
+          device_view.pop('ZWAVE_VALUES')
       except:
         pass
 
@@ -529,6 +531,8 @@ class Firebase(Service):
     if 'RAW_VALUES' in action.keys():
       return
     if 'SENSORS' in action.keys():
+      return
+    if 'ZWAVE_VALUES' in action.keys():
       return
 
     path = '%s/%s' % (FIREBASE_DEVICE_STATUS, ff_id)
@@ -681,6 +685,8 @@ class Firebase(Service):
       if 'RAW_VALUES' in action.keys():
         return
       if 'SENSORS' in action.keys():
+        return
+      if 'ZWAVE_VALUES' in action.keys():
         return
       self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
 

@@ -60,7 +60,7 @@ class ZW120(ZwaveContactSensor):
     self.node.set_config_param(121, 17)  # Sensor Binary and Battery Report
 
     successful = True
-    successful &= self._config_params['determines which report will be sent when magnet switch is opened/ closed'] == 17
+    successful &= self.zwave_values[121]['value'] == 17
 
     self._update_try_count += 1
     self._config_updated = successful

@@ -307,22 +307,26 @@ class Group(object):
 
   def event(self, event: Event) -> None:
     logging.info('[GROUP] received event %s' % event)
-    state_before = self.get_all_request_values()
+    state_before = self.get_all_request_values(True)
 
     self.devices[event.source]['state'].update(event.event_action)
 
-    state_after = self.get_all_request_values()
+    state_after = self.get_all_request_values(True)
     self.broadcast_changes(state_before, state_after)
 
-  def get_all_request_values(self) -> dict:
+  def get_all_request_values(self, min_data=False, **kwargs) -> dict:
     """Function to get all requestable values.
 
     Returns (dict): All requests and values.
 
+    Args:
+      min_data (bool): only get requests that are lowercase. This is used for firebase and filtering out unneeded data.
+
     """
     request_values = {}
     for r in self.requests:
-      request_values[r] = self.request_map[r]()
+      if not min_data or r.islower():
+        request_values[r] = self.request_map[r]()
     return request_values
 
   def broadcast_changes(self, before: dict, after: dict) -> None:

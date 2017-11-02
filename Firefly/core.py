@@ -396,7 +396,7 @@ class Firefly(object):
     if 'location' in devices:
       devices.remove('location')
     for device in devices:
-      current_state[device] = self.components[device].get_all_request_values()
+      current_state[device] = self.components[device].get_all_request_values(True)
     return current_state
 
   def update_current_state(self, event: Event) -> None:

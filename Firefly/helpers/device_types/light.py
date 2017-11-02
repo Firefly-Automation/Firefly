@@ -1,9 +1,11 @@
 from Firefly import logging
 from Firefly.const import ACTION_OFF, ACTION_ON, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, DEVICE_TYPE_SWITCH, LEVEL, SWITCH
-from Firefly.helpers.device import Device
-from Firefly.helpers.metadata import action_on_off_switch, metaSlider
+from Firefly.helpers.device import *
+from Firefly.helpers.device.device import Device
 
-BATTERY = 'battery'
+from Firefly.helpers.metadata import action_on_off_switch, metaSlider, action_dimmer
+
+
 ALARM = 'alarm'
 POWER_METER = 'power_meter'
 VOLTAGE_METER = 'voltage_meter'
@@ -58,7 +60,7 @@ class Light(Device):
       self.add_command(LEVEL, self.set_level)
 
       # TODO: Add new dimmer slider
-      self.add_action(LEVEL, metaSlider(title='Set Level', set_command=LEVEL, command_param=LEVEL))
+      self.add_action(LEVEL, action_dimmer())
       self.add_alexa_action(ALEXA_SET_PERCENTAGE)
 
     if capabilities[COMMAND_SET_LIGHT] and COMMAND_SET_LIGHT in commands:
