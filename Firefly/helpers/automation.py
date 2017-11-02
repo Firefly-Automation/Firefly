@@ -2,10 +2,10 @@ import uuid
 
 from Firefly import aliases, logging
 from Firefly.automation.triggers import Triggers
-from Firefly.const import COMMAND_NOTIFY, SERVICE_NOTIFICATION, TYPE_AUTOMATION
+from Firefly.const import COMMAND_NOTIFY, SERVICE_NOTIFICATION, TYPE_AUTOMATION, API_ALEXA_VIEW, API_FIREBASE_VIEW, API_INFO_REQUEST
 from Firefly.helpers.action import Action
 from Firefly.helpers.conditions import Conditions
-from Firefly.helpers.events import Command, Event
+from Firefly.helpers.events import Command, Event, Request
 
 # TODO(zpriddy): These should be in const file
 LABEL_ACTIONS = 'actions'
@@ -16,7 +16,7 @@ LABEL_MESSAGES = 'messages'
 LABEL_TRIGGERS = 'triggers'
 INTERFACE_LABELS = [LABEL_ACTIONS, LABEL_CONDITIONS, LABEL_DELAYS, LABEL_DEVICES, LABEL_MESSAGES, LABEL_TRIGGERS]
 
-from typing import Callable
+from typing import Callable, Any
 
 
 class Automation(object):
@@ -67,6 +67,38 @@ class Automation(object):
             continue
         # Call the event handler passing in the trigger_index and return.
         return self.event_handler(event, trigger_index, **kwargs)
+
+  def request(self, request: Request) -> Any:
+    """Function to request data from the ff_id.
+
+    The returned data can be in any format. Common formats should be:
+      str, int, dict
+
+    Args:
+      request (Request): Request object
+
+    Returns:
+      Requested Data
+
+    """
+    logging.debug('[AUTOMATION] %s: Got Request %s' % (self.id, request))
+    if request.request == API_INFO_REQUEST:
+      return self.get_api_info()
+    if request.request == API_FIREBASE_VIEW:
+      return self.get_firebase_views()
+    if request.request == API_ALEXA_VIEW:
+      return self.get_alexa_view()
+    return None
+
+  def get_api_info(self, **kwargs):
+    return {}
+
+  def get_firebase_views(self, **kwargs):
+    return {}
+
+  def get_alexa_view(self, **kwargs):
+    logging.info('[AUTOMATION] no alexa view')
+    return {}
 
   def export(self, **kwargs):
     """

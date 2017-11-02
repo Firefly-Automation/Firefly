@@ -58,7 +58,6 @@ class ZwaveAeotecSwitch5(ZwaveSwitch):
       return
     if not self._node.is_ready:
       logging.warn('ZWAVE NODE NOT READY FOR CONFIG')
-      self._update_try_count = 0
       return
 
     if self._update_try_count >= 5:
@@ -101,8 +100,8 @@ class ZwaveAeotecSwitch5(ZwaveSwitch):
 
     # TODO: Fix this logic to actually get the current values by index. This means we will have to index value by param ID not label.
     successful = True
-    successful &= self.node.request_config_param(report_idx) == report_type
-    successful &= self.node.request_config_param(102) == 15
+    successful &= self.zwave_values[report_idx]['value'] == report_type
+    successful &= self.zwave_values[102]['value'] == 15
 
 
     self._update_try_count += 1

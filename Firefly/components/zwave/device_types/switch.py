@@ -53,12 +53,6 @@ class ZwaveSwitch(Switch, ZwaveDevice):
 
     super().__init__(firefly, package, title, AUTHOR, commands, requests, DEVICE_TYPE_SWITCH, capabilities=capabilities, initial_values=initial_values, **kwargs)
 
-    self.value_map = {}
-
-  def export(self, current_values: bool = True, api_view: bool = False, **kwargs):
-    export_data = super().export(current_values, api_view)
-    export_data['value_map'] = self.value_map
-    return export_data
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, values: ZWaveValue = None, values_only=False, **kwargs):
     if node is None:
@@ -66,9 +60,8 @@ class ZwaveSwitch(Switch, ZwaveDevice):
 
     self._node = node
 
-    super().update_from_zwave(node, **kwargs)
-
     if values is None:
+      super().update_from_zwave(node, **kwargs)
       logging.message('ZWAVE SWITCH SENSOR NO VALUES GIVEN')
       return
 
@@ -94,7 +87,7 @@ class ZwaveSwitch(Switch, ZwaveDevice):
       if label == 'Current':
         self.update_values(power_current=values.data)
 
-    if label == 'Level' and values.command_class == COMMAND_CLASS_SWITCH_MULTILEVEL:
+    if label == 'Level' and values.command_class == COMMAND_CLASS_SWITCH_MULTILEVEL and LEVEL in self.capabilities:
       self.value_map[values.label] = values.value_id
       level = node.get_dimmer_level(self.value_map[values.label])
       self.update_values(level=level)
@@ -102,6 +95,8 @@ class ZwaveSwitch(Switch, ZwaveDevice):
         self.update_values(switch=True)
       else:
         self.update_values(switch=False)
+
+    super().update_from_zwave(node, **kwargs)
 
   def set_switch(self, switch=None, **kwargs):
     if switch is None:

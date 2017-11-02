@@ -2,7 +2,8 @@ import requests
 
 from Firefly import logging, scheduler
 from Firefly.const import AUTHOR
-from Firefly.helpers.device import Device
+from Firefly.helpers.device import *
+from Firefly.helpers.device.device import Device
 from Firefly.helpers.metadata import ColorMap, action_text
 from .foobot_service import STATUS_URL
 
@@ -90,8 +91,8 @@ class Foobot(Device):
     self.username = kwargs.get('username')
 
     self.add_request('air_quality', self.get_air_quality)
-    self.add_request('temperature', self.get_temperature)
-    self.add_request('humidity', self.get_humidity)
+    self.add_request(TEMPERATURE, self.get_temperature)
+    self.add_request(HUMIDITY, self.get_humidity)
     self.add_request('pm', self.get_pm)
     self.add_request('c02', self.get_c02)
     self.add_request('voc', self.get_voc)
@@ -107,7 +108,9 @@ class Foobot(Device):
       'No Reading': ['unknown']
     }
     color_mapping = ColorMap(green=['great'], orange=['good'], yellow=['fair'], red=['poor'], black=['unknown'])
-    self.add_action('air_quality', action_text(primary=True, title='Air Quality', context='Calculated Air Quality', request='Air Quality', text_mapping=text_mapping, color_mapping=color_mapping))
+    self.add_action('air_quality', action_text(primary=True, title='Air Quality', context='Calculated Air Quality', request='air_quality', text_mapping=text_mapping, color_mapping=color_mapping))
+    self.add_action(TEMPERATURE, action_text(primary=False, title='Temperature', context='Last reported temperature', request=TEMPERATURE, units=self._temp_scale))
+    self.add_action(HUMIDITY, action_text(primary=False, title='Humidity', context='Last reported humidity', request=HUMIDITY, units='%'))
 
     self.update()
     scheduler.runEveryM(self._refresh_interval, self.update, job_id=self.id)

@@ -26,16 +26,18 @@ AUTOMATION_FILE = 'dev_config/automation.json'
 LOCATION_FILE = 'dev_config/location.json'
 ZWAVE_FILE = 'dev_config/zwave.json'
 GROUPS_CONFIG_FILE = 'dev_config/groups.json'
+ROUTINES_CONFIG_FILE = 'dev_config/routines.json'
 
 REQUIRED_FILES = {
-  ALIAS_FILE:          {},
-  AUTOMATION_FILE:     [],
-  CONFIG_FILE:         None,
-  DEVICE_FILE:         [],
-  GROUPS_CONFIG_FILE:  {},
-  LOCATION_FILE:       {},
-  SERVICE_CONFIG_FILE: None,
-  ZWAVE_FILE:          {}
+  ALIAS_FILE:           {},
+  AUTOMATION_FILE:      [],
+  ROUTINES_CONFIG_FILE: [],
+  CONFIG_FILE:          None,
+  DEVICE_FILE:          [],
+  GROUPS_CONFIG_FILE:   {},
+  LOCATION_FILE:        {},
+  SERVICE_CONFIG_FILE:  None,
+  ZWAVE_FILE:           {}
 }
 
 # FOOBOT SERVICE
@@ -72,6 +74,7 @@ EVENT_ACTION_MODE = 'mode'
 EVENT_PROPERTY_ANY = 'ANY'
 
 TYPE_AUTOMATION = 'TYPE_AUTOMATION'
+TYPE_ROUTINE = 'TYPE_ROUTINE'
 TYPE_DEVICE = 'TYPE_DEVICE'
 TYPE_SERVICE = 'TYPE_SERVICE'
 TYPE_LOCATION = 'TYPE_LOCATION'
@@ -116,6 +119,7 @@ PRESENCE = 'presence'
 MOTION = 'motion'
 LUX = 'lux'
 BEACON_ENABLED = 'BECAON_ENABLED'
+TEMPERATURE = 'temperature'
 
 NOT_ENABLED = False
 ENABLED = True
@@ -170,6 +174,9 @@ COMPONENT_MAP = [{
 }, {
   'type': TYPE_DEVICE,
   'file': DEVICE_FILE
+}, {
+  'type': TYPE_ROUTINE,
+  'file': ROUTINES_CONFIG_FILE
 }]
 
 # TODO: This may not be needed

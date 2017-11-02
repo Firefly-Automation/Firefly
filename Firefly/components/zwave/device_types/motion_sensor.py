@@ -53,16 +53,20 @@ class ZwaveMotionSensor(MultiSensor, ZwaveDevice):
 
     self._node = node
 
-    super().update_from_zwave(node, **kwargs)
-
     if values is None:
       logging.message('ZWAVE MOTION SENSOR NO VALUES GIVEN')
+      super().update_from_zwave(node, **kwargs)
       return
 
     label = values.label
-    if label == 'Sensor':
-      self.update_values(motion=values.data)
-    if label == 'Battery Level':
-      self.update_values(battery=values.data)
-    if label == 'Burglar':
-      self.update_values(alarm=values.data)
+    if label in ['Sensor', 'Battery Level', 'Burglar']:
+      self.value_map[label] = values.value_id
+
+      if label == 'Sensor':
+        self.update_values(motion=values.data)
+      if label == 'Battery Level':
+        self.update_values(battery=values.data)
+      if label == 'Burglar':
+        self.update_values(alarm=values.data)
+
+    super().update_from_zwave(node, **kwargs)

@@ -1,14 +1,12 @@
 from Firefly import logging
 from Firefly.const import LUX, MOTION, MOTION_ACTIVE, MOTION_INACTIVE
-from Firefly.helpers.device import Device
+from Firefly.helpers.device.device import Device
+from Firefly.helpers.device import *
 from Firefly.helpers.metadata import action_motion, metaText, action_text
 
 BATTERY = 'battery'
-TEMPERATURE = 'temperature'
-HUMIDITY = 'humidity'
 ALARM = 'alarm'
 DEVICE_TYPE_MULTI_SENSOR = 'multi_sensor'
-ULTRAVIOLET = 'ultraviolet'
 
 COMMANDS = []
 
@@ -48,15 +46,15 @@ class MultiSensor(Device):
 
     if capabilities[BATTERY] and BATTERY in requests:
       self.add_request(BATTERY, self.get_battery)
-      self.add_action(BATTERY, action_text(title='Battery',context='Battery Level', request=BATTERY))
+      self.add_action(BATTERY, action_text(title='Battery',context='Battery Level', request=BATTERY, units='%'))
 
     if capabilities[HUMIDITY] and HUMIDITY in requests:
       self.add_request(HUMIDITY, self.get_humidity)
-      self.add_action(HUMIDITY, action_text(title='Humidity Level', text_request=HUMIDITY))
+      self.add_action(HUMIDITY, action_text(title='Humidity Level', context='Humidity %', request=HUMIDITY, units='%'))
 
     if capabilities[LUX] and LUX in requests:
       self.add_request(LUX, self.get_lux)
-      self.add_action(LUX, action_text(title='Lux Level', text_request=LUX))
+      self.add_action(LUX, action_text(title='Lux Level', request=LUX, units='lux'))
 
     if capabilities[MOTION] and MOTION in requests:
       self.add_request(MOTION, self.get_motion)
@@ -66,11 +64,11 @@ class MultiSensor(Device):
 
     if capabilities[TEMPERATURE] and TEMPERATURE in requests:
       self.add_request(TEMPERATURE, self.get_temperature)
-      self.add_action(TEMPERATURE, action_text(title='Temperature', text_request=TEMPERATURE))
+      self.add_action(TEMPERATURE, action_text(title='Temperature', request=TEMPERATURE, units='F'))
 
     if capabilities[ULTRAVIOLET] and ULTRAVIOLET in requests:
       self.add_request(ULTRAVIOLET, self.get_ultraviolet)
-      self.add_action(ULTRAVIOLET, action_text(title='Ultraviolet', text_request=ULTRAVIOLET))
+      self.add_action(ULTRAVIOLET, action_text(title='Ultraviolet', request=ULTRAVIOLET))
 
     self._alexa_export = False
     self.capabilities = CAPABILITIES

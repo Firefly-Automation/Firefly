@@ -2,7 +2,7 @@ import requests
 
 from Firefly import logging
 from Firefly.const import AUTHOR, COMMAND_NOTIFY, DEVICE_TYPE_NOTIFICATION, PRIORITY_NORMAL, SERVICE_NOTIFICATION
-from Firefly.helpers.device import Device
+from Firefly.helpers.device.device import Device
 
 TITLE = 'Firefly Pushover Device (pushover.net)'
 DEVICE_TYPE = DEVICE_TYPE_NOTIFICATION

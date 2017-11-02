@@ -55,9 +55,14 @@ Example Trigger:
 
 """
 
-
 # TODO: Change listen_id to trigger_source
 # TODO: Change source to subscriber_id (This may get moved to TriggerList as a TriggerList is all for the same subscriber)
+SIMPLE_TRIGGER = 'simple'
+LOCATION_TRIGGER = 'location'
+TIME_TRIGGER = 'time'
+NUMBER_COMPARE_TRIGGER = 'number'
+NUMBER_COMPARE_OPERATORS = ['le', 'ge', 'lt', 'gt']
+
 
 class Trigger(object):
   def __init__(self, listen_id: str, trigger_action: EVENT_ACTON_TYPE = EVENT_ACTION_ANY, source: str = SOURCE_TRIGGER):
@@ -67,14 +72,45 @@ class Trigger(object):
     else:
       self.trigger_action = verify_event_action(trigger_action)
     self.source = source
+    self.trigger_type = self.get_trigger_type()
+
+  def get_trigger_type(self):
+    """ Gets the trigger type from the data in the trigger object. This is used for checking triggers.
+
+    Returns: string of trigger type
+
+    """
+    if self.listen_id == TIME:
+      return TIME_TRIGGER
+    if self.listen_id == SOURCE_LOCATION:
+      return LOCATION_TRIGGER
+
+    # COMPLEX TRIGGERS (number_compare)
+    trigger_action = self.trigger_action[0]
+    prop = list(trigger_action.keys())[0]
+    if type(trigger_action[prop][0]) is dict:
+      type_number_compare = True
+      for key in trigger_action[prop][0].keys():
+        if key not in NUMBER_COMPARE_OPERATORS:
+          type_number_compare = False
+
+      if type_number_compare:
+        return NUMBER_COMPARE_TRIGGER
+    return SIMPLE_TRIGGER
 
   def check_trigger(self, firefly, event: Event, ignore_event: bool = False, **kwargs) -> bool:
-    if self.listen_id == TIME:
+    if self.trigger_type == TIME_TRIGGER:
       return self.check_time_trigger(event)
-    if self.listen_id == SOURCE_LOCATION:
+
+    if self.trigger_type == LOCATION_TRIGGER:
       return self.check_location_trigger(event)
 
+    if self.trigger_type == NUMBER_COMPARE_TRIGGER and not ignore_event:
+      (item, value), = event.event_action.items()
+      return self.check_number_compare_trigger(item, value)
+
     trigger_action = self.trigger_action[0]
+
     if self.listen_id == event.source and not ignore_event:
       if EVENT_ACTION_ANY in trigger_action:
         return True
@@ -87,6 +123,10 @@ class Trigger(object):
 
     current_states = firefly.current_state
 
+    if self.trigger_type == NUMBER_COMPARE_TRIGGER and ignore_event:
+      prop = list(trigger_action.keys())[0]
+      return self.check_number_compare_trigger(prop, current_states[self.listen_id][prop])
+
     try:
       prop = list(trigger_action.keys())[0]
       if current_states[self.listen_id][prop] in trigger_action[prop]:
@@ -97,6 +137,26 @@ class Trigger(object):
       return False
 
     return False
+
+  def check_number_compare_trigger(self, event_prop, event_value) -> bool:
+    logging.info('checking number trigger: %s' % self.trigger_action)
+    number_compares = self.trigger_action[0][event_prop]
+    valid_trigger = True
+    for number_compare in number_compares:
+      (operator, value), = number_compare.items()
+      if operator == 'gt' and event_value > value:
+        valid_trigger &= True
+      elif operator == 'ge' and event_value >= value:
+        valid_trigger &= True
+      elif operator == 'lt' and event_value < value:
+        valid_trigger &= True
+      elif operator == 'le' and event_value <= value:
+        valid_trigger &= True
+      elif operator == 'eq' and event_value == value:
+        valid_trigger &= True
+      else:
+        return False
+    return valid_trigger
 
   def check_time_trigger(self, event: Event) -> bool:
     # If the event source is not time then it cant match any.
@@ -178,7 +238,7 @@ class TriggerSet(object):
 
   def check_triggers(self, event: Event, ignore_event: bool = False, **kwargs) -> bool:
     # Event source is not in TriggerSet sources -> return False.
-    if event.source not in self.trigger_sources:
+    if event.source not in self.trigger_sources and not ignore_event:
       return False
     for trigger in self.trigger_set:
       if not trigger.check_trigger(self.firefly, event, ignore_event, **kwargs):
@@ -195,6 +255,8 @@ class TriggerSet(object):
 
     self.trigger_sources.add(trigger.listen_id)
     self.trigger_set.append(trigger)
+    if self.check_for_number_compare(trigger.trigger_action):
+      return self.add_number_compare_trigger(trigger)
     if trigger.listen_id != TIME:
       logging.debug('Adding subscription: %s %s %s' % (self.subscriber_id, trigger.listen_id, trigger.trigger_action))
       self.firefly.subscriptions.add_subscriber(self.subscriber_id, trigger.listen_id, trigger.trigger_action)
@@ -208,6 +270,32 @@ class TriggerSet(object):
   def import_trigger_set(self, trigger_set, **kwargs):
     for trigger in trigger_set:
       self.add_trigger(trigger)
+
+  def add_number_compare_trigger(self, trigger):
+    logging.debug('adding number compare trigger: %s' % trigger)
+    try:
+      (trigger_prop, trigger_value), = trigger.trigger_action[0].items()
+    except:
+      logging.error('too many triggers in number compare trigger')
+      return False
+
+    self.firefly.subscriptions.add_subscriber(self.subscriber_id, trigger.listen_id, {
+      trigger_prop: EVENT_ACTION_ANY
+    })
+    return True
+
+  def check_for_number_compare(self, trigger_action):
+    for action in trigger_action:
+      for trigger_prop, trigger_values in action.items():
+        if type(trigger_values) is not list:
+          return False
+        for trigger_value in trigger_values:
+          if type(trigger_value) is not dict:
+            return False
+          for action_key in trigger_value.keys():
+            if action_key not in ['lt', 'gt', 'le', 'ge']:
+              return False
+    return True
 
 
 """
@@ -262,7 +350,6 @@ class Triggers(TriggerList):
     super().__init__(firefly, source_id)
 
   def add_trigger(self, trigger) -> bool:
-    print('Adding trigger: %s' % trigger)
     if type(trigger) is not list:
       trigger = [trigger]
     if set(trigger) in [set(t.trigger_set) for t in self.trigger_list]:
@@ -283,9 +370,6 @@ class Triggers(TriggerList):
   def remove_triggers(self, trigger):
     pass
 
-  # TODO: Find way to migrate old config files, maybe variable cloning? Maybe basic bash script?
-
   @property
   def triggers(self):
-    print(self.export())
     return self.export()

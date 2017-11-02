@@ -7,7 +7,7 @@ import pyrebase
 import requests
 
 from Firefly import aliases, logging, scheduler
-from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SERVICE_CONFIG_FILE, SOURCE_LOCATION, SOURCE_TIME, TYPE_AUTOMATION, TYPE_DEVICE
+from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SERVICE_CONFIG_FILE, SOURCE_LOCATION, SOURCE_TIME, TYPE_AUTOMATION, TYPE_DEVICE, TYPE_ROUTINE
 from Firefly.helpers.service import Command, Request, Service
 from Firefly.services.api_ai import apiai_command_reply
 from Firefly.services.alexa.alexa import process_alexa_request
@@ -297,7 +297,7 @@ class Firebase(Service):
     all_values = {}
     for ff_id, device in self.firefly.components.items():
       try:
-        all_values[ff_id] = device.get_all_request_values()
+        all_values[ff_id] = device.get_all_request_values(True)
       except:
         pass
 
@@ -347,7 +347,7 @@ class Firebase(Service):
         if group.type != 'GROUP':
           continue
         groups[ff_id] = group.get_metadata()
-        groups_state[ff_id] = group.get_all_request_values()
+        groups_state[ff_id] = group.get_all_request_values(True)
 
       self.db.child("homeStatus").child(self.home_id).child('groupViews').set(groups, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('groupStatus').set(groups_state, self.id_token)
@@ -487,7 +487,7 @@ class Firebase(Service):
     all_values = {}
     for ff_id, device in self.firefly.components.items():
       try:
-        all_values[ff_id] = device.get_all_request_values()
+        all_values[ff_id] = device.get_all_request_values(True)
       except:
         pass
 
@@ -499,6 +499,8 @@ class Firebase(Service):
           device_view.pop('RAW_VALUES')
         if 'SENSORS' in device_view.keys():
           device_view.pop('SENSORS')
+        if 'ZWAVE_VALUES' in device_view.keys():
+          device_view.pop('ZWAVE_VALUES')
       except:
         pass
 
@@ -530,6 +532,8 @@ class Firebase(Service):
       return
     if 'SENSORS' in action.keys():
       return
+    if 'ZWAVE_VALUES' in action.keys():
+      return
 
     path = '%s/%s' % (FIREBASE_DEVICE_STATUS, ff_id)
     self.update_home_status(path, action)
@@ -551,7 +555,9 @@ class Firebase(Service):
       'config': []
     }
     for ff_id, d in self.firefly.components.items():
-      if d.type == TYPE_AUTOMATION and 'routine' in d._package:
+      logging.info('[FIREBASE]: getting routine view for: %s-%s' % (ff_id, d.type))
+      if d.type == TYPE_ROUTINE:
+        logging.info('[FIREBASE]: getting routine view for (2): %s' % ff_id)
         routines['view'].append(d.export(firebase_view=True))
         routines['config'].append(d.export())
     return routines
@@ -562,11 +568,12 @@ class Firebase(Service):
     return data
 
   def get_component_alexa_view(self, ff_id, source):
+    logging.info('[FIREBASE] getting alexa view for %s' % ff_id)
     device_request = Request(ff_id, source, API_ALEXA_VIEW)
     data = self.firefly.components[device_request.ff_id].request(device_request)
     return data
 
-  def get_all_alexa_views(self, source, filter=TYPE_DEVICE):
+  def get_all_alexa_views(self, source, filter=[TYPE_DEVICE, TYPE_ROUTINE]):
     if type(filter) is str:
       filter = [filter]
     views = []
@@ -681,6 +688,8 @@ class Firebase(Service):
       if 'RAW_VALUES' in action.keys():
         return
       if 'SENSORS' in action.keys():
+        return
+      if 'ZWAVE_VALUES' in action.keys():
         return
       self.db.child("homeStatus").child(self.home_id).child('devices').child(source).update(action, self.id_token)
 

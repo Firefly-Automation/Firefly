@@ -34,10 +34,13 @@ class FireflyLogging(object):
 
     self.logger = logging.getLogger('Firefly Logger')
     self.logger.setLevel(LOGGING_LEVEL[level])
-    handler = RotatingFileHandler(LOG_PATH, maxBytes=100000000, backupCount=5)
-    fmt = logging.Formatter(FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
-    handler.setFormatter(fmt)
-    self.logger.addHandler(handler)
+    try:
+      handler = RotatingFileHandler(LOG_PATH, maxBytes=100000000, backupCount=5)
+      fmt = logging.Formatter(FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
+      handler.setFormatter(fmt)
+      self.logger.addHandler(handler)
+    except:
+      logging.error('Error setting up logger')
 
   def Startup(self, firefly):
     """

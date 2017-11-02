@@ -47,7 +47,7 @@ LINKED_PACKAGES = {
       PACKAGE: 'ge.dimmer',
       ALIAS:   'GE Dimmer'
     },
-    'unknown: type=4953, id=3133': {
+    'unknown:_type=4953,_id=3133': {
       PACKAGE: 'zwave_generic_devices.motion_sensor',
       ALIAS:   'GE ZW6302 Motion Sensor'
     }

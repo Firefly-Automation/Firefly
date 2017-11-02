@@ -301,7 +301,9 @@ class Zwave(Service):
         logging.error('ZWAVE HEAL ERROR: %s' % str(e))
 
     # Initial refresh of all nodes
-    for node_id, node in self._network.nodes.items():
+    # Make a copy so if something changes it doesnt crash
+    zwave_nodes = self._network.nodes.copy()
+    for node_id, node in zwave_nodes.items():
       node: ZWaveNode = node
       logging.error('ZWAVE DEBUG - node_id: %s' % str(node_id))
       logging.error('ZWAVE DEBUG - node: %s' % str(node))

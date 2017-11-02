@@ -1,9 +1,10 @@
 from Firefly import logging
 from Firefly.const import DEVICE_TYPE_WATER_SENSOR, SENSOR_DRY, SENSOR_WET, WATER
-from Firefly.helpers.device import Device
+from Firefly.helpers.device import *
+from Firefly.helpers.device.device import Device
 from Firefly.helpers.metadata import action_text, action_water_dry
 
-BATTERY = 'battery'
+
 ALARM = 'alarm'
 
 COMMANDS = []

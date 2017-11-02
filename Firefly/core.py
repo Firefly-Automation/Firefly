@@ -230,7 +230,7 @@ class Firefly(object):
     Returns:
 
     '''
-    logging.message('Importing components from config file.')
+    logging.message('Importing components from config file: %s' % config_file)
     try:
       with open(config_file) as file:
         components = json.loads(file.read())
@@ -396,7 +396,7 @@ class Firefly(object):
     if 'location' in devices:
       devices.remove('location')
     for device in devices:
-      current_state[device] = self.components[device].get_all_request_values()
+      current_state[device] = self.components[device].get_all_request_values(True)
     return current_state
 
   def update_current_state(self, event: Event) -> None:

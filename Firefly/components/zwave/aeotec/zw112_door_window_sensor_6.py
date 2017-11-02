@@ -57,7 +57,7 @@ class ZW112(ZwaveContactSensor):
     self.node.set_config_param(121, 3)  # Sensor Binary and Battery Report
 
     successful = True
-    successful &= self._config_params.get('Report Type to Send', -1) == 3
+    successful &= self.zwave_values[121]['value'] == 3
 
     self._update_try_count += 1
     self._config_updated = successful

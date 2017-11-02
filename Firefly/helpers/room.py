@@ -184,15 +184,19 @@ class Room(object):
     self.firefly.send_event(broadcast)
     return
 
-  def get_all_request_values(self) -> dict:
+  def get_all_request_values(self, min_data=False, **kwargs) -> dict:
     """Function to get all requestable values.
 
     Returns (dict): All requests and values.
 
+    Args:
+      min_data (bool): only get requests that are lowercase. This is used for firebase and filtering out unneeded data.
+
     """
     request_values = {}
     for r in self._requests:
-      request_values[r] = self.request_map[r]()
+      if not min_data or r.islower():
+        request_values[r] = self.request_map[r]()
     return request_values
 
   def check_states(self):
