@@ -50,6 +50,8 @@ def Setup(firefly, package, **kwargs):
 
   enable = config.getboolean(SECTION, 'enable', fallback=False)
   port = config.get(SECTION, 'port', fallback=None)
+  # Old path config. TODO: Remove this once all systems moved over to new config.
+  # path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
   path = config.get(SECTION, 'path', fallback=None)
   security = config.getboolean(SECTION, 'security', fallback=True)
   if not enable or port is None:
