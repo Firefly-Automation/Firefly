@@ -467,7 +467,7 @@ def action_dimmer(can_command=True, can_request=True, primary=False, title='Ligh
   Returns: dict of action.
 
   """
-  return action_level(can_command, can_request, primary, title, context, command, command_prop, request, min_level, max_level, level_step, icon, **kwargs)
+  return action_level(can_command=can_command, can_request=can_request, primary=primary, title=title, context=context, command=command, command_prop=command_prop, request=request, min_level=min_level, max_level=max_level, level_step=level_step, icon=icon, **kwargs)
 
 
 ######################################

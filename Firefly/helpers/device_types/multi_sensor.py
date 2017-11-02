@@ -1,8 +1,8 @@
 from Firefly import logging
 from Firefly.const import LUX, MOTION, MOTION_ACTIVE, MOTION_INACTIVE
-from Firefly.helpers.device.device import Device
 from Firefly.helpers.device import *
-from Firefly.helpers.metadata import action_motion, metaText, action_text
+from Firefly.helpers.device.device import Device
+from Firefly.helpers.metadata import action_motion, action_text
 
 BATTERY = 'battery'
 ALARM = 'alarm'
@@ -46,7 +46,7 @@ class MultiSensor(Device):
 
     if capabilities[BATTERY] and BATTERY in requests:
       self.add_request(BATTERY, self.get_battery)
-      self.add_action(BATTERY, action_text(title='Battery',context='Battery Level', request=BATTERY, units='%'))
+      self.add_action(BATTERY, action_text(title='Battery', context='Battery Level', request=BATTERY, units='%'))
 
     if capabilities[HUMIDITY] and HUMIDITY in requests:
       self.add_request(HUMIDITY, self.get_humidity)

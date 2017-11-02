@@ -2,7 +2,7 @@ from Firefly import logging
 from Firefly.const import ACTION_OFF, ACTION_ON, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, DEVICE_TYPE_SWITCH, LEVEL, SWITCH
 from Firefly.helpers.device import *
 from Firefly.helpers.device.device import Device
-from Firefly.helpers.metadata import action_on_off_switch, action_text, metaSlider, metaText
+from Firefly.helpers.metadata import action_battery, action_dimmer, action_on_off_switch, action_text
 
 ALARM = 'alarm'
 POWER_METER = 'power_meter'
@@ -56,11 +56,11 @@ class Switch(Device):
 
     if capabilities[ALARM] and ALARM in requests:
       self.add_request(ALARM, self.get_alarm)
-      self.add_action(ALARM, metaText(title='Alarm', text_request=ALARM))
+      self.add_action(ALARM, action_text(title='Alarm', request=ALARM))
 
     if capabilities[BATTERY] and BATTERY in requests:
       self.add_request(BATTERY, self.get_battery)
-      self.add_action(BATTERY, metaText(title='Battery Level', text_request=BATTERY))
+      self.add_action(BATTERY, action_battery())
 
     if capabilities[SWITCH] and SWITCH in requests and ACTION_OFF in commands and ACTION_ON in commands:
       self.add_command(ACTION_OFF, self.set_off)
@@ -76,7 +76,7 @@ class Switch(Device):
       self.add_request(LEVEL, self.get_level)
       self.add_command(LEVEL, self.set_level)
 
-      self.add_action(LEVEL, metaSlider(title='Set Level', set_command=LEVEL, command_param=LEVEL))
+      self.add_action(LEVEL, action_dimmer())
       self.add_alexa_action(ALEXA_SET_PERCENTAGE)
 
     if capabilities[POWER_METER]:
