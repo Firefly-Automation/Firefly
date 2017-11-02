@@ -4,7 +4,6 @@ from openzwave.value import ZWaveValue
 from Firefly import logging
 from Firefly.components.zwave.device_types.switch import ZwaveSwitch
 from Firefly.const import ACTION_OFF, ACTION_ON, COMMAND_SET_LIGHT, DEVICE_TYPE_DIMMER, EVENT_ACTION_OFF, LEVEL, STATE, SWITCH
-from Firefly.helpers.metadata import metaDimmer
 
 TITLE = 'Firefly GE Dimmer'
 DEVICE_TYPE = DEVICE_TYPE_DIMMER
@@ -43,12 +42,6 @@ class GEDimmer(ZwaveSwitch):
       'requests':       REQUESTS
     })
     super().__init__(firefly, package, TITLE, capabilities=CAPABILITIES, **kwargs)
-
-    self.add_command(COMMAND_SET_LIGHT, self.set_light)
-    self.add_action('LEVEL_OLD', metaDimmer())
-
-  def set_light(self, **kwargs):
-    self.set_level(**kwargs)
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, values: ZWaveValue = None, values_only=False, **kwargs):
     old_level = self.get_level()

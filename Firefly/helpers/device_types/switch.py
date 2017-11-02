@@ -1,8 +1,8 @@
 from Firefly import logging
-from Firefly.const import ACTION_OFF, ACTION_ON, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, DEVICE_TYPE_SWITCH, LEVEL, STATE, SWITCH
+from Firefly.const import ACTION_OFF, ACTION_ON, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, DEVICE_TYPE_SWITCH, LEVEL, SWITCH
 from Firefly.helpers.device import *
 from Firefly.helpers.device.device import Device
-from Firefly.helpers.metadata import action_on_off_switch, action_text, metaSlider, metaSwitch, metaText
+from Firefly.helpers.metadata import action_on_off_switch, action_text, metaSlider, metaText
 
 ALARM = 'alarm'
 POWER_METER = 'power_meter'
@@ -16,7 +16,7 @@ WATTS = 'watts'
 
 COMMANDS = [ACTION_OFF, ACTION_ON, LEVEL]
 
-REQUESTS = [ALARM, BATTERY, SWITCH, CURRENT, VOLTAGE, WATTS, LEVEL]
+REQUESTS = [ALARM, BATTERY, SWITCH, CURRENT, VOLTAGE, WATTS, LEVEL, COMMAND_SET_LIGHT]
 
 CAPABILITIES = {
   ALARM:       False,
@@ -51,6 +51,8 @@ class Switch(Device):
     capabilities = CAPABILITIES
 
     super().__init__(firefly, package, title, author, commands, requests, device_type, initial_values=initial_values, **kwargs)
+
+    self.add_command(COMMAND_SET_LIGHT, self.set_light)
 
     if capabilities[ALARM] and ALARM in requests:
       self.add_request(ALARM, self.get_alarm)
@@ -146,6 +148,12 @@ class Switch(Device):
 
   def set_level(self, level=-1, **kwargs):
     logging.error('set_level not implemented.')
+
+  def set_light(self, **kwargs):
+    if SWITCH in kwargs:
+      self.set_switch(**kwargs)
+    if LEVEL in kwargs:
+      self.set_level(**kwargs)
 
   def set_switch(self, switch=None, **kwargs):
     logging.error('set_switch not implemented.')
