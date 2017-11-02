@@ -48,7 +48,6 @@ class Alias(object):
         return None
       return device_id_list[0]
     if alias in self.aliases.keys():
-      logging.debug('Seems like device_id was given, not alias')
       return alias
     logging.error(code='FF.ALI.GET.001', args=(alias))  # unknown error getting ff_id id for %s
     return None

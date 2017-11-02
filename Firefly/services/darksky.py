@@ -32,7 +32,7 @@ def Setup(firefly, package, **kwargs):
     logging.error(code='FF.DAR.SET.001')  # darksky api key missing
     return False
   darksky = Darksky(firefly, package, api_key=api_key, refresh=refresh)
-  firefly.components[SERVICE_ID] = darksky
+  firefly.install_component(darksky)
   return True
 
 

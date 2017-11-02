@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 
 from Firefly.automation.triggers import Trigger, Triggers
-from Firefly.const import EVENT_ACTION_ANY, EVENT_ACTION_OFF, EVENT_ACTION_ON, EVENT_SUNRISE, EVENT_SUNSET, EVENT_TYPE_BROADCAST, SOURCE_LOCATION, STATE, TIME
+from Firefly.const import EVENT_ACTION_ANY, EVENT_ACTION_OFF, EVENT_ACTION_ON, EVENT_SUNRISE, EVENT_SUNSET, EVENT_TYPE_BROADCAST, SOURCE_LOCATION, STATE, TEMPERATURE, TIME
 from Firefly.helpers.events import Event
 from Firefly.helpers.subscribers import Subscriptions
 
@@ -764,9 +764,7 @@ class TestTriggers(unittest.TestCase):
     trigger_b = Trigger(self.device_b, {
       STATE: [EVENT_ACTION_OFF]
     })
-    trigger_added = triggers.add_trigger([trigger])
-    self.assertTrue(trigger_added)
-    trigger_added = triggers.add_trigger([trigger_b])
+    trigger_added = triggers.add_trigger([trigger, trigger_b])
     self.assertTrue(trigger_added)
     self.firefly.current_state = data
     event = Event(self.device_b, EVENT_TYPE_BROADCAST, {
@@ -1463,5 +1461,258 @@ class TestTriggers(unittest.TestCase):
       'weekday': 1
     })
 
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+
+  def test_trigger_gt_one_value_good(self):
+    """Test number compare gt one value"""
+    # Data returned for current_states
+    data = {
+      self.device: {
+        TEMPERATURE: 71
+      }
+    }
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      TEMPERATURE: [{
+        'gt': 70
+      }]
+    })
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    self.firefly.current_state = data
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      TEMPERATURE: 71
+    })
+    self.firefly.update_current_state(event)
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+
+  def test_trigger_gt_one_value_bad(self):
+    """Test number compare gt one value (bad)"""
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      TEMPERATURE: [{
+        'gt': 70
+      }]
+    })
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      TEMPERATURE: 50
+    })
+    self.firefly.update_current_state(event)
+    triggered = triggers.check_triggers(event)
+    self.assertFalse(triggered)
+
+  def test_trigger_gt_one_value_bad_eq(self):
+    """Test number compare gt one value (bad eq)"""
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      TEMPERATURE: [{
+        'gt': 70
+      }]
+    })
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      TEMPERATURE: 70
+    })
+    self.firefly.update_current_state(event)
+    triggered = triggers.check_triggers(event)
+    self.assertFalse(triggered)
+
+  def test_trigger_gt_lt_two_value_good(self):
+    """Test number compare gt two values (range)"""
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      TEMPERATURE: [{
+        'gt': 50
+      }, {
+        'lt': 70
+      }]
+    })
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      TEMPERATURE: 60
+    })
+    self.firefly.update_current_state(event)
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+
+  def test_trigger_gt_lt_two_value_bad(self):
+    """Test number compare gt two values (bad range)"""
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      TEMPERATURE: [{
+        'gt': 50
+      }, {
+        'lt': 70
+      }]
+    })
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      TEMPERATURE: 71
+    })
+    self.firefly.update_current_state(event)
+    triggered = triggers.check_triggers(event)
+    self.assertFalse(triggered)
+
+  def test_trigger_gt_lt_two_value_bad_eq(self):
+    """Test number compare gt two values (bad eq range)"""
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      TEMPERATURE: [{
+        'gt': 50
+      }, {
+        'lt': 70
+      }]
+    })
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      TEMPERATURE: 70
+    })
+    self.firefly.update_current_state(event)
+    triggered = triggers.check_triggers(event)
+    self.assertFalse(triggered)
+
+  def test_trigger_ge_le_two_value_good(self):
+    """Test number compare gt two values (bad eq range)"""
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      TEMPERATURE: [{
+        'ge': 50
+      }, {
+        'le': 70
+      }]
+    })
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      TEMPERATURE: 70
+    })
+    self.firefly.update_current_state(event)
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+
+  def test_trigger_gt_two_triggers_bad(self):
+    """Test number test two triggers"""
+    data = {
+      self.device:   {
+        TEMPERATURE: 70
+      },
+      self.device_b: {
+        TEMPERATURE: 50
+      }
+    }
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      TEMPERATURE: [{
+        'lt': 50
+      }]
+    })
+    trigger_b = Trigger(self.device_b, {
+      TEMPERATURE: [{
+        'gt': 70
+      }]
+    })
+    trigger_added = triggers.add_trigger([trigger, trigger_b])
+    self.assertTrue(trigger_added)
+    self.firefly.current_state = data
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      TEMPERATURE: 70
+    })
+    self.firefly.update_current_state(event)
+    triggered = triggers.check_triggers(event)
+    self.assertFalse(triggered)
+
+  def test_trigger_gt_two_triggers_good(self):
+    """Test number test two triggers"""
+    data = {
+      self.device:   {
+        TEMPERATURE: 40
+      },
+      self.device_b: {
+        TEMPERATURE: 50
+      }
+    }
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      TEMPERATURE: [{
+        'lt': 50
+      }]
+    })
+    trigger_b = Trigger(self.device_b, {
+      TEMPERATURE: [{
+        'gt': 70
+      }]
+    })
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    triggers.add_trigger([trigger_b])
+    self.firefly.current_state = data
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      TEMPERATURE: 40
+    })
+    self.firefly.update_current_state(event)
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+
+  def test_trigger_gt_two_triggers_good_2(self):
+    """Test number test two triggers"""
+    data = {
+      self.device:   {
+        TEMPERATURE: 60
+      },
+      self.device_b: {
+        TEMPERATURE: 80
+      }
+    }
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      TEMPERATURE: [{
+        'lt': 50
+      }]
+    })
+    trigger_b = Trigger(self.device_b, {
+      TEMPERATURE: [{
+        'gt': 70
+      }]
+    })
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    triggers.add_trigger([trigger_b])
+    self.firefly.current_state = data
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      TEMPERATURE: 60
+    })
+    self.firefly.update_current_state(event)
+    triggered = triggers.check_triggers(event, ignore_event=True)
+    self.assertTrue(triggered)
+
+  def test_low_battery(self):
+    """Test number test two triggers"""
+
+    BATTERY = 'battery'
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      BATTERY: [{
+        'le': 10
+      }]
+    })
+
+    trigger_added = triggers.add_trigger([trigger])
+    self.assertTrue(trigger_added)
+    event = Event(self.device, EVENT_TYPE_BROADCAST, {
+      BATTERY: 5
+    })
+    self.firefly.update_current_state(event)
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)

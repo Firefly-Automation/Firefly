@@ -1,20 +1,23 @@
 from openzwave.network import ZWaveNode
 
-from Firefly import logging
-from Firefly.helpers.device import Device
-from Firefly.helpers.metadata import metaText
+from Firefly import logging, scheduler
+from Firefly.helpers.device.device import Device
+from Firefly.helpers.device import *
+from Firefly.helpers.metadata import action_battery
+from Firefly.util.zwave_command_class import COMMAND_CLASS_BATTERY
 
 
 class ZwaveDevice(Device):
   def __init__(self, firefly, package, title, author, commands, requests, device_type, **kwargs):
 
-    commands.append('ZWAVE_CONFIG')
-    commands.append('ZWAVE_UPDATE')
+    #commands.append('ZWAVE_CONFIG')
+    #commands.append('ZWAVE_UPDATE')
 
-    requests.append('SENSORS')
-    requests.append('PARAMS')
-    requests.append('RAW_VALUES')
-    requests.append('battery')
+    #requests.append('SENSORS')
+    #requests.append('PARAMS')
+    #requests.append('RAW_VALUES')
+    #requests.append('ZWAVE_VALUES')
+    #requests.append('battery')
 
     super().__init__(firefly, package, title, author, commands, requests, device_type, **kwargs)
 
@@ -23,6 +26,7 @@ class ZwaveDevice(Device):
     self._sensors = {}
     self._switches = {}
     self._config_params = {}
+    self.zwave_values = {}
     self._raw_values = {}
     self._config_updated = False
     self._update_try_count = 0
@@ -33,18 +37,21 @@ class ZwaveDevice(Device):
     self._product_name = ''
     self._product_type = ''
 
+    self.value_map = kwargs.get('value_map', {})
+
 
 
     self.add_command('ZWAVE_CONFIG', self.zwave_config)
     self.add_command('ZWAVE_UPDATE', self.update_from_zwave)
 
-    self.add_request('SENSORS', self.get_sensors)
-    self.add_request('PARAMS', self.get_params)
-    self.add_request('RAW_VALUES', self.get_raw_values)
+    #self.add_request('SENSORS', self.get_sensors)
+    #self.add_request('PARAMS', self.get_params)
+    #self.add_request('RAW_VALUES', self.get_raw_values)
+    self.add_request('ZWAVE_VALUES', self.get_zwave_values)
 
     self._battery = kwargs.get('battery', 'NOT REPORTED')
-    self.add_request('battery', self.get_battery)
-    self.add_action('battery', metaText(text_request='battery', context='Current Battery Level', title='Battery'))
+    #self.add_request('battery', self.get_battery)
+    #self.add_action('battery', metaText(text_request='battery', context='Current Battery Level', title='Battery'))
 
     self._update_lock = False
     self._last_command_source = 'startup'
@@ -79,7 +86,11 @@ class ZwaveDevice(Device):
     export_data['product_name'] = self._product_name
     export_data['product_type'] = self._product_type
     export_data['battery'] = self._battery
+    export_data['value_map'] = self.value_map
     return export_data
+
+  def get_zwave_values(self, **kwargs):
+    return self.zwave_values
 
   def get_sensors(self, **kwargs):
     sensor = kwargs.get('sensor')
@@ -116,8 +127,11 @@ class ZwaveDevice(Device):
     logging.debug('Updating ZWave Values')
 
     # Return if no valid node object.
-    if node is None:
+    if node is None and self._node is None:
       return
+
+    if node is None:
+      node = self._node
 
     try:
       if not self._manufacturer_id:
@@ -131,10 +145,6 @@ class ZwaveDevice(Device):
     except:
       pass
 
-    values = kwargs.get('values')
-    genre = ''
-    if values is not None:
-      genre = values.genre
 
     # This will set the node on the first update once zwave boots
     self._node = node
@@ -142,53 +152,27 @@ class ZwaveDevice(Device):
 
     # Update config if device config has not been updated.
     if not self._config_updated:
-      for s, i in node.get_values().items():
-        if i.command_class == 112:
-          self._config_params[i.label.lower()] = {
+      try:
+        for s, i in node.get_values().items():
+          self.zwave_values[i.index] = {
+            'label': i.label.lower(),
+            'class': i.command_class,
             'value': i.data,
-            'id':    i.index
+            'ref': s,
+            'index': i.index,
+            'genre': i.genre,
+            'type': i.type
           }
-        else:
-          self._raw_values[i.label.lower()] = {
-            'value': i.data,
-            'id':    i.index,
-            'class': i.command_class
-          }
-      self.update_device_config()
+      except:
+        pass
 
-    # When security data changes sometimes you need to send a request to update the sensor value
-    # old_security_data = [b for a, b in self._raw_values.items() if b.get('class') == 113]
+    if node.has_command_class(COMMAND_CLASS_BATTERY) and BATTERY not in self.request_map:
+      self.add_request(BATTERY, self.get_battery)
+      self.add_action(BATTERY, action_battery())
 
+    scheduler.runInS(5, self.update_device_config, '%s-update_config' % self.id, max_instances=1)
+    logging.debug('Done updating ZWave Values')
 
-
-    # for s, i in node.get_values().items():
-    if genre == 'Config' or genre == 'System':
-      if values.command_class == 112:
-        self._config_params[values.label.lower()] = {
-          'value': values.data,
-          'id':    values.index
-        }
-
-    if genre == 'User':
-      self._raw_values[values.label.lower()] = {
-        'value': values.data,
-        'id':    values.index,
-        'class': values.command_class
-      }
-
-      if values.command_class == 128:
-        self._battery = values.data
-
-      for s, i in node.get_sensors().items():
-        self._sensors[i.label.lower()] = i.data
-
-
-        # new_security_data = [b for a, b in self._raw_values.items() if b.get('class') == 113]
-
-        # If any of the security values change issue update command
-        # if old_security_data != new_security_data:
-        #  self._node.refresh_info()
-        #  self._node.request_state()
 
   def get_battery(self):
     return self._battery

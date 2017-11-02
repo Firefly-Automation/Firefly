@@ -1,15 +1,17 @@
+from geopy.distance import vincenty
+
 from Firefly import logging, scheduler
 from Firefly.components.virtual_devices import AUTHOR
 from Firefly.const import (ACTION_SET_DELAY, ACTION_SET_PRESENCE, DEVICE_TYPE_PRESENCE, NOT_PRESENT, PRESENCE, PRESENT)
 from Firefly.helpers.action import Command
-from Firefly.helpers.device import Device
-from Firefly.helpers.metadata import metaOwntracks, metaPresence, metaQR, metaText
+from Firefly.helpers.device.device import Device
+from Firefly.helpers.metadata import action_presence, metaOwntracks, metaQR, metaText
 
 TITLE = 'Firefly Virtual Presence Device'
 DEVICE_TYPE = DEVICE_TYPE_PRESENCE
 AUTHOR = AUTHOR
 COMMANDS = [ACTION_SET_DELAY, ACTION_SET_PRESENCE]
-REQUESTS = [PRESENCE, 'zone', 'firebase_api_key']
+REQUESTS = [PRESENCE, 'zone', 'firebase_api_key', 'lat', 'lon']
 INITIAL_VALUES = {
   '_delay':           5,
   '_presence':        NOT_PRESENT,
@@ -31,8 +33,8 @@ def Setup(firefly, package, **kwargs):
   """
   logging.message('Entering %s setup' % TITLE)
   new_presence = VirtualPresence(firefly, package, **kwargs)
-  # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[new_presence.id] = new_presence
+  firefly.install_component(new_presence)
+  return new_presence.id
 
 
 class VirtualPresence(Device):
@@ -59,8 +61,10 @@ class VirtualPresence(Device):
     self.add_request(PRESENCE, self.get_presence)
     self.add_request('zone', self.get_zone)
     self.add_request('firebase_api_key', self.get_firebase_api_key)
+    self.add_request('lat', self.get_lat)
+    self.add_request('lon', self.get_lon)
 
-    self.add_action(PRESENCE, metaPresence(primary=True))
+    self.add_action(PRESENCE, action_presence())
     self.add_action('presenceText', metaText(title='Presence New', text_request=PRESENCE, context='Presence of the device.'))
     self.add_action('zone', metaText(title='Current Zone', text_request='zone', context='Current Zone'))
 
@@ -112,6 +116,12 @@ class VirtualPresence(Device):
     self.add_action('owntracksWaypoint', metaOwntracks(data=ownTracksBeaconData, title='OwnTracks Config (Android) Download and open with OwnTracks (waypoints may not be shown)',
                                                        context="Beacon: %s | major: 1 | minor: 1 | lat: 0 | lon: 0 | name: -Firefly-Home-Beacon" % beacon))
 
+  def get_lat(self, **kwargs):
+    return self._lat
+
+  def get_lon(self, **kwargs):
+    return self._lon
+
   def export(self, current_values: bool = True, api_view: bool = False):
     export_data = super().export(current_values, api_view)
     export_data['firebase_api_key'] = self.firebase_api_key
@@ -139,6 +149,19 @@ class VirtualPresence(Device):
     except Exception as e:
       # TODO: Generate error code.
       logging.error('error setting lat and lon: %s' % e)
+
+    if presence is None and lat and lon:
+      home = (self.firefly.location.latitude, self.firefly.location.longitude)
+      device = (lat, lon)
+      distance = vincenty(home, device).meters
+      if distance < 400:
+        self.set_geo_presence(PRESENT)
+      else:
+        self.set_geo_presence(NOT_PRESENT)
+
+      # If over 3 miles away - set beacon presence too.
+      if distance > 5000:
+        self.set_beacon_presence(NOT_PRESENT)
 
     if zone is not None:
       if 'firefly-home' in zone.lower():

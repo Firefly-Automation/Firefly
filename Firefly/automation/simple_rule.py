@@ -74,9 +74,9 @@ def Setup(firefly, package, **kwargs):
     kwargs['metadata'] = METADATA
   else:
     kwargs['metadata'].update(METADATA)
-  simepl_rule = SimpleRule(firefly, package, **kwargs)
+  simeple_rule = SimpleRule(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[simepl_rule.id] = simepl_rule
+  firefly.components[simeple_rule.id] = simeple_rule
 
 
 class SimpleRule(Automation):

@@ -2,20 +2,21 @@ import uuid
 
 from Firefly import aliases, logging
 from Firefly.automation.triggers import Triggers
-from Firefly.const import TYPE_AUTOMATION, SERVICE_NOTIFICATION, COMMAND_NOTIFY
+from Firefly.const import COMMAND_NOTIFY, SERVICE_NOTIFICATION, TYPE_AUTOMATION, API_ALEXA_VIEW, API_FIREBASE_VIEW, API_INFO_REQUEST
 from Firefly.helpers.action import Action
 from Firefly.helpers.conditions import Conditions
-from Firefly.helpers.events import Event, Command
+from Firefly.helpers.events import Command, Event, Request
 
 # TODO(zpriddy): These should be in const file
 LABEL_ACTIONS = 'actions'
 LABEL_CONDITIONS = 'conditions'
 LABEL_DELAYS = 'delays'
+LABEL_DEVICES = 'devices'
 LABEL_MESSAGES = 'messages'
 LABEL_TRIGGERS = 'triggers'
-INTERFACE_LABELS = [LABEL_ACTIONS, LABEL_CONDITIONS, LABEL_DELAYS, LABEL_MESSAGES, LABEL_TRIGGERS]
+INTERFACE_LABELS = [LABEL_ACTIONS, LABEL_CONDITIONS, LABEL_DELAYS, LABEL_DEVICES, LABEL_MESSAGES, LABEL_TRIGGERS]
 
-from typing import Callable
+from typing import Callable, Any
 
 
 class Automation(object):
@@ -24,6 +25,7 @@ class Automation(object):
     self.command_map = {}
     self.conditions = {}
     self.delays = {}
+    self.devices = {}
     self.event_handler = event_handler
     self.firefly = firefly
     self.interface = interface
@@ -65,6 +67,38 @@ class Automation(object):
             continue
         # Call the event handler passing in the trigger_index and return.
         return self.event_handler(event, trigger_index, **kwargs)
+
+  def request(self, request: Request) -> Any:
+    """Function to request data from the ff_id.
+
+    The returned data can be in any format. Common formats should be:
+      str, int, dict
+
+    Args:
+      request (Request): Request object
+
+    Returns:
+      Requested Data
+
+    """
+    logging.debug('[AUTOMATION] %s: Got Request %s' % (self.id, request))
+    if request.request == API_INFO_REQUEST:
+      return self.get_api_info()
+    if request.request == API_FIREBASE_VIEW:
+      return self.get_firebase_views()
+    if request.request == API_ALEXA_VIEW:
+      return self.get_alexa_view()
+    return None
+
+  def get_api_info(self, **kwargs):
+    return {}
+
+  def get_firebase_views(self, **kwargs):
+    return {}
+
+  def get_alexa_view(self, **kwargs):
+    logging.info('[AUTOMATION] no alexa view')
+    return {}
 
   def export(self, **kwargs):
     """
@@ -129,6 +163,8 @@ class Automation(object):
         self.build_conditions_interface(interface_data)
       if label == LABEL_DELAYS:
         self.build_delays_interface(interface_data)
+      if label == LABEL_DEVICES:
+        self.build_devices_interface(interface_data)
       if label == LABEL_MESSAGES:
         self.build_messages_interface(interface_data)
 
@@ -162,6 +198,12 @@ class Automation(object):
       if not self.interface.get(LABEL_DELAYS):
         continue
       self.delays[delay_index] = self.interface.get(LABEL_DELAYS).get(delay_index)
+
+  def build_devices_interface(self, interface_data: dict, **kwargs):
+    for device_index in interface_data.keys():
+      if not self.interface.get(LABEL_DEVICES):
+        continue
+      self.devices[device_index] = self.interface.get(LABEL_DEVICES).get(device_index)
 
   def build_messages_interface(self, interface_data: dict, **kwargs):
     for message_index in interface_data.keys():
@@ -199,6 +241,12 @@ class Automation(object):
       if delay is None:
         continue
       interface[LABEL_DELAYS][delay_index] = delay
+
+    interface[LABEL_DEVICES] = {}
+    for device_index, device in self.devices.items():
+      if device is None:
+        continue
+      interface[LABEL_DEVICES][device_index] = device
 
     return interface
 

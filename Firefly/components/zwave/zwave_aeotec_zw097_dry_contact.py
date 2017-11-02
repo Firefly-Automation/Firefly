@@ -11,7 +11,7 @@ AUTHOR = 'Zachary Priddy'
 COMMANDS = []
 REQUESTS = [STATE, CONTACT]
 INITIAL_VALUES = {
-  '_state': EVENT_ACTION_OFF
+  '_state': CONTACT_CLOSED
 }
 
 
@@ -29,9 +29,7 @@ class ZwaveAeotecDryContact(ZwaveDevice):
       INITIAL_VALUES.update(kwargs['initial_values'])
     kwargs['initial_values'] = INITIAL_VALUES
     super().__init__(firefly, package, TITLE, AUTHOR, COMMANDS, REQUESTS, DEVICE_TYPE, **kwargs)
-    self.__dict__.update(kwargs['initial_values'])
 
-    self._state = CONTACT_CLOSED
     self._alarm = False
 
     self.add_request(STATE, self.get_state)

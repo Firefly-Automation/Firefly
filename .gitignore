@@ -1,5 +1,4 @@
-dev_config/*
-dev_config_backup/*
+
 *.pyc
 .idea/*
 
@@ -52,3 +51,7 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+
+
+dev_config/*
+dev_config_backup/*

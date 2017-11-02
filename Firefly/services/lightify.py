@@ -33,7 +33,7 @@ def Setup(firefly, package, **kwargs):
     return False
 
   lighify = Lightify(firefly, package, enable=enable, ip=ip,  **kwargs)
-  firefly.components[SERVICE_ID] = lighify
+  firefly.install_component(lighify)
 
   return True
 
@@ -61,10 +61,17 @@ class Lightify(Service):
       if ff_id in self.firefly.components:
         command = Command(ff_id, SERVICE_ID, COMMAND_UPDATE, lightify_object=light)
         self.firefly.send_command(command)
-        continue
+      else:
+        self._firefly.install_package('Firefly.components.lightify.lightify_light', ff_id=ff_id, alias=light.name(), lightify_object=light)
 
-      self._firefly.install_package('Firefly.components.lightify.lightify_light', ff_id=ff_id, alias=light.name(), lightify_object=light)
 
+    for name, group in self.bridge.groups().items():
+      ff_id = 'lightify-group-%s' % name.replace(' ', '_')
+      if ff_id in self.firefly.components:
+        command = Command(ff_id, SERVICE_ID, COMMAND_UPDATE, lightify_object=group, lightify_bridge=self.bridge)
+        self.firefly.send_command(command)
+      else:
+        self._firefly.install_package('Firefly.components.lightify.lightify_group', ff_id=ff_id, alias=name, lightify_object=group, lightify_bridge=self.bridge)
 
 
 

@@ -21,17 +21,16 @@ def Setup(firefly, package, **kwargs):
   config = configparser.ConfigParser()
   config.read(SERVICE_CONFIG_FILE)
 
-  enable = config.getboolean(SECTION, 'enable', fallback=True)
+  enable = config.getboolean(SECTION, 'enable', fallback=False)
   cache_file = config.get(SECTION, 'cache_file', fallback=NEST_CACHE_FILE)
   client_id = config.get(SECTION, 'client_id', fallback='')
   client_secret = config.get(SECTION, 'client_secret', fallback='')
 
-  newNest = Nest(firefly, package, enable=enable, cache_file=cache_file, client_id=client_id, client_secret=client_secret, **kwargs)
-  firefly.components[SERVICE_ID] = newNest
-
   if not enable:
     return False
-  return True
+
+  newNest = Nest(firefly, package, enable=enable, cache_file=cache_file, client_id=client_id, client_secret=client_secret, **kwargs)
+  firefly.install_component(newNest)
 
 
 class Nest(Service):

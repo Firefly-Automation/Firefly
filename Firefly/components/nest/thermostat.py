@@ -1,11 +1,11 @@
-from Firefly import logging
+from uuid import uuid4
+
+from Firefly import logging, scheduler
 from Firefly.components.virtual_devices import AUTHOR
 from Firefly.const import (COMMAND_UPDATE, DEVICE_TYPE_THERMOSTAT, LEVEL)
 from Firefly.helpers.action import Command
-from Firefly.helpers.device import Device
-from Firefly.helpers.metadata import metaButtonObject, metaButtons, metaSlider, metaText
-from Firefly import scheduler
-from uuid import uuid4
+from Firefly.helpers.device.device import Device
+from Firefly.helpers.metadata import action_button_group, action_button_object, action_level, action_text
 
 # TODO(zpriddy): Add more delayed setters to help with rate limits.
 
@@ -28,11 +28,11 @@ MODE_LIST = ['off', 'eco', 'cool', 'heat', 'heat-cool']
 def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   thermostat = Thermostat(firefly, package, **kwargs)
-  # TODO: Replace this with a new firefly.add_device() function
-  firefly.components[thermostat.id] = thermostat
+  firefly.install_component(thermostat)
 
   refresh_command = Command('service_firebase', 'nest', 'refresh')
   firefly.send_command(refresh_command)
+  return thermostat.id
 
 
 class Thermostat(Device):
@@ -60,21 +60,35 @@ class Thermostat(Device):
     self.add_request('mode', self.get_mode)
     self.add_request('away', self.get_away)
 
-    self.add_action('temperature', metaSlider(min=50, max=90, request_param='target', set_command='temperature', command_param='temperature', title='Target Temperature'))
-    self.add_action('current_temperature', metaText(title='Current Temperature', text_request='temperature', primary=True))
-    eco_button = metaButtonObject('Eco', 'mode', 'mode', 'eco')
-    heat_button = metaButtonObject('Heat', 'mode', 'mode', 'heat')
-    cool_button = metaButtonObject('Cool', 'mode', 'mode', 'cool')
-    off_button = metaButtonObject('Off', 'mode', 'mode', 'off')
+    # self.add_action('temperature', metaSlider(min=50, max=90, request_param='target', set_command='temperature', command_param='temperature', title='Target Temperature'))
+    self.add_action('current_temperature', action_text(title='Current Temperature', context='Current temperature', request='temperature', primary=True))
+    # eco_button = metaButtonObject('Eco', 'mode', 'mode', 'eco')
+    # heat_button = metaButtonObject('Heat', 'mode', 'mode', 'heat')
+    # cool_button = metaButtonObject('Cool', 'mode', 'mode', 'cool')
+    # off_button = metaButtonObject('Off', 'mode', 'mode', 'off')
     # TODO: Enable range when supported
     # range_button = metaButtonObject('Range ', 'mode', 'mode', 'off')
-    buttons = [eco_button, cool_button, heat_button, off_button]
-    self.add_action('mode_buttons', metaButtons(title='AC Modes', buttons=buttons, request_val='mode', context='Change AC Mode'))
+    # buttons = [eco_button, cool_button, heat_button, off_button]
+    # self.add_action('mode_buttons', metaButtons(title='AC Modes', buttons=buttons, request_val='mode', context='Change AC Mode'))
 
     # Buttons for Home/Away
-    home_button = metaButtonObject('Home', 'away', 'away', 'home')
-    away_button = metaButtonObject('Away', 'away', 'away', 'away')
-    self.add_action('home_away_buttons', metaButtons(title='Home Mode (nest)', buttons=[home_button, away_button], request_val='away', context='Set Nest to Home/Away'))
+    # home_button = metaButtonObject('Home', 'away', 'away', 'home')
+    # away_button = metaButtonObject('Away', 'away', 'away', 'away')
+    # self.add_action('home_away_buttons', metaButtons(title='Home Mode (nest)', buttons=[home_button, away_button], request_val='away', context='Set Nest to Home/Away'))
+
+
+    # New Buttons
+    eco_button = action_button_object('Eco', 'mode', 'mode', 'eco', 'eco')
+    heat_button = action_button_object('Heat', 'mode', 'mode', 'heat', 'heat')
+    cool_button = action_button_object('Cool', 'mode', 'mode', 'cool', 'cool')
+    off_button = action_button_object('Off', 'mode', 'mode', 'off', 'off')
+    self.add_action('mode_buttons', action_button_group(title='Set Mode', request='mode', buttons=[cool_button, heat_button, eco_button, off_button]))
+
+    home_button = action_button_object('Home', 'away', 'away', 'home', 'home')
+    away_button = action_button_object('Away', 'away', 'away', 'away', 'away')
+    self.add_action('home_away_buttons', action_button_group(title='Set Home/Away', request='away', buttons=[home_button, away_button]))
+
+    self.add_action('set_temperature', action_level(title='Set Temperature', command='temperature', command_prop='temperature', request='target', context='Set target temperature'))
 
     self._alexa_export = False
     self.timer_id = str(uuid4())
@@ -159,7 +173,6 @@ class Thermostat(Device):
       except Exception as e:
         logging.error('Error setting thermostat temperature: %s' % e)
 
-
   @property
   def humidity(self):
     if self.thermostat:
@@ -191,7 +204,6 @@ class Thermostat(Device):
         self.thermostat.mode = mode
       except Exception as e:
         logging.error('Error setting thermostat mode: %s' % e)
-
 
   @property
   def away(self):

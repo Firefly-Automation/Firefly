@@ -1,7 +1,7 @@
 from difflib import get_close_matches
 
 from Firefly import aliases
-from Firefly.const import LEVEL, TYPE_AUTOMATION, TYPE_DEVICE, COMMAND_SET_LIGHT
+from Firefly.const import LEVEL, TYPE_AUTOMATION, TYPE_DEVICE, COMMAND_SET_LIGHT, TYPE_ROUTINE
 from Firefly.helpers.events import Command
 
 
@@ -35,7 +35,7 @@ def get_device_id(firefly, device_alias):
 def get_routine_id(firefly, routine_alias):
   routines = {}
   for id, c in firefly.components.items():
-    if c.type == TYPE_AUTOMATION and 'routine' in c._package:
+    if c.type == TYPE_ROUTINE:
       routines[c._alias] = id
   r_alias = get_close_matches(routine_alias, routines.keys())
   if len(r_alias) == 0:
