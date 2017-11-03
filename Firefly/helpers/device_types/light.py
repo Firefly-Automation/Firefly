@@ -5,6 +5,7 @@ from Firefly.helpers.device.device import Device
 
 from Firefly.helpers.metadata import action_on_off_switch, metaSlider, action_dimmer
 
+from Firefly.services.alexa.alexa_const import ALEXA_LIGHT, ALEXA_POWER_INTERFACE, ALEXA_POWER_LEVEL_INTERFACE
 
 ALARM = 'alarm'
 POWER_METER = 'power_meter'
@@ -45,13 +46,14 @@ class Light(Device):
 
     super().__init__(firefly, package, title, author, commands, requests, device_type, initial_values=initial_values, **kwargs)
 
+    self.add_alexa_categories(ALEXA_LIGHT)
+
     if capabilities[SWITCH] and SWITCH in requests and ACTION_OFF in commands and ACTION_ON in commands:
       self.add_command(ACTION_OFF, self.set_off)
       self.add_command(ACTION_ON, self.set_on)
       self.add_request(SWITCH, self.get_switch)
 
-      self.add_alexa_action(ALEXA_OFF)
-      self.add_alexa_action(ALEXA_ON)
+      self.add_alexa_capabilities(ALEXA_POWER_INTERFACE)
 
       self.add_action(SWITCH, action_on_off_switch())
 
@@ -59,9 +61,8 @@ class Light(Device):
       self.add_request(LEVEL, self.get_level)
       self.add_command(LEVEL, self.set_level)
 
-      # TODO: Add new dimmer slider
       self.add_action(LEVEL, action_dimmer())
-      self.add_alexa_action(ALEXA_SET_PERCENTAGE)
+      self.add_alexa_capabilities(ALEXA_POWER_LEVEL_INTERFACE)
 
     if capabilities[COMMAND_SET_LIGHT] and COMMAND_SET_LIGHT in commands:
       self.add_command(COMMAND_SET_LIGHT, self.set_light)

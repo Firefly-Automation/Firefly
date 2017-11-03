@@ -1,6 +1,7 @@
 from Firefly import logging
 from Firefly.components.zwave.device_types.switch import ZwaveSwitch
 from Firefly.const import ACTION_OFF, ACTION_ON, SWITCH
+from Firefly.services.alexa.alexa_const import ALEXA_SMARTPLUG
 
 TITLE = 'Aeotec Smart Switch 6'
 
@@ -31,7 +32,6 @@ def Setup(firefly, package, **kwargs):
   switch = ZwaveAeotecSwitch6(firefly, package, **kwargs)
   return firefly.install_component(switch)
 
-
 class ZwaveAeotecSwitch6(ZwaveSwitch):
   def __init__(self, firefly, package, **kwargs):
     if kwargs.get('initial_values') is not None:
@@ -42,6 +42,8 @@ class ZwaveAeotecSwitch6(ZwaveSwitch):
       'requests':       REQUESTS
     })
     super().__init__(firefly, package, TITLE, capabilities=CAPABILITIES, **kwargs)
+
+    self.set_alexa_categories(ALEXA_SMARTPLUG)
 
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
