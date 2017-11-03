@@ -8,6 +8,8 @@ from Firefly.helpers.device.device import Device
 from Firefly.helpers.events import Command
 from Firefly.helpers.metadata import metaDimmer, metaSwitch, action_on_off_switch, action_dimmer
 
+from Firefly.services.alexa.alexa_const import ALEXA_INTERFACE, ALEXA_BRIGHTNESS_INTERFACE, ALEXA_COLOR_INTERFACE, ALEXA_COLOR_TEMPERATURE_INTERFACE, ALEXA_POWER_LEVEL_INTERFACE, ALEXA_PERCENTAGE_INTERFACE, ALEXA_POWER_INTERFACE, ALEXA_LIGHT
+
 TITLE = 'Firefly Hue Device'
 DEVICE_TYPE = DEVICE_TYPE_COLOR_LIGHT
 AUTHOR = AUTHOR
@@ -73,15 +75,20 @@ class HueDevice(Device):
 
     self.add_request('hue', self.get_hue)
     self.add_request('sat', self.get_sat)
+    self.add_request('ct', self.get_ct)
 
     self.add_action(SWITCH, action_on_off_switch())
     self.add_action(LEVEL, action_dimmer())
 
-    self.add_alexa_action(ALEXA_OFF)
-    self.add_alexa_action(ALEXA_ON)
-    self.add_alexa_action(ALEXA_SET_PERCENTAGE)
-    self.add_alexa_action(ALEXA_SET_COLOR_TEMP)
-    self.add_alexa_action(ALEXA_SET_COLOR)
+    #self.add_alexa_action(ALEXA_OFF)
+    #self.add_alexa_action(ALEXA_ON)
+    #self.add_alexa_action(ALEXA_SET_PERCENTAGE)
+    #self.add_alexa_action(ALEXA_SET_COLOR_TEMP)
+    #self.add_alexa_action(ALEXA_SET_COLOR)
+
+    self.add_alexa_categories(ALEXA_LIGHT)
+    #TODO: Finish adding alexa types
+    self.add_alexa_capabilities([ALEXA_INTERFACE, ALEXA_POWER_INTERFACE, ALEXA_POWER_LEVEL_INTERFACE])
 
     # TODO: Make HOMEKIT CONST
     self.add_homekit_export('HOMEKIT_COLOR_LIGHT', STATE)
@@ -154,6 +161,9 @@ class HueDevice(Device):
     if self.state == EVENT_ACTION_ON:
       return self.off()
     return self.on()
+
+  def get_ct(self, **kwargs):
+    return self._ct
 
   def get_state(self, **kwargs):
     return self.state

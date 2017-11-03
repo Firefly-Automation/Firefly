@@ -1,8 +1,10 @@
 from Firefly import logging
-from Firefly.const import ACTION_OFF, ACTION_ON, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, DEVICE_TYPE_SWITCH, LEVEL, SWITCH
+from Firefly.const import ACTION_OFF, ACTION_ON, COMMAND_SET_LIGHT, DEVICE_TYPE_SWITCH, LEVEL, SWITCH
 from Firefly.helpers.device import *
 from Firefly.helpers.device.device import Device
 from Firefly.helpers.metadata import action_battery, action_dimmer, action_on_off_switch, action_text
+
+from Firefly.services.alexa.alexa_const import ALEXA_POWER_INTERFACE, ALEXA_POWER_LEVEL_INTERFACE, ALEXA_SWITCH
 
 ALARM = 'alarm'
 POWER_METER = 'power_meter'
@@ -52,6 +54,7 @@ class Switch(Device):
 
     super().__init__(firefly, package, title, author, commands, requests, device_type, initial_values=initial_values, **kwargs)
 
+    self.add_alexa_categories(ALEXA_SWITCH)
     self.add_command(COMMAND_SET_LIGHT, self.set_light)
 
     if capabilities[ALARM] and ALARM in requests:
@@ -67,8 +70,7 @@ class Switch(Device):
       self.add_command(ACTION_ON, self.set_on)
       self.add_request(SWITCH, self.get_switch)
 
-      self.add_alexa_action(ALEXA_OFF)
-      self.add_alexa_action(ALEXA_ON)
+      self.add_alexa_capabilities(ALEXA_POWER_INTERFACE)
 
       self.add_action(SWITCH, action_on_off_switch())
 
@@ -77,7 +79,7 @@ class Switch(Device):
       self.add_command(LEVEL, self.set_level)
 
       self.add_action(LEVEL, action_dimmer())
-      self.add_alexa_action(ALEXA_SET_PERCENTAGE)
+      self.add_alexa_capabilities(ALEXA_POWER_LEVEL_INTERFACE)
 
     if capabilities[POWER_METER]:
       if VOLTAGE in requests:

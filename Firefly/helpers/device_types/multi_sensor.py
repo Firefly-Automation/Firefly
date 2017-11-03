@@ -4,6 +4,9 @@ from Firefly.helpers.device import *
 from Firefly.helpers.device.device import Device
 from Firefly.helpers.metadata import action_motion, action_text
 
+# TODO: Add support for temp reporting.
+# from Firefly.services.alexa.alexa_const import ALEXA_TEMPERATURE_SENSOR, ALEXA_TEMPERATURE_INTERFACE
+
 BATTERY = 'battery'
 ALARM = 'alarm'
 DEVICE_TYPE_MULTI_SENSOR = 'multi_sensor'

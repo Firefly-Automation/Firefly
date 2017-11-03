@@ -66,8 +66,9 @@ class Dsc11(ZwaveDevice):
     self.add_action('switch3', metaSwitch(on_action='switch3', off_action='switchoff3', title='Outlet 3', control_type='switch'))
     self.add_action('switch4', metaSwitch(on_action='switch4', off_action='switchoff4', title='Outlet 4', control_type='switch'))
 
-    self.add_alexa_action(ALEXA_OFF)
-    self.add_alexa_action(ALEXA_ON)
+    self._alexa_export = False
+    #self.add_alexa_action(ALEXA_OFF)
+    #self.add_alexa_action(ALEXA_ON)
 
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values

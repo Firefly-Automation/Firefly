@@ -115,7 +115,7 @@ class Firebase(Service):
 
     scheduler.runEveryM(30, self.refresh_user)
     scheduler.runEveryM(20, self.refresh_all)
-    scheduler.runInS(20, self.refresh_all)
+    scheduler.runInS(30, self.refresh_all)
 
     self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.command_stream_handler, self.id_token)
     self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
@@ -580,7 +580,7 @@ class Firebase(Service):
     for ff_id, device in self.firefly.components.items():
       if device.type in filter or filter is None:
         data = self.get_component_alexa_view(ff_id, source)
-        if data is not None:
+        if data is not None and len(data.get('capabilities')) > 0:
           views.append(data)
     return views
 

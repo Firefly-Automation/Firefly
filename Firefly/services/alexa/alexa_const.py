@@ -74,3 +74,140 @@ REQUEST_SLOT_FILLING = {
   },
   "sessionAttributes": {}
 }
+
+## ALEXA SMART HOME CONST
+ALEXA_INTERFACE = {
+  "type":      "AlexaInterface",
+  "interface": "Alexa",
+  "version":   "3"
+}
+
+ALEXA_COLOR_TEMPERATURE_INTERFACE = {
+  "type":       "AlexaInterface",
+  "interface":  "Alexa.ColorTemperatureController",
+  "version":    "3",
+  "properties": {
+    "supported":           [
+      {
+        "name": "colorTemperatureInKelvin"
+      }
+    ],
+    "proactivelyReported": False,
+    "retrievable":         True
+  }
+}
+
+ALEXA_COLOR_INTERFACE = {
+  "type":       "AlexaInterface",
+  "interface":  "Alexa.ColorController",
+  "version":    "3",
+  "properties": {
+    "supported":           [
+      {
+        "name": "color"
+      }
+    ],
+    "proactivelyReported": False,
+    "retrievable":         True
+  }
+}
+
+ALEXA_BRIGHTNESS_INTERFACE = {
+  "type":       "AlexaInterface",
+  "interface":  "Alexa.BrightnessController",
+  "version":    "3",
+  "properties": {
+    "supported":           [
+      {
+        "name": "brightness"
+      }
+    ],
+    "proactivelyReported": False,
+    "retrievable":         True
+  }
+}
+
+ALEXA_POWER_INTERFACE = {
+  "type":       "AlexaInterface",
+  "interface":  "Alexa.PowerController",
+  "version":    "3",
+  "properties": {
+    "supported":           [
+      {
+        "name": "power"
+      }
+    ],
+    "proactivelyReported": False,
+    "retrievable":         True
+  }
+}
+
+ALEXA_POWER_LEVEL_INTERFACE = {
+  "type":       "AlexaInterface",
+  "interface":  "Alexa.PowerLevelController",
+  "version":    "3",
+  "properties": {
+    "supported":           [
+      {
+        "name": "powerLevel"
+      }
+    ],
+    "proactivelyReported": False,
+    "retrievable":         True
+  }
+}
+
+ALEXA_PERCENTAGE_INTERFACE = {
+  "type":       "AlexaInterface",
+  "interface":  "Alexa.PercentageController",
+  "version":    "3",
+  "properties": {
+    "supported":           [
+      {
+        "name": "percentage"
+      }
+    ],
+    "proactivelyReported": False,
+    "retrievable":         True
+  }
+}
+
+ALEXA_HEALTH_INTERFACE = {
+  "type":       "AlexaInterface",
+  "interface":  "Alexa.EndpointHealth",
+  "version":    "3",
+  "properties": {
+    "supported":           [
+      {
+        "name": "connectivity"
+      }
+    ],
+    "proactivelyReported": False,
+    "retrievable":         True
+  }
+}
+
+ALEXA_TEMPERATURE_INTERFACE = {
+  "type":       "AlexaInterface",
+  "interface":  "Alexa.TemperatureSensor",
+  "version":    "3",
+  "properties": {
+    "supported":           [
+      {
+        "name": "temperature"
+      }
+    ],
+    "proactivelyReported": False,
+    "retrievable":         True
+  }
+}
+
+ALEXA_LIGHT = 'LIGHT'
+ALEXA_SMARTPLUG = 'SMARTPLUG'
+ALEXA_SWITCH = 'SWITCH'
+ALEXA_DOOR = 'DOOR'
+ALEXA_SMARTLOCK = 'SMARTLOCK'
+ALEXA_SPEAKERS = 'SPEAKERS'
+ALEXA_TEMPERATURE_SENSOR = 'TEMPERATURE_SENSOR'
+ALEXA_THERMOSTAT = 'THERMOSTAT'
+ALEXA_TV = 'TV'

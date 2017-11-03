@@ -113,6 +113,10 @@ class Foobot(Device):
     self.add_action(HUMIDITY, action_text(primary=False, title='Humidity', context='Last reported humidity', request=HUMIDITY, units='%'))
 
     self.update()
+
+    #TODO: Add temp reporting
+    self._alexa_export = False
+
     scheduler.runEveryM(self._refresh_interval, self.update, job_id=self.id)
 
   def export(self, current_values: bool = True, api_view: bool = False) -> dict:

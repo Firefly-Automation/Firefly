@@ -21,6 +21,7 @@ class Device(object):
     self._requests = list(set(requests))
     self._device_type = device_type
     self._export_ui = True
+    self._hidden_by_system = False
     self._initial_values = kwargs.get('initial_values')
     self._command_mapping = {}
     self._request_mapping = {}
@@ -60,12 +61,10 @@ class Device(object):
     self._homekit_types = {}
 
     self._alexa_export = kwargs.get('alexa_export', True)
-    self._alexa_alias = kwargs.get('alexa_alias', self._alias)
-    self._alexa_actions = kwargs.get('alexa_actions', [])
-    self._alexa_model = kwargs.get('alexa_model', 'FireflyDevice')
+    self._alexa_categories = []
+    self._alexa_capabilities = []
     self._alexa_manufacturer_name = kwargs.get('alexa_manufacturer_name', 'Firefly')
-    self._alexa_version = kwargs.get('alexa_version', '1')
-    self._alexa_description = kwargs.get('alexa_description', self._alias)
+    self._alexa_description = kwargs.get('alexa_description', 'Firefly Home Device')
 
     self._room = kwargs.get('room', '')
     self._tags = kwargs.get('tags', [])
@@ -88,7 +87,6 @@ class Device(object):
 
     self._alias = aliases.set_alias(self._id, new_alias)
     self._habridge_alias = self._alias
-    self._alexa_alias = self._alias
     self._homekit_alias = self._alias
 
   def set_room(self, **kwargs):
@@ -126,13 +124,7 @@ class Device(object):
       'export_ui':               self._export_ui,
       'tags':                    self._tags,
       'room':                    self._room,
-      'alexa_export':            self._alexa_export,
-      'alexa_alias':             self._alexa_alias,
-      'alexa_actions':           self._alexa_actions,
-      'alexa_model':             self._alexa_model,
-      'alexa_manufacturer_name': self._alexa_manufacturer_name,
-      'alexa_version':           self._alexa_version,
-      'alexa_description':       self._alexa_description
+      'alexa_export':            self._alexa_export
     }
 
     if current_values:
@@ -144,25 +136,38 @@ class Device(object):
 
     return export_data
 
-  def add_alexa_action(self, alexa_action: str) -> None:
-    if alexa_action not in self._alexa_actions:
-      self._alexa_actions.append(alexa_action)
-
   def get_alexa_view(self):
     if self._alexa_export is False:
       return None
 
     return {
-      "actions":                    self._alexa_actions,
-      "additionalApplianceDetails": {},
-      "applianceId":                self.id,
-      "friendlyDescription":        self._alexa_description,
-      "friendlyName":               self._alexa_alias,
-      "isReachable":                True,
-      "manufacturerName":           self._alexa_manufacturer_name,
-      "modelName":                  self._alexa_model,
-      "version":                    self._alexa_version
+      'endpointId':        self.id,
+      'friendlyName':      self.alias,
+      'description':       self._alexa_description,
+      'manufacturerName':  self._alexa_manufacturer_name,
+      'displayCategories': self._alexa_categories,
+      'cookie':            {},
+      'capabilities':      self._alexa_capabilities
     }
+
+  def add_alexa_capabilities(self, capabilities):
+    if type(capabilities) is not list:
+      capabilities = [capabilities]
+    for capability in capabilities:
+      if capability not in self._alexa_capabilities:
+        self._alexa_capabilities.append(capability)
+
+  def add_alexa_categories(self, categories):
+    if type(categories) is not list:
+      categories = [categories]
+    for category in categories:
+      if category not in self._alexa_categories:
+        self._alexa_categories.append(category)
+
+  def set_alexa_categories(self, categories):
+    if type(categories) is not list:
+      categories = [categories]
+    self._alexa_categories = categories
 
   def add_command(self, command: str, function: Callable) -> None:
     """
@@ -363,6 +368,10 @@ class Device(object):
   @property
   def id(self):
     return self._id
+
+  @property
+  def alias(self):
+    return self._alias
 
   @property
   def firefly(self):

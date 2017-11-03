@@ -84,19 +84,21 @@ class Routine(Automation):
       return None
 
     return {
-      "endpointId":        self.id,
-      "manufacturerName":  "Firefly Home",
-      "friendlyName":      self.alias,
-      "description":       "A Firefly Home Scene",
-      "displayCategories": ["ACTIVITY_TRIGGER"],
-      "cookie":            {},
-      "capabilities":      [{
-        "type":                 "AlexaInterface",
-        "interface":            "Alexa.SceneController",
-        "version":              "3",
-        "supportsDeactivation": False,
-        "proactivelyReported":  True
-      }]
+      'endpointId':        self.id,
+      'manufacturerName':  'Firefly Home',
+      'friendlyName':      self.alias,
+      'description':       'A Firefly Home Scene',
+      'displayCategories': ['SCENE_TRIGGER'],
+      'cookie':            {},
+      'capabilities':      [
+        {
+          'type':                 'AlexaInterface',
+          'interface':            'Alexa.SceneController',
+          'version':              '3',
+          'supportsDeactivation': False,
+          'proactivelyReported':  True
+        }
+      ]
     }
 
   @property

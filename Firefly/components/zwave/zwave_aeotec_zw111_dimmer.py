@@ -49,9 +49,10 @@ class ZW111(ZwaveDevice):
     self.add_request(SWITCH, self.get_state)
     self.add_request(LEVEL, self.get_level)
 
-    self.add_alexa_action(ALEXA_OFF)
-    self.add_alexa_action(ALEXA_ON)
-    self.add_alexa_action(ALEXA_SET_PERCENTAGE)
+    self._alexa_export = False
+    #self.add_alexa_action(ALEXA_OFF)
+    #self.add_alexa_action(ALEXA_ON)
+    #self.add_alexa_action(ALEXA_SET_PERCENTAGE)
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     if node is None:
