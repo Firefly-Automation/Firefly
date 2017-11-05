@@ -224,7 +224,7 @@ class ZwaveDevice(Device):
     successful = True
     for param in param_list:
       if len(param) == 3:
-        successful &= self.verify_set_zwave_param(param[0], param[1], param[3])
+        successful &= self.verify_set_zwave_param(param[0], param[1], param[2])
       elif len(param) == 2:
         successful &= self.verify_set_zwave_param(param[0], param[1])
       else:
