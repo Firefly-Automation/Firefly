@@ -1,6 +1,6 @@
 from Firefly.api import FireflyCoreAPI
 from Firefly.const import CONFIG_FILE
-from Firefly.core import Firefly, app
+from Firefly.core.core import Firefly, app
 from Firefly.helpers.settings import Settings
 from logging.handlers import RotatingFileHandler
 

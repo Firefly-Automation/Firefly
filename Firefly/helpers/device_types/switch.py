@@ -123,7 +123,7 @@ class Switch(Device):
       else:
         self._switch = switch
 
-    if level is not None:
+    if level is not None and self.capabilities[LEVEL] is True:
       if type(level) is not int:
         self._level = -1
 

@@ -2,6 +2,7 @@ from Firefly import logging, scheduler
 import configparser
 from Firefly.const import FOOBOT_SECTION, SERVICE_FOOBOT, AUTHOR, SERVICE_CONFIG_FILE
 from Firefly.helpers.service import Service
+from Firefly.core.service_handler import ServiceConfig, ServicePackage
 import requests
 
 TITLE = 'Foobot Service'
@@ -11,30 +12,24 @@ REQUESTS = []
 OWNER_URL = 'http://api.foobot.io/v2/owner/%s/device/'
 STATUS_URL = 'http://api.foobot.io/v2/device/%s/datapoint/0/last/0/'
 
-def Setup(firefly, package, **kwargs):
-  logging.message('Setting up %s service' % SERVICE_FOOBOT)
-  config = configparser.ConfigParser()
-  config.read(SERVICE_CONFIG_FILE)
-  enable = config.getboolean(FOOBOT_SECTION, 'enable', fallback=False)
-  username = config.get(FOOBOT_SECTION, 'username', fallback=None)
-  api_key = config.get(FOOBOT_SECTION, 'api_key', fallback=None)
-  refresh_interval = config.getint(FOOBOT_SECTION, 'refresh_interval', fallback=15)
-
-  if not enable or not api_key or not username:
-    return False
-
-  foobot = Foobot(firefly, package, enable=enable, username=username, api_key=api_key, refresh_interval=refresh_interval, **kwargs)
+def Setup(firefly, package, alias, ff_id, service_package: ServicePackage, config: ServiceConfig, **kwargs):
+  logging.info('Setting up %s service' % service_package.name)
+  foobot = Foobot(firefly, alias, ff_id, service_package, config, **kwargs)
   firefly.install_component(foobot)
+  return True
 
 
 class Foobot(Service):
-  def __init__(self, firefly, package, **kwargs):
+  def __init__(self, firefly, alias, ff_id, service_package: ServicePackage, config: ServiceConfig, **kwargs):
+    # TODO: Fix this
+    package = service_package.package
     super().__init__(firefly, SERVICE_FOOBOT, package, TITLE, AUTHOR, COMMANDS, REQUESTS)
 
-    self.enable = kwargs.get('enable', False)
-    self.username = kwargs.get('username')
-    self.api_key = kwargs.get('api_key')
-    self.refresh_interval = kwargs.get('refresh_interval', 15)
+    self.config = config
+    self.enable = config.enabled
+    self.username = config.username
+    self.api_key = config.api_key
+    self.refresh_interval = config.refresh
     self.devices = []
 
 

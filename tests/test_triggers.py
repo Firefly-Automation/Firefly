@@ -8,7 +8,7 @@ from Firefly.helpers.subscribers import Subscriptions
 
 
 class TestTriggers(unittest.TestCase):
-  @patch('Firefly.core.Firefly')
+  @patch('Firefly.core.core.Firefly')
   def setUp(self, firefly):
     self.firefly = firefly
     self.firefly.subscriptions = Subscriptions()
@@ -1664,7 +1664,7 @@ class TestTriggers(unittest.TestCase):
     triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
 
-  def test_trigger_gt_two_triggers_good_2(self):
+  def test_trigger_gt_two_triggers_bad_2(self):
     """Test number test two triggers"""
     data = {
       self.device:   {
@@ -1691,10 +1691,79 @@ class TestTriggers(unittest.TestCase):
     triggers.add_trigger([trigger_b])
     self.firefly.current_state = data
     event = Event(self.device, EVENT_TYPE_BROADCAST, {
-      TEMPERATURE: 60
+      TEMPERATURE: 49
     })
     self.firefly.update_current_state(event)
-    triggered = triggers.check_triggers(event, ignore_event=True)
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+
+
+  def test_trigger_number_compare_complex_1(self):
+    """Test number test two triggers"""
+    data = {
+      self.device:   {
+        TEMPERATURE: 40
+      },
+      self.device_b: {
+        TEMPERATURE: 80
+      }
+    }
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      TEMPERATURE: [{
+        'lt': 50
+      }]
+    })
+    trigger_b = Trigger(self.device_b, {
+      TEMPERATURE: [{
+        'gt': 70
+      }]
+    })
+    trigger_added = triggers.add_trigger([trigger, trigger_b])
+    self.assertTrue(trigger_added)
+    #triggers.add_trigger([trigger_b])
+    self.firefly.current_state = data
+    event = Event(self.device_b, EVENT_TYPE_BROADCAST, {
+      TEMPERATURE: 80,
+      'motion': 'active'
+    })
+    self.firefly.update_current_state(event)
+    triggered = triggers.check_triggers(event)
+    self.assertTrue(triggered)
+
+  def test_trigger_number_compare_complex_2(self):
+    """Test number test two triggers"""
+    data = {
+      self.device:   {
+        TEMPERATURE: 40
+      },
+      self.device_b: {
+        TEMPERATURE: 80
+      }
+    }
+
+    triggers = Triggers(self.firefly, self.trigger_id)
+    trigger = Trigger(self.device, {
+      TEMPERATURE: [{
+        'lt': 50
+      }]
+    })
+    trigger_b = Trigger(self.device_b, {
+      TEMPERATURE: [{
+        'gt': 70
+      }]
+    })
+    trigger_added = triggers.add_trigger([trigger, trigger_b])
+    self.assertTrue(trigger_added)
+    triggers.add_trigger([trigger_b])
+    self.firefly.current_state = data
+    event = Event(self.device_b, EVENT_TYPE_BROADCAST, {
+      TEMPERATURE: 80,
+      'motion': 'active'
+    })
+    self.firefly.update_current_state(event)
+    triggered = triggers.check_triggers(event)
     self.assertTrue(triggered)
 
   def test_low_battery(self):

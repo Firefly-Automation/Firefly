@@ -91,9 +91,12 @@ class SimpleRule(Automation):
     self._alias = self.alias
 
   def event_handler(self, event: Event = None, trigger_index="", **kwargs):
+    logging.info('[Simple Rule] Handling Event: %s' % event)
     if trigger_index == "initial":
+      logging.info(('[SIMPLE RULE] Inital Trigger'))
       self.initial_event_handler(event, trigger_index)
     if trigger_index == "delayed":
+      logging.info(('[SIMPLE RULE] Delayed Trigger'))
       self.delayed_event_handler(event, trigger_index)
 
   def initial_event_handler(self, event: Event = None, trigger_index="initial", skip_delay=False, **kwargs):
@@ -114,6 +117,7 @@ class SimpleRule(Automation):
       self.triggered = True
     else:
       scheduler.cancel(self.timer_id)
+    logging.info('[SIMPLE RULE] Executing Initial')
     self.execute_actions(trigger_index)
 
   def delayed_event_handler(self, event: Event = None, trigger_index="delayed", **kwargs):
@@ -129,6 +133,7 @@ class SimpleRule(Automation):
       self.execute_delayed_actions(trigger_index)
 
   def execute_delayed_actions(self, trigger_index="delayed", **kwargs):
+    logging.info('[SIMPLE RULE] Executing Delayed')
     self.triggered = False
     self.send_messages(trigger_index)
     self.execute_actions(trigger_index)

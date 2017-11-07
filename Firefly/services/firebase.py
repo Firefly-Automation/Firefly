@@ -1,4 +1,3 @@
-import configparser
 import copy
 import json
 from os import system
@@ -7,13 +6,12 @@ import pyrebase
 import requests
 
 from Firefly import aliases, logging, scheduler
-from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SERVICE_CONFIG_FILE, SOURCE_LOCATION, SOURCE_TIME, TYPE_AUTOMATION, TYPE_DEVICE, TYPE_ROUTINE
+from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SOURCE_LOCATION, SOURCE_TIME, TYPE_DEVICE, TYPE_ROUTINE
+from Firefly.core.service_handler import ServiceConfig, ServicePackage
+from Firefly.helpers.metadata import EXPORT_UI, FF_ID, HIDDEN_BY_USER, PRIMARY_ACTION
 from Firefly.helpers.service import Command, Request, Service
-from Firefly.services.api_ai import apiai_command_reply
 from Firefly.services.alexa.alexa import process_alexa_request
-
-
-from Firefly.helpers.metadata import PRIMARY_ACTION, FF_ID, HIDDEN_BY_USER, EXPORT_UI
+from Firefly.services.api_ai import apiai_command_reply
 
 FIREBASE_LOCATION_STATUS_PATH = 'locationStatus'
 FIREBASE_DEVICE_VIEWS = 'deviceViews'
@@ -49,42 +47,29 @@ SECTION = 'FIREBASE'
 
 # TODO: push this data to location weather info.. this could be useful
 
-def Setup(firefly, package, **kwargs):
-  config = configparser.ConfigParser()
-  config.read(SERVICE_CONFIG_FILE)
-  enable = config.getboolean(SECTION, 'enable', fallback=False)
-  if enable is False:
-    return False
-  api_key = config.get(SECTION, 'api_key', fallback=None)
-  auth_domain = config.get(SECTION, 'auth_domain', fallback=None)
-  database_url = config.get(SECTION, 'database_url', fallback=None)
-  email = config.get(SECTION, 'email', fallback=None)
-  password = config.get(SECTION, 'password', fallback=None)
-  storage_bucket = config.get(SECTION, 'storage_bucket', fallback=None)
-  home_id = config.get(SECTION, 'home_id', fallback=None)
-  #TODO: Move facebook somewhere better
-  facebook = config.getboolean(SECTION, 'facebook', fallback=False)
-  if api_key is None:
-    logging.error('firebase error')  # TODO Make this error code
-    return False
-  firebase = Firebase(firefly, package, api_key=api_key, auth_domain=auth_domain, database_url=database_url, email=email, password=password, storage_bucket=storage_bucket, home_id=home_id, facebook=facebook)
+def Setup(firefly, package, alias, ff_id, service_package: ServicePackage, config: ServiceConfig, **kwargs):
+  logging.notify('Installing Firebase Service')
+  firebase = Firebase(firefly, alias, ff_id, service_package, config, **kwargs)
   firefly.install_component(firebase)
   return True
 
 
 class Firebase(Service):
-  def __init__(self, firefly, package, **kwargs):
+  def __init__(self, firefly, alias, ff_id, service_package: ServicePackage, config: ServiceConfig, **kwargs):
+    # TODO: Fix this
+    package = service_package.package
     super().__init__(firefly, SERVICE_ID, package, TITLE, AUTHOR, COMMANDS, REQUESTS)
 
-    self.api_key = kwargs.get('api_key')
-    self.auth_domain = kwargs.get('auth_domain')
-    self.database_url = kwargs.get('database_url')
-    self.storage_bucket = kwargs.get('storage_bucket')
-    self.email = kwargs.get('email')
-    self.password = kwargs.get('password')
-    self.facebook = kwargs.get('facebook')
+    self.service_config = config
+    self.api_key = config.api_key
+    self.auth_domain = config.auth_domain
+    self.database_url = config.database_url
+    self.storage_bucket = config.storage_bucket
+    self.email = config.email
+    self.password = config.password
+    self.facebook = config.facebook
 
-    self.home_id = kwargs.get('home_id')
+    self.home_id = config.home_id
 
     self.add_command('push', self.push)
     self.add_command('refresh', self.refresh_all)
@@ -131,13 +116,9 @@ class Firebase(Service):
       logging.notify('error registering home')
       return
 
-    config = configparser.ConfigParser()
-    config.read(SERVICE_CONFIG_FILE)
-    config.set(SECTION, r'home_id', str(self.home_id))
-    with open(SERVICE_CONFIG_FILE, 'w') as configfile:
-      config.write(configfile)
+    self.service_config.home_id = self.home_id
+    self.service_config.save()
     logging.info('Config file for hue has been updated.')
-
 
   def process_settings(self, message, **kwargs):
     logging.info('[FIREBASE] PROCESSING SETTINGS: %s' % str(message))
@@ -145,23 +126,18 @@ class Firebase(Service):
       enable = bool(message.get('notification', {}).get('facebook'))
       self.set_facebook_settings(enable)
 
-
-
   def set_facebook_settings(self, enable, **kwargs):
     self.facebook = enable
     logging.info('[FIREBASE] Enabling/Disabling Facebook. %s' % str(enable))
-    config = configparser.ConfigParser()
-    config.read(SERVICE_CONFIG_FILE)
-    config.set(SECTION, r'facebook', str(enable))
-    with open(SERVICE_CONFIG_FILE, 'w') as configfile:
-      config.write(configfile)
+    self.service_config.facebook = enable
+    self.service_config.save()
+
     if enable:
       self.send_facebook_notification("Facebook notifications for firefly are now enabled.")
     else:
       self.send_facebook_notification("Facebook notifications for firefly are now disabled.")
 
     logging.info('Config file for hue has been updated.')
-
 
   def refresh_stream(self):
     if not internet_up():
@@ -175,7 +151,6 @@ class Firebase(Service):
     self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
 
   def command_reply(self, message):
-
 
     data = message['data']
     # Take path and split it. we are only going to process top level paths. This should be the clientID.
@@ -203,7 +178,7 @@ class Firebase(Service):
 
 
 
-     # TODO: Remove this after upgrading all cloud functions
+      # TODO: Remove this after upgrading all cloud functions
     if not message['data']:
       return
     if message['data'].get('reply') is not None or message.get('reply') is not None:
@@ -315,8 +290,8 @@ class Firebase(Service):
       routines = self.get_routines()
 
       # TODO(zpriddy): Remove old views when new UI is done
-      #self.db.child("userAlexa").child(self.uid).child("devices").set(alexa_views, self.id_token)
-      #self.db.child("homeStatus").child(self.home_id).child('devices').update(all_values, self.id_token)
+      # self.db.child("userAlexa").child(self.uid).child("devices").set(alexa_views, self.id_token)
+      # self.db.child("homeStatus").child(self.home_id).child('devices').update(all_values, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('routines').set(routines['config'], self.id_token)
       # End of old views
 
@@ -430,23 +405,21 @@ class Firebase(Service):
 
     self.update_home_status(FIREBASE_LOCATION_STATUS_PATH, location_status)
 
-
   def update_device_min_views(self, device_views, **kwargs):
     device_min_view = {}
     for ff_id, device_view in device_views.items():
       try:
         primary_action = device_view['metadata']['primary']
         device_min_view[ff_id] = {
-          FF_ID: device_view[FF_ID],
-          'alias': device_view['alias'],
+          FF_ID: device_view         [FF_ID],
+          'alias': device_view       ['alias'],
           # TODO: Update this to hidden_by_user or hidden_by_firefly when ready.
-          EXPORT_UI: device_view[EXPORT_UI],
+          EXPORT_UI: device_view     [EXPORT_UI],
           HIDDEN_BY_USER: device_view[EXPORT_UI],
 
-          PRIMARY_ACTION : {
+          PRIMARY_ACTION:            {
 
-
-              primary_action: device_view['metadata']['actions'][primary_action]
+            primary_action: device_view['metadata']['actions'][primary_action]
 
           }
         }
@@ -454,8 +427,6 @@ class Firebase(Service):
         logging.error('[FIREBASE DEVICE MIN VIEW] error: %s' % str(e))
     logging.debug('[FIREBASE DEVICE MIN VIEW] setting min view: %s' % str(device_min_view))
     self.set_home_status('deviceMinView', device_min_view)
-
-
 
   def update_device_views(self, **kwargs):
     ''' Update device views metadata for all devices
@@ -475,7 +446,7 @@ class Firebase(Service):
 
     self.update_device_min_views(device_views)
 
-    #TODO: Remove this
+    # TODO: Remove this
     check_all_keys(device_views)
     self.set_home_status('devices', device_views)
 
@@ -504,9 +475,9 @@ class Firebase(Service):
       except:
         pass
 
-    #TODO Remove this
+    # TODO Remove this
     check_all_keys(all_values)
-    #self.update_home_status('devices', all_values)
+    # self.update_home_status('devices', all_values)
 
     if overwrite:
       self.set_home_status(FIREBASE_DEVICE_STATUS, all_values)
@@ -514,7 +485,7 @@ class Firebase(Service):
 
     self.update_home_status(FIREBASE_DEVICE_STATUS, all_values)
 
-  def update_device_status(self, ff_id, action, **kwargs):
+  def update_device_status(self, ff_id, action:dict, **kwargs):
     ''' Update a single device status
 
     Args:
@@ -711,6 +682,12 @@ class Firebase(Service):
     Returns:
 
     '''
+    if 'last_update' in action.keys():
+      action.pop('last_update')
+    if 'status_message' in action.keys():
+      action.pop('status_message')
+    if not action:
+      return
     now = self.firefly.location.now
     now_time = now.strftime("%B %d %Y %I:%M:%S %p")
     self.db.child("homeStatus").child(self.home_id).child('events').push({
@@ -743,7 +720,6 @@ class Firebase(Service):
   def send_facebook_notification(self, message, **kwargs):
     logging.info("[FIREBASE FACEBOOK] SENDING NOTIFICATION")
     self.db.child("homeStatus").child(self.home_id).child("facebookNotifcations").push(message, self.id_token)
-
 
   def get_api_id(self, **kwargs):
     ff_id = kwargs.get('api_ff_id')
@@ -799,6 +775,7 @@ def scrub(x):
 
 
 FIREBASE_INVALID_CHARS = ['/', '\\', '$', '#']
+
 
 def has_invalid_char(string_to_check):
   for c in FIREBASE_INVALID_CHARS:

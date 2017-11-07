@@ -9,6 +9,8 @@ from Firefly.const import COMMAND_UPDATE, SERVICE_CONFIG_FILE
 from Firefly.helpers.events import Command
 from Firefly.helpers.service import Service
 
+from Firefly.core.service_handler import ServicePackage, ServiceConfig
+
 TITLE = 'Hue service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
 SERVICE_ID = 'service_hue'
@@ -18,30 +20,23 @@ REQUESTS = ['get_lights', 'get_groups', 'get_orphans']
 SECTION = 'HUE'
 
 
-def Setup(firefly, package, **kwargs):
-  logging.message('Setting up %s service' % SERVICE_ID)
-  config = configparser.ConfigParser()
-  config.read(SERVICE_CONFIG_FILE)
-
-  enable = config.getboolean(SECTION, 'enable', fallback=False)
-  ip = config.get(SECTION, 'ip', fallback=None)
-  username = config.get(SECTION, 'username', fallback=None)
-
-  if not enable:
-    return False
-
-  hue = Hue(firefly, package, enable=enable, ip=ip, username=username, **kwargs)
+def Setup(firefly, package, alias, ff_id, service_package:ServicePackage, config:ServiceConfig, **kwargs):
+  logging.info('Setting up %s service' % service_package.name)
+  hue = Hue(firefly, alias, ff_id, service_package, config, **kwargs)
   firefly.install_component(hue)
   return True
 
 
 class Hue(Service):
-  def __init__(self, firefly, package, **kwargs):
-    super().__init__(firefly, SERVICE_ID, package, TITLE, AUTHOR, COMMANDS, REQUESTS)
+  def __init__(self, firefly, alias, ff_id, service_package:ServicePackage, config:ServiceConfig, **kwargs):
+    #TODO: Fix this
+    package = service_package.package
+    super().__init__(firefly, ff_id, package, TITLE, AUTHOR, COMMANDS, REQUESTS)
 
-    self._ip = kwargs.get('ip')
-    self._username = kwargs.get('username')
-    self._enable = kwargs.get('enable')
+    self.config = config
+    self._ip = config.ip
+    self._username = config.username
+    self._enable = config.enabled
 
     self._installed_items = {}
 
@@ -172,13 +167,9 @@ class Hue(Service):
     if 'success' in response:
       self._username = response['success']['username']
       logging.debug('Success! username: %s' % str(self._username))
-
-      config = configparser.ConfigParser()
-      config.read(SERVICE_CONFIG_FILE)
-      config.set(SECTION, r'username', str(self._username))
-      config.set(SECTION, r'ip', str(self._ip))
-      with open(SERVICE_CONFIG_FILE, 'w') as configfile:
-        config.write(configfile)
+      self.config.ip = self._ip
+      self.config.username = self._username
+      self.config.save()
       logging.info('Config file for hue has been updated.')
 
 

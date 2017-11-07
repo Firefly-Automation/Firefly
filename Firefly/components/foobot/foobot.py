@@ -15,7 +15,7 @@ COMMANDS = ['set_temp_scale']
 INITIAL_VALUES = {
   '_air_quality':      'unknown',
   '_pm':               -1,
-  '_temperature':      -1,
+  '_temperature':      -1.0,
   '_humidity':         -1,
   '_c02':              -1,
   '_voc':              -1,
@@ -75,6 +75,7 @@ def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   foobot = Foobot(firefly, package, **kwargs)
   firefly.install_component(foobot)
+  logging.info('Finished Installing Foobot')
   return foobot.id
 
 
@@ -89,6 +90,7 @@ class Foobot(Device):
     self.device = kwargs.get('foobot_device')
     self.api_key = kwargs.get('api_key')
     self.username = kwargs.get('username')
+    self.refresh = kwargs.get('refresh', 15)
 
     self.add_request('air_quality', self.get_air_quality)
     self.add_request(TEMPERATURE, self.get_temperature)
@@ -112,12 +114,12 @@ class Foobot(Device):
     self.add_action(TEMPERATURE, action_text(primary=False, title='Temperature', context='Last reported temperature', request=TEMPERATURE, units=self._temp_scale))
     self.add_action(HUMIDITY, action_text(primary=False, title='Humidity', context='Last reported humidity', request=HUMIDITY, units='%'))
 
-    self.update()
+    #self.update()
 
     #TODO: Add temp reporting
     self._alexa_export = False
-
-    scheduler.runEveryM(self._refresh_interval, self.update, job_id=self.id)
+    scheduler.runInS(10, self.update)
+    scheduler.runEveryM(self.refresh, self.update, job_id=self.id)
 
   def export(self, current_values: bool = True, api_view: bool = False) -> dict:
     export_data = super().export(current_values, api_view)
@@ -145,7 +147,7 @@ class Foobot(Device):
   def get_temperature(self, **kwargs):
     if self._temp_scale == 'c':
       return self._temperature
-    return 9.0 / 5.0 * self._temperature + 32
+    return 9.0 / 5.0 * float(self._temperature) + 32
 
   def get_humidity(self, **kwargs):
     return self._humidity
@@ -159,7 +161,7 @@ class Foobot(Device):
   def get_allpollu(self, **kwargs):
     return self._allpollu
 
-  def update(self, **kwargs):
+  def update(self, *args, **kwargs):
     url = STATUS_URL % str(self.id)
     headers = {
       'X-API-KEY-TOKEN': self.api_key,
@@ -179,12 +181,20 @@ class Foobot(Device):
     if len(datapoints) < 7:
       return
 
+    self.store_before_state()
+
     self._pm = datapoints[1]
     self._temperature = datapoints[2]
     self._humidity = datapoints[3]
     self._c02 = datapoints[4]
     self._voc = datapoints[5]
     self._allpollu = datapoints[6]
+
+    self._last_command_source = 'Foobot Refresh'
+    self._last_update_time = self.firefly.location.now
+
+    self.broadcast_change()
+
 
   def pm_score(self, **kwargs):
     if self._pm == -1:

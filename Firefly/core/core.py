@@ -13,13 +13,17 @@ from aiohttp import web
 
 from Firefly import aliases, logging, scheduler
 from Firefly.const import COMPONENT_MAP, DEVICE_FILE, EVENT_TYPE_BROADCAST, LOCATION_FILE, SERVICE_CONFIG_FILE, TIME, TYPE_DEVICE, VERSION, REQUIRED_FILES
-from Firefly.helpers.events import (Event, Request)
+from Firefly.helpers.events import Event, Request, Command
 from Firefly.helpers.groups.groups import import_groups
 from Firefly.helpers.location import Location
 from Firefly.helpers.room import Rooms
 from Firefly.helpers.subscribers import Subscriptions
 
+from Firefly.core.service_handler import ServiceHandler
+
 app = web.Application()
+
+FIREBASE_SERVICE = 'service_firebase'
 
 
 def sigterm_handler(_signo, _stack_frame):
@@ -55,7 +59,6 @@ class Firefly(object):
     self.loop.set_default_executor(self.executor)
 
     self._subscriptions = Subscriptions()
-
     self.location = self.import_location()
 
     # Get the beacon ID.
@@ -71,6 +74,11 @@ class Firefly(object):
       self.import_components(c['file'])
 
     self.install_services()
+
+    self.service_handler = ServiceHandler()
+    self.service_handler.install_services(self)
+
+    logging.info('[CORE] services installed: %s' % str(self.service_handler.get_installed_services(self)))
 
     # TODO: Rooms will be replaced by groups subclass rooms.
     self._rooms = Rooms(self)
@@ -91,6 +99,8 @@ class Firefly(object):
     all_devices = set([c_id for c_id, c in self.components.items() if (c.type == TYPE_DEVICE or c.type == 'ROOM')])
     self.current_state = self.get_device_states(all_devices)
 
+    #self.async_send_command(Command('service_zwave', 'core_startup', 'initialize'))
+
   def install_component(self, component):
     ''' Install a component into the core components.
 
@@ -100,6 +110,7 @@ class Firefly(object):
     Returns:
 
     '''
+    logging.info('[CORE INSTALL COMPONENT] Installing Component: %s' % component.id)
     try:
       self.components[component.id] = component
       return component.id
@@ -162,7 +173,7 @@ class Firefly(object):
         logging.error(code='FF.COR.INS.001', args=(service, e))  # error installing package %s: %s
         logging.notify('Error installing package %s: %s' % (service, e))
 
-    if self.components.get('service_firebase'):
+    if self.components.get(FIREBASE_SERVICE):
       self._firebase_enabled = True
 
   def start(self) -> None:
@@ -209,8 +220,8 @@ class Firefly(object):
   def delete_device(self, ff_id):
     self.components.pop(ff_id)
     aliases.aliases.pop(ff_id)
-    if self.components.get('service_firebase'):
-      self.components['service_firebase'].refresh_all()
+    if FIREBASE_SERVICE in self.service_handler.get_installed_services(self):
+      self.components[FIREBASE_SERVICE].refresh_all()
 
   def export_all_components(self) -> None:
     """
@@ -273,6 +284,7 @@ class Firefly(object):
       kwargs.pop('package')
     setup_return = package.Setup(self, module, **kwargs)
     scheduler.runInS(10, self.refresh_firebase, job_id='FIREBASE_REFRESH_CORE')
+    scheduler.runInS(15, self.export_all_components, job_id='CORE_EXPORT_ALL')
     return setup_return
 
   def send_firebase(self, event: Event):
@@ -284,12 +296,12 @@ class Firefly(object):
     Returns:
 
     '''
-    if self.components.get('service_firebase'):
-      self.components['service_firebase'].push(event.source, event.event_action)
+    if self.components.get(FIREBASE_SERVICE):
+      self.components[FIREBASE_SERVICE].push(event.source, event.event_action)
 
   def refresh_firebase(self, **kwargs):
-    if self.firebase_enabled:
-      self.components['service_firebase'].refresh_all()
+    if FIREBASE_SERVICE in self.service_handler.get_installed_services(self):
+      self.components[FIREBASE_SERVICE].refresh_all()
 
   @asyncio.coroutine
   def async_send_event(self, event):

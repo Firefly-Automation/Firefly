@@ -99,6 +99,7 @@ class Trigger(object):
     return SIMPLE_TRIGGER
 
   def check_trigger(self, firefly, event: Event, ignore_event: bool = False, **kwargs) -> bool:
+    current_states = firefly.current_state
     if self.trigger_type == TIME_TRIGGER:
       return self.check_time_trigger(event)
 
@@ -106,8 +107,8 @@ class Trigger(object):
       return self.check_location_trigger(event)
 
     if self.trigger_type == NUMBER_COMPARE_TRIGGER and not ignore_event:
-      (item, value), = event.event_action.items()
-      return self.check_number_compare_trigger(item, value)
+      #(item, value), = event.event_action.items()
+      return self.check_number_compare_trigger(event, current_states)
 
     trigger_action = self.trigger_action[0]
 
@@ -121,7 +122,7 @@ class Trigger(object):
           return True
       return False
 
-    current_states = firefly.current_state
+
 
     if self.trigger_type == NUMBER_COMPARE_TRIGGER and ignore_event:
       prop = list(trigger_action.keys())[0]
@@ -138,7 +139,40 @@ class Trigger(object):
 
     return False
 
-  def check_number_compare_trigger(self, event_prop, event_value) -> bool:
+
+  def check_number_compare_trigger(self, event, current_state):
+    trigger_action = self.trigger_action[0]
+    if self.listen_id == event.source:
+      for action_type, action in event.event_action.items():
+        if action_type in trigger_action:
+          return self.check_number(action, trigger_action[action_type])
+    else:
+      for action_type, action in event.event_action.items():
+        if action_type in trigger_action:
+          current_device_value = current_state.get(self.listen_id, {}).get(action_type)
+          return self.check_number(current_device_value, trigger_action[action_type])
+    return False
+
+  def check_number(self, event_value:int, trigger_numbers:dict) -> bool:
+    valid_trigger = True
+    for number_compare in trigger_numbers:
+      (operator, value), = number_compare.items()
+      if operator == 'gt' and event_value > value:
+        valid_trigger &= True
+      elif operator == 'ge' and event_value >= value:
+        valid_trigger &= True
+      elif operator == 'lt' and event_value < value:
+        valid_trigger &= True
+      elif operator == 'le' and event_value <= value:
+        valid_trigger &= True
+      elif operator == 'eq' and event_value == value:
+        valid_trigger &= True
+      else:
+        return False
+    return valid_trigger
+
+
+  def check_number_compare(self, event_prop, event_value) -> bool:
     logging.info('checking number trigger: %s' % self.trigger_action)
     number_compares = self.trigger_action[0][event_prop]
     valid_trigger = True
@@ -159,8 +193,10 @@ class Trigger(object):
     return valid_trigger
 
   def check_time_trigger(self, event: Event) -> bool:
+    logging.info('Checking Time Trigger')
     # If the event source is not time then it cant match any.
     if event.source != TIME:
+      logging.info('source is not time')
       return False
     # If any time trigger in list of times matches return True.
     for t in self.trigger_action:

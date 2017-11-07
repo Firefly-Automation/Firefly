@@ -103,6 +103,8 @@ def get_package(node: ZWaveNode) -> dict:
       'node':            node
     }
 
+
+  logging.info('[ZWAVE] NEW NODE INFO: id: %s product_name: %s product_type: %s device_type: %s info: %s' % (node.node_id, node.product_name, node.product_type, node.device_type, str(node.to_dict())))
   if not node.is_ready:
     logging.message('Node is not ready, Waiting for more info.')
     return {}

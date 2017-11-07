@@ -23,6 +23,7 @@ def Setup(firefly, package, **kwargs):
   logging.message('Entering %s setup' % TITLE)
   sensor = ZwaveAeotecMulti(firefly, package, **kwargs)
   firefly.install_component(sensor)
+  logging.message('Finished Installing %s' % sensor.id)
   return sensor.id
 
 

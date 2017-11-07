@@ -7,6 +7,8 @@ from Firefly.const import COMMAND_UPDATE, NEST_CACHE_FILE, SERVICE_CONFIG_FILE
 from Firefly.helpers.events import Command
 from Firefly.helpers.service import Service
 
+from Firefly.core.service_handler import ServicePackage, ServiceConfig
+
 TITLE = 'nest service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
 SERVICE_ID = 'service_nest'
@@ -16,30 +18,23 @@ REQUESTS = []
 SECTION = 'NEST'
 
 
-def Setup(firefly, package, **kwargs):
-  logging.message('Setting up %s service' % SERVICE_ID)
-  config = configparser.ConfigParser()
-  config.read(SERVICE_CONFIG_FILE)
-
-  enable = config.getboolean(SECTION, 'enable', fallback=False)
-  cache_file = config.get(SECTION, 'cache_file', fallback=NEST_CACHE_FILE)
-  client_id = config.get(SECTION, 'client_id', fallback='')
-  client_secret = config.get(SECTION, 'client_secret', fallback='')
-
-  if not enable:
-    return False
-
-  newNest = Nest(firefly, package, enable=enable, cache_file=cache_file, client_id=client_id, client_secret=client_secret, **kwargs)
+def Setup(firefly, package, alias, ff_id, service_package:ServicePackage, config:ServiceConfig, **kwargs):
+  logging.info('Setting up %s service' % service_package.name)
+  newNest = Nest(firefly, alias, ff_id, service_package, config, **kwargs)
   firefly.install_component(newNest)
+  return True
 
 
 class Nest(Service):
-  def __init__(self, firefly, package, **kwargs):
+  def __init__(self, firefly, alias, ff_id, service_package:ServicePackage, config:ServiceConfig, **kwargs):
+    #TODO: Fix this
+    package = service_package.package
     super().__init__(firefly, SERVICE_ID, package, TITLE, AUTHOR, COMMANDS, REQUESTS)
-    self.enable = kwargs.get('enable')
-    self.cache_file = kwargs.get('cache_file')
-    self.client_id = kwargs.get('client_id')
-    self.client_secret = kwargs.get('client_secret')
+    self.config = config
+    self.enable = config.enabled
+    self.cache_file = service_package.config['cache']
+    self.client_id = config.client_id
+    self.client_secret = config.client_secret
     self.nest = None
 
     if self.client_secret != '' and self.client_id != '':
@@ -65,13 +60,11 @@ class Nest(Service):
     self.nest = nest.Nest(client_id=self.client_id, client_secret=self.client_secret, access_token_cache_file=self.cache_file)
     self.nest.request_token(auth_code)
 
-    config = configparser.ConfigParser()
-    config.read(SERVICE_CONFIG_FILE)
-    config.set(SECTION, r'client_id', str(self.client_id))
-    config.set(SECTION, r'client_secret', str(self.client_secret))
-    with open(SERVICE_CONFIG_FILE, 'w') as configfile:
-      config.write(configfile)
-    logging.info('Config file for hue has been updated.')
+
+    self.config.client_id = self.client_id
+    self.config.client_secret = self.client_secret
+    self.config.save()
+    logging.info('Config file for nest has been updated.')
 
     self.refresh()
 

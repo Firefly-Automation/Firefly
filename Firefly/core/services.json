@@ -1,0 +1,200 @@
+[
+    {
+        "config": {
+            "config": "darksky.json"
+        },
+        "defaults": {
+            "refresh": {
+                "context": "Refresh time of Darksky data.",
+                "default": 15,
+                "type": "int"
+            }
+        },
+        "description": "Darksky weather reporting. Visit https://darksky.net",
+        "ff_id": "service_darksky",
+        "name": "Darksky",
+        "package": "Firefly.services.darksky",
+        "required": {
+            "api_key": {
+                "context": "Darksky API Key",
+                "default": null,
+                "type": "string"
+            }
+        }
+    },
+    {
+        "config": {
+            "config": "zwave.json",
+            "nodes": "zwave_nodes.json"
+        },
+        "defaults": {
+            "path": {
+                "context": "Path to openzwave config",
+                "default": null,
+                "type": "string",
+                "default_init": true
+            },
+            "port": {
+                "context": "Serial port of zwave stick",
+                "default": "/dev/ttyACM0",
+                "type": "string"
+            },
+            "security": {
+                "context": "Enable zwave security",
+                "default": true,
+                "type": "bool"
+            }
+        },
+        "description": "Zwave wireless device service",
+        "ff_id": "service_zwave",
+        "name": "Zwave",
+        "package": "Firefly.services.zwave",
+        "required": {}
+    },
+    {
+        "config": {
+            "config": "hue.json"
+        },
+        "defaults": {
+            "ip": {
+                "context": "IP of hue bridge. This should be set automatically.",
+                "default": null,
+                "self_init": true,
+                "type": "string"
+            },
+            "username": {
+                "context": "Username on hue bridge. This should be set automatically",
+                "default": null,
+                "self_init": true,
+                "type": "string"
+            }
+        },
+        "description": "Phillips Hue light service",
+        "ff_id": "service_hue",
+        "name": "Hue",
+        "package": "Firefly.components.hue.hue_service",
+        "required": {}
+    },
+    {
+        "config": {
+            "config": "firebase.json"
+        },
+        "defaults": {
+            "facebook": {
+                "context": "Enable/Disable Facebook Notifications",
+                "default": false,
+                "type": "bool"
+            },
+            "home_id": {
+                "context": "Firebase Home ID. This should be set automatically",
+                "default": null,
+                "self_init": true,
+                "type": "string"
+            }
+        },
+        "description": "Firebase cloud control service",
+        "ff_id": "service_firebase",
+        "name": "Firebase",
+        "package": "Firefly.services.firebase",
+        "required": {
+            "api_key": {
+                "default_init": true,
+                "default": "AIzaSyCguxzjPs-2ky4lDUeHszynWFWC2WqqYl4",
+                "type": "string"
+            },
+            "auth_domain": {
+                "default_init": true,
+                "default": "firefly-beta-cdb9d.firebaseapp.com",
+                "type": "string"
+            },
+            "database_url": {
+                "default_init": true,
+                "default": "https://firefly-beta-cdb9d.firebaseio.com",
+                "type": "string"
+            },
+            "email": {
+                "context": "Email addres used for My Firefly Home",
+                "default": null,
+                "type": "string"
+            },
+            "password": {
+                "context": "Password used for My Firefly Home",
+                "default": null,
+                "type": "string"
+            },
+            "storage_bucket": {
+                "default_init": true,
+                "default": "firefly-beta-cdb9d.appspot.com",
+                "type": "string"
+            }
+        }
+    },
+    {
+        "config": {
+            "cache": "nest_cache.config",
+            "config": "nest.json"
+        },
+        "defaults": {
+            "client_id": {
+                "context": "OAuth Client ID. This should be set automatically",
+                "default": null,
+                "type": "string"
+            },
+            "client_secret": {
+                "context": "OAuth Client Secret. This should be set automatically.",
+                "default": null,
+                "type": "string"
+            }
+        },
+        "description": "Nest Thermostat Control",
+        "ff_id": "service_nest",
+        "name": "Nest",
+        "package": "Firefly.services.nest",
+        "required": {}
+    },
+    {
+        "config": {
+            "config": "lightify.json"
+        },
+        "defaults": {},
+        "description": "Lightify light service",
+        "ff_id": "service_lightify",
+        "name": "Lightify",
+        "package": "Firefly.services.lightify",
+        "required": {
+            "ip": {
+                "context": "IP of lightify bridge.",
+                "default": null,
+                "type": "string"
+            }
+        }
+    },
+    {
+        "config": {
+            "config": "foobot.json"
+        },
+        "defaults": {
+            "refresh": {
+                "context": "Refresh time of Foobot data.",
+                "default": 15,
+                "type": "int"
+            }
+        },
+        "description": "Foobot Air Quality Sensor Service.",
+        "ff_id": "service_foobot",
+        "name": "Foobot",
+        "package": "Firefly.components.foobot.foobot_service",
+        "required": {
+            "api_key": {
+                "context": "Api key from Foobot website",
+                "default": null,
+                "type": "string"
+            },
+            "username": {
+                "context": "Email address for Foobot account",
+                "default": null,
+                "type": "string"
+            }
+        }
+    }
+]

@@ -1,22 +1,15 @@
 import asyncio
-import configparser
 import json
 from time import sleep
-
-import logging as pyLogging
-from logging.handlers import RotatingFileHandler
 
 from openzwave.network import ZWaveController, ZWaveNetwork, ZWaveNode, dispatcher
 from openzwave.option import ZWaveOption
 
 from Firefly import logging, scheduler
 from Firefly.components.zwave.package_lookup import get_package
-from Firefly.const import SERVICE_CONFIG_FILE, ZWAVE_FILE
+from Firefly.core.service_handler import ServiceConfig, ServicePackage
 from Firefly.helpers.events import Command
 from Firefly.helpers.service import Service
-
-
-
 
 '''
 The ZWAVE service is the background service for zwave.
@@ -35,60 +28,51 @@ of what node number they are for sending commands.
 TITLE = 'Z-Wave service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
 SERVICE_ID = 'service_zwave'
-COMMANDS = ['send_command', 'stop', 'add_node', 'remove_node', 'cancel']
+COMMANDS = ['send_command', 'stop', 'add_node', 'remove_node', 'cancel', 'initialize']
 REQUESTS = ['get_nodes', 'get_orphans']
 
 SECTION = 'ZWAVE'
 # TODO: Make this 300 after testing is done
 STARTUP_TIMEOUT = 10
+#TODO: Create nodes files if not there
 
-
-def Setup(firefly, package, **kwargs):
-  logging.message('Setting up %s service' % SERVICE_ID)
-  config = configparser.ConfigParser()
-  config.read(SERVICE_CONFIG_FILE)
-
-  enable = config.getboolean(SECTION, 'enable', fallback=False)
-  port = config.get(SECTION, 'port', fallback=None)
-  # Old path config. TODO: Remove this once all systems moved over to new config.
-  # path = config.get(SECTION, 'path', fallback='/opt/firefly_system/python-openzwave/openzwave/config')
-  path = config.get(SECTION, 'path', fallback=None)
-  security = config.getboolean(SECTION, 'security', fallback=True)
-  if not enable or port is None:
-    return False
-
+def Setup(firefly, package, alias, ff_id, service_package: ServicePackage, config: ServiceConfig, **kwargs):
+  logging.info('Setting up %s service' % service_package.name)
+  installed_nodes = {}
+  ignore_nodes = []
   try:
-    with open(ZWAVE_FILE) as f:
+    with open(service_package.config['nodes']) as f:
       zc = json.loads(f.read())
       installed_nodes = zc.get('installed_nodes', {})
       ignore_nodes = zc.get('ignore_nodes', [])
-      kwargs['installed_nodes'] = installed_nodes
-      kwargs['ignore_nodes'] = ignore_nodes
       logging.message('ZWAVE DEBUG - INSTALLED NODES: %s' % str(installed_nodes))
   except Exception as e:
     logging.error(code='FF.ZWA.SET.001', args=(e))  # error reading zwave.json file
     pass
 
-  zwave = Zwave(firefly, package, enable=enable, port=port, path=path, security=security, **kwargs)
+  zwave = Zwave(firefly, alias, ff_id, service_package, config, installed_nodes=installed_nodes, ignore_nodes=ignore_nodes, **kwargs)
   firefly.install_component(zwave)
   return True
 
 
 class Zwave(Service):
-  def __init__(self, firefly, package, **kwargs):
+  def __init__(self, firefly, alias, ff_id, service_package: ServicePackage, config: ServiceConfig, installed_nodes={}, ignore_nodes=[], **kwargs):
+    # TODO: Fix this
+    package = service_package.package
     super().__init__(firefly, SERVICE_ID, package, TITLE, AUTHOR, COMMANDS, REQUESTS)
 
-    self._port = kwargs.get('port')
-    self._path = kwargs.get('path')
-    self._enable = kwargs.get('enable')
+    self.config = config
+    self.service_package = service_package
+    self._port = config.port
+    self._path = config.path
+    self._enable = config.enabled
     self._zwave_option = None
     self._network: ZWaveNetwork = None
-    self._installed_nodes = kwargs.get('installed_nodes', {})
-
-    self.ignore_nodes = kwargs.get('ignore_nodes', [])
+    self._installed_nodes = installed_nodes
+    self.ignore_nodes = ignore_nodes
 
     # TODO: Enable zwave security
-    self._security_enable = kwargs.get('security')
+    self._security_enable = config.security
 
     self.add_command('send_command', self.send_command)
     self.add_command('stop', self.stop)
@@ -96,6 +80,7 @@ class Zwave(Service):
     self.add_command('add_node', self.add_device)
     self.add_command('remove_node', self.remove_device)
     self.add_command('cancel', self.cancel_command)
+    self.add_command('initialize', self.initialize_zwave)
 
     self.add_request('get_nodes', self.get_nodes)
     self.add_request('get_orphans', self.get_orphans)
@@ -105,7 +90,6 @@ class Zwave(Service):
 
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE_ADDED)
     dispatcher.connect(self.zwave_node_removed_handler, ZWaveNetwork.SIGNAL_NODE_REMOVED)
-
 
     dispatcher.connect(self.zwave_handler, ZWaveNetwork.SIGNAL_NODE)
     dispatcher.connect(self.zwave_controller_command, ZWaveNetwork.SIGNAL_CONTROLLER_COMMAND)
@@ -121,10 +105,10 @@ class Zwave(Service):
     dispatcher.connect(self.button_handler, ZWaveNetwork.SIGNAL_BUTTON_ON)
     dispatcher.connect(self.scene_handler, ZWaveNetwork.SIGNAL_SCENE_EVENT)
 
-    #TODO: Is this best? This will cause devices to get configed on node events
+    # TODO: Is this best? This will cause devices to get configed on node events
     dispatcher.connect(self.node_event_handler, ZWaveNetwork.SIGNAL_NODE_EVENT)
 
-    scheduler.runInS(5, self.initialize_zwave)
+    scheduler.runInS(20, self.initialize_zwave)
 
     scheduler.runEveryH(2, self.poll_nodes)
 
@@ -170,11 +154,11 @@ class Zwave(Service):
     # Initial refresh of all nodes
     self.zwave_refresh()
     scheduler.runEveryH(72, self.zwave_refresh, job_id='123-zwave_refresh')
-    #scheduler.runEveryH(10, self.find_dead_nodes, job_id='123-find-dead-nodes')
+    # scheduler.runEveryH(10, self.find_dead_nodes, job_id='123-find-dead-nodes')
 
     for node_id, node in self._network.nodes.items():
-      #node.refresh_info()
-      #node.request_all_config_params()
+      # node.refresh_info()
+      # node.request_all_config_params()
       try:
         if node.node_id in self.ignore_nodes:
           logging.debug('ZWAVE HANDLER: Node %d in ignored nodes. Skipping' % node.node_id)
@@ -326,7 +310,7 @@ class Zwave(Service):
           else:
             logging.info('[ZWAVE REFRESH] NEW NODE FOUND.')
             self.zwave_handler(node=node)
-          # else:
+            # else:
       except Exception as e:
         logging.error('ZWAVE ERROR: %s' % str(e))
 
@@ -403,7 +387,7 @@ class Zwave(Service):
     self._firefly.send_command(refresh_command)
 
   def export(self):
-    with open(ZWAVE_FILE, 'w') as f:
+    with open(self.service_package.config['nodes'], 'w') as f:
       json.dump({
         'installed_nodes': self._installed_nodes,
         'ignore_nodes':    self.ignore_nodes
@@ -457,8 +441,6 @@ class Zwave(Service):
     logging.notify('Ready to remove zwave device.')
     self._network.controller.remove_node()
     scheduler.runInM(3, self.cancel_command, job_id='zwave_cancel_pairing')
-
-
 
   def send_command(self):
     '''

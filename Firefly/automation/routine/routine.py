@@ -30,10 +30,14 @@ class Routine(Automation):
     self._package = self.package
     self._alias = self.alias
 
-    self.mode = self.interface.get(ROUTINE_MODE, {}).get(ROUTINE_ROUTINE)
-    self.icon = self.interface.get(ROUTINE_ICON, {}).get(ROUTINE_ROUTINE, 'new_releases')
+    #TODO: Change these to self.interface.settings.mode and interface.settings.icon
+    self.mode = self.new_interface.mode.get(ROUTINE_ROUTINE, None)
+    self.icon = self.new_interface.icon.get(ROUTINE_ROUTINE, '')
+    self.export_ui = self.new_interface.export_ui.get(ROUTINE_ROUTINE, True)
+
+
     # TODO: replace export_ui with a const from metadata or core.
-    self.export_ui = self.interface.get('export_ui', {}).get(ROUTINE_ROUTINE, True)
+    #self.export_ui = self.interface.get('export_ui', {}).get(ROUTINE_ROUTINE, True)
 
     self.add_command(ROUTINE_EXECUTE, self.event_handler)
 
@@ -67,15 +71,15 @@ class Routine(Automation):
     return view_data
 
   def event_handler(self, event: Event = None, trigger_index=0, **kwargs):
-    if self.messages.get(ROUTINE_ROUTINE):
-      notify = Command(SERVICE_NOTIFICATION, self.id, COMMAND_NOTIFY, message=self.messages[ROUTINE_ROUTINE])
+    if self.new_interface.messages.get(ROUTINE_ROUTINE):
+      notify = Command(SERVICE_NOTIFICATION, self.id, COMMAND_NOTIFY, message=self.new_interface.messages.get(ROUTINE_ROUTINE))
       self.firefly.send_command(notify)
 
     if self.mode:
       self.firefly.location.mode = self.mode
 
-    if self.actions.get(ROUTINE_ROUTINE):
-      for a in self.actions[ROUTINE_ROUTINE]:
+    if self.new_interface.actions.get(ROUTINE_ROUTINE):
+      for a in self.new_interface.actions.get(ROUTINE_ROUTINE):
         a.execute_action(self.firefly)
     return True
 
