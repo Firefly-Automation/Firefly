@@ -1,18 +1,18 @@
-#Window Fan Control
+# Window Fan Control
 \[package: window_fan_control]
 
-##About
+## About
 This automation plugin is to control the temperature of a room or your whole house using window fans.
 The idea is when it is colder outside and you open your windows and place a window fan in the window, you
 can target a temperature that you would like the room to be. If it hits the lower limit of the range it 
 will turn off the fans. If it hits the higher limit of the range it will turn the fans back on. 
 
 
-###Future Plans
+### Future Plans
 Pull in weather data as well as inside data.
 
 
-##Inputs
+## Inputs
 
 - sensors.temperature: list of temperature sensors.
 - sensors.windows: list of windows sensors that must be open for actions to happen.
@@ -22,3 +22,6 @@ Pull in weather data as well as inside data.
 
 
 
+---
+
+**Author**: Zachary Priddy (me@zpriddy.com)
