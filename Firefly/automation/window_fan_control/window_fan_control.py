@@ -17,12 +17,12 @@ def Setup(firefly, package, **kwargs):
     kwargs['metadata'] = METADATA
   else:
     kwargs['metadata'].update(METADATA)
-  event_automation = DoorMotionLights(firefly, package, **kwargs)
+  event_automation = WindowFanControl(firefly, package, **kwargs)
   # TODO: Replace this with a new firefly.add_device() function
   firefly.components[event_automation.id] = event_automation
 
 
-class DoorMotionLights(Automation):
+class WindowFanControl(Automation):
   def __init__(self, firefly, package, **kwargs):
     logging.info('[WINDOW FAN] Starting Setup')
     interface_data = kwargs.get('interface', {})
@@ -68,7 +68,7 @@ class DoorMotionLights(Automation):
 
     self.timmer_id = str(uuid4())
     self.windows_open = False
-    scheduler.runInS(5, self.check_start_state)
+    scheduler.runInS(10, self.check_start_state, job_id=self.timmer_id)
 
 
   def check_start_state(self):

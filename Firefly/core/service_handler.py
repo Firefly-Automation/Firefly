@@ -222,7 +222,8 @@ class ServiceHandler(object):
     with open(service_packages, 'rb') as sp:
       self.service_packages = json.load(sp)
 
-    self.services: Dict[str, ServicePackage] = {}
+    # self.services: Dict[str, ServicePackage] = {}
+    self.services = {}
     for service in self.service_packages:
       new_service = ServicePackage(**service)
       self.services[new_service.ff_id] = new_service
