@@ -278,10 +278,10 @@ class ServiceHandler(object):
       logging.info('Looking at installing service %s' % ff_id)
       if service.enabled:
         logging.info('Service %s is enabled.' % ff_id)
-        try:
-          service.install_service(firefly)
-        except:
-          logging.info('Error installing service')
+        #try:
+        service.install_service(firefly)
+        #except:
+        #  logging.info('Error installing service')
       else:
         logging.info('Service %s is not enabled.' % ff_id)
 
