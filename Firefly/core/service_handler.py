@@ -225,6 +225,7 @@ class ServiceHandler(object):
     # self.services: Dict[str, ServicePackage] = {}
     self.services = {}
     for service in self.service_packages:
+      logging.info('New Service Package %s' % str(service))
       new_service = ServicePackage(**service)
       self.services[new_service.ff_id] = new_service
 
@@ -269,11 +270,15 @@ class ServiceHandler(object):
     Args:
       firefly: Firefly Object
     """
+    logging.info('services: %s ' % str(self.services))
     for ff_id, service in self.services.items():
       logging.info('Looking at installing service %s' % ff_id)
       if service.enabled:
         logging.info('Service %s is enabled.' % ff_id)
-        service.install_service(firefly)
+        try:
+          service.install_service(firefly)
+        except:
+          logging.info('Error installing service')
       else:
         logging.info('Service %s is not enabled.' % ff_id)
 

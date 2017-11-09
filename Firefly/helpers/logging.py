@@ -99,7 +99,7 @@ class FireflyLogging(object):
           message = str(error_codes.get(code)) % args
         else:
           message = error_codes.get(code)
-          self.logger.error('%-130s [%s - %s]' % (message, function_name, file_name))
+        self.logger.error('%-130s [%s - %s]' % (message, function_name, file_name))
     except:
       self.logger.error('error getting code: %-130s [%s - %s]' % (code, function_name, file_name))
       # TODO: Log errors to Fierbase for future debugging
