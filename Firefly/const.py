@@ -37,7 +37,6 @@ REQUIRED_FILES = {
   GROUPS_CONFIG_FILE:   {},
   LOCATION_FILE:        {},
   SERVICE_CONFIG_FILE:  None,
-  ZWAVE_FILE:           {}
 }
 
 # FOOBOT SERVICE
