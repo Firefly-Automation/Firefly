@@ -125,6 +125,7 @@ class ServicePackage(object):
   def install_service(self, firefly, **kwargs):
     logging.info('Installing Service %s' % self.name)
     if not self.enabled:
+      logging.info('Service %s is not enabled' % self.name)
       return False
     try:
       config_object = self.get_config()
