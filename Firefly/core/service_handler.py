@@ -128,7 +128,7 @@ class ServicePackage(object):
       return False
     try:
       config_object = self.get_config()
-      logging.info('Service Config: %s' str(config_object.__dict__))
+      logging.info('Service Config: %s' % str(config_object.__dict__))
       firefly.install_package(self.package, alias=self.name, ff_id=self.ff_id, service_package=self, config=config_object)
       self.installed = True
       return True
