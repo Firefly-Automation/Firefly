@@ -80,6 +80,6 @@ class ZwaveContactSensor(ContactSensor, ZwaveDevice):
         self.update_values(alarm=values.data)
 
     elif label == 'Basic':
-      self.update_values(contact=(values.data==0))
+      self.update_values(contact=(values.data==255))
 
     super().update_from_zwave(node, **kwargs)
