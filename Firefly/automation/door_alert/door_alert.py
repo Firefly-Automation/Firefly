@@ -61,7 +61,7 @@ class DoorAlert(Automation):
     # If it's the first time getting triggered then send the message.
     # If it has already been triggered then cancel the current delayed action timer.
     if not skip_delay and not self.triggered and self.delays.get(trigger_index):
-      scheduler.runInS(self.delays.get(trigger_index), self.initial_event_handler, self.timer_id, True, event=event, trigger_index=trigger_index, skip_delay=True)
+      scheduler.runInS(self.new_interface.delays.get(trigger_index), self.initial_event_handler, self.timer_id, True, event=event, trigger_index=trigger_index, skip_delay=True)
       return
     if skip_delay and not self.triggered:
       self.start(trigger_index)
@@ -78,7 +78,7 @@ class DoorAlert(Automation):
       return
     # If there is a delay, wait for the delay and then execute, otherwise execute.
     if self.delays.get(trigger_index):
-      scheduler.runInS(self.delays.get(trigger_index), self.stop, self.timer_id, True, trigger_index=trigger_index)
+      scheduler.runInS(self.new_interface.delays.get(trigger_index), self.stop, self.timer_id, True, trigger_index=trigger_index)
     else:
       self.stop(trigger_index)
 

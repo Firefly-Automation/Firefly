@@ -63,7 +63,7 @@ class DoorMotionLights(Automation):
     scheduler.cancel(self.timmer_id)
 
     if trigger_index == 'on':
-      actions = self.new_interface.action.get('on')
+      actions = self.new_interface.actions.get('on')
       if actions:
         self.execute_actions(trigger_index)
       else:
@@ -76,7 +76,7 @@ class DoorMotionLights(Automation):
       scheduler.runInS(self.new_interface.delays.off, self.set_off, job_id=self.timmer_id)
 
   def set_off(self, **kwargs):
-    actions = self.new_interface.action.get('off')
+    actions = self.new_interface.actions.get('off')
     if actions:
       self.execute_actions("off")
     else:
