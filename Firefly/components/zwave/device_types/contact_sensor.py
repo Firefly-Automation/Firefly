@@ -77,7 +77,7 @@ class ZwaveContactSensor(ContactSensor, ZwaveDevice):
         self.update_values(battery=values.data)
       if label == 'Burglar':
         self.update_values(alarm=values.data)
-      if label == 'Basic':
-        self.update_values(contact=(values.data==0))
+    elif label == 'Basic':
+      self.update_values(contact=(values.data==0))
 
     super().update_from_zwave(node, **kwargs)
