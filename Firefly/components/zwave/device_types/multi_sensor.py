@@ -50,7 +50,7 @@ class ZwaveMultiSensor(MultiSensor, ZwaveDevice):
     self._node = node
 
     if values is None:
-      super().update_from_zwave(node, **kwargs)
+      super().update_from_zwave(node, values=values, **kwargs)
       logging.message('ZWAVE MULTI SENSOR NO VALUES GIVEN')
       return
 

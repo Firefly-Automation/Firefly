@@ -157,7 +157,7 @@ class ZwaveDevice(Device):
 
     '''
 
-    logging.debug('Updating ZWave Values')
+    logging.debug('Updating ZWave Values: %s' % str(kwargs))
 
     # Return if no valid node object.
     if node is None and self._node is None:
@@ -187,6 +187,9 @@ class ZwaveDevice(Device):
     if not self._config_updated:
       for s, i in node.get_values().items():
         self.zwave_values[i.index] = ZwavePrarmValue(i.index, i.label, s, i.data, i.command_class, i.type, i.genre)
+    elif kwargs.get('values'):
+      values = kwargs.get('values')
+      self.zwave_values[values.index] = ZwavePrarmValue(values.index, values.label, values.value_id, values.data, values.command_class, values.type, values.genre)
 
 
     if node.has_command_class(COMMAND_CLASS_BATTERY) and BATTERY not in self.request_map:

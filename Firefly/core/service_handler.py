@@ -252,6 +252,17 @@ class ServiceHandler(object):
     except:
       return False
 
+  def install_service(self, firefly, service_name, config_args={}):
+    for ff_id, service in self.services.items():
+      if service.name != service_name and ff_id != service_name:
+        continue
+      new_config = self.generate_config(ff_id, **config_args)
+      service.refresh_file()
+      if new_config.enabled:
+        service.install_service(firefly)
+        return True
+    return False
+
   def install_services(self, firefly):
     """ Tries to install all services that are enabled.
 

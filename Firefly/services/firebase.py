@@ -107,10 +107,12 @@ class Firebase(Service):
     self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
 
   def register_home(self):
+    logging.info('Registering Home On Firebase!!!!')
     register_url = 'https://us-central1-firefly-beta-cdb9d.cloudfunctions.net/registerHome'
     return_data = requests.post(register_url, data={
       'uid': self.uid
     }).json()
+
     self.home_id = return_data.get('home_id')
 
     if self.home_id is None:
@@ -119,7 +121,7 @@ class Firebase(Service):
 
     self.service_config.home_id = self.home_id
     self.service_config.save()
-    logging.info('Config file for hue has been updated.')
+    logging.info('Config file for firebase has been updated.')
 
   def process_settings(self, message, **kwargs):
     logging.info('[FIREBASE] PROCESSING SETTINGS: %s' % str(message))
