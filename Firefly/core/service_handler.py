@@ -127,16 +127,16 @@ class ServicePackage(object):
     if not self.enabled:
       logging.info('Service %s is not enabled' % self.name)
       return False
-    #try:
-    config_object = self.get_config()
-    logging.info('Service Config: %s' % str(config_object.__dict__))
-    firefly.install_package(self.package, alias=self.name, ff_id=self.ff_id, service_package=self, config=config_object)
-    self.installed = True
-    return True
-    #except ValueError:
-    #  logging.error('missing required values for service: %s' % self.name)
-    #except Exception as e:
-    #  logging.error('unknown error installing service: %s (%s)' % (self.name, e))
+    try:
+      config_object = self.get_config()
+      logging.info('Service Config: %s' % str(config_object.__dict__))
+      firefly.install_package(self.package, alias=self.name, ff_id=self.ff_id, service_package=self, config=config_object)
+      self.installed = True
+      return True
+    except ValueError:
+      logging.error('missing required values for service: %s' % self.name)
+    except Exception as e:
+      logging.error('unknown error installing service: %s (%s)' % (self.name, e))
     return False
 
   def get_config_value(self, config_index, accept_default=True, fix_with_default=True, missing_okay=False):
@@ -179,7 +179,6 @@ class ServicePackage(object):
         return config_value
       if accept_default:
         config_value = param.default
-        logging.info('Param: %s' % str(param.__dict__))
         if config_value is None and not (param.self_init or param.default_init):
           return raise_value_error(config_value, missing_okay)
         return config_value
@@ -279,10 +278,10 @@ class ServiceHandler(object):
       logging.info('Looking at installing service %s' % ff_id)
       if service.enabled:
         logging.info('Service %s is enabled.' % ff_id)
-        #try:
-        service.install_service(firefly)
-        #except:
-        #  logging.info('Error installing service')
+        try:
+          service.install_service(firefly)
+        except:
+          logging.info('Error installing service')
       else:
         logging.info('Service %s is not enabled.' % ff_id)
 
