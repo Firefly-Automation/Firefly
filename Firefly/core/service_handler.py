@@ -127,16 +127,16 @@ class ServicePackage(object):
     if not self.enabled:
       logging.info('Service %s is not enabled' % self.name)
       return False
-    try:
-      config_object = self.get_config()
-      logging.info('Service Config: %s' % str(config_object.__dict__))
-      firefly.install_package(self.package, alias=self.name, ff_id=self.ff_id, service_package=self, config=config_object)
-      self.installed = True
-      return True
-    except ValueError:
-      logging.error('missing required values for service: %s' % self.name)
-    except Exception as e:
-      logging.error('unknown error installing service: %s (%s)' % (self.name, e))
+    #try:
+    config_object = self.get_config()
+    logging.info('Service Config: %s' % str(config_object.__dict__))
+    firefly.install_package(self.package, alias=self.name, ff_id=self.ff_id, service_package=self, config=config_object)
+    self.installed = True
+    return True
+    #except ValueError:
+    #  logging.error('missing required values for service: %s' % self.name)
+    #except Exception as e:
+    #  logging.error('unknown error installing service: %s (%s)' % (self.name, e))
     return False
 
   def get_config_value(self, config_index, accept_default=True, fix_with_default=True, missing_okay=False):
