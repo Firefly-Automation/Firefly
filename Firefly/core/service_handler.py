@@ -270,8 +270,12 @@ class ServiceHandler(object):
       firefly: Firefly Object
     """
     for ff_id, service in self.services.items():
+      logging.info('Looking at installing service %s' % ff_id)
       if service.enabled:
+        logging.info('Service %s is enabled.' % ff_id)
         service.install_service(firefly)
+      else:
+        logging.info('Service %s is not enabled.' % ff_id)
 
   def get_installed_services(self, firefly):
     """ Gets list of installed services.
