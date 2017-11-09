@@ -179,6 +179,7 @@ class ServicePackage(object):
         return config_value
       if accept_default:
         config_value = param.default
+        logging.info('Param: %s' % str(param.__dict__))
         if config_value is None and not (param.self_init or param.default_init):
           return raise_value_error(config_value, missing_okay)
         return config_value
