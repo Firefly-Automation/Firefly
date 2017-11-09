@@ -69,6 +69,7 @@ class ZwaveContactSensor(ContactSensor, ZwaveDevice):
       self.refreshed = True
 
     label = values.label
+    logging.info('[ZWAVE] Value label: %s data: %s' % (label, values.data))
     if label in ['Sensor', 'Battery Level', 'Burglar']:
       self.value_map[label] = values.value_id
       if label == 'Sensor':
@@ -77,6 +78,7 @@ class ZwaveContactSensor(ContactSensor, ZwaveDevice):
         self.update_values(battery=values.data)
       if label == 'Burglar':
         self.update_values(alarm=values.data)
+
     elif label == 'Basic':
       self.update_values(contact=(values.data==0))
 
