@@ -83,6 +83,7 @@
             "facebook": {
                 "context": "Enable/Disable Facebook Notifications",
                 "default": false,
+                "default_init": true,
                 "type": "bool"
             },
             "home_id": {
