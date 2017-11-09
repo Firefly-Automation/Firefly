@@ -13,20 +13,20 @@ apt-get dist-upgrade -y
 
 echo ""
 echo "******************************************************"
-echo " INSTALLING PYTHON 3.6"
+echo " INSTALLING PYTHON 3.6 VIA BERRYCONDA"
 echo "******************************************************"
 echo ""
 
 mkdir $FIREFLY_ROOT
-mkdir $FIREFLY_ROOT/python3.6
-cd $FIREFLY_ROOT/python3.6
-apt-get install -y build-essential tk-dev libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev libc6-dev
-wget https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tgz
-tar xzvf Python-3.6.2.tgz
-cd Python-3.6.2/
-./configure
-make -j 4
-sudo make altinstall
+cd $FIREFLY_ROOT
+wget https://github.com/jjhelmus/berryconda/releases/download/v2.0.0/Berryconda3-2.0.0-Linux-armv7l.sh
+sudo bash Berryconda3-2.0.0-Linux-armv7l.sh -b -p $FIREFLY_ROOT/berryconda
+
+# System Links to python binaries
+sudo ln -s $FIREFLY_ROOT/berryconda/bin/pip /usr/bin/pip3.6
+sudo ln -s $FIREFLY_ROOT/berryconda/bin/pydoc3.6 /usr/bin/pydoc3.6
+sudo ln -s $FIREFLY_ROOT/berryconda/bin/python3.6-config /usr/bin/python3.6-config
+sudo ln -s $FIREFLY_ROOT/berryconda/bin/python3.6 /usr/bin/python3.6
 
 
 echo ""
@@ -35,18 +35,12 @@ echo " INSTALLING PYTHON OPEN ZWAVE"
 echo "******************************************************"
 echo ""
 
-pip3.6 install docutils pygments roman
-cd $FIREFLY_ROOT
-git clone https://github.com/OpenZWave/python-openzwave.git
-cd python-openzwave/
-make common-deps PYTHON_EXEC=python3
-make build PYTHON_EXEC=python3
-pip3.6 install cython
-make install PYTHON_EXEC=python3
+sudo apt-get install --force-yes -y make libudev-dev g++ libyaml-dev
+sudo pip3.6 install python_openzwave
 
 echo ""
 echo "******************************************************"
-echo " INSTALLING PFIREFLY"
+echo " INSTALLING FIREFLY"
 echo "******************************************************"
 echo ""
 
@@ -69,10 +63,18 @@ python3.6 setup.py install
 
 cd $FIREFLY_ROOT
 git clone https://github.com/Firefly-Automation/Firefly.git
+# TODO: Leave this as master
+git checkout beta
 cd Firefly
 pip3.6 install -r requirements.txt
-cp -r sample_config dev_config
-echo [] > dev_config/automation.json
+# TODO: Make this just config in the future
+mkdir dev_config
+cd dev_config
+mkdir services
+cd ..
+cp sample_config/firefly.config dev_config/
+cp sample_config/device_alias.json dev_config/
+echo [] > dev_config/automation.jsonecho [] > dev_config/automation.json
 
 #####################################
 # SETUP BEACON
@@ -85,7 +87,7 @@ echo $BEACON_ID > $FIREFLY_META/beacon_id
 #####################################
 # RECORD UPDATE VERSION
 #####################################
-echo "0.0.0.b" > $FIREFLY_META/current_version
+echo "b.0.0.1" > $FIREFLY_META/current_version
 
 #####################################
 # SETUP AUTO-START

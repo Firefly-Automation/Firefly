@@ -84,6 +84,7 @@ sudo crontab mycron
 rm mycron
 
 chmod +x /opt/firefly_system/Firefly/system_files/update_firefly.sh
+chmod +x /opt/firefly_system/Firefly/system_files/restart_firefly.sh
 bash /opt/firefly_system/Firefly/system_files/update_firefly.sh
 
 

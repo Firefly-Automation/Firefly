@@ -4,6 +4,7 @@ from os import system
 
 import pyrebase
 import requests
+import subprocess
 
 from Firefly import aliases, logging, scheduler
 from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SOURCE_LOCATION, SOURCE_TIME, TYPE_DEVICE, TYPE_ROUTINE
@@ -216,6 +217,9 @@ class Firebase(Service):
     if ff_id == 'settings':
       self.process_settings(command)
       return
+
+    if ff_id == 'system' and command == 'restart':
+      subprocess.run(['bash /opt/firefly_system/Firefly/system_files/restart_firefly.sh'], shell=True)
 
     if type(command) is str:
       send_command = Command(ff_id, 'web_api', command)

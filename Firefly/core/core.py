@@ -73,7 +73,6 @@ class Firefly(object):
     for c in COMPONENT_MAP:
       self.import_components(c['file'])
 
-    self.install_services()
 
     self.service_handler = ServiceHandler()
     self.service_handler.install_services(self)
@@ -100,6 +99,45 @@ class Firefly(object):
     self.current_state = self.get_device_states(all_devices)
 
     #self.async_send_command(Command('service_zwave', 'core_startup', 'initialize'))
+
+
+  def import_components(self, config_file=DEVICE_FILE):
+    ''' Import all components from the devices file
+
+    Args:
+      config_file: json file of all components
+
+    Returns:
+
+    '''
+    logging.message('Importing components from config file: %s' % config_file)
+    try:
+      with open(config_file) as file:
+        components = json.loads(file.read())
+      for component in components:
+        self.install_package(component.get('package'), **component)
+    except Exception as e:
+      logging.error('Error importing data from: %s - %s' % (config_file, str(e)))
+
+  def install_package(self, module: str, **kwargs):
+    """
+    Installs a package from the module. The package must support the Setup(firefly, **kwargs) function.
+
+    The setup function can (and should) add the ff_id (if a ff_id) to the firefly._devices dict.
+
+    Args:
+      module (str): path to module being imported
+      **kwargs (): If possible supply alias and/or device_id
+    """
+    logging.message('Installing module from %s %s' % (module, str(kwargs)))
+    package = importlib.import_module(module)
+    if kwargs.get('package'):
+      kwargs.pop('package')
+    setup_return = package.Setup(self, module, **kwargs)
+    scheduler.runInS(10, self.refresh_firebase, job_id='FIREBASE_REFRESH_CORE')
+    scheduler.runInS(15, self.export_all_components, job_id='CORE_EXPORT_ALL')
+    return setup_return
+
 
   def install_component(self, component):
     ''' Install a component into the core components.
@@ -155,26 +193,6 @@ class Firefly(object):
 
 
 
-  def install_services(self) -> None:
-    config = configparser.ConfigParser()
-    config.read(SERVICE_CONFIG_FILE)
-    services = config.sections()
-
-    for service in services:
-      package = config.get(service, 'package')
-      alias = ('service_%s' % service).lower()
-      enabled = config.getboolean(service, 'enable', fallback=False)
-      if not enabled:
-        continue
-
-      try:
-        self.install_package(package, alias=alias)
-      except Exception as e:
-        logging.error(code='FF.COR.INS.001', args=(service, e))  # error installing package %s: %s
-        logging.notify('Error installing package %s: %s' % (service, e))
-
-    if self.components.get(FIREBASE_SERVICE):
-      self._firebase_enabled = True
 
   def start(self) -> None:
     """
@@ -233,23 +251,7 @@ class Firefly(object):
     aliases.export_aliases()
 
 
-  def import_components(self, config_file=DEVICE_FILE):
-    ''' Import all components from the devices file
 
-    Args:
-      config_file: json file of all components
-
-    Returns:
-
-    '''
-    logging.message('Importing components from config file: %s' % config_file)
-    try:
-      with open(config_file) as file:
-        components = json.loads(file.read())
-      for component in components:
-        self.install_package(component.get('package'), **component)
-    except Exception as e:
-      logging.error('Error importing data from: %s - %s' % (config_file, str(e)))
 
   def export_components(self, config_file: str, component_type: str, current_values: bool = True) -> None:
     """
@@ -268,24 +270,7 @@ class Firefly(object):
     with open(config_file, 'w') as file:
       json.dump(components, file, indent=4, sort_keys=True)
 
-  def install_package(self, module: str, **kwargs):
-    """
-    Installs a package from the module. The package must support the Setup(firefly, **kwargs) function.
 
-    The setup function can (and should) add the ff_id (if a ff_id) to the firefly._devices dict.
-
-    Args:
-      module (str): path to module being imported
-      **kwargs (): If possible supply alias and/or device_id
-    """
-    logging.message('Installing module from %s %s' % (module, str(kwargs)))
-    package = importlib.import_module(module)
-    if kwargs.get('package'):
-      kwargs.pop('package')
-    setup_return = package.Setup(self, module, **kwargs)
-    scheduler.runInS(10, self.refresh_firebase, job_id='FIREBASE_REFRESH_CORE')
-    scheduler.runInS(15, self.export_all_components, job_id='CORE_EXPORT_ALL')
-    return setup_return
 
   def send_firebase(self, event: Event):
     ''' Send and event to firebase
