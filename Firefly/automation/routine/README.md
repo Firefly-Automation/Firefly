@@ -31,6 +31,20 @@ You can also define custom commands in the actions of the routines. (advanced)
     - commands.off_day: command to send to lights when turning them off when the sun is up. This defaults to ```{"set_light":{"switch":"off"}}```
     - commands.off_night: command to send to lights when turning them off when the sun is down. This defaults to ```{"set_light":{"switch":"off"}}```
 
+- triggersv2:
+    - triggers.door_open
+    - triggers.door_closed
+    - triggers.motion_active
+    - triggers.motion_inactive
+    - triggers.present
+    - triggers.not_present
+    - triggers.time
+    - triggers.time_day (sunset, sunrise)
+    - triggers.on
+    - triggers.off
+    - triggers.temp_above
+    - triggers.temp_below
+
 - triggers:
     - triggers.routine: (triggerList) that would cause the routine to execute.
     
