@@ -73,7 +73,10 @@ class DoorMotionLights(Automation):
           self.firefly.send_command(c)
 
     if trigger_index == 'off':
-      scheduler.runInS(self.new_interface.delays.off, self.set_off, job_id=self.timmer_id)
+      if self.new_interface.delays.get('off'):
+        scheduler.runInS(self.new_interface.delays.off, self.set_off, job_id=self.timmer_id)
+      else:
+        self.set_off()
 
   def set_off(self, **kwargs):
     actions = self.new_interface.actions.get('off')

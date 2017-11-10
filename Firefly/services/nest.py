@@ -33,11 +33,10 @@ class Nest(Service):
     self.config = config
     self.enable = config.enabled
     self.cache_file = service_package.config['cache']
-    self.client_id = config.client_id
-    self.client_secret = config.client_secret
+    self.access_token = config.access_token
     self.nest = None
 
-    if self.client_secret != '' and self.client_id != '':
+    if self.access_token:
       self.init_nest()
 
     self.add_command('refresh', self.refresh)
@@ -47,22 +46,17 @@ class Nest(Service):
     scheduler.runEveryM(4, self.refresh)
 
   def init_nest(self):
-    self.nest = nest.Nest(client_id=self.client_id, client_secret=self.client_secret, access_token_cache_file=self.cache_file)
+    self.nest = nest.Nest(access_token=self.access_token, access_token_cache_file=self.cache_file)
     self.refresh()
 
   def set_auth(self, **kwargs):
-    self.client_id = kwargs.get('client_id')
-    self.client_secret = kwargs.get('client_secret')
-    auth_code = kwargs.get('code')
+    self.access_token = kwargs.get('access_token')
 
-    if self.client_id is None or self.client_secret is None or auth_code is None:
+    if self.access_token is None:
       return
-    self.nest = nest.Nest(client_id=self.client_id, client_secret=self.client_secret, access_token_cache_file=self.cache_file)
-    self.nest.request_token(auth_code)
+    self.nest = nest.Nest(access_token=self.access_token, access_token_cache_file=self.cache_file)
 
-
-    self.config.client_id = self.client_id
-    self.config.client_secret = self.client_secret
+    self.config.access_token = self.access_token
     self.config.save()
     logging.info('Config file for nest has been updated.')
 

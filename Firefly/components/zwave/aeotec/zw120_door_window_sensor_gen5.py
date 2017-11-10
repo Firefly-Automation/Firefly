@@ -50,9 +50,8 @@ class ZW120(ZwaveContactSensor):
 
 
 
-
+    # (2, 0),  # Disable 10 min wake up time
     successful = self.verify_set_zwave_params([
-      (2, 0),  # Disable 10 min wake up time
       (121, 17)  # Sensor Binary and Battery Report
     ])
 

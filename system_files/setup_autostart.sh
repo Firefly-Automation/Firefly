@@ -60,7 +60,7 @@ sudo systemctl enable ffbeacon.service
 mkdir $FIREFLY_ROOT/logs
 chmod -R 775 $FIREFLY_ROOT/logs
 
-echo -e -n "/opt/firefly_system/logs/firefly.log {\n\tsize 100M\n\tcreate 766 root root\n\trotate 5\n}" >> /etc/logrotate.conf
+echo -e -n "/opt/firefly_system/logs/firefly.log {\n\tsize 100M\n\tcreate 0766 root root\n\trotate 5\ncopytruncate\nsu root root}" >> /etc/logrotate.conf
 echo -e -n "/opt/firefly_system/logs/firefly_beacon.log {\n\tsize 100M\n\tcreate 766 root root\n\trotate 5\n}" >> /etc/logrotate.conf
 echo -e -n "/opt/firefly_system/logs/firefly_update.log {\n\tsize 100M\n\tcreate 766 root root\n\trotate 5\n}" >> /etc/logrotate.conf
 echo -e -n "/opt/firefly_system/logs/firefly_brakeglass.log {\n\tsize 100M\n\tcreate 766 root root\n\trotate 5\n}" >> /etc/logrotate.conf

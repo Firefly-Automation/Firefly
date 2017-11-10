@@ -136,13 +136,8 @@
             "config": "nest.json"
         },
         "defaults": {
-            "client_id": {
-                "context": "OAuth Client ID. This should be set automatically",
-                "default": null,
-                "type": "string"
-            },
-            "client_secret": {
-                "context": "OAuth Client Secret. This should be set automatically.",
+            "access_token": {
+                "context": "OAuth Access Token. This should be set automatically",
                 "default": null,
                 "type": "string"
             }
