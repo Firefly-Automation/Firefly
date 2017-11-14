@@ -93,7 +93,9 @@ class WindowFanControl(Automation):
       request = Request(window, self.id, CONTACT)
       contact_state = self.firefly.components[window].request(request)
       if contact_state == CONTACT_CLOSED:
+        self.windows_open = False
         return False
+    self.windows_open = True
     return True
 
   def get_average_temperature(self):
@@ -108,12 +110,14 @@ class WindowFanControl(Automation):
 
   def event_handler(self, event: Event = None, trigger_index="", **kwargs):
     logging.info('[WINDOW FAN] EVENT HANDLER: %s' % trigger_index)
+    self.check_windows()
     if trigger_index == 'windows_open':
       self.check_start_state()
     if trigger_index == 'windows_closed':
       self.switch_fans('off')
       self.windows_open = False
-    if trigger_index == 'temp_low':
+      return
+    if trigger_index == 'temp_low' and self.windows_open:
       avg_temp = self.get_average_temperature()
       if avg_temp > self.new_interface.temperature.get('low'):
         return
@@ -122,7 +126,7 @@ class WindowFanControl(Automation):
         scheduler.runInS(delay, self.switch_fans, job_id=self.timmer_id, state='off')
       else:
         self.switch_fans('off')
-    if trigger_index == 'temp_high':
+    if trigger_index == 'temp_high' and self.windows_open:
       avg_temp = self.get_average_temperature()
       if avg_temp < self.new_interface.temperature.get('high'):
         return
