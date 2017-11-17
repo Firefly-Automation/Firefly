@@ -433,7 +433,7 @@ class Zwave(Service):
     Returns:
 
     """
-    self._network.controller.cancel_command()
+    self._network.controller.kill_command()
     return True
 
   def remove_device(self):
