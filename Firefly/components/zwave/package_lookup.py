@@ -17,6 +17,11 @@ WORK_AROUND_MAPPING = {
   'unknown:_type=1c02,_id=0334': {
     PACKAGE: 'leviton.dzs15',
     ALIAS:   'Levition Zwave Switch'
+  },
+  'unknown:_type=1b03,_id=0334': {
+    PACKAGE: 'leviton.dzmx1',
+    ALIAS:   'Levition Zwave Dimmer'
+
   },  # Ecolink Door Window Plus Sensor
   'unknown:_type=0004,_id=0002': {
     PACKAGE: 'ecolink.contact_sensor',
