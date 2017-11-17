@@ -61,6 +61,7 @@ class Firebase(Service):
     package = service_package.package
     super().__init__(firefly, SERVICE_ID, package, TITLE, AUTHOR, COMMANDS, REQUESTS)
 
+    logging.info('[FIREBASE] setting up firebase')
     self.service_config = config
     self.api_key = config.api_key
     self.auth_domain = config.auth_domain
@@ -83,6 +84,8 @@ class Firebase(Service):
       "storageBucket": self.storage_bucket
     }
 
+
+    logging.info('[FIREBASE] logging into firebase')
     self.firebase = pyrebase.initialize_app(self.config)
 
     # Get a reference to the auth service
@@ -103,8 +106,11 @@ class Firebase(Service):
     scheduler.runEveryM(20, self.refresh_all)
     scheduler.runInS(30, self.refresh_all)
 
+    logging.info('[FIREBASE] starting stream')
     self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.command_stream_handler, self.id_token)
     self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
+    logging.info('[FIREBASE] stream started')
+
 
   def register_home(self):
     logging.info('Registering Home On Firebase!!!!')
