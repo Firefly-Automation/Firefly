@@ -114,7 +114,12 @@
                 "type": "string"
             },
             "email": {
-                "context": "Email addres used for My Firefly Home",
+                "context": "Email address used for My Firefly Home",
+                "default": null,
+                "type": "string"
+            },
+            "sn": {
+                "context": "Serial Number of unit",
                 "default": null,
                 "type": "string"
             },
@@ -139,7 +144,8 @@
             "access_token": {
                 "context": "OAuth Access Token. This should be set automatically",
                 "default": null,
-                "type": "string"
+                "type": "string",
+                "self_init": true
             }
         },
         "description": "Nest Thermostat Control",

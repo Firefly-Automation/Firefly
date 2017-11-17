@@ -81,7 +81,53 @@ class Routine(Automation):
     if self.new_interface.actions.get(ROUTINE_ROUTINE):
       for a in self.new_interface.actions.get(ROUTINE_ROUTINE):
         a.execute_action(self.firefly)
+
+    self.handle_off_commands()
+    self.handle_on_commands()
+
     return True
+
+
+  def handle_on_commands(self):
+    self.handle_on_off_command('on', 'on')
+
+    if self.firefly.location.isDark:
+      self.handle_on_off_command('on_night', 'on')
+    else:
+      self.handle_on_off_command('on_day', 'on')
+
+  def handle_off_commands(self):
+    self.handle_on_off_command('off', 'off')
+
+    if self.firefly.location.isDark:
+      self.handle_on_off_command('off_night', 'off')
+    else:
+      self.handle_on_off_command('off_day', 'off')
+
+  def handle_on_off_command(self, command_index, default_command):
+    logging.info('ROUTINE DEBUG COMMAND INDEX: %s' % command_index)
+    command = self.new_interface.commands.get(command_index)
+    logging.info('ROUTINE DEBUG COMMAND: %s' % command)
+    logging.info('ROUTINE DEBUG COMMAND: %s' % bool(command))
+
+    if not command:
+      logging.info('ROUTINE DEBUG NO COMMAND - DOING DEFAULT')
+      lights = self.new_interface.lights.get(command_index)
+      if lights:
+        for light in lights:
+          self.firefly.send_command(Command(light, self.id, default_command))
+
+    else:
+      logging.info('ROUTINE DEBUG COMMAND - DOING CUSTOM COMMAND')
+      set_command = list(command.keys())[0]
+      command_args = list(command.values())[0]
+      logging.info('ROUTINE DEBUG COMMAND: %s' % set_command)
+      lights = self.new_interface.lights.get(command_index)
+      if lights:
+        for light in lights:
+          self.firefly.send_command(Command(light, self.id, set_command, **command_args))
+
+
 
   def get_alexa_view(self, **kwargs):
     if self.export_ui is False:

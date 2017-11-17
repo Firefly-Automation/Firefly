@@ -3,7 +3,7 @@ from typing import Any, Callable
 
 from functools import wraps
 
-from Firefly import aliases, logging
+from Firefly import aliases, logging, scheduler
 from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE
 from Firefly.helpers.events import Command, Event, Request
 from Firefly.helpers.metadata import EXPORT_UI, FF_ID, HIDDEN_BY_USER, action_text
@@ -247,7 +247,8 @@ class Device(object):
     Returns:
       (bool): Command successful.
     """
-    state_before = self.get_all_request_values(True, True)
+    #state_before = self.get_all_request_values(True, True)
+    self.store_before_state()
     logging.debug('%s: Got Command: %s' % (self.id, command.command))
     if command.command in self.command_map.keys():
       self._last_command_source = command.source
@@ -256,8 +257,9 @@ class Device(object):
         self.command_map[command.command](**command.args)
       except:
         return False
-      state_after = self.get_all_request_values(True, True)
-      self.broadcast_changes(state_before, state_after)
+      #state_after = self.get_all_request_values(True, True)
+      #self.broadcast_changes(state_before, state_after)
+      scheduler.runInMCS(5, self.broadcast_change, job_id='%s-b' % self.id )
       return True
     return False
 

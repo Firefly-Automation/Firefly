@@ -50,6 +50,7 @@ class Nest(Service):
     self.refresh()
 
   def set_auth(self, **kwargs):
+    logging.info('setting nest auth')
     self.access_token = kwargs.get('access_token')
 
     if self.access_token is None:

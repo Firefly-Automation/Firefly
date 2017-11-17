@@ -306,12 +306,15 @@ class Firefly(object):
     for s in send_to:
       # asyncio.ensure_future(self._send_event(event, s, fut), loop=self.loop)
       try:
+        # asyncio.ensure_future(self.components[s].event(event))
         self.components[s].event(event)
       except Exception as e:
         logging.error('Error sending event %s' % str(e))
         # self.loop.run_in_executor(None,self.components[s].event, event)
     self.update_current_state(event)
     self.send_firebase(event)
+    #asyncio.ensure_future(self.update_current_state(event))
+    #asyncio.ensure_future(self.send_firebase(event))
     return True
 
   @asyncio.coroutine
