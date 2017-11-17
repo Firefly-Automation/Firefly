@@ -42,7 +42,7 @@ AVAILABLE_PACKAGES = {
     'zw112_door_window_sensor_6',
     'dsb45_water_sensor',
     'dsb04100_door_window_sensor',
-    'zw096_smart_dimmer_6'
+    'zw099_smart_dimmer_6'
   ]
 }
 
