@@ -48,14 +48,14 @@ class ZwaveLevitonDimmer(ZwaveSwitch):
     if node is None:
       return
 
-    try:
-      if not node.values[self.value_map['Switch']].is_polled:
-        node.values[self.value_map['Switch']].enable_poll()
-    except:
-      pass
+    #try:
+    #  if not node.values[self.value_map['Switch']].is_polled:
+    #    node.values[self.value_map['Switch']].enable_poll()
+    #except:
+    #  pass
 
     try:
       if not node.values[self.value_map['Level']].is_polled:
-        node.values[self.value_map['Level']].enable_poll()
+        node.values[self.value_map['Level']].enable_poll(3)
     except:
       pass

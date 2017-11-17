@@ -55,4 +55,4 @@ class ZwaveLevitonSwitch(ZwaveSwitch):
       return
 
     if not node.values[self.value_map['Switch']].is_polled:
-      node.values[self.value_map['Switch']].enable_poll()
+      node.values[self.value_map['Switch']].enable_poll(3)

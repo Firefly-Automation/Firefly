@@ -4,7 +4,7 @@ from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import (ACTION_OFF, ACTION_ON, STATE, EVENT_ACTION_OFF, EVENT_ACTION_ON,
                            ACTION_TOGGLE, DEVICE_TYPE_SWITCH, SWITCH, ALEXA_ON, ALEXA_OFF)
-from Firefly.helpers.metadata import metaSwitch, metaText
+from Firefly.helpers.metadata import metaSwitch, metaText, action_text, action_on_off_switch
 
 TITLE = 'Aeotec Alarm ZW080'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
@@ -53,11 +53,13 @@ class ZW080(ZwaveDevice):
     self.add_request('alarm5', self.get_state)
 
     self.add_action(STATE, metaText(primary=True, title='Alarm', text='Alarm'))
-    self.add_action('alarm1', metaSwitch(on_action='alarm1', title='Alarm 1', control_type='switch'))
+    #self.add_action('alarm1', metaSwitch(on_action='alarm1', title='Alarm 1', control_type='switch'))
     self.add_action('alarm2', metaSwitch(on_action='alarm2', title='Alarm 2', control_type='switch'))
     self.add_action('alarm3', metaSwitch(on_action='alarm3', title='Alarm 3', control_type='switch'))
     self.add_action('alarm4', metaSwitch(on_action='alarm4', title='Alarm 4', control_type='switch'))
     self.add_action('alarm5', metaSwitch(on_action='alarm5', title='Alarm 5', control_type='switch'))
+
+    self.add_action('alarm1', action_on_off_switch(False, 'Alarm 1', 'Turn Alarm 1 on or off', 'alarm1', 'alarm1', 'off'))
 
     self._alexa_export = False
 
