@@ -121,6 +121,7 @@
             "sn": {
                 "context": "Serial Number of unit",
                 "default": null,
+                "default_init": true,
                 "type": "string"
             },
             "password": {
