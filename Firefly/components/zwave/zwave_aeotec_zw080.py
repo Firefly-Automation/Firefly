@@ -52,18 +52,23 @@ class ZW080(ZwaveDevice):
     self.add_request('alarm4', self.get_state)
     self.add_request('alarm5', self.get_state)
 
-    self.add_action(STATE, metaText(primary=True, title='Alarm', text='Alarm'))
+    self.add_action(STATE, action_text(False, True, True, 'Alarm', 'Alarm is going off', SWITCH, 'off', text_mapping={'red':['on'], 'green':['off']}))
     #self.add_action('alarm1', metaSwitch(on_action='alarm1', title='Alarm 1', control_type='switch'))
-    self.add_action('alarm2', metaSwitch(on_action='alarm2', title='Alarm 2', control_type='switch'))
-    self.add_action('alarm3', metaSwitch(on_action='alarm3', title='Alarm 3', control_type='switch'))
-    self.add_action('alarm4', metaSwitch(on_action='alarm4', title='Alarm 4', control_type='switch'))
-    self.add_action('alarm5', metaSwitch(on_action='alarm5', title='Alarm 5', control_type='switch'))
+    #self.add_action('alarm2', metaSwitch(on_action='alarm2', title='Alarm 2', control_type='switch'))
+    #self.add_action('alarm3', metaSwitch(on_action='alarm3', title='Alarm 3', control_type='switch'))
+    #self.add_action('alarm4', metaSwitch(on_action='alarm4', title='Alarm 4', control_type='switch'))
+    #self.add_action('alarm5', metaSwitch(on_action='alarm5', title='Alarm 5', control_type='switch'))
 
     self.add_action('alarm1', action_on_off_switch(False, 'Alarm 1', 'Turn Alarm 1 on or off', 'alarm1', 'alarm1', 'off'))
+    self.add_action('alarm2', action_on_off_switch(False, 'Alarm 2', 'Turn Alarm 2 on or off', 'alarm2', 'alarm2', 'off'))
+    self.add_action('alarm3', action_on_off_switch(False, 'Alarm 3', 'Turn Alarm 3 on or off', 'alarm3', 'alarm3', 'off'))
+    self.add_action('alarm4', action_on_off_switch(False, 'Alarm 4', 'Turn Alarm 4 on or off', 'alarm4', 'alarm4', 'off'))
+    self.add_action('alarm5', action_on_off_switch(False, 'Alarm 5', 'Turn Alarm 5 on or off', 'alarm5', 'alarm5', 'off'))
 
     self._alexa_export = False
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
+    self.store_before_state()
     if node is None:
       return
 
@@ -83,6 +88,8 @@ class ZW080(ZwaveDevice):
       self._state = EVENT_ACTION_ON
     else:
       self._state = EVENT_ACTION_OFF
+
+    self.broadcast_change()
 
   def off(self, **kwargs):
     self._state = EVENT_ACTION_OFF
