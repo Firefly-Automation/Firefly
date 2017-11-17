@@ -51,7 +51,7 @@ class ZW080(ZwaveDevice):
     self.add_request('alarm3', self.get_state)
     self.add_request('alarm4', self.get_state)
     self.add_request('alarm5', self.get_state)
-    
+
     cm = ColorMap(green=['off'], red=['on'])
     self.add_action(STATE, action_text(False, True, True, 'Alarm', 'Alarm is going off', SWITCH, 'off', text_mapping={'Alarm':['on'], 'No Alarm':['off']}, color_mapping=cm))
     #self.add_action('alarm1', metaSwitch(on_action='alarm1', title='Alarm 1', control_type='switch'))
