@@ -28,7 +28,7 @@ of what node number they are for sending commands.
 TITLE = 'Z-Wave service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
 SERVICE_ID = 'service_zwave'
-COMMANDS = ['send_command', 'stop', 'add_node', 'remove_node', 'cancel', 'initialize']
+COMMANDS = ['send_command', 'stop', 'add_node', 'remove_node', 'cancel', 'initialize', 'heal_network']
 REQUESTS = ['get_nodes', 'get_orphans']
 
 SECTION = 'ZWAVE'
@@ -81,6 +81,7 @@ class Zwave(Service):
     self.add_command('remove_node', self.remove_device)
     self.add_command('cancel', self.cancel_command)
     self.add_command('initialize', self.initialize_zwave)
+    self.add_command('heal_network', self.zwave_refresh)
 
     self.add_request('get_nodes', self.get_nodes)
     self.add_request('get_orphans', self.get_orphans)
