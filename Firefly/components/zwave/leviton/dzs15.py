@@ -21,7 +21,9 @@ WATTS = 'watts'
 COMMANDS = [ACTION_OFF, ACTION_ON]
 REQUESTS = [SWITCH]
 
-INITIAL_VALUES = {}
+INITIAL_VALUES = {
+  '_state': 'off'
+}
 
 CAPABILITIES = {
   SWITCH: True,

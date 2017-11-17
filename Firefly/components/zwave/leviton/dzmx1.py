@@ -13,7 +13,10 @@ ALARM = 'alarm'
 COMMANDS = [ACTION_OFF, ACTION_ON, LEVEL]
 REQUESTS = [SWITCH, LEVEL]
 
-INITIAL_VALUES = {}
+INITIAL_VALUES = {
+  '_state': 'off',
+  '_level': -1
+}
 
 CAPABILITIES = {
   SWITCH: True,
