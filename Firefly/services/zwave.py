@@ -120,9 +120,9 @@ class Zwave(Service):
     try:
       self._zwave_option = ZWaveOption(self._port, self._path)
       self._zwave_option.set_console_output(False)
-      self._zwave_option.set_poll_interval(120)
+      self._zwave_option.set_poll_interval(30)
       self._zwave_option.set_interval_between_polls(True)
-      self._zwave_option.set_suppress_value_refresh(True)
+      #self._zwave_option.set_suppress_value_refresh(True)
       self._zwave_option.set_associate(True)
       self._zwave_option.lock()
 
@@ -433,7 +433,7 @@ class Zwave(Service):
     Returns:
 
     """
-    self._network.controller.kill_command()
+    self._network.controller.cancel_command()
     return True
 
   def remove_device(self):
