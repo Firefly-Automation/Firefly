@@ -54,5 +54,6 @@ class ZwaveLevitonSwitch(ZwaveSwitch):
     if node is None:
       return
 
-    #if not node.values[self.value_map['Switch']].is_polled:
-    #  node.values[self.value_map['Switch']].enable_poll(3)
+    if self.value_map['Switch']:
+      if not node.values[self.value_map['Switch']].is_polled:
+        node.values[self.value_map['Switch']].enable_poll(3)

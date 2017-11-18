@@ -81,7 +81,7 @@ class Zwave(Service):
     self.add_command('remove_node', self.remove_device)
     self.add_command('cancel', self.cancel_command)
     self.add_command('initialize', self.initialize_zwave)
-    self.add_command('heal_network', self.zwave_refresh)
+    self.add_command('heal', self.zwave_heal)
 
     self.add_request('get_nodes', self.get_nodes)
     self.add_request('get_orphans', self.get_orphans)
@@ -122,11 +122,13 @@ class Zwave(Service):
       self._zwave_option.set_console_output(False)
       self._zwave_option.set_poll_interval(30)
       self._zwave_option.set_interval_between_polls(True)
-      #self._zwave_option.set_suppress_value_refresh(True)
-      self._zwave_option.set_associate(True)
+      self._zwave_option.set_suppress_value_refresh(False)
+      #self._zwave_option.set_associate(True)
       self._zwave_option.lock()
 
       self._network = ZWaveNetwork(self._zwave_option)  # , autostart=False)
+      self._network.set_poll_interval(1000)
+
       # self._network.start()
 
     except Exception as e:
@@ -153,10 +155,10 @@ class Zwave(Service):
       else:
         await asyncio.sleep(1)
 
-    self._network.set_poll_interval(milliseconds=10000)
+    #self._network.set_poll_interval(milliseconds=10000)
 
     # Initial refresh of all nodes
-    self.zwave_refresh()
+    #self.zwave_refresh()
     scheduler.runEveryH(72, self.zwave_refresh, job_id='123-zwave_refresh')
     # scheduler.runEveryH(10, self.find_dead_nodes, job_id='123-find-dead-nodes')
 
@@ -281,6 +283,10 @@ class Zwave(Service):
     else:
       logging.error('node %s not found in installed nodes' % str(node_id))
       self.add_child_nodes(self._network.nodes[node_id], **kwargs)
+
+
+  def zwave_heal(self, **kwargs):
+    self._network.heal(True)
 
   def zwave_refresh(self, **kwargs):
     if self._network.state >= 7 and not self.healed:
