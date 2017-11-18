@@ -259,8 +259,7 @@ class Device(object):
         return False
       #state_after = self.get_all_request_values(True, True)
       #self.broadcast_changes(state_before, state_after)
-      self.broadcast_change()
-      #scheduler.runInMCS(5, self.broadcast_change, job_id='%s-b' % self.id, max_instances=1)
+      scheduler.runInMCS(5, self.broadcast_change, job_id='%s-b' % self.id, max_instances=1)
       return True
     return False
 
