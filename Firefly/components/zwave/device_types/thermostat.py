@@ -11,7 +11,7 @@ HEAT = "heat"
 COOL = "cool"
 OFF = 'off'
 FAN_ON = 'fan_on'
-FAN_AUTO = 'fan_off'
+FAN_AUTO = 'fan_auto'
 SET_HEAT = 'set_heat'
 SET_COOL = 'set_cool'
 FAN = 'fan'
@@ -19,7 +19,7 @@ HEAT_TEMP = 'heat_temp'
 COOL_TEMP = 'cool_temp'
 
 
-COMMANDS = [MODE, HEAT, COOL, OFF, FAN_ON, FAN_OFF, SET_HEAT, SET_COOL]
+COMMANDS = [MODE, HEAT, COOL, OFF, FAN_ON, FAN_AUTO, SET_HEAT, SET_COOL]
 
 REQUESTS = [FAN, HEAT_TEMP, COOL_TEMP]
 
@@ -69,7 +69,7 @@ class ZwaveThermostat(ZwaveDevice):
   def fan_on(self, **kwargs):
     self.node.set_thermostat_fan_mode('On Low')
 
-  def fan_off(self, **kwargs):
+  def fan_auto(self, **kwargs):
     self.node.set_thermostat_fan_mode('Auto Low')
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
