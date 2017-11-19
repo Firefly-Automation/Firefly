@@ -232,7 +232,7 @@ class ZwaveDevice(Device):
     return successful
 
   @property
-  def node(self):
+  def node(self) -> ZWaveNode:
     return self._node
 
 
