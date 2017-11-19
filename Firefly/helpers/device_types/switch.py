@@ -36,6 +36,7 @@ INITIAL_VALUES = {
   '_level':                   -1,
   '_previous_energy_reading': -1,
   '_switch':                  ACTION_OFF,
+  '_state':                   ACTION_OFF,
   '_voltage':                 -1,
   '_watts':                   -1,
   '_min_level':               -1,
