@@ -25,6 +25,10 @@ WORK_AROUND_MAPPING = {
   'zw080_siren_gen5':            {
     PACKAGE: 'zwave_aeotec_zw080',
     ALIAS:   'ZW080 Siren'
+  },
+  'ct100_thermostat_usa': {
+    PACKAGE: 'zwave_generic_devices.thermostat',
+    ALIAS: 'Zwave Thermostat'
   }
 }
 
