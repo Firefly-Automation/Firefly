@@ -104,9 +104,10 @@ class Device(object):
       return False
     if self._after_state is None:
       self.store_after_state()
+    
     self.broadcast_changes(self._before_state, self._after_state)
 
-    self._before_state = None,
+    self._before_state = None
     self._after_state = None
     return True
 
