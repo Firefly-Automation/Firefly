@@ -28,7 +28,7 @@ of what node number they are for sending commands.
 TITLE = 'Z-Wave service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
 SERVICE_ID = 'service_zwave'
-COMMANDS = ['send_command', 'stop', 'add_node', 'remove_node', 'cancel', 'initialize', 'heal_network']
+COMMANDS = ['send_command', 'stop', 'add_node', 'remove_node', 'cancel', 'initialize', 'heal', 'hard_reset']
 REQUESTS = ['get_nodes', 'get_orphans']
 
 SECTION = 'ZWAVE'
@@ -82,6 +82,7 @@ class Zwave(Service):
     self.add_command('cancel', self.cancel_command)
     self.add_command('initialize', self.initialize_zwave)
     self.add_command('heal', self.zwave_heal)
+    self.add_command('hard_reset', self.zwave_hard_reset)
 
     self.add_request('get_nodes', self.get_nodes)
     self.add_request('get_orphans', self.get_orphans)
@@ -123,7 +124,7 @@ class Zwave(Service):
       self._zwave_option.set_poll_interval(30)
       self._zwave_option.set_interval_between_polls(True)
       #self._zwave_option.set_suppress_value_refresh(False)
-      #self._zwave_option.set_associate(True)
+      self._zwave_option.set_associate(True)
       self._zwave_option.lock()
 
       self._network = ZWaveNetwork(self._zwave_option)  # , autostart=False)
@@ -287,6 +288,19 @@ class Zwave(Service):
 
   def zwave_heal(self, **kwargs):
     self._network.heal(True)
+
+    scheduler.runInM(5, self.network_update, job_id='zwave_network_update')
+
+  def network_update(self, **kwargs):
+    zwave_nodes = self._network.nodes.copy()
+    for node_id, node in zwave_nodes.items():
+      try:
+        node.neighbor_update()
+      except:
+        logging.error('[ZWAVE] Error updating network. node_id: %s' % node_id)
+
+  def zwave_hard_reset(self, **kwargs):
+    self._network.controller.hard_reset()
 
   def zwave_refresh(self, **kwargs):
     if self._network.state >= 7 and not self.healed:
