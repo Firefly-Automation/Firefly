@@ -1,25 +1,23 @@
 import asyncio
-import configparser
 import importlib
 import json
 import signal
 import sys
-from os import path
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any
+from os import path
 from pathlib import Path
+from typing import Any
 
 from aiohttp import web
 
 from Firefly import aliases, logging, scheduler
-from Firefly.const import COMPONENT_MAP, DEVICE_FILE, EVENT_TYPE_BROADCAST, LOCATION_FILE, SERVICE_CONFIG_FILE, TIME, TYPE_DEVICE, VERSION, REQUIRED_FILES
-from Firefly.helpers.events import Event, Request, Command
+from Firefly.const import COMPONENT_MAP, DEVICE_FILE, EVENT_TYPE_BROADCAST, LOCATION_FILE, REQUIRED_FILES, TIME, TYPE_DEVICE, VERSION
+from Firefly.core.service_handler import ServiceHandler
+from Firefly.helpers.events import Event, Request
 from Firefly.helpers.groups.groups import import_groups
 from Firefly.helpers.location import Location
 from Firefly.helpers.room import Rooms
 from Firefly.helpers.subscribers import Subscriptions
-
-from Firefly.core.service_handler import ServiceHandler
 
 app = web.Application()
 
@@ -73,7 +71,6 @@ class Firefly(object):
     for c in COMPONENT_MAP:
       self.import_components(c['file'])
 
-
     self.service_handler = ServiceHandler()
     self.service_handler.install_services(self)
 
@@ -86,7 +83,6 @@ class Firefly(object):
     # Import Groups
     import_groups(self)
 
-
     logging.error(code='FF.COR.INI.001')  # this is a test error message
     logging.notify('Firefly is starting up in mode: %s' % self.location.mode)
 
@@ -98,8 +94,7 @@ class Firefly(object):
     all_devices = set([c_id for c_id, c in self.components.items() if (c.type == TYPE_DEVICE or c.type == 'ROOM')])
     self.current_state = self.get_device_states(all_devices)
 
-    #self.async_send_command(Command('service_zwave', 'core_startup', 'initialize'))
-
+    # self.async_send_command(Command('service_zwave', 'core_startup', 'initialize'))
 
   def import_components(self, config_file=DEVICE_FILE):
     ''' Import all components from the devices file
@@ -138,7 +133,6 @@ class Firefly(object):
     scheduler.runInS(15, self.export_all_components, job_id='CORE_EXPORT_ALL')
     return setup_return
 
-
   def install_component(self, component):
     ''' Install a component into the core components.
 
@@ -155,7 +149,6 @@ class Firefly(object):
     except Exception as e:
       logging.error('[CORE INSTALL COMPONENT] ERROR INSTALLING: %s' % str(e))
       return None
-
 
   def import_location(self) -> Location:
     ''' Import location data.
@@ -190,9 +183,6 @@ class Firefly(object):
         elif type(default_content) is dict or type(default_content) is list:
           with open(file_path, 'w') as new_file:
             json.dump(default_content, new_file)
-
-
-
 
   def start(self) -> None:
     """
@@ -248,10 +238,8 @@ class Firefly(object):
     logging.message('Exporting current config.')
     for c in COMPONENT_MAP:
       self.export_components(c['file'], c['type'])
+
     aliases.export_aliases()
-
-
-
 
   def export_components(self, config_file: str, component_type: str, current_values: bool = True) -> None:
     """
@@ -263,14 +251,15 @@ class Firefly(object):
     """
     logging.message('Exporting component and states to config file. - %s' % component_type)
     components = []
-    for _, device in self.components.items():
+    for ff_id, device in self.components.items():
       if device.type == component_type:
-        components.append(device.export(current_values=current_values))
+        try:
+          components.append(device.export(current_values=current_values))
+        except Exception as e:
+          logging.error('[CORE] ERROR EXPORTING %s - %s' % (ff_id, e))
 
     with open(config_file, 'w') as file:
       json.dump(components, file, indent=4, sort_keys=True)
-
-
 
   def send_firebase(self, event: Event):
     ''' Send and event to firebase
@@ -313,8 +302,8 @@ class Firefly(object):
         # self.loop.run_in_executor(None,self.components[s].event, event)
     self.update_current_state(event)
     self.send_firebase(event)
-    #asyncio.ensure_future(self.update_current_state(event))
-    #asyncio.ensure_future(self.send_firebase(event))
+    # asyncio.ensure_future(self.update_current_state(event))
+    # asyncio.ensure_future(self.send_firebase(event))
     return True
 
   @asyncio.coroutine
