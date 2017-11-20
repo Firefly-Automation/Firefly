@@ -14,7 +14,7 @@ DEVICE_TYPE_MULTI_SENSOR = 'multi_sensor'
 REQUESTS = [MOTION, ALARM, LUX, TEMPERATURE, HUMIDITY, ULTRAVIOLET, BATTERY, 'sensitivity']
 
 INITIAL_VALUES = {
-  '_sensitivity': 3,
+  '_sensitivity': 2,
   '_timeout':     300.
 }
 
