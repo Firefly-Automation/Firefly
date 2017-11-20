@@ -21,7 +21,7 @@ class MotionSensor(ZwaveMotionSensor):
     super().__init__(firefly, package, TITLE, **kwargs)
 
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, values: ZWaveValue = None, values_only=False, **kwargs):
-    if not values
+    if not values:
       super().update_from_zwave(node, ignore_update, values, values_only, **kwargs)
       return
 
