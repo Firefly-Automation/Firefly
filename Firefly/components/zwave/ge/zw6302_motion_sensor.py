@@ -23,4 +23,10 @@ class MotionSensor(ZwaveMotionSensor):
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, values: ZWaveValue = None, values_only=False, **kwargs):
     super().update_from_zwave(node, ignore_update, values, values_only, **kwargs)
 
+    if not values:
+      return
+
+    if values.label == 'Burglar':
+      self.update_values(motion=values.data==8)
+
 
