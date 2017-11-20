@@ -62,11 +62,11 @@ class ZwaveContactSensor(ContactSensor, ZwaveDevice):
           self.node.refresh_value(value_id)
       return
 
-    if node.is_ready and node.is_awake and not self.refreshed:
-      for label, value_id in self.value_map.items():
-        logging.info('REFRESHING VALUE %s' % label)
-        self.node.refresh_value(value_id)
-      self.refreshed = True
+    #if node.is_ready and node.is_awake and not self.refreshed:
+    #  for label, value_id in self.value_map.items():
+    #    logging.info('REFRESHING VALUE %s' % label)
+    #    self.node.refresh_value(value_id)
+    #  self.refreshed = True
 
     label = values.label
     logging.info('[ZWAVE] Value label: %s data: %s' % (label, values.data))

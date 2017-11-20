@@ -162,9 +162,9 @@ class Zwave(Service):
     #self.zwave_refresh()
     scheduler.runEveryH(72, self.zwave_refresh, job_id='123-zwave_refresh')
     # scheduler.runEveryH(10, self.find_dead_nodes, job_id='123-find-dead-nodes')
-
-    for node_id, node in self._network.nodes.items():
-      node.refresh_info()
+    scheduler.runInM(1, self.zwave_refresh, job_id='zwave_refresh-1')
+    #for node_id, node in self._network.nodes.items():
+      #node.refresh_info()
       # node.request_all_config_params()
       #try:
       #  if node.node_id in self.ignore_nodes:
