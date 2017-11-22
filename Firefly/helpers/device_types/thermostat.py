@@ -7,7 +7,8 @@ from Firefly.helpers.metadata import action_switch, action_text, action_level
 
 COMMANDS = ['set_thermostat', 'set_mode', 'set_fan']
 THERMOSTAT_FAN_ON_OFF = 'thermostat_on_off'
-REQUESTS = [THERMOSTAT_FAN, THERMOSTAT_MODE, THERMOSTAT_TARGET_HEAT, THERMOSTAT_TARGET_COOL, TEMPERATURE, THERMOSTAT_FAN_ON_OFF]
+REQUESTS = [THERMOSTAT_FAN, THERMOSTAT_MODE, THERMOSTAT_TARGET_HEAT, THERMOSTAT_TARGET_COOL, TEMPERATURE,
+            THERMOSTAT_FAN_ON_OFF]
 INITIAL_VALUES = {
   '_mode':        THERMOSTAT_OFF,
   '_target_heat': 55,
@@ -23,7 +24,6 @@ CAPABILITIES = {
   THERMOSTAT_MODE_COOL: True,
   THERMOSTAT_OFF:       True
 }
-
 
 
 class Thermostat(Device):
@@ -60,7 +60,8 @@ class Thermostat(Device):
     self.add_command(THERMOSTAT_FAN_AUTO, self.set_fan_auto)
     self.add_request(THERMOSTAT_FAN_ON_OFF, self.get_fan_on_off)
     self.add_action(THERMOSTAT_FAN,
-                    action_switch(title='Fan', context='Change fan mode', request=THERMOSTAT_FAN_ON_OFF, on_command=THERMOSTAT_FAN_ON,
+                    action_switch(title='Fan', context='Change fan mode', request=THERMOSTAT_FAN_ON_OFF,
+                                  on_command=THERMOSTAT_FAN_ON,
                                   off_command=THERMOSTAT_FAN_AUTO))
 
     if self.capabilities[THERMOSTAT_MODE_COOL]:
@@ -70,6 +71,7 @@ class Thermostat(Device):
       # TODO: Add action for setting target_cool
       self.add_action(THERMOSTAT_TARGET_COOL,
                       action_level(title='Cool target', context='Set the target temperature for cooling',
+                                   request=THERMOSTAT_TARGET_COOL,
                                    command=THERMOSTAT_TARGET_COOL, command_prop=TEMPERATURE, min_level=55, max_level=90,
                                    level_step=1))
 
@@ -80,6 +82,7 @@ class Thermostat(Device):
       # TODO: Add action for setting target_heat
       self.add_action(THERMOSTAT_TARGET_HEAT,
                       action_level(title='Heat target', context='Set the target temperature for heating',
+                                   request=THERMOSTAT_TARGET_HEAT,
                                    command=THERMOSTAT_TARGET_HEAT, command_prop=TEMPERATURE, min_level=55, max_level=90,
                                    level_step=1))
 
