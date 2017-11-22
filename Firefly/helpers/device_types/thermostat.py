@@ -117,7 +117,7 @@ class Thermostat(Device):
     :param kwargs:
     """
     target_temp = kwargs.get(TEMPERATURE)
-    self.set_thermostat(target_coolw=target_temp)
+    self.set_thermostat(target_cool=target_temp)
 
   def get_target_cool(self, **kwargs):
     return self._target_cool

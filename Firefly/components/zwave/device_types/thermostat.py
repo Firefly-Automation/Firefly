@@ -62,6 +62,14 @@ class ZwaveThermostat(Thermostat, ZwaveDevice):
       set_fan = FAN_MODE_MAP[fan_mode]
       self.node.set_thermostat_fan_mode(set_fan)
 
+    target_cool = kwargs.get('target_cool')
+    if target_cool is not None:
+      self.node.set_thermostat_cooling(target_cool)
+
+    target_heat = kwargs.get('target_heat')
+    if target_heat is not None:
+      self.node.set_thermostat_heating(target_heat)
+
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, values: ZWaveValue = None, values_only=False, **kwargs):
     logging.info('[THERMOSTAT] %s' % str(kwargs))
     super().update_from_zwave(node, ignore_update, **kwargs)
