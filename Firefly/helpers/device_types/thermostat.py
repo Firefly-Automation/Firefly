@@ -3,10 +3,11 @@ from Firefly.helpers.device.const import THERMOSTAT, THERMOSTAT_FAN, THERMOSTAT_
   THERMOSTAT_MODE, THERMOSTAT_MODE_AUTO, THERMOSTAT_MODE_COOL, THERMOSTAT_MODE_ECO, THERMOSTAT_MODE_HEAT, \
   THERMOSTAT_OFF, THERMOSTAT_TARGET_COOL, THERMOSTAT_TARGET_HEAT, TEMPERATURE
 from Firefly.helpers.device.device import Device
-from Firefly.helpers.metadata import action_switch, action_text
+from Firefly.helpers.metadata import action_switch, action_text, action_level
 
 COMMANDS = ['set_thermostat', 'set_mode', 'set_fan']
-REQUESTS = [THERMOSTAT_FAN, THERMOSTAT_MODE, THERMOSTAT_TARGET_HEAT, THERMOSTAT_TARGET_COOL, TEMPERATURE]
+THERMOSTAT_FAN_ON_OFF = 'thermostat_on_off'
+REQUESTS = [THERMOSTAT_FAN, THERMOSTAT_MODE, THERMOSTAT_TARGET_HEAT, THERMOSTAT_TARGET_COOL, TEMPERATURE, THERMOSTAT_FAN_ON_OFF]
 INITIAL_VALUES = {
   '_mode':        THERMOSTAT_OFF,
   '_target_heat': 55,
@@ -22,6 +23,7 @@ CAPABILITIES = {
   THERMOSTAT_MODE_COOL: True,
   THERMOSTAT_OFF:       True
 }
+
 
 
 class Thermostat(Device):
@@ -56,21 +58,30 @@ class Thermostat(Device):
 
     self.add_command(THERMOSTAT_FAN_ON, self.set_fan_on)
     self.add_command(THERMOSTAT_FAN_AUTO, self.set_fan_auto)
+    self.add_request(THERMOSTAT_FAN_ON_OFF, self.get_fan_on_off)
     self.add_action(THERMOSTAT_FAN,
-                    action_switch(True, True, False, 'Fan', 'Change fan mode', THERMOSTAT_FAN, THERMOSTAT_FAN_ON,
-                                  THERMOSTAT_FAN_AUTO))
+                    action_switch(title='Fan', context='Change fan mode', request=THERMOSTAT_FAN_ON_OFF, on_command=THERMOSTAT_FAN_ON,
+                                  off_command=THERMOSTAT_FAN_AUTO))
 
     if self.capabilities[THERMOSTAT_MODE_COOL]:
       self.add_command(THERMOSTAT_MODE_COOL, self.set_cool)
       self.add_command(THERMOSTAT_TARGET_COOL, self.set_target_cool)
       self.add_request(THERMOSTAT_TARGET_COOL, self.get_target_cool)
       # TODO: Add action for setting target_cool
+      self.add_action(THERMOSTAT_TARGET_COOL,
+                      action_level(title='Cool target', context='Set the target temperature for cooling',
+                                   command=THERMOSTAT_TARGET_COOL, command_prop=TEMPERATURE, min_level=55, max_level=90,
+                                   level_step=1))
 
     if self.capabilities[THERMOSTAT_MODE_HEAT]:
       self.add_command(THERMOSTAT_MODE_HEAT, self.set_heat)
       self.add_command(THERMOSTAT_TARGET_HEAT, self.set_target_heat)
       self.add_request(THERMOSTAT_TARGET_HEAT, self.get_target_heat)
       # TODO: Add action for setting target_heat
+      self.add_action(THERMOSTAT_TARGET_COOL,
+                      action_level(title='Heat target', context='Set the target temperature for heating',
+                                   command=THERMOSTAT_TARGET_HEAT, command_prop=TEMPERATURE, min_level=55, max_level=90,
+                                   level_step=1))
 
     if self.capabilities[THERMOSTAT_OFF]:
       self.add_command(THERMOSTAT_OFF, self.set_off)
@@ -87,23 +98,25 @@ class Thermostat(Device):
   def set_thermostat(self, **kwargs):
     logging.warn('Not Implemented')
 
-  def set_target_heat(self, target_temp, **kwargs):
+  def set_target_heat(self, **kwargs):
     """ Set the heat target temperature
 
     :param target_temp: temperature to set for heating
     :param kwargs:
     """
+    target_temp = kwargs.get(TEMPERATURE)
     self.set_thermostat(target_high=target_temp)
 
   def get_target_heat(self, **kwargs):
     return self._target_heat
 
-  def set_target_cool(self, target_temp, **kwargs):
+  def set_target_cool(self, **kwargs):
     """ Set the cool target temperature
 
     :param target_temp: temperature to set for cooling
     :param kwargs:
     """
+    target_temp = kwargs.get(TEMPERATURE)
     self.set_thermostat(target_coolw=target_temp)
 
   def get_target_cool(self, **kwargs):
@@ -152,6 +165,9 @@ class Thermostat(Device):
 
   def get_fan(self, **kwargs):
     return self._fan
+
+  def get_fan_on_off(self, **kwargs):
+    return 'on' if self._fan == THERMOSTAT_FAN_ON else 'off'
 
   def update_values(self, mode=None, fan=None, target_heat=None, target_cool=None, temperature=None, **kwargs):
     # self.store_state_before()
