@@ -1,4 +1,4 @@
-__all__ = ['TEMPERATURE', 'HUMIDITY', 'LUX', 'ULTRAVIOLET', 'BATTERY']
+__all__ = ['TEMPERATURE', 'HUMIDITY', 'LUX', 'ULTRAVIOLET', 'BATTERY', 'THERMOSTAT']
 
 
 from .const import *
