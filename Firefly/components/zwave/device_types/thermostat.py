@@ -75,8 +75,5 @@ class ZwaveThermostat(Thermostat, ZwaveDevice):
       self.update_values(target_cool=values.data)
     if label == 'Temperature':
       self.update_values(temperature=values.data)
-
-    try:
-      self._fan_state = 'on' if self.node.get_thermostat_state() == 'On Low' else 'off'
-    except:
-      pass
+    if label == 'Fan Mode':
+      self.update_values(fan=THERMOSTAT_FAN_AUTO if values.data == 'Auto Low' else THERMOSTAT_FAN_ON)
