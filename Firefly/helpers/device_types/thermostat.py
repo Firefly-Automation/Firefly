@@ -78,7 +78,7 @@ class Thermostat(Device):
       self.add_command(THERMOSTAT_TARGET_HEAT, self.set_target_heat)
       self.add_request(THERMOSTAT_TARGET_HEAT, self.get_target_heat)
       # TODO: Add action for setting target_heat
-      self.add_action(THERMOSTAT_TARGET_COOL,
+      self.add_action(THERMOSTAT_TARGET_HEAT,
                       action_level(title='Heat target', context='Set the target temperature for heating',
                                    command=THERMOSTAT_TARGET_HEAT, command_prop=TEMPERATURE, min_level=55, max_level=90,
                                    level_step=1))
