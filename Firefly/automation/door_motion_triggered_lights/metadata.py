@@ -5,7 +5,7 @@ METADATA = {
   'author':    AUTHOR,
   'commands':  ['execute'],
   'interface': {
-    'sensors':          {
+    'sensors':    {
       'motion': {
         'context': 'motion sensors to use to trigger light',
         'filter':  {
@@ -21,8 +21,8 @@ METADATA = {
         'type':    'deviceList'
       }
     },
-    'lights':           {
-      "light":   {
+    'lights':     {
+      "light": {
         'context': 'lights to turn on/off',
         'type':    'deviceList',
         'filter':  {
@@ -31,7 +31,7 @@ METADATA = {
       },
     },
     'commands':   {
-      "on": {
+      "on":  {
         'context': 'command to send to lights to turn on',
         'type':    'command',
         'filter':  {}
@@ -42,29 +42,29 @@ METADATA = {
         'filter':  {}
       }
     },
-    'actions':  {
-      'on': {
+    'actions':    {
+      'on':  {
         'context': 'This is auto generated'
       },
       'off': {
         'context': 'This is auto generated'
       }
     },
-    'custom': {
+    'custom':     {
       'custom_actions': {
         'context': 'set to true if using custom action',
-        'type': 'bool'
+        'type':    'bool'
       }
     },
-    'conditions':{
-      "on": {
+    'conditions': {
+      "on":  {
         'context': 'condition for turning lights on'
       },
       'off': {
         'context': 'condition for turning lights off'
       }
     },
-    'delays':           {
+    'delays':     {
       'off': {
         'context': 'Time to delay before turning all lights off (seconds)',
         'type':    'number'

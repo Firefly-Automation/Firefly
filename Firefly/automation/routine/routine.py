@@ -49,29 +49,31 @@ class Routine(Automation):
     interface = AutomationInterface(firefly, 'not_set', interface_data)
     interface.build_interface(ignore_setup=True)
 
-    trigger_sunrise = interface.auto_transition.get('sunrise')
+    trigger_sunrise = interface.auto_transition.get('sunrise', None)
     if trigger_sunrise is True or trigger_sunrise is None:
       trigger_sunrise = True
 
-    trigger_sunset = interface.auto_transition.get('sunset')
+    trigger_sunset = interface.auto_transition.get('sunset', None)
     if trigger_sunset is True or trigger_sunset is None:
       trigger_sunset = True
 
     if trigger_sunrise and trigger_sunset:
-      if SUNRISE_SUNSET_TRIGGER not in interface.triggers.get(ROUTINE_ROUTINE):
-        routine_triggers = interface.triggers.routine.get(ROUTINE_ROUTINE)
+      if SUNRISE_SUNSET_TRIGGER not in interface.triggers.get(ROUTINE_ROUTINE, []):
+        routine_triggers = interface.triggers.routine.get(ROUTINE_ROUTINE, [])
         routine_triggers.append(SUNRISE_SUNSET_TRIGGER)
         interface_data['triggers']['routine'] = routine_triggers
     elif trigger_sunrise:
-      if SUNRISE_TRIGGER not in interface.triggers.get(ROUTINE_ROUTINE):
-        routine_triggers = interface.triggers.routine.get(ROUTINE_ROUTINE)
+      if SUNRISE_TRIGGER not in interface.triggers.get(ROUTINE_ROUTINE, []):
+        routine_triggers = interface.triggers.routine.get(ROUTINE_ROUTINE, [])
         routine_triggers.append(SUNRISE_TRIGGER)
         interface_data['triggers']['routine'] = routine_triggers
     elif trigger_sunset:
-      if SUNSET_TRIGGER not in interface.triggers.get(ROUTINE_ROUTINE):
-        routine_triggers = interface.triggers.routine.get(ROUTINE_ROUTINE)
+      if SUNSET_TRIGGER not in interface.triggers.get(ROUTINE_ROUTINE, []):
+        routine_triggers = interface.triggers.routine.get(ROUTINE_ROUTINE, [])
         routine_triggers.append(SUNSET_TRIGGER)
         interface_data['triggers']['routine'] = routine_triggers
+
+    logging.info('[ROUTINE INTERFACE] %s' %str(interface_data))
 
     kwargs['interface'] = interface_data
 
