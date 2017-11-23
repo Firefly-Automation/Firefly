@@ -1,0 +1,9 @@
+LOW_BATTERY_PERCENT = 'low_battery_percent'
+CRITICAL_BATTERY_PERCENT = 'critical_battery_percent'
+BATTERY_LOW = 'battery_low'
+BATTERY_CRITICAL = 'battery_critical'
+BATTERY_OKAY = 'battery_okay'
+BATTERY_NOT_REPORTED = 'battery_not_reported'
+
+BATTERY_NO_NOTIFY_STATES = [BATTERY_OKAY, BATTERY_NOT_REPORTED]
+BATTERY_NOTIFY_STATES = [BATTERY_LOW, BATTERY_CRITICAL]

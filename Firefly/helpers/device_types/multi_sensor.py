@@ -76,6 +76,9 @@ class MultiSensor(Device):
     self._alexa_export = False
     self.capabilities = CAPABILITIES
 
+    # TODO: Use device settings for this
+    self._security_monitoring = kwargs.get('security_monitoring', True)
+
   def update_values(self, alarm=None, battery=None, humidity=None, lux=None, motion=None, temperature=None, ultraviolet=None, **kwargs):
     if alarm is not None:
       self._alarm = alarm

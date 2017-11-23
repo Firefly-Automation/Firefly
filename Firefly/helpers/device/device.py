@@ -1,15 +1,10 @@
 import uuid
 from typing import Any, Callable
 
-from functools import wraps
-
-from Firefly import aliases, logging, scheduler
+from Firefly import aliases, logging
 from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE
 from Firefly.helpers.events import Command, Event, Request
 from Firefly.helpers.metadata import EXPORT_UI, FF_ID, HIDDEN_BY_USER, action_text
-
-
-
 
 
 class Device(object):
@@ -30,6 +25,7 @@ class Device(object):
     self._initial_values = kwargs.get('initial_values')
     self._command_mapping = {}
     self._request_mapping = {}
+    self._security_monitoring = kwargs.get('security_monitoring', False)
     self._metadata = {
       'title':   self._title,
       'author':  self._author,
@@ -91,7 +87,6 @@ class Device(object):
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
 
-
   def store_before_state(self, **kwargs):
     self._before_state = self.get_all_request_values(True, True)
 
@@ -148,19 +143,20 @@ class Device(object):
       (dict): A dict of the ff_id config.
     """
     export_data = {
-      'package':                 self._package,
-      'ff_id':                   self.id,
-      'alias':                   self._alias,
-      'type':                    self.type,
-      'homekit_export':          self._homekit_export,
-      'homekit_alias':           self._homekit_alias,
-      'homekit_types':           self._homekit_types,
-      'habridge_export':         self._habridge_export,
-      'habridge_alias':          self._habridge_alias,
-      'export_ui':               self._export_ui,
-      'tags':                    self._tags,
-      'room':                    self._room,
-      'alexa_export':            self._alexa_export
+      'package':             self._package,
+      'ff_id':               self.id,
+      'alias':               self._alias,
+      'type':                self.type,
+      'homekit_export':      self._homekit_export,
+      'homekit_alias':       self._homekit_alias,
+      'homekit_types':       self._homekit_types,
+      'habridge_export':     self._habridge_export,
+      'habridge_alias':      self._habridge_alias,
+      'export_ui':           self._export_ui,
+      'tags':                self._tags,
+      'room':                self._room,
+      'alexa_export':        self._alexa_export,
+      'security_monitoring': self.security
     }
 
     if current_values:
@@ -248,7 +244,7 @@ class Device(object):
     Returns:
       (bool): Command successful.
     """
-    #state_before = self.get_all_request_values(True, True)
+    # state_before = self.get_all_request_values(True, True)
     self.store_before_state()
     logging.debug('%s: Got Command: %s' % (self.id, command.command))
     if command.command in self.command_map.keys():
@@ -258,10 +254,10 @@ class Device(object):
         self.command_map[command.command](**command.args)
       except:
         return False
-      #state_after = self.get_all_request_values(True, True)
-      #self.broadcast_changes(state_before, state_after)
+      # state_after = self.get_all_request_values(True, True)
+      # self.broadcast_changes(state_before, state_after)
       self.broadcast_change()
-      #scheduler.runInMCS(5, self.broadcast_change, job_id='%s-b' % self.id, max_instances=1)
+      # scheduler.runInMCS(5, self.broadcast_change, job_id='%s-b' % self.id, max_instances=1)
       return True
     return False
 
@@ -438,3 +434,7 @@ class Device(object):
   @property
   def type(self):
     return TYPE_DEVICE
+
+  @property
+  def security(self):
+    return self._security_monitoring

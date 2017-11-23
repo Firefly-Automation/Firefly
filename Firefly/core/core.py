@@ -18,6 +18,8 @@ from Firefly.helpers.groups.groups import import_groups
 from Firefly.helpers.location import Location
 from Firefly.helpers.room import Rooms
 from Firefly.helpers.subscribers import Subscriptions
+from Firefly.services.firefly_security_and_monitoring.firefly_monitoring import FireflySecurityAndMonitoring
+
 
 app = web.Application()
 
@@ -62,8 +64,13 @@ class Firefly(object):
     # Get the beacon ID.
     self.beacon_id = settings.beacon_id
 
+    # Start Security and Monitoring Service
+    self.security_and_monitoring = FireflySecurityAndMonitoring(self)
+
     # Start Notification service
     self.install_package('Firefly.services.notification', alias='service notification')
+
+
 
     # self.install_package('Firefly.components.notification.pushover', alias='Pushover', api_key='KEY', user_key='KEY')
 
@@ -273,6 +280,22 @@ class Firefly(object):
     if self.components.get(FIREBASE_SERVICE):
       self.components[FIREBASE_SERVICE].push(event.source, event.event_action)
 
+
+  def send_security_monitor(self, event: Event):
+    """ Send event to security and monitoring service.
+
+    Args:
+      event: Event to be sent
+
+    Returns:
+
+    """
+    try:
+      self.security_and_monitoring.event(event)
+    except AttributeError:
+      logging.warn('[CORE - SECURITY] Could not send event to security and monitoring. This is probably due to the service not being active yet.')
+
+
   def refresh_firebase(self, **kwargs):
     if FIREBASE_SERVICE in self.service_handler.get_installed_services(self):
       self.components[FIREBASE_SERVICE].refresh_all()
@@ -291,6 +314,7 @@ class Firefly(object):
   def send_event(self, event: Event) -> Any:
     logging.info('Received event: %s' % event)
     self.loop.run_in_executor(None, self._test_send_event, event)
+    self.loop.run_in_executor(None, self.send_security_monitor, event)
 
 
   def _test_send_event(self, event):

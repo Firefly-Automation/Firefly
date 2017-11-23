@@ -71,6 +71,9 @@ class Light(Device):
 
     self.capabilities = CAPABILITIES
 
+    # TODO: Use device settings for this
+    self._security_monitoring = kwargs.get('security_monitoring', True)
+
   def update_values(self, level=None, switch=None, **kwargs):
     if switch is not None:
       if type(switch) is bool:
