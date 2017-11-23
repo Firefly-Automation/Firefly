@@ -9,27 +9,20 @@ from Firefly.helpers.events import Command, Event
 
 # TODO: Routines should take a list of lights to turn off and a list of lights to user definable value.
 
-SUNRISE_TRIGGER = [{
+SUNRISE_TRIGGER = [[{
   "listen_id":      "location",
   "source":         "SOURCE_TRIGGER",
   "trigger_action": [{
     "location": ["sunrise"]
   }]
-}]
-SUNSET_TRIGGER = [{
+}]]
+SUNSET_TRIGGER = [[{
   "listen_id":      "location",
   "source":         "SOURCE_TRIGGER",
   "trigger_action": [{
     "location": ["sunset"]
   }]
-}]
-SUNRISE_SUNSET_TRIGGER = [{
-  "listen_id":      "location",
-  "source":         "SOURCE_TRIGGER",
-  "trigger_action": [{
-    "location": ["sunrise", "sunset"]
-  }]
-}]
+}]]
 
 
 def Setup(firefly, package, **kwargs):
