@@ -74,12 +74,50 @@ METADATA = {
         'type':    'conditions'
       }
     },
+    'simple_triggers': {
+      'contact_open':    {
+        'context': 'Execute routine when one of the doors/windows listed opens.',
+        'type':    'deviceList',
+        'filters': ['contact']
+      },
+      'contact_close':   {
+        'context': 'Execute routine when all of the door/window listed closes.',
+        'type':    'deviceList',
+        'filters': ['contact']
+      },
+      'motion_active':   {
+        'context': 'Execute routine when one of the motion sensors listed detects activity.',
+        'type':    'deviceList',
+        'filters': ['motion']
+      },
+      'motion_inactive': {
+        'context': 'Execute routine when all of the motion sensors listed do not detect activity.',
+        'type':    'deviceList',
+        'filters': ['motion']
+      },
+      'present':         {
+        'context': 'Execute routine when one of the presence sensors listed is present.',
+        'type':    'deviceList',
+        'filters': ['presence']
+      },
+      'not_present':     {
+        'context': 'Execute routine when all of the presence sensors listed are not present.',
+        'type':    'deviceList',
+        'filters': ['presence']
+      }
+    },
+    'delays' : {
+      'motion_inactive' : {
+        'context': 'Wait this many seconds of all motion sensors being inactive before executing routine.',
+        'type': 'number'
+      }
+    },
     'auto_transition': {
       'sunrise': {
         'context': 'Auto change lights and switches when the sun raises. (defaults true)',
         'type':    'bool'
       },
-      'sunset': {
+      'sunset':  {
         'context': 'Auto change lights and switches when the sun sets. (defaults true)',
         'type':    'bool'
       }

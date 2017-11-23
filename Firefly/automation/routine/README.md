@@ -31,13 +31,13 @@ You can also define custom commands in the actions of the routines. (advanced)
     - commands.off_day: command to send to lights when turning them off when the sun is up. This defaults to ```{"set_light":{"switch":"off"}}```
     - commands.off_night: command to send to lights when turning them off when the sun is down. This defaults to ```{"set_light":{"switch":"off"}}```
 
-- triggersv2:
-    - triggers.door_open
-    - triggers.door_closed
-    - triggers.motion_active
-    - triggers.motion_inactive
-    - triggers.present
-    - triggers.not_present
+- simple_triggers:
+    - triggers.contact_open: create a trigger when one of the contact sensors listed opens 
+    - triggers.contact_closed: create a trigger when all of the contact sensors listed closes
+    - triggers.motion_active: create a trigger when one of the motions sensors listed detects motion
+    - triggers.motion_inactive: create a trigger when all of the motions sensors listed no longer detect motion
+    - triggers.present: create a trigger when one of the presence devices listed are present
+    - triggers.not_present: create a trigger when one of the presence devices listed are present
     - triggers.time
     - triggers.time_day (sunset, sunrise)
     - triggers.on
