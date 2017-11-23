@@ -28,7 +28,7 @@ of what node number they are for sending commands.
 TITLE = 'Z-Wave service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
 SERVICE_ID = 'service_zwave'
-COMMANDS = ['send_command', 'stop', 'add_node', 'remove_node', 'cancel', 'initialize', 'heal', 'hard_reset']
+COMMANDS = ['send_command', 'stop', 'add_node', 'remove_node', 'cancel', 'initialize', 'heal', 'hard_reset', 'save']
 REQUESTS = ['get_nodes', 'get_orphans']
 
 SECTION = 'ZWAVE'
@@ -83,6 +83,7 @@ class Zwave(Service):
     self.add_command('initialize', self.initialize_zwave)
     self.add_command('heal', self.zwave_heal)
     self.add_command('hard_reset', self.zwave_hard_reset)
+    self.add_command('save', self.save_zwave_data)
 
     self.add_request('get_nodes', self.get_nodes)
     self.add_request('get_orphans', self.get_orphans)
@@ -113,6 +114,8 @@ class Zwave(Service):
     scheduler.runInS(20, self.initialize_zwave)
 
     scheduler.runEveryH(2, self.poll_nodes)
+
+    scheduler.runEveryH(2, self.save_zwave_data)
 
   async def initialize_zwave(self):
     if self._network is not None:
@@ -339,8 +342,13 @@ class Zwave(Service):
         logging.error('ZWAVE ERROR: %s' % str(e))
 
   def stop(self):
+    self.save_zwave_data()
     self.export()
     self._network.stop()
+
+  def save_zwave_data(self, **kwargs):
+    logging.info('[ZWAVE] Saving config')
+    self._network.manager.writeConfig(self._network.home_id)
 
   def zwave_handler(self, *args, **kwargs):
     if kwargs.get('node') is None:

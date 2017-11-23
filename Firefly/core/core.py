@@ -290,21 +290,19 @@ class Firefly(object):
 
   def send_event(self, event: Event) -> Any:
     logging.info('Received event: %s' % event)
-    fut = asyncio.Future(loop=self.loop)
+    self.loop.run_in_executor(None, self._test_send_event, event)
+
+
+  def _test_send_event(self, event):
     send_to = self._subscriptions.get_subscribers(event.source, event_action=event.event_action)
     for s in send_to:
-      # asyncio.ensure_future(self._send_event(event, s, fut), loop=self.loop)
       try:
-        # asyncio.ensure_future(self.components[s].event(event))
         self.components[s].event(event)
+        logging.info('[CORE] EVENT SENT!!! YAY!')
       except Exception as e:
         logging.error('Error sending event %s' % str(e))
-        # self.loop.run_in_executor(None,self.components[s].event, event)
     self.update_current_state(event)
     self.send_firebase(event)
-    # asyncio.ensure_future(self.update_current_state(event))
-    # asyncio.ensure_future(self.send_firebase(event))
-    return True
 
   @asyncio.coroutine
   def _send_event(self, event, ff_id, fut):
