@@ -4,10 +4,32 @@ from Firefly.automation.routine.const import ROUTINE_EXECUTE, ROUTINE_ICON, ROUT
 from Firefly.automation.routine.metadata import METADATA, TITLE
 from Firefly.const import COMMAND_NOTIFY, SERVICE_NOTIFICATION, TYPE_ROUTINE
 from Firefly.helpers.automation import Automation
+from Firefly.helpers.automation.automation_interface import AutomationInterface
 from Firefly.helpers.events import Command, Event
 
-
 # TODO: Routines should take a list of lights to turn off and a list of lights to user definable value.
+
+SUNRISE_TRIGGER = [{
+  "listen_id":      "location",
+  "source":         "SOURCE_TRIGGER",
+  "trigger_action": [{
+    "location": ["sunrise"]
+  }]
+}]
+SUNSET_TRIGGER = [{
+  "listen_id":      "location",
+  "source":         "SOURCE_TRIGGER",
+  "trigger_action": [{
+    "location": ["sunset"]
+  }]
+}]
+SUNRISE_SUNSET_TRIGGER = [{
+  "listen_id":      "location",
+  "source":         "SOURCE_TRIGGER",
+  "trigger_action": [{
+    "location": ["sunrise", "sunset"]
+  }]
+}]
 
 
 def Setup(firefly, package, **kwargs):
@@ -23,6 +45,36 @@ def Setup(firefly, package, **kwargs):
 
 class Routine(Automation):
   def __init__(self, firefly, package, **kwargs):
+    interface_data = kwargs.get('interface', {})
+    interface = AutomationInterface(firefly, 'not_set', interface_data)
+    interface.build_interface(ignore_setup=True)
+
+    trigger_sunrise = interface.auto_transition.get('sunrise')
+    if trigger_sunrise is True or trigger_sunrise is None:
+      trigger_sunrise = True
+
+    trigger_sunset = interface.auto_transition.get('sunset')
+    if trigger_sunset is True or trigger_sunset is None:
+      trigger_sunset = True
+
+    if trigger_sunrise and trigger_sunset:
+      if SUNRISE_SUNSET_TRIGGER not in interface.triggers.get(ROUTINE_ROUTINE):
+        routine_triggers = interface.triggers.routine.get(ROUTINE_ROUTINE)
+        routine_triggers.append(SUNRISE_SUNSET_TRIGGER)
+        interface_data['triggers']['routine'] = routine_triggers
+    elif trigger_sunrise:
+      if SUNRISE_TRIGGER not in interface.triggers.get(ROUTINE_ROUTINE):
+        routine_triggers = interface.triggers.routine.get(ROUTINE_ROUTINE)
+        routine_triggers.append(SUNRISE_TRIGGER)
+        interface_data['triggers']['routine'] = routine_triggers
+    elif trigger_sunset:
+      if SUNSET_TRIGGER not in interface.triggers.get(ROUTINE_ROUTINE):
+        routine_triggers = interface.triggers.routine.get(ROUTINE_ROUTINE)
+        routine_triggers.append(SUNSET_TRIGGER)
+        interface_data['triggers']['routine'] = routine_triggers
+
+    kwargs['interface'] = interface_data
+
     super().__init__(firefly, package, self.event_handler, **kwargs)
 
     # TODO(zpriddy): Fix this is firebase service
@@ -30,14 +82,13 @@ class Routine(Automation):
     self._package = self.package
     self._alias = self.alias
 
-    #TODO: Change these to self.interface.settings.mode and interface.settings.icon
+    # TODO: Change these to self.interface.settings.mode and interface.settings.icon
     self.mode = self.new_interface.mode.get(ROUTINE_ROUTINE, None)
     self.icon = self.new_interface.icon.get(ROUTINE_ROUTINE, '')
     self.export_ui = self.new_interface.export_ui.get(ROUTINE_ROUTINE, True)
 
-
     # TODO: replace export_ui with a const from metadata or core.
-    #self.export_ui = self.interface.get('export_ui', {}).get(ROUTINE_ROUTINE, True)
+    # self.export_ui = self.interface.get('export_ui', {}).get(ROUTINE_ROUTINE, True)
 
     self.add_command(ROUTINE_EXECUTE, self.event_handler)
 
@@ -71,6 +122,10 @@ class Routine(Automation):
     return view_data
 
   def event_handler(self, event: Event = None, trigger_index=0, **kwargs):
+    if self.mode == self.firefly.location.mode:
+      logging.info('[ROUTINE] not executing because already in mode.')
+      return False
+
     if self.new_interface.messages.get(ROUTINE_ROUTINE):
       notify = Command(SERVICE_NOTIFICATION, self.id, COMMAND_NOTIFY, message=self.new_interface.messages.get(ROUTINE_ROUTINE))
       self.firefly.send_command(notify)
@@ -86,7 +141,6 @@ class Routine(Automation):
     self.handle_on_commands()
 
     return True
-
 
   def handle_on_commands(self):
     self.handle_on_off_command('on', 'on')
@@ -126,8 +180,6 @@ class Routine(Automation):
       if lights:
         for light in lights:
           self.firefly.send_command(Command(light, self.id, set_command, **command_args))
-
-
 
   def get_alexa_view(self, **kwargs):
     if self.export_ui is False:

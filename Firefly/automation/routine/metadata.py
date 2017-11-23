@@ -10,71 +10,81 @@ METADATA = {
   'author':    AUTHOR,
   'commands':  COMMANDS,
   'interface': {
-    'lights': {
-      'off': {
+    'lights':          {
+      'off':       {
         'context': 'Turn off these lights when the routine executes.',
-        'type': 'deviceList'
+        'type':    'deviceList'
       },
       'off_night': {
         'context': 'Turn off these lights when the routine executes after sunset.',
-        'type': 'deviceList'
+        'type':    'deviceList'
       },
-      'off_day': {
+      'off_day':   {
         'context': 'Turn off these lights when the routine executes before sunset.',
-        'type': 'deviceList'
+        'type':    'deviceList'
       },
-      'on': {
+      'on':        {
         'context': 'Turn on these lights when the routine executes.',
-        'type': 'deviceList'
+        'type':    'deviceList'
       },
-      'on_night': {
+      'on_night':  {
         'context': 'Turn on these lights when the routine executes after sunset.',
-        'type': 'deviceList'
+        'type':    'deviceList'
       },
-      'on_day': {
+      'on_day':    {
         'context': 'Turn on these lights when the routine executes before sunset.',
-        'type': 'deviceList'
+        'type':    'deviceList'
       }
     },
-    'commands' : {
-      'off': {
+    'commands':        {
+      'off':       {
         'context': 'command to send to lights when turning them off. Defaults to {set_light:{switch:off}}',
-        'type': 'command'
+        'type':    'command'
       },
       'off_night': {
         'context': 'command to send to lights when turning them off after sunset. Defaults to {set_light:{switch:off}}',
-        'type': 'command'
+        'type':    'command'
       },
-      'off_day': {
+      'off_day':   {
         'context': 'command to send to lights when turning them off before sunset. Defaults to {set_light:{switch:off}}',
-        'type': 'command'
+        'type':    'command'
       },
-      'on': {
+      'on':        {
         'context': 'command to send to lights when turning them on. Defaults to {set_light:{switch:on}}',
-        'type': 'command'
+        'type':    'command'
       },
-      'on_day': {
+      'on_day':    {
         'context': 'command to send to lights when turning them on before sunset. Defaults to {set_light:{switch:on}}, you could do {set_light:{switch:on,ct:6500}}',
-        'type': 'command'
+        'type':    'command'
       },
-      'on_night': {
+      'on_night':  {
         'context': 'command to send to lights when turning them on after sunset. Defaults to {set_light:{switch:on}}, you could do {set_light:{switch:on,ct:2700}}',
-        'type': 'command'
+        'type':    'command'
       }
     },
-    'actions':   {
+    'actions':         {
       ROUTINE_ROUTINE: {
         'context': 'Actions to be executed when routine runs.',
         'type':    'commandList'
       }
     },
-    'conditions' : {
-      ROUTINE_ROUTINE : {
+    'conditions':      {
+      ROUTINE_ROUTINE: {
         'context': 'Conditions that must be met to trigger routine.',
-        'type': 'conditions'
+        'type':    'conditions'
       }
     },
-    'messages':  {
+    'auto_transition': {
+      'sunrise': {
+        'context': 'Auto change lights and switches when the sun raises. (defaults true)',
+        'type':    'bool'
+      },
+      'sunset': {
+        'context': 'Auto change lights and switches when the sun sets. (defaults true)',
+        'type':    'bool'
+      }
+    },
+    'messages':        {
       ROUTINE_ROUTINE: {
         'context': 'Message to be sent when routine executes.',
         'type':    'string'
@@ -92,13 +102,13 @@ METADATA = {
         'type':    'iconString'
       }
     },
-    'export_ui': {
+    'export_ui':       {
       ROUTINE_ROUTINE: {
         'context': 'Display routine on web interface.',
         'type':    'boolean'
       }
     },
-    'triggers':  {
+    'triggers':        {
       ROUTINE_ROUTINE: {
         'context': 'Actions that will trigger the routine',
         'type':    'triggerList'
