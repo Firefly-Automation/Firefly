@@ -43,7 +43,7 @@ class Nest(Service):
     self.add_command('set_nest_auth', self.set_auth)
 
     self.refresh()
-    scheduler.runEveryM(4, self.refresh)
+    scheduler.runEveryM(4, self.refresh, job_id='Nest Refresh')
 
   def init_nest(self):
     self.nest = nest.Nest(access_token=self.access_token, access_token_cache_file=self.cache_file)
