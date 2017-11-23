@@ -41,14 +41,14 @@ class Routine(Automation):
   def __init__(self, firefly, package, **kwargs):
     interface_data = kwargs.get('interface', {})
     logging.info('[INTERFACE DATA] %s' % str(interface_data))
-    #if not interface_data['triggers']:
-    #  interface_data['triggers'] = {}
-    #interface_data['triggers']['sunrise'] = SUNRISE_TRIGGER
-    #interface_data['triggers']['sunset'] = SUNSET_TRIGGER
+    if not interface_data['triggers']:
+      interface_data['triggers'] = {}
+    interface_data['triggers']['sunrise'] = SUNRISE_TRIGGER
+    interface_data['triggers']['sunset'] = SUNSET_TRIGGER
 
-    #logging.info('[INTERFACE DATA] %s' % str(interface_data))
+    logging.info('[INTERFACE DATA] %s' % str(interface_data))
 
-    #kwargs['interface'] = interface_data
+    kwargs['interface'] = interface_data
 
     super().__init__(firefly, package, self.event_handler, **kwargs)
 
