@@ -46,6 +46,8 @@ def Setup(firefly, package, **kwargs):
 class Routine(Automation):
   def __init__(self, firefly, package, **kwargs):
     interface_data = kwargs.get('interface', {})
+    if not interface_data['triggers']:
+      interface_data['triggers'] = {}
     interface_data['triggers']['sunrise'] = SUNRISE_TRIGGER
     interface_data['triggers']['sunset'] = SUNSET_TRIGGER
 
