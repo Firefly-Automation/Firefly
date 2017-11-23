@@ -46,34 +46,8 @@ def Setup(firefly, package, **kwargs):
 class Routine(Automation):
   def __init__(self, firefly, package, **kwargs):
     interface_data = kwargs.get('interface', {})
-    interface = AutomationInterface(firefly, 'not_set', interface_data)
-    interface.build_interface(ignore_setup=True)
-
-    trigger_sunrise = interface.auto_transition.get('sunrise', None)
-    if trigger_sunrise is True or trigger_sunrise is None:
-      trigger_sunrise = True
-
-    trigger_sunset = interface.auto_transition.get('sunset', None)
-    if trigger_sunset is True or trigger_sunset is None:
-      trigger_sunset = True
-
-    if trigger_sunrise and trigger_sunset:
-      if SUNRISE_SUNSET_TRIGGER not in interface.triggers.get(ROUTINE_ROUTINE, []):
-        routine_triggers = interface.triggers.routine.get(ROUTINE_ROUTINE, [])
-        routine_triggers.append(SUNRISE_SUNSET_TRIGGER)
-        interface_data['triggers']['routine'] = routine_triggers
-    elif trigger_sunrise:
-      if SUNRISE_TRIGGER not in interface.triggers.get(ROUTINE_ROUTINE, []):
-        routine_triggers = interface.triggers.routine.get(ROUTINE_ROUTINE, [])
-        routine_triggers.append(SUNRISE_TRIGGER)
-        interface_data['triggers']['routine'] = routine_triggers
-    elif trigger_sunset:
-      if SUNSET_TRIGGER not in interface.triggers.get(ROUTINE_ROUTINE, []):
-        routine_triggers = interface.triggers.routine.get(ROUTINE_ROUTINE, [])
-        routine_triggers.append(SUNSET_TRIGGER)
-        interface_data['triggers']['routine'] = routine_triggers
-
-    logging.info('[ROUTINE INTERFACE] %s' %str(interface_data))
+    interface_data['triggers']['sunrise'] = SUNRISE_TRIGGER
+    interface_data['triggers']['sunset'] = SUNSET_TRIGGER
 
     kwargs['interface'] = interface_data
 
@@ -124,6 +98,17 @@ class Routine(Automation):
     return view_data
 
   def event_handler(self, event: Event = None, trigger_index=0, **kwargs):
+    if (trigger_index == 'sunrise' and self.new_interface.auto_transition.get('sunrise', True)) or (trigger_index == 'sunset' and self.new_interface.auto_transition.get('sunset', True)):
+      if self.new_interface.actions.get(ROUTINE_ROUTINE):
+        for a in self.new_interface.actions.get(ROUTINE_ROUTINE):
+          a.execute_action(self.firefly)
+
+      self.handle_off_commands()
+      self.handle_on_commands()
+
+      return True
+
+
     if self.mode == self.firefly.location.mode:
       logging.info('[ROUTINE] not executing because already in mode.')
       return False
