@@ -5,7 +5,7 @@ from uuid import uuid4
 from Firefly import aliases, logging
 from Firefly.const import ACTION_OFF, ACTION_ON, CONTACT, CONTACT_CLOSED, CONTACT_OPEN, EVENT_TYPE_BROADCAST, GROUPS_CONFIG_FILE, LEVEL, MOTION, MOTION_ACTIVE, MOTION_INACTIVE, STATE, SWITCH
 from Firefly.helpers.events import Command, Event, Request
-from Firefly.helpers.metadta.metadata import action_contact, action_motion, action_on_off_switch
+from Firefly.helpers.metadata.metadata import action_contact, action_motion, action_on_off_switch
 
 '''
 devices[ff_id] = {tags: [tags], values: {prop: value}}
