@@ -6,6 +6,8 @@ BATTERY_LOW = 'battery_low'
 BATTERY_CRITICAL = 'battery_critical'
 BATTERY_OKAY = 'battery_okay'
 BATTERY_NOT_REPORTED = 'battery_not_reported'
+ALARM_ARMED_MESSAGE_NO_MOTION = 'Alarm system is now armed without motion active'
+ALARM_ARMED_MESSAGE_MOTION = 'Alarm system is now armed with motion active'
 
 BATTERY_NO_NOTIFY_STATES = [BATTERY_OKAY, BATTERY_NOT_REPORTED]
 BATTERY_NOTIFY_STATES = [BATTERY_LOW, BATTERY_CRITICAL]

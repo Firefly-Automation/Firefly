@@ -15,11 +15,8 @@ from Firefly.helpers.device import BATTERY, CONTACT, CONTACT_CLOSE, CONTACT_OPEN
 from Firefly.helpers.events import Command, Event
 from Firefly.services.firefly_security_and_monitoring.battery_monitor import check_battery_from_event, generate_battery_notification_message
 from Firefly.services.firefly_security_and_monitoring.security_monitor import check_all_security_contact_sensors, generate_contact_warning_message, process_contact_change
-from .const import BATTERY_LOW, BATTERY_NO_NOTIFY_STATES, STATUS_TEMPLATE
-
-# TODO: Make this part of a config file
-SECURE_MODES_NO_MOTION = ['night']
-SECURE_MODES_MOTION = ['away']
+from Firefly.services.firefly_security_and_monitoring.secueity_settings import FireflySecuritySettings
+from .const import BATTERY_LOW, BATTERY_NO_NOTIFY_STATES, STATUS_TEMPLATE, ALARM_ARMED_MESSAGE_MOTION, ALARM_ARMED_MESSAGE_NO_MOTION
 
 
 class FireflySecurityAndMonitoring(object):
@@ -27,6 +24,8 @@ class FireflySecurityAndMonitoring(object):
     self.firefly = firefly
     self.enabled = enabled
     self.status = STATUS_TEMPLATE
+
+    self.settings = FireflySecuritySettings()
 
   def event(self, event: Event, **kwargs):
     logging.info('[FIREFLY SECURITY] event received: %s' % str(event))
@@ -42,12 +41,12 @@ class FireflySecurityAndMonitoring(object):
     # Enter Secure Mode
     if event.source == SOURCE_LOCATION and 'mode' in event.event_action:
       mode = event.event_action['mode']
-      if mode in SECURE_MODES_MOTION or mode in SECURE_MODES_NO_MOTION:
+      if mode in self.settings.secure_modes_motion or mode in self.settings.secure_modes_no_motion:
         self.enter_secure_mode()
 
     # Process Events while in secure mode
     mode = self.firefly.location.mode
-    if mode in SECURE_MODES_NO_MOTION or mode in SECURE_MODES_MOTION:
+    if mode in self.settings.secure_modes_motion or mode in self.settings.secure_modes_no_motion:
       device = self.firefly.components[event.source]
       if device.type != TYPE_DEVICE:
         logging.info('[FIREFLY SECURITY] event source is not device')
@@ -116,6 +115,7 @@ class FireflySecurityAndMonitoring(object):
       self.send_notification(contact_data['message'])
       if contact_data['alarm']:
         logging.info('[FIREFLY SECURITY] ALARM TRIGGERED')
+        # TODO: Turn on listed lights, if no lights listed then turn on all lights
 
   def enter_secure_mode(self, **kwargs):
     logging.info('[FIREFLY SECURITY] Entering Secure Mode.')
@@ -123,9 +123,16 @@ class FireflySecurityAndMonitoring(object):
     current_state = self.firefly.current_state.copy()
     components = self.firefly.components
     contact_states = check_all_security_contact_sensors(components, current_state)
-    if contact_states[CONTACT_CLOSE]:
+    if contact_states[CONTACT_OPEN]:
       message = generate_contact_warning_message(contact_states)
       self.send_notification(message)
+      return
+
+    # If no contacts open then send notification that alarm is now armed.
+    if self.firefly.location.mode in self.settings.secure_modes_motion:
+      self.send_notification(ALARM_ARMED_MESSAGE_MOTION)
+      return
+    self.send_notification(ALARM_ARMED_MESSAGE_NO_MOTION)
 
   def process_battery_event(self, event: Event, **kwargs):
     battery_state = check_battery_from_event(event)
