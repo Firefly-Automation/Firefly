@@ -2,8 +2,8 @@ from openzwave.network import ZWaveNode
 
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.const import CONTACT, CONTACT_CLOSED, CONTACT_OPEN, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF, STATE
-from Firefly.helpers.metadata import metaWaterLevel
+from Firefly.const import CONTACT, CONTACT_CLOSED, CONTACT_OPEN, DEVICE_TYPE_SWITCH, STATE
+from Firefly.helpers.metadata.metadata import metaWaterLevel
 
 TITLE = 'Aeotec Zwave ZW097 Dry Conact'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH
