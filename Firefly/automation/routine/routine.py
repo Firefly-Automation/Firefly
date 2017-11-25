@@ -12,7 +12,7 @@ SUNRISE_TRIGGER = [[{
   "listen_id":      "location",
   "source":         "SOURCE_TRIGGER",
   "trigger_action": [{
-    "location": ["sunrise"]
+    "location": ["sunrise_system"]
   }]
 }]]
 
@@ -20,7 +20,7 @@ SUNSET_TRIGGER = [[{
   "listen_id":      "location",
   "source":         "SOURCE_TRIGGER",
   "trigger_action": [{
-    "location": ["sunset"]
+    "location": ["sunset_system"]
   }]
 }]]
 
@@ -105,7 +105,7 @@ class Routine(Automation):
         self.handle_off_commands()
         self.handle_on_commands()
 
-        return True
+      return True
 
     if self.mode == self.firefly.location.mode:
       logging.info('[ROUTINE] not executing because already in mode.')

@@ -24,6 +24,7 @@ class FireflySecurityAndMonitoring(object):
     self.firefly = firefly
     self.enabled = enabled
     self.status = STATUS_TEMPLATE
+    self.alarm_status = 'disarmed'
 
     self.settings = FireflySecuritySettings()
 
@@ -44,6 +45,14 @@ class FireflySecurityAndMonitoring(object):
       if mode in self.settings.secure_modes_motion or mode in self.settings.secure_modes_no_motion:
         self.enter_secure_mode()
 
+      last_mode = self.firefly.location.lastMode
+      if mode not in self.settings.secure_modes_motion and mode not in self.settings.secure_modes_no_motion and (
+          last_mode in self.settings.secure_modes_motion or last_mode in self.settings.secure_modes_no_motion):
+        self.alarm_status = 'disarmed'
+        self.status['status']['alarm'] = self.alarm_status
+        self.firefly.update_security_firebase(self.status)
+        self.send_notification('Security alarm disabled.')
+
     # Process Events while in secure mode
     mode = self.firefly.location.mode
     if mode in self.settings.secure_modes_motion or mode in self.settings.secure_modes_no_motion:
@@ -62,7 +71,12 @@ class FireflySecurityAndMonitoring(object):
 
     contact_states = check_all_security_contact_sensors(self.firefly.components, self.firefly.current_state)
     status_data = {
+      'status': {
+        'message': 'Message Placeholder',
+        'alarm': self.alarm_status
+      },
       CONTACT: {
+        'message': '',
         CONTACT_OPEN:  {
           'count':                 len(contact_states[CONTACT_OPEN]),
           'devices': contact_states[CONTACT_OPEN]
@@ -126,13 +140,17 @@ class FireflySecurityAndMonitoring(object):
     if contact_states[CONTACT_OPEN]:
       message = generate_contact_warning_message(contact_states)
       self.send_notification(message)
-      return
 
     # If no contacts open then send notification that alarm is now armed.
     if self.firefly.location.mode in self.settings.secure_modes_motion:
       self.send_notification(ALARM_ARMED_MESSAGE_MOTION)
-      return
-    self.send_notification(ALARM_ARMED_MESSAGE_NO_MOTION)
+      self.alarm_status = 'armed_motion'
+    else:
+      self.send_notification(ALARM_ARMED_MESSAGE_NO_MOTION)
+      self.alarm_status = 'armed_no_motion'
+
+    self.status['status']['alarm'] = self.alarm_status
+    self.firefly.update_security_firebase(self.status)
 
   def process_battery_event(self, event: Event, **kwargs):
     battery_state = check_battery_from_event(event)

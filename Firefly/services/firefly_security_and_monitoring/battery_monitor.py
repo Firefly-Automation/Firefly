@@ -29,10 +29,10 @@ def check_battery_from_event(event: Event, **kwargs):
 
   try:
     battery_level = int(battery_level)
-    if battery_level <= SETTINGS[LOW_BATTERY_PERCENT]:
-      return BATTERY_LOW
     if battery_level <= SETTINGS[CRITICAL_BATTERY_PERCENT]:
       return BATTERY_CRITICAL
+    if battery_level <= SETTINGS[LOW_BATTERY_PERCENT]:
+      return BATTERY_LOW
     return BATTERY_OKAY
   except Exception as e:
     logging.warn('[BATTERY MONITOR] battery level not reported as numeric value. ff_id:%s - battery_level: %s - error: %s' % (event.source, battery_level, e))

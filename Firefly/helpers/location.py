@@ -154,6 +154,10 @@ class Location(object):
       SOURCE_LOCATION: day_event
     })
     self.firefly.send_event(event)
+    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={
+      SOURCE_LOCATION: '%s_system' % day_event
+    })
+    self.firefly.send_event(event)
     next_day_event_time = self.getNextDayEvent(day_event)
     scheduler.runAt(next_day_event_time, self.DayEventHandler, day_event=day_event, job_id=day_event)
 
