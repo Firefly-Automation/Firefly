@@ -46,7 +46,7 @@ class Location(object):
     with open(location_file) as config_file:
       config = json.load(config_file)
       self.location_file = location_file
-      self.modes = config.get('modes', ['home'])
+      self.modes = config.get('modes', ['home', 'away', 'night', 'vacation', 'alarm'])
       self._mode = config.get('mode', 'home')
       self._last_mode = config.get('last_mode', 'home')
       self.address = config.get('address', 'San Fransisco')
