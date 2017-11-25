@@ -98,6 +98,9 @@ class Routine(Automation):
 
   def event_handler(self, event: Event = None, trigger_index=0, **kwargs):
     if (trigger_index == 'sunrise' and self.new_interface.auto_transition.get('sunrise', True)) or (trigger_index == 'sunset' and self.new_interface.auto_transition.get('sunset', True)):
+      if self.mode != self.firefly.location.mode:
+        logging.indo('[ROUTINE] not re-executing routine because of mode missmatch.')
+        return
       if self.new_interface.actions.get(ROUTINE_ROUTINE):
         for a in self.new_interface.actions.get(ROUTINE_ROUTINE):
           a.execute_action(self.firefly)
