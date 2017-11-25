@@ -4,7 +4,6 @@ from Firefly.automation.routine.const import ROUTINE_EXECUTE, ROUTINE_ICON, ROUT
 from Firefly.automation.routine.metadata import METADATA, TITLE
 from Firefly.const import COMMAND_NOTIFY, SERVICE_NOTIFICATION, TYPE_ROUTINE
 from Firefly.helpers.automation import Automation
-from Firefly.helpers.automation.automation_interface import AutomationInterface
 from Firefly.helpers.events import Command, Event
 
 # TODO: Routines should take a list of lights to turn off and a list of lights to user definable value.
@@ -13,7 +12,7 @@ SUNRISE_TRIGGER = [[{
   "listen_id":      "location",
   "source":         "SOURCE_TRIGGER",
   "trigger_action": [{
-    "location": ["sunrise"]
+    "location": ["sunrise_system"]
   }]
 }]]
 
@@ -21,7 +20,7 @@ SUNSET_TRIGGER = [[{
   "listen_id":      "location",
   "source":         "SOURCE_TRIGGER",
   "trigger_action": [{
-    "location": ["sunset"]
+    "location": ["sunset_system"]
   }]
 }]]
 
@@ -98,18 +97,15 @@ class Routine(Automation):
 
   def event_handler(self, event: Event = None, trigger_index=0, **kwargs):
     if (trigger_index == 'sunrise' and self.new_interface.auto_transition.get('sunrise', True)) or (trigger_index == 'sunset' and self.new_interface.auto_transition.get('sunset', True)):
-      if self.mode != self.firefly.location.mode:
-        logging.indo('[ROUTINE] not re-executing routine because of mode missmatch.')
-        return
-      if self.new_interface.actions.get(ROUTINE_ROUTINE):
-        for a in self.new_interface.actions.get(ROUTINE_ROUTINE):
-          a.execute_action(self.firefly)
+      if self.mode == self.firefly.location.mode:
+        if self.new_interface.actions.get(ROUTINE_ROUTINE):
+          for a in self.new_interface.actions.get(ROUTINE_ROUTINE):
+            a.execute_action(self.firefly)
 
-      self.handle_off_commands()
-      self.handle_on_commands()
+        self.handle_off_commands()
+        self.handle_on_commands()
 
       return True
-
 
     if self.mode == self.firefly.location.mode:
       logging.info('[ROUTINE] not executing because already in mode.')

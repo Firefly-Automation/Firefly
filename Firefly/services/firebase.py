@@ -17,6 +17,7 @@ from Firefly.services.api_ai import apiai_command_reply
 FIREBASE_LOCATION_STATUS_PATH = 'locationStatus'
 FIREBASE_DEVICE_VIEWS = 'deviceViews'
 FIREBASE_DEVICE_STATUS = 'deviceStatus'
+FIREBASE_DEVICE_SETTINGS_PATH = 'deviceSettings'
 FIREBASE_HOME_STATUS = 'homeStatus'
 FIREBASE_COMMAND_REPLY = 'commandReply'
 FIREBASE_ALIASES = 'aliases'
@@ -318,6 +319,9 @@ class Firebase(Service):
       # Update all devices statuses
       self.update_all_device_status(overwrite=True)
 
+      # Update device settings
+      self.update_device_settings()
+
       # This is the new location of routine views [/homeStatus/{homeId}/routineViews]
       self.db.child("homeStatus").child(self.home_id).child('routineViews').set(routine_view, self.id_token)
       self.db.child("homeStatus").child(self.home_id).child('routineConfigs').set(routine_config, self.id_token)
@@ -343,6 +347,21 @@ class Firebase(Service):
 
     except Exception as e:
       logging.notify("Firebase 271: %s" % str(e))
+
+
+  def update_device_settings(self):
+    logging.info('[FIREBASE] updating device settings')
+    device_settings = {}
+    for ff_id, device in self.firefly.components.items():
+      try:
+        if device.type != TYPE_DEVICE:
+          continue
+        device_settings[ff_id] = device.get_settings_view()
+      except:
+        pass
+
+    self.set_home_status(FIREBASE_DEVICE_SETTINGS_PATH, device_settings)
+
 
   def update_last_metadata_timestamp(self):
     ''' Update the lastMetadataUpdate timestamp

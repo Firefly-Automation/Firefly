@@ -27,16 +27,18 @@ LOCATION_FILE = 'dev_config/location.json'
 ZWAVE_FILE = 'dev_config/zwave.json'
 GROUPS_CONFIG_FILE = 'dev_config/groups.json'
 ROUTINES_CONFIG_FILE = 'dev_config/routines.json'
+SECURITY_SETTINGS_FILE = 'dev_config/security_settings.json'
 
 REQUIRED_FILES = {
-  ALIAS_FILE:           {},
-  AUTOMATION_FILE:      [],
-  ROUTINES_CONFIG_FILE: [],
-  CONFIG_FILE:          None,
-  DEVICE_FILE:          [],
-  GROUPS_CONFIG_FILE:   {},
-  LOCATION_FILE:        {},
-  SERVICE_CONFIG_FILE:  None,
+  ALIAS_FILE:             {},
+  AUTOMATION_FILE:        [],
+  ROUTINES_CONFIG_FILE:   [],
+  CONFIG_FILE:            None,
+  DEVICE_FILE:            [],
+  GROUPS_CONFIG_FILE:     {},
+  LOCATION_FILE:          {},
+  SERVICE_CONFIG_FILE:    None,
+  SECURITY_SETTINGS_FILE: {}
 }
 
 # FOOBOT SERVICE

@@ -5,6 +5,7 @@ from Firefly import aliases, logging
 from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE
 from Firefly.helpers.events import Command, Event, Request
 from Firefly.helpers.metadata import EXPORT_UI, FF_ID, HIDDEN_BY_USER, action_text
+from Firefly.helpers.metadata.settings import settings_alias, settings_device_tags
 
 
 class Device(object):
@@ -31,6 +32,12 @@ class Device(object):
       'author':  self._author,
       'package': self._package,
       'actions': {}
+    }
+
+    self._settings = {
+      'values': {},
+      'metadata': {},
+      'requests': {}
     }
     self._last_command_source = 'none'
     self._last_update_time = self.firefly.location.now
@@ -77,6 +84,9 @@ class Device(object):
     self.add_action('z_last_update', action_text(title='Last Update', request='last_update'))
     self.add_request('last_update', self.last_update)
 
+    self.add_setting('name', '_alias', 'alias', settings_alias())
+    self.add_setting('tags', '_tags', 'tags', settings_device_tags())
+
     # Set initial values
     for prop, val in self._initial_values.items():
       self.__setattr__(prop, val)
@@ -86,6 +96,21 @@ class Device(object):
 
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
+
+  def add_setting(self, setting_index, setting_request, setting_param, setting_metadata):
+    self._settings['metadata'][setting_index] = setting_metadata
+    self._settings['requests'][setting_param] = setting_request
+
+  def get_settings_values(self):
+    for param in list(self._settings['requests'].keys()):
+      self._settings['values'][param] = self.get_setting_value(param)
+
+  def get_setting_value(self, setting_param):
+    return self.__getattribute__(self._settings['requests'][setting_param])
+
+  def get_settings_view(self):
+    self.get_settings_values()
+    return self._settings
 
   def store_before_state(self, **kwargs):
     self._before_state = self.get_all_request_values(True, True)
