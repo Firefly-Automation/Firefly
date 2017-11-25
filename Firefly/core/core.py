@@ -40,6 +40,8 @@ class Firefly(object):
     signal.signal(signal.SIGHUP, sigterm_handler)
     signal.signal(signal.SIGQUIT, sigterm_handler)
 
+    self.done_starting_up = False
+
     # TODO: Most of this should be in startup not init.
     logging.Startup(self)
     logging.message('Initializing Firefly')
@@ -60,6 +62,9 @@ class Firefly(object):
 
     self._subscriptions = Subscriptions()
     self.location = self.import_location()
+
+    self.device_initial_values = {}
+
 
     # Get the beacon ID.
     self.beacon_id = settings.beacon_id
@@ -103,7 +108,27 @@ class Firefly(object):
 
     # self.async_send_command(Command('service_zwave', 'core_startup', 'initialize'))
 
+    # TODO: Run this line after some delay (1 min) and re-set device initial values
+    scheduler.runInM(2, self.finish_starting_up, 'finish_startup')
+    #self.done_starting_up = True
+
     self.security_and_monitoring.generate_status()
+
+
+  def finish_starting_up(self):
+    self.done_starting_up = True
+    self.set_initial_values()
+
+  def set_initial_values(self):
+    for ff_id, device in self.components.items():
+      if device.type != TYPE_DEVICE:
+        continue
+      for attr, value in self.device_initial_values.get(ff_id, {}).items():
+        device.__setattr__(attr, value)
+    scheduler.runInS(10, self.refresh_firebase, job_id='FIREBASE_REFRESH_CORE')
+    scheduler.runInS(15, self.export_all_components, job_id='CORE_EXPORT_ALL')
+
+
 
   def import_components(self, config_file=DEVICE_FILE):
     ''' Import all components from the devices file
@@ -138,6 +163,10 @@ class Firefly(object):
     if kwargs.get('package'):
       kwargs.pop('package')
     setup_return = package.Setup(self, module, **kwargs)
+    ff_id = kwargs.get('ff_id')
+    initial_values = kwargs.get('initial_values')
+    if ff_id and initial_values:
+      self.device_initial_values[ff_id] = initial_values
     scheduler.runInS(10, self.refresh_firebase, job_id='FIREBASE_REFRESH_CORE')
     scheduler.runInS(15, self.export_all_components, job_id='CORE_EXPORT_ALL')
     return setup_return
@@ -320,6 +349,9 @@ class Firefly(object):
 
   def send_event(self, event: Event) -> Any:
     logging.info('Received event: %s' % event)
+    if not self.done_starting_up:
+      logging.info('[CORE] firefly still starting up. No events will be sent')
+      return
     self.loop.run_in_executor(None, self._test_send_event, event)
     self.loop.run_in_executor(None, self.send_security_monitor, event)
 
