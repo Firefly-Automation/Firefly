@@ -101,6 +101,9 @@ class Switch(Device):
 
     self.capabilities = CAPABILITIES
 
+    # TODO: Use device settings for this
+    self._security_monitoring = kwargs.get('security_monitoring', True)
+
   def update_values(self, alarm=None, battery=None, voltage=None, power_current=None, watts=None, level=None, switch=None, previous_energy_reading=None, current_energy_reading=None, **kwargs):
 
     if alarm is not None:
