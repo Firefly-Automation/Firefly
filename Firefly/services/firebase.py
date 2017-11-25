@@ -638,6 +638,11 @@ class Firebase(Service):
       scheduler.runInH(1, self.refresh_user, 'firebase_refresh_user')
       pass
 
+
+  def security_update(self, security_status):
+    logging.info('Updating Firebase security status')
+    self.db.child("homeStatus").child(self.home_id).child('securityStatus').set(security_status, self.id_token)
+
   def push(self, source, action, retry=True):
     logging.info('[FIREBASE PUSH] Pushing Data: %s: %s' % (str(source), str(action)))
     try:

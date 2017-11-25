@@ -13,7 +13,7 @@ from aiohttp import web
 from Firefly import aliases, logging, scheduler
 from Firefly.const import COMPONENT_MAP, DEVICE_FILE, EVENT_TYPE_BROADCAST, LOCATION_FILE, REQUIRED_FILES, TIME, TYPE_DEVICE, VERSION
 from Firefly.core.service_handler import ServiceHandler
-from Firefly.helpers.events import Event, Request
+from Firefly.helpers.events import Event, Request, Command
 from Firefly.helpers.groups.groups import import_groups
 from Firefly.helpers.location import Location
 from Firefly.helpers.room import Rooms
@@ -102,6 +102,8 @@ class Firefly(object):
     self.current_state = self.get_device_states(all_devices)
 
     # self.async_send_command(Command('service_zwave', 'core_startup', 'initialize'))
+
+    self.security_and_monitoring.generate_status()
 
   def import_components(self, config_file=DEVICE_FILE):
     ''' Import all components from the devices file
@@ -281,6 +283,11 @@ class Firefly(object):
       self.components[FIREBASE_SERVICE].push(event.source, event.event_action)
 
 
+  def update_security_firebase(self, security_status):
+    if self.components.get(FIREBASE_SERVICE):
+      self.components[FIREBASE_SERVICE].security_update(security_status)
+
+
   def send_security_monitor(self, event: Event):
     """ Send event to security and monitoring service.
 
@@ -317,7 +324,7 @@ class Firefly(object):
     self.loop.run_in_executor(None, self.send_security_monitor, event)
 
 
-  def _test_send_event(self, event):
+  def _test_send_event(self, event:Event):
     send_to = self._subscriptions.get_subscribers(event.source, event_action=event.event_action)
     for s in send_to:
       try:
@@ -327,6 +334,13 @@ class Firefly(object):
         logging.error('Error sending event %s' % str(e))
     self.update_current_state(event)
     self.send_firebase(event)
+
+
+  def _test_send_command(self, command:Command):
+    try:
+      self.components[command.device].command(command)
+    except Exception as e:
+      logging.error('[CORE] error sending command: %s' % e)
 
   @asyncio.coroutine
   def _send_event(self, event, ff_id, fut):
@@ -351,22 +365,24 @@ class Firefly(object):
     fut.set_result(result)
     return result
 
-  def send_command(self, command, wait=False):
+  def send_command(self, command: Command, wait=False):
     if command.device not in self.components:
       return False
-    try:
-      if wait:
-        fut = asyncio.run_coroutine_threadsafe(self.new_send_command(command, None, self.loop), self.loop)
-        return fut.result(10)
-      else:
-        # asyncio.run_coroutine_threadsafe(self.send_command_no_wait(command, self.loop), self.loop)
-        self.components[command.device].command(command)
-        return True
-    except Exception as e:
-      logging.error(code='FF.COR.SEN.001')  # unknown error sending command
-      logging.error(e)
-      # TODO: Figure out how to wait for result
-    return False
+    self.loop.run_in_executor(None, self._test_send_command, command)
+
+    #try:
+    #  if wait:
+    #    fut = asyncio.run_coroutine_threadsafe(self.new_send_command(command, None, self.loop), self.loop)
+    #    return fut.result(10)
+    #  else:
+    #    # asyncio.run_coroutine_threadsafe(self.send_command_no_wait(command, self.loop), self.loop)
+    #    self.components[command.device].command(command)
+    #    return True
+    #except Exception as e:
+    #  logging.error(code='FF.COR.SEN.001')  # unknown error sending command
+    #  logging.error(e)
+    #  # TODO: Figure out how to wait for result
+    #return False
 
   async def new_send_command(self, command, fut, loop):
     fut = await asyncio.ensure_future(loop.run_in_executor(None, self.components[command.device].command, command))
