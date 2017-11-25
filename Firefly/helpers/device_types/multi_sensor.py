@@ -2,7 +2,7 @@ from Firefly import logging
 from Firefly.const import LUX, MOTION, MOTION_ACTIVE, MOTION_INACTIVE
 from Firefly.helpers.device import *
 from Firefly.helpers.device.device import Device
-from Firefly.helpers.metadata import action_motion, action_text
+from Firefly.helpers.metadta.metadata import action_motion, action_text
 
 # TODO: Add support for temp reporting.
 # from Firefly.services.alexa.alexa_const import ALEXA_TEMPERATURE_SENSOR, ALEXA_TEMPERATURE_INTERFACE

@@ -2,7 +2,7 @@ from Firefly import logging
 from Firefly.const import CONTACT, CONTACT_CLOSED, CONTACT_OPEN
 from Firefly.helpers.device import *
 from Firefly.helpers.device.device import Device
-from Firefly.helpers.metadata import action_contact, action_text
+from Firefly.helpers.metadta.metadata import action_contact, action_text
 
 
 ALARM = 'alarm'

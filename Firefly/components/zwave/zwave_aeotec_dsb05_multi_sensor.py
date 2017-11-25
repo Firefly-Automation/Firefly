@@ -3,7 +3,7 @@ from openzwave.network import ZWaveNode
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
 from Firefly.const import DEVICE_TYPE_MOTION, MOTION, MOTION_ACTIVE, MOTION_INACTIVE, STATE
-from Firefly.helpers.metadata import metaMotion
+from Firefly.helpers.metadta.metadata import metaMotion
 
 TITLE = 'Aeotec DSB05 MultiSensor'
 DEVICE_TYPE = DEVICE_TYPE_MOTION

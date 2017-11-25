@@ -2,8 +2,8 @@ from openzwave.network import ZWaveNode
 
 from Firefly import logging, scheduler
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.const import ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, DEVICE_TYPE_DIMMER, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE, SWITCH
-from Firefly.helpers.metadata import metaDimmer, metaSwitch
+from Firefly.const import ACTION_OFF, ACTION_ON, ACTION_TOGGLE, COMMAND_SET_LIGHT, DEVICE_TYPE_DIMMER, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE, SWITCH
+from Firefly.helpers.metadta.metadata import metaDimmer, metaSwitch
 
 TITLE = 'Aeotec ZW111 Dimmer'
 DEVICE_TYPE = DEVICE_TYPE_DIMMER

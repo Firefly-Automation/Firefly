@@ -4,7 +4,7 @@ from Firefly import logging, scheduler
 from Firefly.const import AUTHOR
 from Firefly.helpers.device import *
 from Firefly.helpers.device.device import Device
-from Firefly.helpers.metadata import ColorMap, action_text
+from Firefly.helpers.metadta.metadata import ColorMap, action_text
 from .foobot_service import STATUS_URL
 
 TITLE = 'Foobot Air Sensor'

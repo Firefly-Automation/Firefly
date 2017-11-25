@@ -5,7 +5,7 @@ from Firefly.components.virtual_devices import AUTHOR
 from Firefly.const import (COMMAND_UPDATE, DEVICE_TYPE_THERMOSTAT, LEVEL)
 from Firefly.helpers.action import Command
 from Firefly.helpers.device.device import Device
-from Firefly.helpers.metadata import action_button_group, action_button_object, action_level, action_text
+from Firefly.helpers.metadta.metadata import action_button_group, action_button_object, action_level, action_text
 
 # TODO(zpriddy): Add more delayed setters to help with rate limits.
 

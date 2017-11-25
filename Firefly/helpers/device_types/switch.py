@@ -2,7 +2,7 @@ from Firefly import logging
 from Firefly.const import ACTION_OFF, ACTION_ON, COMMAND_SET_LIGHT, DEVICE_TYPE_SWITCH, LEVEL, SWITCH
 from Firefly.helpers.device import *
 from Firefly.helpers.device.device import Device
-from Firefly.helpers.metadata import action_battery, action_dimmer, action_on_off_switch, action_text
+from Firefly.helpers.metadta.metadata import action_battery, action_dimmer, action_on_off_switch, action_text
 
 from Firefly.services.alexa.alexa_const import ALEXA_POWER_INTERFACE, ALEXA_POWER_LEVEL_INTERFACE, ALEXA_SWITCH
 

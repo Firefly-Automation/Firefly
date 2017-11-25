@@ -1,9 +1,9 @@
 from openzwave.network import ZWaveNode
 
 from Firefly import logging, scheduler
-from Firefly.helpers.device.device import Device
 from Firefly.helpers.device import *
-from Firefly.helpers.metadata import action_battery
+from Firefly.helpers.device.device import Device
+from Firefly.helpers.metadta.metadata import action_battery
 from Firefly.util.zwave_command_class import COMMAND_CLASS_BATTERY, COMMAND_CLASS_DESC
 
 

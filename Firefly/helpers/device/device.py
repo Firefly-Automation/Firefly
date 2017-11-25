@@ -4,7 +4,8 @@ from typing import Any, Callable
 from Firefly import aliases, logging
 from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE
 from Firefly.helpers.events import Command, Event, Request
-from Firefly.helpers.metadata import EXPORT_UI, FF_ID, HIDDEN_BY_USER
+from Firefly.helpers.metadta.metadata import EXPORT_UI, FF_ID, HIDDEN_BY_USER
+from Firefly.helpers.metadta.device_settings_metadata import settings_alias, settings_device_tags
 
 
 class Device(object):
@@ -30,6 +31,12 @@ class Device(object):
       'author':  self._author,
       'package': self._package,
       'actions': {}
+    }
+
+    self._settings = {
+      'values': {},
+      'metadata': {},
+      'requests': {}
     }
     self._last_command_source = 'none'
     self._last_update_time = self.firefly.location.now
@@ -73,12 +80,34 @@ class Device(object):
     self.add_command('set_room', self.set_room)
     self.add_command('delete', self.delete_device)
 
+    self.add_setting('name', '_alias', 'alias', settings_alias())
+    self.add_setting('tags', '_tags', 'tags', settings_device_tags())
+
     # Set initial values
     for prop, val in self._initial_values.items():
       self.__setattr__(prop, val)
 
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
+
+
+  def add_setting(self, setting_index, setting_request, setting_param, setting_metadata):
+    self._settings['metadata'][setting_index] = setting_metadata
+    self._settings['requests'][setting_param] = setting_request
+
+
+  def get_settings_values(self):
+    for param in list(self._settings['requests'].keys()):
+      self._settings['values'][param] = self.get_setting_value(param)
+
+  def get_setting_value(self, setting_param):
+    return self.__getattribute__(self._settings['requests'][setting_param])
+
+  def get_settings_view(self):
+    self.get_settings_values()
+    return self._settings
+
+
 
   def set_alias(self, **kwargs):
     new_alias = kwargs.get('alias')

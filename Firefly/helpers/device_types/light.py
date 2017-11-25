@@ -1,10 +1,7 @@
 from Firefly import logging
-from Firefly.const import ACTION_OFF, ACTION_ON, ALEXA_OFF, ALEXA_ON, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, DEVICE_TYPE_SWITCH, LEVEL, SWITCH
-from Firefly.helpers.device import *
+from Firefly.const import ACTION_OFF, ACTION_ON, COMMAND_SET_LIGHT, DEVICE_TYPE_SWITCH, LEVEL, SWITCH
 from Firefly.helpers.device.device import Device
-
-from Firefly.helpers.metadata import action_on_off_switch, metaSlider, action_dimmer
-
+from Firefly.helpers.metadta.metadata import action_dimmer, action_on_off_switch
 from Firefly.services.alexa.alexa_const import ALEXA_LIGHT, ALEXA_POWER_INTERFACE, ALEXA_POWER_LEVEL_INTERFACE
 
 ALARM = 'alarm'

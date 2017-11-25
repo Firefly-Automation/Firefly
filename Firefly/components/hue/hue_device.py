@@ -2,13 +2,12 @@ from Firefly import logging
 # from rgb_cie import Converter
 from Firefly.components.hue.ct_fade import CTFade
 from Firefly.components.virtual_devices import AUTHOR
-from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ALEXA_OFF, ALEXA_ON, ALEXA_SET_COLOR, ALEXA_SET_COLOR_TEMP, ALEXA_SET_PERCENTAGE, COMMAND_SET_LIGHT, COMMAND_UPDATE,
+from Firefly.const import (ACTION_LEVEL, ACTION_OFF, ACTION_ON, ACTION_TOGGLE, COMMAND_SET_LIGHT, COMMAND_UPDATE,
                            DEVICE_TYPE_COLOR_LIGHT, EVENT_ACTION_OFF, EVENT_ACTION_ON, LEVEL, STATE, SWITCH)
 from Firefly.helpers.device.device import Device
 from Firefly.helpers.events import Command
-from Firefly.helpers.metadata import metaDimmer, metaSwitch, action_on_off_switch, action_dimmer
-
-from Firefly.services.alexa.alexa_const import ALEXA_INTERFACE, ALEXA_BRIGHTNESS_INTERFACE, ALEXA_COLOR_INTERFACE, ALEXA_COLOR_TEMPERATURE_INTERFACE, ALEXA_POWER_LEVEL_INTERFACE, ALEXA_PERCENTAGE_INTERFACE, ALEXA_POWER_INTERFACE, ALEXA_LIGHT
+from Firefly.helpers.metadta.metadata import action_dimmer, action_on_off_switch
+from Firefly.services.alexa.alexa_const import ALEXA_INTERFACE, ALEXA_LIGHT, ALEXA_POWER_INTERFACE, ALEXA_POWER_LEVEL_INTERFACE
 
 TITLE = 'Firefly Hue Device'
 DEVICE_TYPE = DEVICE_TYPE_COLOR_LIGHT

@@ -5,7 +5,7 @@ from Firefly.components.virtual_devices import AUTHOR
 from Firefly.const import (ACTION_SET_DELAY, ACTION_SET_PRESENCE, DEVICE_TYPE_PRESENCE, NOT_PRESENT, PRESENCE, PRESENT)
 from Firefly.helpers.action import Command
 from Firefly.helpers.device.device import Device
-from Firefly.helpers.metadata import action_presence, metaOwntracks, metaQR, metaText
+from Firefly.helpers.metadta.metadata import action_presence, metaOwntracks, metaQR, metaText
 
 TITLE = 'Firefly Virtual Presence Device'
 DEVICE_TYPE = DEVICE_TYPE_PRESENCE
