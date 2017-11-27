@@ -8,6 +8,10 @@ INTERFACE = {
     'context': 'Modes that the security system should be armed but not monitoring motion for. (i.e. Night)'
   },
   'alarm': {
+    'mode': {
+      'type': 'mode',
+      'context': 'Mode to set home to when alarm is going off. (default: alarm)'
+    },
     'lights': {
       'type': 'deviceList',
       'context': 'List of devices to turn on when alarm is triggered.'

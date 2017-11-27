@@ -349,6 +349,13 @@ class HueDevice(Device):
         })
       self._on = on
 
+    switch = value.get('switch')
+    if switch is not None:
+      hue_value.update({
+        'on': switch == 'on'
+      })
+      self._on = switch == 'on'
+
     # Turn lights on unless told not to or has already been set
     if hue_value.get('on') is None and not value.get('no_on'):
       hue_value.update({
@@ -440,17 +447,21 @@ class HueDevice(Device):
 
 
 def check_ct(ct) -> int:
-  if 'K' in ct.upper():
-    try:
-      ct = int(ct.upper().replace('K', ''))
-    except:
-      ct = 2700
+  if type(ct) is str:
+    if 'K' in ct.upper():
+      try:
+        ct = int(ct.upper().replace('K', ''))
+      except:
+        ct = 2700
+      ct = 1000000.0 / ct
+    else:
+      try:
+        ct = int(ct)
+      except:
+        ct = 1000000.0 / 2700.0
+
+  if ct >= 2700 and ct <= 6500:
     ct = 1000000.0 / ct
-  else:
-    try:
-      ct = int(ct)
-    except:
-      ct = 1000000.0 / 2700.0
 
   if ct > 500:
     ct = 500
