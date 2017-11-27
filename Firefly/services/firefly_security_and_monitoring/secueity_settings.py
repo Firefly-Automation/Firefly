@@ -20,7 +20,7 @@ class FireflySecuritySettings(object):
 
     self.alarm_config = AlarmSettings()
 
-    self._secure_motion_modes = ['away', 'vacation']
+    self._secure_motion_modes = ['away', 'vacation', 'alarm']
     self._secure_no_motion_modes = ['night']
 
 
