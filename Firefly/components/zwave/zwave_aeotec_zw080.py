@@ -68,6 +68,8 @@ class ZW080(ZwaveDevice):
 
     self._alexa_export = False
 
+    self._tags = ['alarm']
+
   def update_from_zwave(self, node: ZWaveNode = None, ignore_update=False, **kwargs):
     self.store_before_state()
     if node is None:

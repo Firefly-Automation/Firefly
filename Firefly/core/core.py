@@ -119,6 +119,8 @@ class Firefly(object):
     self.done_starting_up = True
     self.set_initial_values()
 
+    self.security_and_monitoring.startup()
+
   def set_initial_values(self):
     for ff_id, device in self.components.items():
       if device.type != TYPE_DEVICE:

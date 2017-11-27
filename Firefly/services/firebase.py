@@ -1,13 +1,13 @@
 import copy
 import json
+import subprocess
 from os import system
 
 import pyrebase
 import requests
-import subprocess
 
 from Firefly import aliases, logging, scheduler
-from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SOURCE_LOCATION, SOURCE_TIME, TYPE_DEVICE, TYPE_ROUTINE
+from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SOURCE_LOCATION, SOURCE_TIME, TYPE_DEVICE, TYPE_ROUTINE, FIREFLY_SECURITY_MONITORING
 from Firefly.core.service_handler import ServiceConfig, ServicePackage
 from Firefly.helpers.metadata import EXPORT_UI, FF_ID, HIDDEN_BY_USER, PRIMARY_ACTION
 from Firefly.helpers.service import Command, Request, Service
@@ -85,7 +85,6 @@ class Firebase(Service):
       "storageBucket": self.storage_bucket
     }
 
-
     logging.info('[FIREBASE] logging into firebase')
     self.firebase = pyrebase.initialize_app(self.config)
 
@@ -111,7 +110,6 @@ class Firebase(Service):
     self.stream = self.db.child('homeStatus').child(self.home_id).child('commands').stream(self.command_stream_handler, self.id_token)
     self.commandReplyStream = self.db.child('homeStatus').child(self.home_id).child('commandReply').stream(self.command_reply, self.id_token)
     logging.info('[FIREBASE] stream started')
-
 
   def register_home(self):
     logging.info('Registering Home On Firebase!!!!')
@@ -348,7 +346,6 @@ class Firebase(Service):
     except Exception as e:
       logging.notify("Firebase 271: %s" % str(e))
 
-
   def update_device_settings(self):
     logging.info('[FIREBASE] updating device settings')
     device_settings = {}
@@ -361,7 +358,6 @@ class Firebase(Service):
         pass
 
     self.set_home_status(FIREBASE_DEVICE_SETTINGS_PATH, device_settings)
-
 
   def update_last_metadata_timestamp(self):
     ''' Update the lastMetadataUpdate timestamp
@@ -435,6 +431,11 @@ class Firebase(Service):
       self.set_home_status('%s/statusMessages' % FIREBASE_LOCATION_STATUS_PATH, {})
 
     self.update_home_status(FIREBASE_LOCATION_STATUS_PATH, location_status)
+
+
+  def update_security_status(self, status):
+    self.update_home_status('%s/security' % FIREBASE_LOCATION_STATUS_PATH, status)
+
 
   def update_device_min_views(self, device_views, **kwargs):
     device_min_view = {}
@@ -516,7 +517,7 @@ class Firebase(Service):
 
     self.update_home_status(FIREBASE_DEVICE_STATUS, all_values)
 
-  def update_device_status(self, ff_id, action:dict, **kwargs):
+  def update_device_status(self, ff_id, action: dict, **kwargs):
     ''' Update a single device status
 
     Args:
@@ -607,6 +608,7 @@ class Firebase(Service):
     """
     now = self.firefly.location.now
     return_data = {
+      'security':          {},
       'time':           {
         'epoch':    now.timestamp(),
         'day':      now.day,
@@ -628,6 +630,10 @@ class Firebase(Service):
       'statusMessages': self.firefly.location.status_messages,
       'modes':          self.firefly.location.modes
     }
+    try:
+      return_data['security']['status'] = self.firefly.security_and_monitoring.get_alarm_status()
+    except:
+      pass
     return return_data
 
   def refresh_user(self):
@@ -657,7 +663,6 @@ class Firebase(Service):
       scheduler.runInH(1, self.refresh_user, 'firebase_refresh_user')
       pass
 
-
   def security_update(self, security_status):
     logging.info('Updating Firebase security status')
     self.db.child("homeStatus").child(self.home_id).child('securityStatus').set(security_status, self.id_token)
@@ -675,6 +680,11 @@ class Firebase(Service):
       if source == SOURCE_LOCATION:
         update_status_message = action == STATUS_MESSAGE_UPDATED
         self.update_location_status(update_status_message=update_status_message)
+        self.send_event(source, action)
+        return
+
+      if source == FIREFLY_SECURITY_MONITORING:
+        self.update_security_status(action)
         self.send_event(source, action)
         return
 

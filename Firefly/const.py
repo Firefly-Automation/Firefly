@@ -97,6 +97,8 @@ COMMAND_SPEECH = 'SPEECH'
 COMMAND_ROUTINE = 'ROUTINE'
 COMMAND_SET_LIGHT = 'set_light'
 
+FIREFLY_SECURITY_MONITORING = 'security_and_monitoring_service'
+
 ACTION_OFF = 'off'
 ACTION_ON = 'on'
 ACTION_TOGGLE = 'toggle'
