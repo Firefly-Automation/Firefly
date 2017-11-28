@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from os import path
 from pathlib import Path
 from typing import Any
+from time import sleep
 
 from aiohttp import web
 
@@ -62,6 +63,7 @@ class Firefly(object):
 
     self._subscriptions = Subscriptions()
     self.location = self.import_location()
+    self.location.add_status_message('firefly_startup', 'Firefly is starting up. This can take up to 5 minutes.')
 
     self.device_initial_values = {}
 
@@ -120,6 +122,7 @@ class Firefly(object):
     self.set_initial_values()
 
     self.security_and_monitoring.startup()
+    self.location.remove_status_message('firefly_startup')
 
   def set_initial_values(self):
     for ff_id, device in self.components.items():
@@ -242,10 +245,11 @@ class Firefly(object):
 
     Shutdown process should export the current state of all components so it can be imported on reboot and startup.
     '''
-    logging.message('Stopping Firefly')
+    logging.notify('Stopping Firefly')
 
     self.export_all_components()
     self.export_location()
+    self.security_and_monitoring.shutdown()
 
     try:
       logging.message('Stopping zwave service')
@@ -253,6 +257,8 @@ class Firefly(object):
         self.components['service_zwave'].stop()
     except Exception as e:
       logging.notify(e)
+
+    sleep(10)
 
     self.loop.stop()
     self.loop.close()

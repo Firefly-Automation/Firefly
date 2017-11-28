@@ -36,6 +36,7 @@ class Notify(Service):
 
 
   def send(self, **kwargs):
+    logging.info('[SERVICE NOTIFICATION] sending notification: %s' % str(kwargs))
     message = kwargs.get('message')
     device = kwargs.get('device', NOTIFY_DEFAULT)
     priority = kwargs.get('priority', PRIORITY_NORMAL)
