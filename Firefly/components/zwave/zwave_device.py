@@ -197,9 +197,10 @@ class ZwaveDevice(Device):
       self.add_action(BATTERY, action_battery())
 
 
-    if self._node.is_ready and self._update_try_count <= 5 and not self._config_updated:
+    if self._node.is_ready and self._update_try_count <= 20 and not self._config_updated:
       scheduler.runInS(5, self.update_device_config, '%s-update_config' % self.id, max_instances=1)
-    if self._update_try_count >6:
+      logging.debug('Not Done updating ZWave Values')
+    if self._update_try_count > 20:
       self._config_updated = True
     logging.debug('Done updating ZWave Values')
 
