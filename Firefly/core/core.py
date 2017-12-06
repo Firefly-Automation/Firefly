@@ -316,7 +316,10 @@ class Firefly(object):
 
   def update_security_firebase(self, security_status):
     if self.components.get(FIREBASE_SERVICE):
-      self.components[FIREBASE_SERVICE].security_update(security_status)
+      try:
+        self.components[FIREBASE_SERVICE].security_update(security_status)
+      except:
+        logging.warn('[CORE - SECURITY] Could not send event to security and monitoring. This is probably due to the service not being active yet.')
 
 
   def send_security_monitor(self, event: Event):

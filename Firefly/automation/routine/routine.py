@@ -2,7 +2,7 @@ from Firefly import logging
 from Firefly.automation.const import AUTOMATION_INTERFACE
 from Firefly.automation.routine.const import ROUTINE_EXECUTE, ROUTINE_ICON, ROUTINE_MODE, ROUTINE_ROUTINE
 from Firefly.automation.routine.metadata import METADATA, TITLE
-from Firefly.const import COMMAND_NOTIFY, SERVICE_NOTIFICATION, TYPE_ROUTINE
+from Firefly.const import COMMAND_NOTIFY, SERVICE_NOTIFICATION, TYPE_ROUTINE, EVENT_TYPE_COMMAND
 from Firefly.helpers.automation import Automation
 from Firefly.helpers.events import Command, Event
 
@@ -64,7 +64,7 @@ class Routine(Automation):
     # TODO: replace export_ui with a const from metadata or core.
     # self.export_ui = self.interface.get('export_ui', {}).get(ROUTINE_ROUTINE, True)
 
-    self.add_command(ROUTINE_EXECUTE, self.event_handler)
+    self.add_command(ROUTINE_EXECUTE, self.execute)
 
   def export(self, **kwargs):
     if kwargs.get('firebase_view'):
@@ -107,9 +107,17 @@ class Routine(Automation):
 
       return True
 
+    if trigger_index in ['sunrise', 'sunset']:
+      return False
+
     if self.mode == self.firefly.location.mode:
       logging.info('[ROUTINE] not executing because already in mode.')
       return False
+
+    self.execute()
+
+
+  def execute(self, **kwargs):
 
     if self.new_interface.messages.get(ROUTINE_ROUTINE):
       notify = Command(SERVICE_NOTIFICATION, self.id, COMMAND_NOTIFY, message=self.new_interface.messages.get(ROUTINE_ROUTINE))

@@ -28,7 +28,7 @@ of what node number they are for sending commands.
 TITLE = 'Z-Wave service for Firefly'
 AUTHOR = 'Zachary Priddy me@zpriddy.com'
 SERVICE_ID = 'service_zwave'
-COMMANDS = ['send_command', 'stop', 'add_node', 'remove_node', 'cancel', 'initialize', 'heal', 'hard_reset', 'save']
+COMMANDS = ['send_command', 'stop', 'add_node', 'remove_node', 'cancel', 'initialize', 'heal', 'hard_reset', 'save', 'find_dead_nodes']
 REQUESTS = ['get_nodes', 'get_orphans']
 
 SECTION = 'ZWAVE'
@@ -84,6 +84,7 @@ class Zwave(Service):
     self.add_command('heal', self.zwave_heal)
     self.add_command('hard_reset', self.zwave_hard_reset)
     self.add_command('save', self.save_zwave_data)
+    self.add_command('find_dead_nodes', self.find_dead_nodes)
 
     self.add_request('get_nodes', self.get_nodes)
     self.add_request('get_orphans', self.get_orphans)
@@ -182,8 +183,9 @@ class Zwave(Service):
   def find_dead_nodes(self, **kwargs):
     for node_id, node in self._network.nodes.items():
       logging.message('ZWAVE FINDING DEAD NODES: %s' % str(node_id))
-      self._network.controller.has_node_failed(node_id)
-      sleep(60)
+      if self._network.controller.has_node_failed(node_id):
+        self._network.controller.remove_failed_node(node_id)
+        sleep(60)
 
   def zwave_controller_command(self, **kwargs):
     logging.message('ZWAVE CONTROLLER COMMAND: %s' % str(kwargs))

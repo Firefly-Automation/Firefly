@@ -302,12 +302,12 @@ class FireflySecurityAndMonitoring(object):
     return devices
 
   def process_battery_event(self, event: Event, **kwargs):
-    battery_state = check_battery_from_event(event)
+    (battery_state, battery_level) = check_battery_from_event(event)
     if battery_state in BATTERY_NO_NOTIFY_STATES:
       if scheduler.cancel('%s_battery_notify' % event.source):
         self.send_notification('Battery in %s has been replaced.')
       return
-    message = generate_battery_notification_message(event.source, battery_state)
+    message = generate_battery_notification_message(event.source, battery_state, battery_level)
     self.send_notification(message)
     if battery_state == BATTERY_LOW:
       return

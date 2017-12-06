@@ -52,3 +52,6 @@ Look under Firefly/automation in this repo. Each automation should have a README
 - Window Fan Control
 - Nest Eco Window
 - Door Alert
+
+
+pip install git+https://github.com/vaab/colour

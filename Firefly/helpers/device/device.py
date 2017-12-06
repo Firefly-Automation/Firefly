@@ -69,7 +69,7 @@ class Device(object):
     self._homekit_types = {}
 
     self._alexa_export = kwargs.get('alexa_export', True)
-    self._alexa_categories = []
+    self._alexa_categories = kwargs.get('alexa_categories', [])
     self._alexa_capabilities = []
     self._alexa_manufacturer_name = kwargs.get('alexa_manufacturer_name', 'Firefly')
     self._alexa_description = kwargs.get('alexa_description', 'Firefly Home Device')
@@ -347,6 +347,8 @@ class Device(object):
     """
     return_data = {}
     return_data.update(self.export(api_view=True))
+    return_data['alexa_view'] = self.get_alexa_view()
+    return_data['alexa_c'] = self._alexa_categories
     return_data['commands'] = self._commands
     return_data['requests'] = self._requests
     return_data['device_type'] = self._device_type

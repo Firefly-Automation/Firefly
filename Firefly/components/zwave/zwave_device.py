@@ -51,7 +51,7 @@ class ZwaveDevice(Device):
 
     super().__init__(firefly, package, title, author, commands, requests, device_type, **kwargs)
 
-    self._node: ZWaveNode = kwargs.get('node')
+    self._node = kwargs.get('node')
 
     self._sensors = {}
     self._switches = {}
@@ -186,10 +186,10 @@ class ZwaveDevice(Device):
     # Update config if device config has not been updated.
     if not self._config_updated:
       for s, i in node.get_values().items():
-        self.zwave_values[i.index] = ZwavePrarmValue(i.index, i.label, s, i.data, i.command_class, i.type, i.genre)
+        self.zwave_values["%s_%s" %(i.genre.lower(), i.index)] = ZwavePrarmValue(i.index, i.label, s, i.data, i.command_class, i.type, i.genre)
     elif kwargs.get('values'):
       values = kwargs.get('values')
-      self.zwave_values[values.index] = ZwavePrarmValue(values.index, values.label, values.value_id, values.data, values.command_class, values.type, values.genre)
+      self.zwave_values["%s_%s" %(values.genre.lower(), values.index)] = ZwavePrarmValue(values.index, values.label, values.value_id, values.data, values.command_class, values.type, values.genre)
 
 
     if node.has_command_class(COMMAND_CLASS_BATTERY) and BATTERY not in self.request_map:
@@ -218,7 +218,7 @@ class ZwaveDevice(Device):
 
 
   def verify_set_zwave_param(self, param_index, param_value, size=2) -> bool:
-    if self.get_zwave_value(param_index) != param_value:
+    if self.get_zwave_value("config_%s" %param_index) != param_value:
       self.node.set_config_param(param_index, param_value, size)
       return False
     return True

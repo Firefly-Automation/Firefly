@@ -28,8 +28,15 @@ INITIAL_VALUES = {
 class ContactSensor(Device):
   def __init__(self, firefly, package, title, author, commands=COMMANDS, requests=REQUESTS, device_type=DEVICE_TYPE_CONTACT_SENSOR, capabilities=CAPABILITIES, initial_values=INITIAL_VALUES, **kwargs):
     logging.message('SETTING UP MULTI_SENSOR')
-    INITIAL_VALUES.update(initial_values)
-    initial_values = INITIAL_VALUES
+
+    initial_values_updated = INITIAL_VALUES.copy()
+    initial_values_updated.update(initial_values)
+    initial_values = initial_values_updated
+
+    capabilities_updated = CAPABILITIES.copy()
+    capabilities_updated.update(capabilities)
+    capabilities = capabilities_updated
+
     super().__init__(firefly, package, title, author, commands, requests, device_type, initial_values=initial_values, **kwargs)
 
     if capabilities[ALARM] and ALARM in requests:
@@ -47,7 +54,7 @@ class ContactSensor(Device):
         self._tags.append('contact')
 
     self._alexa_export = False
-    self.capabilities = CAPABILITIES
+    self.capabilities = capabilities
 
     # TODO: Use device settings for this
     self._security_monitoring = kwargs.get('security_monitoring', True)
