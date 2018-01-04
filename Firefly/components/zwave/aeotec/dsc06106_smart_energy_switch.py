@@ -37,7 +37,7 @@ class ZwaveAeotecSwitch5(ZwaveSwitch):
     initial_values = INITIAL_VALUES
     if kwargs.get('initial_values') is not None:
       initial_values_updated = INITIAL_VALUES.copy()
-      initial_values_updated.update( kwargs.get('initial_values'))
+      initial_values_updated.update(kwargs.get('initial_values'))
       initial_values = initial_values_updated
 
     kwargs.update({
@@ -45,10 +45,9 @@ class ZwaveAeotecSwitch5(ZwaveSwitch):
       'commands':       COMMANDS,
       'requests':       REQUESTS
     })
-    super().__init__(firefly, package, TITLE, capabilities=CAPABILITIES, alexa_categories=[ALEXA_SMARTPLUG], **kwargs)
+    super().__init__(firefly, package, TITLE, capabilities=CAPABILITIES, **kwargs)
 
-    self.set_alexa_categories(['SMARTPLUG'])
-    self._alexa_categories = ['SMARTPLUG']
+    self.set_alexa_categories(ALEXA_SMARTPLUG)
 
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values

@@ -47,7 +47,7 @@ class ZwaveAeotecSwitch6(ZwaveSwitch):
     })
     super().__init__(firefly, package, TITLE, capabilities=CAPABILITIES, **kwargs)
 
-    self.set_alexa_categories([ALEXA_SMARTPLUG])
+    self.set_alexa_categories(ALEXA_SMARTPLUG)
 
   def update_device_config(self, **kwargs):
     # TODO: Pull these out into config values
