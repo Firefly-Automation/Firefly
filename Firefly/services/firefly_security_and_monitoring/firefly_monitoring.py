@@ -9,8 +9,8 @@ This is the core Firefly Security and Monitoring Service. There should be almost
 - Smoke Alerts
 - Flooding Alerts
 """
-from Firefly import logging, scheduler
-from Firefly.const import COMMAND_NOTIFY, EVENT_TYPE_BROADCAST, FIREFLY_SECURITY_MONITORING, SERVICE_NOTIFICATION, SOURCE_LOCATION, TYPE_DEVICE
+from Firefly import logging, scheduler, aliases
+from Firefly.const import COMMAND_NOTIFY, EVENT_TYPE_BROADCAST, FIREFLY_SECURITY_MONITORING, SERVICE_NOTIFICATION, SOURCE_LOCATION, TYPE_DEVICE, WATER, SENSOR_DRY, SENSOR_WET
 from Firefly.helpers.device import BATTERY, CONTACT, CONTACT_CLOSE, CONTACT_OPEN, MOTION, MOTION_ACTIVE, MOTION_INACTIVE
 from Firefly.helpers.events import Command, Event
 from Firefly.services.firefly_security_and_monitoring.battery_monitor import check_battery_from_event, generate_battery_notification_message
@@ -55,7 +55,10 @@ class FireflySecurityAndMonitoring(object):
     if BATTERY in event.event_action:
       self.process_battery_event(event)
 
-    # TODO: process water event
+    # Process water event only if monitoring is enabled for the device.
+    if WATER in event.event_action:
+      if self.check_security_enabled(event.source):
+        self.process_water_event(event)
 
     # Enter Secure Mode
     if event.source == SOURCE_LOCATION and 'mode' in event.event_action:
@@ -300,6 +303,17 @@ class FireflySecurityAndMonitoring(object):
       except:
         pass
     return devices
+
+
+  def process_water_event(self, event: Event, **kwargs):
+    alias = aliases.get_alias(event.source)
+    if event.event_action.get(WATER) == SENSOR_WET:
+      self.send_notification('ALERT!!! Water detected by: %s' % alias)
+      self.trigger_alarm()
+      return
+    if event.event_action.get(WATER) == SENSOR_DRY:
+      self.send_notification('ALERT!!! Water no longer detected by: %s' % alias)
+      return
 
   def process_battery_event(self, event: Event, **kwargs):
     (battery_state, battery_level) = check_battery_from_event(event)

@@ -40,7 +40,7 @@ class WaterSensor(Device):
 
     if capabilities[ALARM] and ALARM in requests:
       self.add_request(ALARM, self.get_alarm)
-      self.add_action(ALARM, action_text(title='Alarm Code', context='Alarm code from device', request=ALARM))
+      self.add_action(ALARM, action_text(title='Alarm Code', context='Flood Alarm Code', request=ALARM))
 
     if capabilities[BATTERY] and BATTERY in requests:
       self.add_request(BATTERY, self.get_battery)
