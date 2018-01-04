@@ -50,7 +50,7 @@ SECTION = 'FIREBASE'
 # TODO: push this data to location weather info.. this could be useful
 
 def Setup(firefly, package, alias, ff_id, service_package: ServicePackage, config: ServiceConfig, **kwargs):
-  logging.notify('Installing Firebase Service')
+  logging.info('Installing Firebase Service')
   firebase = Firebase(firefly, alias, ff_id, service_package, config, **kwargs)
   firefly.install_component(firebase)
   return True
