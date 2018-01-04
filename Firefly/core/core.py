@@ -14,7 +14,7 @@ from Firefly import aliases, logging, scheduler
 from Firefly.const import COMPONENT_MAP, DEVICE_FILE, EVENT_TYPE_BROADCAST, LOCATION_FILE, REQUIRED_FILES, TIME, TYPE_DEVICE, VERSION
 from Firefly.core.service_handler import ServiceHandler
 from Firefly.helpers.events import Event, Request, Command
-from Firefly.helpers.groups.groups import import_groups
+from Firefly.helpers.groups.groups import import_groups, build_rooms, export_groups
 from Firefly.helpers.location import Location
 from Firefly.helpers.room import Rooms
 from Firefly.helpers.subscribers import Subscriptions
@@ -94,6 +94,8 @@ class Firefly(object):
 
     # Import Groups
     import_groups(self)
+    build_rooms(self)
+
 
     logging.error(code='FF.COR.INI.001')  # this is a test error message
     logging.notify('Firefly is starting up in mode: %s' % self.location.mode)
@@ -280,6 +282,7 @@ class Firefly(object):
       self.export_components(c['file'], c['type'])
 
     aliases.export_aliases()
+    export_groups()
 
   def export_components(self, config_file: str, component_type: str, current_values: bool = True) -> None:
     """
