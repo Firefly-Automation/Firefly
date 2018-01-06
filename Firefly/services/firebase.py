@@ -7,7 +7,7 @@ import pyrebase
 import requests
 
 from Firefly import aliases, logging, scheduler
-from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, SOURCE_LOCATION, SOURCE_TIME, TYPE_DEVICE, TYPE_ROUTINE, FIREFLY_SECURITY_MONITORING
+from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, FIREFLY_SECURITY_MONITORING, SOURCE_LOCATION, SOURCE_TIME, TYPE_DEVICE, TYPE_ROUTINE
 from Firefly.core.service_handler import ServiceConfig, ServicePackage
 from Firefly.helpers.metadata import EXPORT_UI, FF_ID, HIDDEN_BY_USER, PRIMARY_ACTION
 from Firefly.helpers.service import Command, Request, Service
@@ -50,7 +50,7 @@ SECTION = 'FIREBASE'
 # TODO: push this data to location weather info.. this could be useful
 
 def Setup(firefly, package, alias, ff_id, service_package: ServicePackage, config: ServiceConfig, **kwargs):
-  logging.notify('Installing Firebase Service')
+  logging.info('Installing Firebase Service')
   firebase = Firebase(firefly, alias, ff_id, service_package, config, **kwargs)
   firefly.install_component(firebase)
   return True
@@ -432,10 +432,8 @@ class Firebase(Service):
 
     self.update_home_status(FIREBASE_LOCATION_STATUS_PATH, location_status)
 
-
   def update_security_status(self, status):
     self.update_home_status('%s/security' % FIREBASE_LOCATION_STATUS_PATH, status)
-
 
   def update_device_min_views(self, device_views, **kwargs):
     device_min_view = {}
@@ -608,7 +606,7 @@ class Firebase(Service):
     """
     now = self.firefly.location.now
     return_data = {
-      'security':          {},
+      'security':       {},
       'time':           {
         'epoch':    now.timestamp(),
         'day':      now.day,
@@ -665,7 +663,7 @@ class Firebase(Service):
 
   def security_update(self, security_status):
     logging.info('Updating Firebase security status')
-    self.db.child("homeStatus").child(self.home_id).child('securityStatus').set(security_status, self.id_token)
+    self.set_home_status("securityStatus", security_status)
 
   def push(self, source, action, retry=True):
     logging.info('[FIREBASE PUSH] Pushing Data: %s: %s' % (str(source), str(action)))

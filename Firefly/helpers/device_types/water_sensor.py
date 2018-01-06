@@ -26,14 +26,21 @@ INITIAL_VALUES = {
 
 class WaterSensor(Device):
   def __init__(self, firefly, package, title, author, commands=COMMANDS, requests=REQUESTS, device_type=DEVICE_TYPE_WATER_SENSOR, capabilities=CAPABILITIES, initial_values=INITIAL_VALUES, **kwargs):
-    logging.message('SETTING UP MULTI_SENSOR')
-    INITIAL_VALUES.update(initial_values)
-    initial_values = INITIAL_VALUES
+    logging.message('SETTING UP WATER SENSOR')
+
+    initial_values_updated = INITIAL_VALUES.copy()
+    initial_values_updated.update(initial_values)
+    initial_values = initial_values_updated
+
+    capabilities_updated = CAPABILITIES.copy()
+    capabilities_updated.update(capabilities)
+    capabilities = capabilities_updated
+
     super().__init__(firefly, package, title, author, commands, requests, device_type, initial_values=initial_values, **kwargs)
 
     if capabilities[ALARM] and ALARM in requests:
       self.add_request(ALARM, self.get_alarm)
-      self.add_action(ALARM, action_text(title='Alarm Code', context='Alarm code from device', request=ALARM))
+      self.add_action(ALARM, action_text(title='Alarm Code', context='Flood Alarm Code', request=ALARM))
 
     if capabilities[BATTERY] and BATTERY in requests:
       self.add_request(BATTERY, self.get_battery)
