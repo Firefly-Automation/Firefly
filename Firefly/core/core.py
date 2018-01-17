@@ -384,7 +384,7 @@ class Firefly(object):
         logging.error('Error sending event %s' % str(e))
     self.update_current_state(event)
     self.send_firebase(event)
-    self.event_logger.event(event)
+    self.event_logger.event(event.source, event.event_action, self.location.now.timestamp())
 
 
   def _test_send_command(self, command:Command):
