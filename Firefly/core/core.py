@@ -17,9 +17,9 @@ from Firefly.core.service_handler import ServiceHandler
 from Firefly.helpers.events import Event, Request, Command
 from Firefly.helpers.groups.groups import import_groups, build_rooms, export_groups
 from Firefly.helpers.location import Location
-from Firefly.helpers.room import Rooms
 from Firefly.helpers.subscribers import Subscriptions
 from Firefly.services.firefly_security_and_monitoring.firefly_monitoring import FireflySecurityAndMonitoring
+from Firefly.services.firebase.event_logging import EventLogger
 
 
 app = web.Application()
@@ -88,11 +88,13 @@ class Firefly(object):
     self.service_handler = ServiceHandler()
     self.service_handler.install_services(self)
 
+
+
     logging.info('[CORE] services installed: %s' % str(self.service_handler.get_installed_services(self)))
 
     # TODO: Rooms will be replaced by groups subclass rooms.
-    self._rooms = Rooms(self)
-    self._rooms.build_rooms()
+    # self._rooms = Rooms(self)
+    # self._rooms.build_rooms()
 
     # Import Groups
     import_groups(self)
@@ -117,6 +119,8 @@ class Firefly(object):
     #self.done_starting_up = True
 
     self.security_and_monitoring.generate_status()
+
+    self.event_logger = EventLogger(self)
 
 
   def finish_starting_up(self):
@@ -288,7 +292,7 @@ class Firefly(object):
       self.export_components(c['file'], c['type'])
 
     aliases.export_aliases()
-    export_groups()
+    export_groups(self)
 
   def export_components(self, config_file: str, component_type: str, current_values: bool = True) -> None:
     """
@@ -380,6 +384,7 @@ class Firefly(object):
         logging.error('Error sending event %s' % str(e))
     self.update_current_state(event)
     self.send_firebase(event)
+    self.event_logger.event(event)
 
 
   def _test_send_command(self, command:Command):

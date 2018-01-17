@@ -5,6 +5,7 @@ from os import system
 
 import pyrebase
 import requests
+import collections
 
 from Firefly import aliases, logging, scheduler
 from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, FIREFLY_SECURITY_MONITORING, SOURCE_LOCATION, SOURCE_TIME, TYPE_DEVICE, TYPE_ROUTINE
@@ -13,6 +14,8 @@ from Firefly.helpers.metadata import EXPORT_UI, FF_ID, HIDDEN_BY_USER, PRIMARY_A
 from Firefly.helpers.service import Command, Request, Service
 from Firefly.services.alexa.alexa import process_alexa_request
 from Firefly.services.api_ai import apiai_command_reply
+
+from Firefly.services.firebase.event_logging import EventLogger
 
 FIREBASE_LOCATION_STATUS_PATH = 'locationStatus'
 FIREBASE_DEVICE_VIEWS = 'deviceViews'
@@ -41,6 +44,8 @@ COMMANDS = ['push', 'refresh', 'get_api_id']
 REQUESTS = []
 
 SECTION = 'FIREBASE'
+
+MAX_EVENTS = 1000
 
 
 # TODO: Setup function should get the config from the service config file. If the
@@ -73,6 +78,12 @@ class Firebase(Service):
     self.facebook = config.facebook
 
     self.home_id = config.home_id
+
+    # Create the event logger
+    self.event_logger = EventLogger(self)
+    # Event history will hold the last 1000 events and overwrite existing events when buffer is full
+    self.event_history = collections.deque(maxlen=MAX_EVENTS)
+    self.events_since_clear = 0
 
     self.add_command('push', self.push)
     self.add_command('refresh', self.refresh_all)
@@ -734,12 +745,38 @@ class Firebase(Service):
       return
     now = self.firefly.location.now
     now_time = now.strftime("%B %d %Y %I:%M:%S %p")
+
+    self.event_logger.event(source, action, now.timestamp())
+
+    event_key = '%s-%s' % (str(now.timestamp()).replace('.', ''), source)
+    event_data = {
+      'ff_id':     source,
+      'event':     action,
+      'timestamp': now.timestamp(),
+      'time':      now_time
+    }
+
+    if self.events_since_clear > MAX_EVENTS:
+      last_x_events = {}
+      self.events_since_clear = 0
+      for e in self.event_history:
+        last_x_events[e.get('key')] = e.get('data')
+      self.db.child("homeStatus").child(self.home_id).child('events').set(last_x_events, self.id_token)
+
+
+    self.db.child("homeStatus").child(self.home_id).child('events').child(event_key).set(event_data, self.id_token)
+    self.event_history.append({'key':event_key, 'data':event_data})
+    self.events_since_clear += 1
+
+
+    '''
     self.db.child("homeStatus").child(self.home_id).child('events').push({
       'ff_id':     source,
       'event':     action,
       'timestamp': now.timestamp(),
       'time':      now_time
     }, self.id_token)
+    '''
 
   def push_notification(self, message, priority, retry=True):
     try:
@@ -796,6 +833,12 @@ class Firebase(Service):
       }
     }, self.id_token)
     my_stream = self.db.child("homeStatus").child(self.home_id).child("apiDevices").child(ff_id).child('apiKey').stream(stream_api_key, self.id_token)
+
+
+  def upload_log(self, filename, **kwargs):
+    storage = self.firebase.storage()
+    remote_file_name = '%s_event_log_%s.json' % (self.home_id, self.firefly.location.now.timestamp())
+    storage.child(self.home_id).child(remote_file_name).put(filename, self.id_token)
 
 
 def scrub(x):
