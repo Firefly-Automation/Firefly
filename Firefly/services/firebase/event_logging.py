@@ -15,6 +15,8 @@ class EventLogger(object):
     self.lock_count = 0
 
   def event(self, source, action, ts, **kwargs):
+    if source == "time":
+      return
     event_line = {
       'timestamp': ts,
       'ff_id': source,
