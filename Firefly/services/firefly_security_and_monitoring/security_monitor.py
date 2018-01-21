@@ -58,7 +58,7 @@ def process_contact_change(event: Event, **kwargs) -> dict:
     return_data['alarm'] = True
     return_data['message'] = 'ALERT! %s has opened while system was armed. Alarm has now been triggered!' % alias
   elif event.event_action[CONTACT] == CONTACT_CLOSE:
-    return_data['message'] = 'Warning: System was armed while %s was still opened. %s has been closed. If it opens again before disarming the system the alarm will be triggered.' % (alias, alias)
+    return_data['message'] = 'Warning: %s has been closed. If it opens again before disarming the system the alarm will be triggered.' % (alias, alias)
 
   return return_data
 

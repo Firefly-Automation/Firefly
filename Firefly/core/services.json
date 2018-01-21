@@ -96,7 +96,7 @@
         "description": "Firebase cloud control service",
         "ff_id": "service_firebase",
         "name": "Firebase",
-        "package": "Firefly.services.firebase",
+        "package": "Firefly.services.firebase.firebase",
         "required": {
             "api_key": {
                 "default_init": true,

@@ -73,7 +73,7 @@ def export_groups(firefly, config_file=GROUPS_CONFIG_FILE):
     export_data[ff_id] = component.export()
 
   with open(config_file, 'w') as f:
-    json.dump(export_data)
+    json.dump(export_data, f, indent=4, sort_keys=True)
 
 
 def make_group(firefly, alias):
@@ -234,7 +234,6 @@ class Group(object):
 
   def export(self, **kwargs):
     export_data = {
-      'ff_id':   self.id,
       'alias':   self.alias,
       'group_type': self.group_type,
       'devices': list(self.devices.keys())

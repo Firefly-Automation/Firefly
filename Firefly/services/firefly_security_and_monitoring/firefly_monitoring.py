@@ -39,6 +39,9 @@ class FireflySecurityAndMonitoring(object):
     self.settings = FireflySecuritySettings()
 
 
+  def shutdown(self, **kwargs):
+    self.settings.save_config()
+
   def get_alarm_status(self, **kwargs):
     if not self.enabled:
       return SYSTEM_DISABLED
@@ -73,7 +76,7 @@ class FireflySecurityAndMonitoring(object):
         self.status['status']['alarm'] = self.alarm_status
         self.firefly.update_security_firebase(self.status)
         self.send_notification('Security alarm disabled.')
-        self.broadcasrt_status()
+        self.broadcast_status()
       return
 
     if event.source not in self.firefly.components:
@@ -256,8 +259,8 @@ class FireflySecurityAndMonitoring(object):
       command = Command(ff_id, self.id, self.settings.alarm_command)
       self.firefly.send_command(command)
 
-    self.broadcasrt_status()
-    self.status['status']['alarm'] = self.alarm_status
+    self.broadcast_status()
+    self.status['status']['alarm'] = self.alarm_status.replace('_', ' ')
     self.firefly.update_security_firebase(self.status)
 
   def enter_secure_mode(self, **kwargs):
@@ -273,18 +276,18 @@ class FireflySecurityAndMonitoring(object):
     # If no contacts open then send notification that alarm is now armed.
     if self.check_secure_mode(no_motion=False):
       self.send_notification(ALARM_ARMED_MESSAGE_MOTION)
-      self.alarm_status = ALARM_ARMED_MESSAGE_MOTION
+      self.alarm_status = ALARM_ARMED_MOTION
     else:
       self.send_notification(ALARM_ARMED_MESSAGE_NO_MOTION)
-      self.alarm_status = ALARM_ARMED_MESSAGE_NO_MOTION
+      self.alarm_status = ALARM_ARMED_NO_MOTION
 
-    self.status['status']['alarm'] = self.alarm_status
+    self.status['status']['alarm'] = self.alarm_status.replace('_', ' ')
     self.firefly.update_security_firebase(self.status)
-    self.broadcasrt_status()
+    self.broadcast_status()
 
 
 
-  def broadcasrt_status(self, **kwargs):
+  def broadcast_status(self, **kwargs):
     event = Event(self.id, EVENT_TYPE_BROADCAST, {
       'status': self.alarm_status,
     })

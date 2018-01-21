@@ -1,4 +1,5 @@
 import json
+from Firefly import logging
 
 
 DEFAULT_ON_COMMAND = {"set_light":{"level": 100, "switch": "on", "ct":6500}}
@@ -31,8 +32,17 @@ class FireflySecuritySettings(object):
     alarm_settings = self.config.get('alarm')
     self.alarm_config = AlarmSettings(**alarm_settings)
 
-    self._secure_motion_modes = self.config.get('secure_motion_enabled', ['away', 'vacation'])
-    self._secure_motion_modes = self.config.get('secure_motion_disabled', ['night'])
+    self._secure_motion_modes = self.config.get('secure_motion_enabled', ['away', 'vacation', 'alarm'])
+    self._secure_no_motion_modes = self.config.get('secure_motion_disabled', ['night'])
+
+
+  def save_config(self):
+    logging.info('[FIREFLY SECURITY] saving config')
+    with open(self.file_path, 'w') as config_file:
+      config = self.alarm_config.__dict__
+      config['secure_motion_enabled'] = self._secure_motion_modes
+      config['secure_motion_disabled'] = self._secure_no_motion_modes
+      json.dump(config, config_file, indent=4, sort_keys=True)
 
 
   @property
