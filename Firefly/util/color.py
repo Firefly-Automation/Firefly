@@ -548,11 +548,11 @@ def populate_colors(**kwargs) -> Colors:
     sat_in = float(kwargs['sat'])
     bri_in = float(kwargs['bri'])
 
-    if hue_in < 1.0:
+    if hue_in <= 1.0:
       hue_in = hue_in * 65536
-    if sat_in < 1.0:
+    if sat_in <= 1.0:
       sat_in = sat_in * 255
-    if bri_in < 1.0:
+    if bri_in <= 1.0:
       bri_in = bri_in * 255
 
     hue_in = int(hue_in)
@@ -580,6 +580,9 @@ def populate_colors(**kwargs) -> Colors:
   g = int(rgb_out[1] * 255)
   b = int(rgb_out[2] * 255)
 
-  colors.set(color.get_hue(), color.get_saturation(), color.get_luminance(), color.get_hex(), r, g, b, color.get_web())
+  if 'hue' in kwargs and 'sat' in kwargs and 'bri' in kwargs:
+    colors.set(hue_in, sat_in, bri_in, color.get_hex(), r, g, b, color.get_web())
+  else:
+    colors.set(color.get_hue(), color.get_saturation(), color.get_luminance(), color.get_hex(), r, g, b, color.get_web())
 
   return colors

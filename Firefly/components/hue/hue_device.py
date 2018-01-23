@@ -236,13 +236,16 @@ class HueDevice(Light):
       self.update_values(level=level)
 
     if colors.is_set:
-      hue = int(colors.hue_expanded)
-      sat = int(colors.sat_expanded)
+      #hue = int(colors.hue_expanded)
+     #sat = int(colors.sat_expanded)
+      hue = colors.hue
+      sat = colors.sat
       hue_value.update({
         'hue': hue,
-        'sat': sat
+        'sat': sat,
+        'bri': colors.bri
       })
-      self.update_values(hue=hue, sat=sat, bri=self._bri)
+      self.update_values(hue=hue, sat=sat, bri=colors.bri)
 
     if ct is not None:
       ct = check_ct(ct, kelvin=False)
