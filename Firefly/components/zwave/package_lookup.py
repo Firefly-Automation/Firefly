@@ -17,6 +17,11 @@ WORK_AROUND_MAPPING = {
   'unknown:_type=1c02,_id=0334': {
     PACKAGE: 'leviton.dzs15',
     ALIAS:   'Levition Zwave Switch'
+  },
+  'unknown:_type=1b03,_id=0334': {
+    PACKAGE: 'leviton.dzmx1',
+    ALIAS:   'Levition Zwave Dimmer'
+
   },  # Ecolink Door Window Plus Sensor
   'unknown:_type=0004,_id=0002': {
     PACKAGE: 'ecolink.contact_sensor',
@@ -29,8 +34,17 @@ WORK_AROUND_MAPPING = {
 }
 
 AVAILABLE_PACKAGES = {
-  'aeotec': ['dsc06106_smart_energy_switch', 'zw096_smart_switch_6', 'zw100_multisensor_6', 'zw100_multisensor_6', 'zw120_door_window_sensor_gen5', 'zw112_door_window_sensor_6', 'dsb45_water_sensor',
-    'dsb04100_door_window_sensor']
+  'aeotec': [
+    'dsc06106_smart_energy_switch',
+    'zw096_smart_switch_6',
+    'zw100_multisensor_6',
+    'zw120_door_window_sensor_gen5',
+    'zw112_door_window_sensor_6',
+    'dsb45_water_sensor',
+    'dsb04100_door_window_sensor',
+    'zw099_smart_dimmer_6',
+    'zw117_range_extender_6'
+  ]
 }
 
 LINKED_PACKAGES = {
@@ -58,6 +72,8 @@ DEVICE_TYPE_MAPPING = {
   'on/off relay switch':  'zwave_generic_devices.switch',
   'on/off power switch':  'zwave_generic_devices.switch',
   'door/window sensor':   'zwave_generic_devices.contact_sensor',
+  'door sensor':          'zwave_generic_devices.contact_sensor',
+  'window sensor':        'zwave_generic_devices.contact_sensor',
   'door/window detector': 'zwave_generic_devices.contact_sensor',
   'motion sensor':        'zwave_generic_devices.motion_sensor',
   'motion detector':      'zwave_generic_devices.motion_sensor'
@@ -103,6 +119,7 @@ def get_package(node: ZWaveNode) -> dict:
       'node':            node
     }
 
+  logging.info('[ZWAVE] NEW NODE INFO: id: %s product_name: %s product_type: %s device_type: %s info: %s' % (node.node_id, node.product_name, node.product_type, node.device_type, str(node.to_dict())))
   if not node.is_ready:
     logging.message('Node is not ready, Waiting for more info.')
     return {}
@@ -113,7 +130,7 @@ def get_package(node: ZWaveNode) -> dict:
     if node_type in product_name:
       return {
         MODULE: '%s.%s' % (PACKAGE_BASE, package),
-        ALIAS:  node.product_name.replace('/',' ')
+        ALIAS:  node.product_name.replace('/', ' ')
       }
 
   print('******************************************')

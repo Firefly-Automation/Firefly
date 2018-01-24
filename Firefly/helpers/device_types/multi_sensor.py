@@ -2,7 +2,7 @@ from Firefly import logging
 from Firefly.const import LUX, MOTION, MOTION_ACTIVE, MOTION_INACTIVE
 from Firefly.helpers.device import *
 from Firefly.helpers.device.device import Device
-from Firefly.helpers.metadata import action_motion, action_text
+from Firefly.helpers.metadata.metadata import action_motion, action_text
 
 # TODO: Add support for temp reporting.
 # from Firefly.services.alexa.alexa_const import ALEXA_TEMPERATURE_SENSOR, ALEXA_TEMPERATURE_INTERFACE
@@ -39,8 +39,15 @@ INITIAL_VALUES = {
 class MultiSensor(Device):
   def __init__(self, firefly, package, title, author, commands=COMMANDS, requests=REQUESTS, device_type=DEVICE_TYPE_MULTI_SENSOR, capabilities=CAPABILITIES, initial_values=INITIAL_VALUES, **kwargs):
     logging.message('SETTING UP MULTI_SENSOR')
-    INITIAL_VALUES.update(initial_values)
-    initial_values = INITIAL_VALUES
+
+    initial_values_updated = INITIAL_VALUES.copy()
+    initial_values_updated.update(initial_values)
+    initial_values = initial_values_updated
+
+    capabilities_updated = CAPABILITIES.copy()
+    capabilities_updated.update(capabilities)
+    capabilities = capabilities_updated
+
     super().__init__(firefly, package, title, author, commands, requests, device_type, initial_values=initial_values, **kwargs)
 
     if capabilities[ALARM] and ALARM in requests:
@@ -74,7 +81,10 @@ class MultiSensor(Device):
       self.add_action(ULTRAVIOLET, action_text(title='Ultraviolet', request=ULTRAVIOLET))
 
     self._alexa_export = False
-    self.capabilities = CAPABILITIES
+    self.capabilities = capabilities
+
+    # TODO: Use device settings for this
+    self._security_monitoring = kwargs.get('security_monitoring', True)
 
   def update_values(self, alarm=None, battery=None, humidity=None, lux=None, motion=None, temperature=None, ultraviolet=None, **kwargs):
     if alarm is not None:

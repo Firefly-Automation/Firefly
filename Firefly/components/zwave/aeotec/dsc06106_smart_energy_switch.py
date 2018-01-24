@@ -34,10 +34,14 @@ def Setup(firefly, package, **kwargs):
 
 class ZwaveAeotecSwitch5(ZwaveSwitch):
   def __init__(self, firefly, package, **kwargs):
+    initial_values = INITIAL_VALUES
     if kwargs.get('initial_values') is not None:
-      INITIAL_VALUES.update(kwargs['initial_values'])
+      initial_values_updated = INITIAL_VALUES.copy()
+      initial_values_updated.update(kwargs.get('initial_values'))
+      initial_values = initial_values_updated
+
     kwargs.update({
-      'initial_values': INITIAL_VALUES,
+      'initial_values': initial_values,
       'commands':       COMMANDS,
       'requests':       REQUESTS
     })

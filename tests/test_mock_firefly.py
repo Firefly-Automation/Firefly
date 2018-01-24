@@ -26,7 +26,7 @@ class TestFirefly(unittest.TestCase):
 
 
 class MyTest(unittest.TestCase):
-  @patch('Firefly.core.Firefly')
+  @patch('Firefly.core.core.Firefly')
   def setUp(self, firefly):
     test_firefly = TestFirefly()
     test_firefly.setUp()

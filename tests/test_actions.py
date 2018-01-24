@@ -9,7 +9,7 @@ from Firefly.helpers.conditions import Conditions
 
 
 class TestCheckConditions(unittest.TestCase):
-  @patch('Firefly.core.Firefly', new_callable=PropertyMock)
+  @patch('Firefly.core.core.Firefly', new_callable=PropertyMock)
   def setUp(self, firefly):
     self.firefly = firefly
 

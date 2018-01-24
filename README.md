@@ -2,26 +2,56 @@
 
 ## What is Firefly? 
 
-Firefly is an opensource home automation system. It is light weight and can run off of a rasberryPi. The python based framework allows for easy development of apps and new components. Using this advanced framework Firefly is able to do complex actions in different scenarios.
+Firefly is an open-source home automation system, This system has been a passion of mine for about 5 years now and wll here it is. 
+There is an option (really at this time the only way to make it usable) for cloud based control using Firebase. Before setting up your Firefly system
+you will need to go to [https://my.firefly-home.io](https://my.firefly-home.io) and create an account. Please note that all automation actions are done
+locally on the raspberryPi and the cloud support is for remote control, Alexa, Google Home, and Facebook Messenger support, it is also used for geofence 
+reporting using OwnTracks. 
 
-Actions can be based off of time of day, if the sun is up, who is home, sensor state and anything else you can imagine!
+There has been a full plugin framework developed for Devices, Services, and Automation and soon to come full documentation for how Firefly operates. 
 
-For example my Hue lights fade from an orange to a daylight white either before my alarm goes off, or if its my day off, when the sun comes up. After I wake up the lights and the level of them are based off of a light sensor in each room, if its cloudy the lights are at 100%, if its sunny they are off, or if its partly cloudy they may be at 50%. At sunset the lights start to fade from the daylight white to a soft white and as it get closer to bedtime they go to a candle light. This is only one example of what can be done with Firefly.
+For setup you can just run the setup.sh scrip on your raspberryPi and it will take you though the setup process. To enable cloud support, 
+after setting up your raspberryPi you will need to create a file '/opt/firefly_system/Firefly/dev_config/services.firebase.json' with the 
+email and password used to create your account at mMy.Firefly-Home.io
+```json
+{
+    "username": "email@gmail.com",
+    "password": "mySecurePassword"
+}
+```
 
-Firefly has an open API that makes it easy to integrate with other systems allowing for seamless interactions such as the included ha-bridge functionality. 
+After doing this run:
+```bash 
+sudo service firefly restart
+```
 
-Firefly Home: https://firefly-home.io
+Your new firefly system will register with the server automatically and within minutes you will be able to see it on the website. 
+After doing so you will be able to install enable services and add devices and automation (coming soon)
 
-## Features
-- Google Home Support
-- Alexa Support
-- Hue Support
-- ZWave Support
-- Remote Cloud Access
-- Web based control: https://beta.firefly-home.io
-- Geofencing and iBeacon via OwnTracks
-- OAuth Linking for external services
-- Local API
-- Remote API (In progress)
-- WebApp support for iOS and Android
-- Notifications via Pushover: http://pushover.net
+You can also add automation and services by editing the files in the dev_config folder mentioned above. There are samples of how to do this in the
+sample_config fodler of this repo.
+
+
+## Supported
+- Google Home
+- Amazon Echo / Alexa
+- Facebook Messenger
+- Pushover
+- OwnTracks
+- Hue
+- Lightify
+- Zwave
+- DarkSky
+- Nest
+- Foobot
+
+## Prebuilt Automation
+Look under Firefly/automation in this repo. Each automation should have a README explaining what it does.
+- Routines
+- Door/Motion Lights
+- Window Fan Control
+- Nest Eco Window
+- Door Alert
+
+
+pip install git+https://github.com/vaab/colour

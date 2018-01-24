@@ -6,6 +6,7 @@ from Firefly.const import COMMAND_NOTIFY, SERVICE_NOTIFICATION, TYPE_AUTOMATION,
 from Firefly.helpers.action import Action
 from Firefly.helpers.conditions import Conditions
 from Firefly.helpers.events import Command, Event, Request
+from Firefly.helpers.automation.automation_interface import AutomationInterface
 
 # TODO(zpriddy): These should be in const file
 LABEL_ACTIONS = 'actions'
@@ -14,7 +15,9 @@ LABEL_DELAYS = 'delays'
 LABEL_DEVICES = 'devices'
 LABEL_MESSAGES = 'messages'
 LABEL_TRIGGERS = 'triggers'
-INTERFACE_LABELS = [LABEL_ACTIONS, LABEL_CONDITIONS, LABEL_DELAYS, LABEL_DEVICES, LABEL_MESSAGES, LABEL_TRIGGERS]
+LABEL_TRIGGER_ACTION = 'trigger_actions'
+
+INTERFACE_LABELS = [LABEL_ACTIONS, LABEL_CONDITIONS, LABEL_DELAYS, LABEL_DEVICES, LABEL_MESSAGES, LABEL_TRIGGERS, LABEL_TRIGGER_ACTION]
 
 from typing import Callable, Any
 
@@ -33,6 +36,7 @@ class Automation(object):
     self.metadata = metadata
     self.package = package
     self.triggers = {}
+    self.trigger_actions = {}
 
     # TODO(zpriddy): Should should be a shared function in a lib somewhere.
     # Alias and id functions
@@ -54,18 +58,24 @@ class Automation(object):
     self.id = ff_id
     self.alias = alias if alias else ff_id
 
-    self.build_interfaces()
+
+    self.new_interface = AutomationInterface(firefly, self.id, self.interface)
+    self.new_interface.build_interface()
+
+    #self.build_interfaces()
 
   def event(self, event: Event, **kwargs):
     logging.info('[AUTOMATION] %s - Receiving event: %s' % (self.id, event))
     # Check each triggerList in triggers.
-    for trigger_index, trigger in self.triggers.items():
+    for trigger_index, trigger in self.new_interface.triggers.items():
       if trigger.check_triggers(event):
         # Check if there are conditions with the same index, if so check them.
-        if self.conditions.get(trigger_index) is not None:
-          if not self.conditions[trigger_index].check_conditions(self.firefly):
+        if self.new_interface.conditions.get(trigger_index):
+          if not self.new_interface.conditions.get(trigger_index).check_conditions(self.firefly):
+            logging.info('[AUTOMATION] failed condition checks.')
             continue
         # Call the event handler passing in the trigger_index and return.
+        logging.info('[AUTOMATION] no conditions. executing event handler.')
         return self.event_handler(event, trigger_index, **kwargs)
 
   def request(self, request: Request) -> Any:
@@ -112,7 +122,7 @@ class Automation(object):
     export_data = {
       'alias':     self.alias,  # 'commands':  self.command_map.keys(),
       'ff_id':     self.id,
-      'interface': self.export_interface(),
+      'interface': self.new_interface.export(),
       'metadata':  self.metadata,
       'package':   self.package,
       'type':      self.type
@@ -167,6 +177,8 @@ class Automation(object):
         self.build_devices_interface(interface_data)
       if label == LABEL_MESSAGES:
         self.build_messages_interface(interface_data)
+      if label == LABEL_TRIGGER_ACTION:
+        self.build_trigger_actions_interface(interface_data)
 
   def build_actions_interface(self, interface_data: dict, **kwargs):
     for action_index in interface_data.keys():
@@ -183,6 +195,12 @@ class Automation(object):
         continue
       self.triggers[trigger_index] = Triggers(self.firefly, self.id)
       self.triggers[trigger_index].import_triggers(self.interface.get(LABEL_TRIGGERS).get(trigger_index))
+
+  def build_trigger_actions_interface(self, interface_data: dict, **kwargs):
+    for trigger_action_index in interface_data.keys():
+      if not self.interface.get(LABEL_TRIGGER_ACTION):
+        continue
+      self.trigger_actions[trigger_action_index] = self.interface.get(LABEL_TRIGGER_ACTION).get(trigger_action_index)
 
   def build_conditions_interface(self, interface_data: dict, **kwargs):
     for condition_index in interface_data.keys():
@@ -248,6 +266,12 @@ class Automation(object):
         continue
       interface[LABEL_DEVICES][device_index] = device
 
+    interface[LABEL_TRIGGER_ACTION] = {}
+    for trigger_action_index, trigger_action in self.trigger_actions.items():
+      if trigger_action is None:
+        continue
+      interface[LABEL_TRIGGER_ACTION][trigger_action_index] = trigger_action
+
     return interface
 
   def add_command(self, command: str, function: Callable) -> None:
@@ -261,18 +285,21 @@ class Automation(object):
     self.command_map[command] = function
 
   def execute_actions(self, action_index: str, **kwargs) -> bool:
-    if not self.actions.get(action_index):
+    if not self.new_interface.actions.get(action_index):
       return False
-    for action in self.actions.get(action_index):
+    for action in self.new_interface.actions.get(action_index):
       action.execute_action(self.firefly)
     return True
 
   def send_messages(self, message_index: str, **kwargs) -> bool:
-    if not self.messages.get(message_index):
+    if not self.new_interface.messages.get(message_index):
       return False
-    notify = Command(SERVICE_NOTIFICATION, self.id, COMMAND_NOTIFY, message=self.messages.get(message_index))
+    notify = Command(SERVICE_NOTIFICATION, self.id, COMMAND_NOTIFY, message=self.new_interface.messages.get(message_index))
     self.firefly.send_command(notify)
     return True
+
+  def event_handler(self, event: Event = None, trigger_index="", **kwargs):
+    logging.error('EVENT HANDLER NOT CREATED')
 
   @property
   def type(self):

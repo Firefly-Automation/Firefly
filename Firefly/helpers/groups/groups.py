@@ -3,13 +3,16 @@ from typing import Callable
 from uuid import uuid4
 
 from Firefly import aliases, logging
-from Firefly.const import ACTION_OFF, ACTION_ON, CONTACT, CONTACT_CLOSED, CONTACT_OPEN, EVENT_TYPE_BROADCAST, GROUPS_CONFIG_FILE, LEVEL, MOTION, MOTION_ACTIVE, MOTION_INACTIVE, STATE, SWITCH
+from Firefly.const import ACTION_OFF, ACTION_ON, CONTACT, CONTACT_CLOSED, CONTACT_OPEN, EVENT_TYPE_BROADCAST, GROUPS_CONFIG_FILE, LEVEL, MOTION, MOTION_ACTIVE, MOTION_INACTIVE, STATE, SWITCH, TYPE_DEVICE
 from Firefly.helpers.events import Command, Event, Request
-from Firefly.helpers.metadata import action_on_off_switch, action_motion, action_contact
+from Firefly.helpers.metadata.metadata import action_contact, action_motion, action_on_off_switch
 
 '''
 devices[ff_id] = {tags: [tags], values: {prop: value}}
 '''
+
+TYPE_GROUP = 'group_type_group'
+TYPE_ROOM = 'group_type_room'
 
 TAG_MAP = {
   'switch':   [SWITCH, STATE],
@@ -70,7 +73,7 @@ def export_groups(firefly, config_file=GROUPS_CONFIG_FILE):
     export_data[ff_id] = component.export()
 
   with open(config_file, 'w') as f:
-    json.dump(export_data)
+    json.dump(export_data, f, indent=4, sort_keys=True)
 
 
 def make_group(firefly, alias):
@@ -84,11 +87,24 @@ def make_group(firefly, alias):
   return new_group.id
 
 
+def build_rooms(firefly):
+  for ff_id, component in firefly.components.items():
+    if component.type != TYPE_DEVICE:
+      continue
+    if component.room_id == '':
+      continue
+    if component.room_id not in firefly.components:
+      component.room_id = ''
+      continue
+    firefly.components[component.room_id].add_device(ff_id)
+
+
 class Group(object):
   def __init__(self, firefly, alias, **kwargs):
     self.firefly = firefly
 
     self.device_list = kwargs.get('devices', [])
+    self.group_type = kwargs.get('group_type', TYPE_GROUP)
     self.devices = {}
     self.requests = []
     self.command_mapping = {}
@@ -96,6 +112,10 @@ class Group(object):
     self.metadata = {
       'actions': {}
     }
+
+    # We are going to build up the rooms from the groups in the device config, So for now we just want an empty group.
+    if self.group_type == TYPE_ROOM:
+      self.device_list = []
 
     self.add_request(SWITCH, self.get_switch_switch)
     self.add_action(SWITCH, action_on_off_switch(False, 'Switches'))
@@ -214,8 +234,8 @@ class Group(object):
 
   def export(self, **kwargs):
     export_data = {
-      'ff_id':   self.id,
       'alias':   self.alias,
+      'group_type': self.group_type,
       'devices': list(self.devices.keys())
     }
     return export_data
@@ -225,6 +245,7 @@ class Group(object):
       'ff_id':   self.id,
       'alias':   self.alias,
       'devices': self.devices,
+      'group_type': self.group_type,
       'tags': self.get_all_tags(),
       'metadata': self.metadata
     }

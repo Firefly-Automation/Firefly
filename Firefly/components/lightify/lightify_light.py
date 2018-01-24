@@ -31,10 +31,15 @@ class LightifyLight(LightifyDevice):
     if lightify_object is None:
       return
     self.lightify_object: Light = lightify_object
+
     switch = ACTION_ON if self.lightify_object.on() else ACTION_OFF
     level = self.lightify_object.lum()
+    ct = self.lightify_object.temp()
+    r = self.lightify_object.red()
+    g = self.lightify_object.green()
+    b = self.lightify_object.blue()
 
-    self.update_values(level, switch)
+    self.update_values(level=level, switch=switch, ct=ct, r=r, g=g, b=b)
 
     if self.lightify_object.name() != self._alias:
       self.set_alias(alias=self.lightify_object.name())

@@ -21,7 +21,9 @@ WATTS = 'watts'
 COMMANDS = [ACTION_OFF, ACTION_ON]
 REQUESTS = [SWITCH]
 
-INITIAL_VALUES = {}
+INITIAL_VALUES = {
+  '_state': 'off'
+}
 
 CAPABILITIES = {
   SWITCH: True,
@@ -52,5 +54,6 @@ class ZwaveLevitonSwitch(ZwaveSwitch):
     if node is None:
       return
 
-    if not node.values[self.value_map['Switch']].is_polled:
-      node.values[self.value_map['Switch']].enable_poll()
+    if self.value_map['Switch']:
+      if not node.values[self.value_map['Switch']].is_polled:
+        node.values[self.value_map['Switch']].enable_poll(3)

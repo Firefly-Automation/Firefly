@@ -2,8 +2,8 @@ from openzwave.network import ZWaveNode
 
 from Firefly import logging
 from Firefly.components.zwave.zwave_device import ZwaveDevice
-from Firefly.const import ACTION_OFF, ACTION_ON, ACTION_TOGGLE, ALEXA_OFF, ALEXA_ON, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF, EVENT_ACTION_ON, STATE
-from Firefly.helpers.metadata import metaSwitch
+from Firefly.const import ACTION_OFF, ACTION_ON, ACTION_TOGGLE, DEVICE_TYPE_SWITCH, EVENT_ACTION_OFF, EVENT_ACTION_ON, STATE
+from Firefly.helpers.metadata.metadata import metaSwitch
 
 TITLE = 'Firefly Aeotec SDSC11 Smart Strip'
 DEVICE_TYPE = DEVICE_TYPE_SWITCH

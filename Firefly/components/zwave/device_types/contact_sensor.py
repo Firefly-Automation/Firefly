@@ -62,13 +62,14 @@ class ZwaveContactSensor(ContactSensor, ZwaveDevice):
           self.node.refresh_value(value_id)
       return
 
-    if node.is_ready and node.is_awake and not self.refreshed:
-      for label, value_id in self.value_map.items():
-        logging.info('REFRESHING VALUE %s' % label)
-        self.node.refresh_value(value_id)
-      self.refreshed = True
+    #if node.is_ready and node.is_awake and not self.refreshed:
+    #  for label, value_id in self.value_map.items():
+    #    logging.info('REFRESHING VALUE %s' % label)
+    #    self.node.refresh_value(value_id)
+    #  self.refreshed = True
 
     label = values.label
+    logging.info('[ZWAVE] Value label: %s data: %s' % (label, values.data))
     if label in ['Sensor', 'Battery Level', 'Burglar']:
       self.value_map[label] = values.value_id
       if label == 'Sensor':
@@ -77,5 +78,8 @@ class ZwaveContactSensor(ContactSensor, ZwaveDevice):
         self.update_values(battery=values.data)
       if label == 'Burglar':
         self.update_values(alarm=values.data)
+
+    elif label == 'Basic':
+      self.update_values(contact=(values.data==255))
 
     super().update_from_zwave(node, **kwargs)

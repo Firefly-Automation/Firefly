@@ -4,7 +4,8 @@ from typing import Any, Callable
 from Firefly import aliases, logging
 from Firefly.const import API_ALEXA_VIEW, API_FIREBASE_VIEW, API_INFO_REQUEST, EVENT_TYPE_BROADCAST, TYPE_DEVICE
 from Firefly.helpers.events import Command, Event, Request
-from Firefly.helpers.metadata import EXPORT_UI, FF_ID, HIDDEN_BY_USER
+from Firefly.helpers.metadata import EXPORT_UI, FF_ID, HIDDEN_BY_USER, action_text
+from Firefly.helpers.metadata.settings import settings_alias, settings_device_tags
 
 
 class Device(object):
@@ -25,11 +26,18 @@ class Device(object):
     self._initial_values = kwargs.get('initial_values')
     self._command_mapping = {}
     self._request_mapping = {}
+    self._security_monitoring = kwargs.get('security_monitoring', False)
     self._metadata = {
       'title':   self._title,
       'author':  self._author,
       'package': self._package,
       'actions': {}
+    }
+
+    self._settings = {
+      'values':   {},
+      'metadata': {},
+      'requests': {}
     }
     self._last_command_source = 'none'
     self._last_update_time = self.firefly.location.now
@@ -61,24 +69,68 @@ class Device(object):
     self._homekit_types = {}
 
     self._alexa_export = kwargs.get('alexa_export', True)
-    self._alexa_categories = []
+    self._alexa_categories = kwargs.get('alexa_categories', [])
     self._alexa_capabilities = []
     self._alexa_manufacturer_name = kwargs.get('alexa_manufacturer_name', 'Firefly')
     self._alexa_description = kwargs.get('alexa_description', 'Firefly Home Device')
 
     self._room = kwargs.get('room', '')
+    self.room_id = kwargs.get('room_id', '')
     self._tags = kwargs.get('tags', [])
 
     self.add_command('set_alias', self.set_alias)
     self.add_command('set_room', self.set_room)
     self.add_command('delete', self.delete_device)
 
+    self.add_action('z_last_update', action_text(title='Last Update', request='last_update'))
+    self.add_request('last_update', self.last_update)
+
+    self.add_setting('name', '_alias', 'alias', settings_alias())
+    self.add_setting('tags', '_tags', 'tags', settings_device_tags())
+
     # Set initial values
     for prop, val in self._initial_values.items():
       self.__setattr__(prop, val)
 
+    self._before_state = None
+    self._after_state = None
+
   def __str__(self):
     return '< FIREFLY DEVICE - ID: %s | PACKAGE: %s >' % (self.id, self._package)
+
+  def add_setting(self, setting_index, setting_request, setting_param, setting_metadata):
+    self._settings['metadata'][setting_index] = setting_metadata
+    self._settings['requests'][setting_param] = setting_request
+
+  def get_settings_values(self):
+    for param in list(self._settings['requests'].keys()):
+      self._settings['values'][param] = self.get_setting_value(param)
+
+  def get_setting_value(self, setting_param):
+    return self.__getattribute__(self._settings['requests'][setting_param])
+
+  def get_settings_view(self):
+    self.get_settings_values()
+    return self._settings
+
+  def store_before_state(self, **kwargs):
+    self._before_state = self.get_all_request_values(True, True)
+
+  def store_after_state(self, **kwargs):
+    self._after_state = self.get_all_request_values(True, True)
+
+  def broadcast_change(self, **kwargs):
+    if self._before_state is None:
+      logging.error('before_sate not recorded')
+      return False
+    if self._after_state is None:
+      self.store_after_state()
+
+    self.broadcast_changes(self._before_state, self._after_state)
+
+    self._before_state = None
+    self._after_state = None
+    return True
 
   def set_alias(self, **kwargs):
     new_alias = kwargs.get('alias')
@@ -88,6 +140,8 @@ class Device(object):
     self._alias = aliases.set_alias(self._id, new_alias)
     self._habridge_alias = self._alias
     self._homekit_alias = self._alias
+
+    self.firefly.refresh_firebase()
 
   def set_room(self, **kwargs):
     new_room = kwargs.get('room')
@@ -101,6 +155,9 @@ class Device(object):
     self.firefly.delete_device(self.id)
     return
 
+  def last_update(self):
+    return '%s (%s)' % (self._last_update_time.strftime("%B %d %Y %I:%M:%S %p"), self._last_command_source)
+
   def export(self, current_values: bool = True, api_view: bool = False) -> dict:
     """
     Export ff_id config with options current values to a dictionary.
@@ -112,19 +169,21 @@ class Device(object):
       (dict): A dict of the ff_id config.
     """
     export_data = {
-      'package':                 self._package,
-      'ff_id':                   self.id,
-      'alias':                   self._alias,
-      'type':                    self.type,
-      'homekit_export':          self._homekit_export,
-      'homekit_alias':           self._homekit_alias,
-      'homekit_types':           self._homekit_types,
-      'habridge_export':         self._habridge_export,
-      'habridge_alias':          self._habridge_alias,
-      'export_ui':               self._export_ui,
-      'tags':                    self._tags,
-      'room':                    self._room,
-      'alexa_export':            self._alexa_export
+      'package':             self._package,
+      'ff_id':               self.id,
+      'alias':               self._alias,
+      'type':                self.type,
+      'homekit_export':      self._homekit_export,
+      'homekit_alias':       self._homekit_alias,
+      'homekit_types':       self._homekit_types,
+      'habridge_export':     self._habridge_export,
+      'habridge_alias':      self._habridge_alias,
+      'export_ui':           self._export_ui,
+      'tags':                self._tags,
+      'room':                self._room,
+      'alexa_export':        self._alexa_export,
+      'security_monitoring': self.security,
+      'room_id':             self.room_id
     }
 
     if current_values:
@@ -212,7 +271,8 @@ class Device(object):
     Returns:
       (bool): Command successful.
     """
-    state_before = self.get_all_request_values(True)
+    # state_before = self.get_all_request_values(True, True)
+    self.store_before_state()
     logging.debug('%s: Got Command: %s' % (self.id, command.command))
     if command.command in self.command_map.keys():
       self._last_command_source = command.source
@@ -221,8 +281,10 @@ class Device(object):
         self.command_map[command.command](**command.args)
       except:
         return False
-      state_after = self.get_all_request_values(True)
-      self.broadcast_changes(state_before, state_after)
+      # state_after = self.get_all_request_values(True, True)
+      # self.broadcast_changes(state_before, state_after)
+      self.broadcast_change()
+      # scheduler.runInMCS(5, self.broadcast_change, job_id='%s-b' % self.id, max_instances=1)
       return True
     return False
 
@@ -244,6 +306,7 @@ class Device(object):
     for item, val in after.items():
       if after.get(item) != before.get(item):
         changed[item] = after.get(item)
+    changed['last_update'] = self.last_update()
     logging.debug("Items changed: %s %s" % (str(changed), self))
     broadcast = Event(self.id, EVENT_TYPE_BROADCAST, event_action=changed)
     logging.info(broadcast)
@@ -286,6 +349,7 @@ class Device(object):
     """
     return_data = {}
     return_data.update(self.export(api_view=True))
+    return_data['alexa_view'] = self.get_alexa_view()
     return_data['commands'] = self._commands
     return_data['requests'] = self._requests
     return_data['device_type'] = self._device_type
@@ -320,7 +384,7 @@ class Device(object):
     }
     return return_data
 
-  def get_all_request_values(self, min_data=False, **kwargs) -> dict:
+  def get_all_request_values(self, min_data=False, diff_check=False, **kwargs) -> dict:
     """Function to get all requestable values.
 
     Returns (dict): All requests and values.
@@ -331,6 +395,8 @@ class Device(object):
     """
     request_values = {}
     for r in self._requests:
+      if diff_check and r == 'last_update':
+        continue
       try:
         if not min_data:
           request_values[r] = self.request_map[r]()
@@ -357,9 +423,9 @@ class Device(object):
 
     """
     logging.info("Setting %s to %s" % (key, val))
-    state_before = self.get_all_request_values(True)
+    state_before = self.get_all_request_values(True, True)
     self.__setattr__(key, val)
-    state_after = self.get_all_request_values(True)
+    state_after = self.get_all_request_values(True, True)
     self.broadcast_changes(state_before, state_after)
 
   # TODO: Add runInX functions to devices. These functions have to be similar to member_set and should be able to
@@ -396,3 +462,7 @@ class Device(object):
   @property
   def type(self):
     return TYPE_DEVICE
+
+  @property
+  def security(self):
+    return self._security_monitoring

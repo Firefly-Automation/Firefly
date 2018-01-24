@@ -5,7 +5,7 @@ from Firefly.components.virtual_devices import AUTHOR
 from Firefly.const import (COMMAND_UPDATE, DEVICE_TYPE_THERMOSTAT, LEVEL)
 from Firefly.helpers.action import Command
 from Firefly.helpers.device.device import Device
-from Firefly.helpers.metadata import action_button_group, action_button_object, action_level, action_text
+from Firefly.helpers.metadata.metadata import action_button_group, action_button_object, action_level, action_text
 
 # TODO(zpriddy): Add more delayed setters to help with rate limits.
 
@@ -13,13 +13,14 @@ TITLE = 'Nest Thermostat'
 DEVICE_TYPE = DEVICE_TYPE_THERMOSTAT
 AUTHOR = AUTHOR
 COMMANDS = [COMMAND_UPDATE, LEVEL, 'temperature', 'mode', 'away', 'home']
-REQUESTS = ['temperature', 'humidity', 'mode', 'away', 'target']
+REQUESTS = ['temperature', 'humidity', 'mode', 'away', 'target', 'last_refresh']
 INITIAL_VALUES = {
   '_temperature': -1,
   '_humidity':    -1,
   '_target':      -1,
   '_mode':        'unknown',
-  '_away':        'unknown'
+  '_away':        'unknown',
+  '_last_refresh': -1,
 }
 
 MODE_LIST = ['off', 'eco', 'cool', 'heat', 'heat-cool']
@@ -59,6 +60,8 @@ class Thermostat(Device):
     self.add_request('humidity', self.get_humidity)
     self.add_request('mode', self.get_mode)
     self.add_request('away', self.get_away)
+
+    self.add_request('last_refresh', self.get_last_refresh)
 
     # self.add_action('temperature', metaSlider(min=50, max=90, request_param='target', set_command='temperature', command_param='temperature', title='Target Temperature'))
     self.add_action('current_temperature', action_text(title='Current Temperature', context='Current temperature', request='temperature', primary=True))
@@ -108,6 +111,9 @@ class Thermostat(Device):
   def get_away(self, **kwargs):
     return self.away
 
+  def get_last_refresh(self, **kwargs):
+    return self._last_refresh
+
   def set_away(self, **kwargs):
     '''set_away will set to away by default, if 'away' is in kwargs it will set to the value of 'away'
     '''
@@ -144,6 +150,8 @@ class Thermostat(Device):
 
   def update_thermostat(self, **kwargs):
     thermostat = kwargs.get('thermostat')
+    logging.info('[NEST] updating thermostat: %s' % str(thermostat))
+    self._last_refresh = self.firefly.location.now.timestamp()
     if thermostat is not None:
       self.thermostat = thermostat
 

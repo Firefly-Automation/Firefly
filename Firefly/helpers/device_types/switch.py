@@ -2,9 +2,9 @@ from Firefly import logging
 from Firefly.const import ACTION_OFF, ACTION_ON, COMMAND_SET_LIGHT, DEVICE_TYPE_SWITCH, LEVEL, SWITCH
 from Firefly.helpers.device import *
 from Firefly.helpers.device.device import Device
-from Firefly.helpers.metadata import action_battery, action_dimmer, action_on_off_switch, action_text
+from Firefly.helpers.metadata.metadata import action_battery, action_dimmer, action_on_off_switch, action_text
 
-from Firefly.services.alexa.alexa_const import ALEXA_POWER_INTERFACE, ALEXA_POWER_LEVEL_INTERFACE, ALEXA_SWITCH
+from Firefly.services.alexa.alexa_const import ALEXA_POWER_INTERFACE, ALEXA_POWER_LEVEL_INTERFACE, ALEXA_SWITCH, ALEXA_SMARTPLUG
 
 ALARM = 'alarm'
 POWER_METER = 'power_meter'
@@ -36,6 +36,7 @@ INITIAL_VALUES = {
   '_level':                   -1,
   '_previous_energy_reading': -1,
   '_switch':                  ACTION_OFF,
+  '_state':                   ACTION_OFF,
   '_voltage':                 -1,
   '_watts':                   -1,
   '_min_level':               -1,
@@ -46,15 +47,17 @@ class Switch(Device):
   def __init__(self, firefly, package, title, author, commands=COMMANDS, requests=REQUESTS, device_type=DEVICE_TYPE_SWITCH, capabilities=CAPABILITIES, initial_values=INITIAL_VALUES, **kwargs):
     logging.message('SETTING UP SWITCH')
 
-    INITIAL_VALUES.update(initial_values)
-    initial_values = INITIAL_VALUES
+    initial_values_updated = INITIAL_VALUES.copy()
+    initial_values_updated.update(initial_values)
+    initial_values = initial_values_updated
 
-    CAPABILITIES.update(capabilities)
-    capabilities = CAPABILITIES
+    capabilities_updated = CAPABILITIES.copy()
+    capabilities_updated.update(capabilities)
+    capabilities = capabilities_updated
 
     super().__init__(firefly, package, title, author, commands, requests, device_type, initial_values=initial_values, **kwargs)
 
-    self.add_alexa_categories(ALEXA_SWITCH)
+    self.add_alexa_categories([ALEXA_SWITCH])
     self.add_command(COMMAND_SET_LIGHT, self.set_light)
 
     if capabilities[ALARM] and ALARM in requests:
@@ -98,7 +101,10 @@ class Switch(Device):
 
     self._alexa_export = True
 
-    self.capabilities = CAPABILITIES
+    self.capabilities = capabilities
+
+    # TODO: Use device settings for this
+    self._security_monitoring = kwargs.get('security_monitoring', True)
 
   def update_values(self, alarm=None, battery=None, voltage=None, power_current=None, watts=None, level=None, switch=None, previous_energy_reading=None, current_energy_reading=None, **kwargs):
 
@@ -123,7 +129,7 @@ class Switch(Device):
       else:
         self._switch = switch
 
-    if level is not None:
+    if level is not None and self.capabilities[LEVEL] is True:
       if type(level) is not int:
         self._level = -1
 

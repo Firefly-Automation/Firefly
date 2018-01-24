@@ -46,7 +46,7 @@ class Location(object):
     with open(location_file) as config_file:
       config = json.load(config_file)
       self.location_file = location_file
-      self.modes = config.get('modes', ['home'])
+      self.modes = config.get('modes', ['home', 'away', 'night', 'vacation', 'alarm'])
       self._mode = config.get('mode', 'home')
       self._last_mode = config.get('last_mode', 'home')
       self.address = config.get('address', 'San Fransisco')
@@ -152,6 +152,10 @@ class Location(object):
     logging.info('day event handler - event: {}'.format(day_event))
     event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={
       SOURCE_LOCATION: day_event
+    })
+    self.firefly.send_event(event)
+    event = Event(SOURCE_LOCATION, EVENT_TYPE_BROADCAST, event_action={
+      SOURCE_LOCATION: '%s_system' % day_event
     })
     self.firefly.send_event(event)
     next_day_event_time = self.getNextDayEvent(day_event)

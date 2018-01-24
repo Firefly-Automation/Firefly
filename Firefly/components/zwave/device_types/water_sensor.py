@@ -76,6 +76,6 @@ class ZwaveWaterSensor(WaterSensor, ZwaveDevice):
     if label == 'Battery Level':
       self.update_values(battery=values.data)
       self.value_map[values.label] = values.value_id
-    if label == 'Burglar':
+    if label == 'Flood':
       self.update_values(alarm=values.data)
       self.value_map[values.label] = values.value_id

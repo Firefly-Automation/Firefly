@@ -37,6 +37,8 @@ cd $FIREFLY_BACKUP
 
 cd /opt/firefly_system/Firefly
 git pull
+pip3.6 install -r requirements.txt
+
 
 if [ ! -f $FIREFLY_META/current_version ]; then
     # This is a placeholder and in the future will do checks and stop/update/start firefly

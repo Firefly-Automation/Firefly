@@ -31,3 +31,4 @@ pyrebase
 python-nest>=3
 lightify
 geopy
+colour

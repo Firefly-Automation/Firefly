@@ -61,6 +61,15 @@ class Scheduler(object):
                             max_instances=max_instances, misfire_grace_time=misfire_grace_time,
                             replace_existing=replace)
 
+  def runInMCS(self, delay, function, job_id=None, replace=True, max_instances=3, misfire_grace_time=60, *args, **kwargs):
+    if job_id is None:
+      job_id = str(function)
+    logging.info('runInS job: {}'.format(str(job_id)))
+    run_time = datetime.now() + timedelta(microseconds=delay)
+    self._scheduler.add_job(function, 'date', run_date=run_time, args=args, kwargs=kwargs, id=job_id,
+                            max_instances=max_instances, misfire_grace_time=misfire_grace_time,
+                            replace_existing=replace)
+
   def runInS(self, delay, function, job_id=None, replace=True, max_instances=3, misfire_grace_time=60, *args, **kwargs):
     if job_id is None:
       job_id = str(function)
