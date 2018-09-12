@@ -35,7 +35,7 @@ sample_config fodler of this repo.
 ## Supported
 - Google Home
 - Amazon Echo / Alexa
-- Facebook Messenger
+- Facebook Messenger (broken)
 - Pushover
 - OwnTracks
 - Hue
